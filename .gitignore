@@ -2,6 +2,7 @@
 *.dll
 *.so
 *.dylib
+yaylog
 
 /bin/
 /build/
