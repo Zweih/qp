@@ -2,9 +2,9 @@ package config
 
 import (
 	"fmt"
-	//  "log"
-	//  "time"
-	//  "os"
+	"log"
+	"os"
+	"time"
 
 	"github.com/spf13/pflag"
 )
@@ -14,6 +14,8 @@ type Config struct {
 	ShowHelp         bool
 	ExplicitOnly     bool
 	DependenciesOnly bool
+	DateFilter       time.Time
+	SortBy           string
 }
 
 // reads cli arguments and populates a Config
@@ -22,6 +24,8 @@ func ParseFlags(args []string) Config {
 	var showHelp bool
 	var explicitOnly bool
 	var dependenciesOnly bool
+	var dateFilter string
+	var sortBy string
 
 	// flags
 	// pflag.*VarP specifies a long name, a short name, and a default value
@@ -29,24 +33,43 @@ func ParseFlags(args []string) Config {
 	pflag.BoolVarP(&showHelp, "help", "h", false, "Display help")
 	pflag.BoolVarP(&explicitOnly, "explicit", "e", false, "Show only explicitly installed packages")
 	pflag.BoolVarP(&dependenciesOnly, "dependencies", "d", false, "Show only packages installed as dependencies")
+	pflag.StringVar(&dateFilter, "date", "", "Filter packages installed on a specific date (YYYY-MM-DD)")
+	pflag.StringVar(&sortBy, "sort", "date", "Sort by date or alphabetically")
+
+	var parsedDate time.Time
+
+	if dateFilter != "" {
+		var err error
+		parsedDate, err = time.Parse("2006-01-02", dateFilter)
+		if err != nil {
+			log.Fatalf("Invalid date format: %v\n", err)
+		}
+	}
 
 	// parse the flags in args
-	pflag.CommandLine.Parse(args)
+	if err := pflag.CommandLine.Parse(args); err != nil {
+		fmt.Printf("Error parsing flags: %v\n", err)
+		os.Exit(1)
+	}
 
 	return Config{
 		Count:            count,
 		ShowHelp:         showHelp,
 		ExplicitOnly:     explicitOnly,
 		DependenciesOnly: dependenciesOnly,
+		DateFilter:       parsedDate,
+		SortBy:           sortBy,
 	}
 }
 
-// help message
 func PrintHelp() {
 	fmt.Println(`Usage: yaylog [options]
 
 Options:
   -n, --number <number>   Display the specified number of recent packages (default: 20)
-  -h, --help              Display this help message
-`)
+  -e, --explicit          Show only explicitly installed packages
+  -d, --dependencies      Show only packages installed as dependencies
+      --date <YYYY-MM-DD> Filter packages installed on a specific date
+      --sort <mode>       Sort by date (default) or "alphabetical"
+  -h, --help              Display this help message`)
 }
