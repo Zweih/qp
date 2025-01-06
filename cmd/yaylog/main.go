@@ -40,6 +40,12 @@ func main() {
 		packages = pkgdata.FilterDependencies(packages)
 	}
 
+	if !cfg.DateFilter.IsZero() {
+		packages = pkgdata.FilterByDate(packages, cfg.DateFilter)
+	}
+
+	pkgdata.SortPackages(packages, cfg.SortBy)
+
 	if cfg.Count > 0 && len(packages) > cfg.Count {
 		packages = packages[:cfg.Count]
 	}
