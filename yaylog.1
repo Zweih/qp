@@ -1,29 +1,50 @@
 .\" Man page for yaylog
-.TH yaylog 1 "November 2024" "yaylog 1.0.0" "User Commands"
+.TH yaylog 1 "January 2025" "yaylog 2.0.0" "User Commands"
 .SH NAME
-yaylog \- List recently installed packages on Arch-based systems.
+yaylog \- List and filter recently installed packages on Arch-based systems.
 .SH SYNOPSIS
 .B yaylog
-.RI [ \-n <number> ] [ \-e ] [ \-a ]
+.RI [ \-n <number> ] [ \-e ] [ \-a ] [ \-d ] [ \-\-date <YYYY-MM-DD> ] [ \-\-sort <mode> ] [ \-h ]
 .SH DESCRIPTION
 .B yaylog
-is a CLI utility for Arch and Arch-based Linux distributions to list recently installed packages. It works with any package manager that logs installations to
+is a CLI utility for Arch and Arch-based Linux distributions to list and filter recently installed packages. It works with any package manager that logs installations to
 .B /var/log/pacman.log ,
 including
 .B pacman ,
 .B yay ,
-and others. The utility supports optional filters for explicitly installed packages or dependencies.
+and others.
+
+The utility provides options to filter by explicitly installed packages, dependencies, or installations on a specific date. It also supports sorting results by date or alphabetically.
 
 .SH OPTIONS
 .TP
 .B \-n <number>
-Display the specified number of recent packages (default: 20).
+Display the specified number of recent packages (default: 20). Ignored if
+.B \-a
+is used.
 .TP
 .B \-e
 Show only explicitly installed packages.
 .TP
+.B \-d
+Show only packages installed as dependencies.
+.TP
 .B \-a
-Show all installed packages.
+Show all installed packages, ignoring the
+.B \-n
+option.
+.TP
+.B \-\-date <YYYY-MM-DD>
+Show packages installed on the specified date.
+.TP
+.B \-\-sort <mode>
+Sort results by the specified mode. Available modes:
+.IP
+.B date
+(default): Sort by installation date.
+.IP
+.B alphabetical
+: Sort alphabetically by package name.
 .TP
 .B \-h
 Display help information.
@@ -42,11 +63,31 @@ Show all explicitly installed packages:
 yaylog -ae
 .EE
 .TP
+Show only dependencies installed on a specific date:
+.PP
+.EX
+yaylog -d --date 2024-12-25
+.EE
+.TP
+Show all packages sorted alphabetically:
+.PP
+.EX
+yaylog -a --sort alphabetical
+.EE
+.TP
 Show the 15 most recent explicitly installed packages:
 .PP
 .EX
 yaylog -en 15
 .EE
+
+.SH NOTES
+.B yaylog
+requires the
+.B expac
+utility to function correctly. Ensure
+.B expac
+is installed and properly configured on your system.
 
 .SH AUTHOR
 Written by Fernando Nunez <me@fernandonunez.io>.
@@ -55,3 +96,12 @@ This project is licensed under the MIT License. See the
 .B LICENSE
 file for details.
 
+.SH BUGS
+Report bugs to the GitHub repository:
+.UR https://github.com/zweih/yaylog
+.LI https://github.com/zweih/yaylog
+.UE
+
+.SH SEE ALSO
+.B pacman(8),
+.B expac(1)
