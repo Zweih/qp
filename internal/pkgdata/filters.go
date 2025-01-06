@@ -1,8 +1,9 @@
 package pkgdata
 
+import "time"
+
 // TODO: combine functions to allow for mixed arguments
 
-// filters packages only those listed as FilterExplicit
 func FilterExplicit(pkgs []PackageInfo) []PackageInfo {
 	var explicitPackages []PackageInfo
 
@@ -15,7 +16,6 @@ func FilterExplicit(pkgs []PackageInfo) []PackageInfo {
 	return explicitPackages
 }
 
-// filters packages only listed as dependencies
 func FilterDependencies(pkgs []PackageInfo) []PackageInfo {
 	var dependencyPackages []PackageInfo
 
@@ -26,4 +26,17 @@ func FilterDependencies(pkgs []PackageInfo) []PackageInfo {
 	}
 
 	return dependencyPackages
+}
+
+// filters packages installed on specific date
+func FilterByDate(pkgs []PackageInfo, date time.Time) []PackageInfo {
+	var filteredPackages []PackageInfo
+
+	for _, pkg := range pkgs {
+		if pkg.Timestamp.Year() == date.Year() && pkg.Timestamp.YearDay() == date.YearDay() {
+			filteredPackages = append(filteredPackages, pkg)
+		}
+	}
+
+	return filteredPackages
 }
