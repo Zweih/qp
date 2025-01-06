@@ -61,6 +61,7 @@ func ParseFlags(args []string) Config {
 
 	return Config{
 		Count:            count,
+		AllPackages:      allPackages,
 		ShowHelp:         showHelp,
 		ExplicitOnly:     explicitOnly,
 		DependenciesOnly: dependenciesOnly,
