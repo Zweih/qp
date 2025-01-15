@@ -47,7 +47,8 @@ func main() {
 	pkgdata.SortPackages(packages, cfg.SortBy)
 
 	if cfg.Count > 0 && !cfg.AllPackages && len(packages) > cfg.Count {
-		packages = packages[:cfg.Count]
+		cutoffIdx := len(packages) - cfg.Count
+		packages = packages[cutoffIdx:]
 	}
 
 	display.PrintTable(packages)

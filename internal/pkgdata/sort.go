@@ -11,7 +11,7 @@ func SortPackages(pkgs []PackageInfo, sortBy string) {
 
 	default: // date is the default sort
 		sort.Slice(pkgs, func(i, j int) bool {
-			return pkgs[i].Timestamp.After(pkgs[j].Timestamp)
+			return pkgs[i].Timestamp.Before(pkgs[j].Timestamp)
 		})
 	}
 }
