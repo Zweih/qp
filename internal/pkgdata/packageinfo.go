@@ -7,4 +7,5 @@ type PackageInfo struct {
 	Timestamp time.Time
 	Name      string
 	Reason    string // "explicit" or "dependency"
+	Size      int64  // package size in bytes
 }

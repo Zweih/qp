@@ -37,7 +37,7 @@ func ParseFlags(args []string) Config {
 	pflag.BoolVarP(&explicitOnly, "explicit", "e", false, "Show only explicitly installed packages")
 	pflag.BoolVarP(&dependenciesOnly, "dependencies", "d", false, "Show only packages installed as dependencies")
 	pflag.StringVar(&dateFilter, "date", "", "Filter packages installed on a specific date (YYYY-MM-DD)")
-	pflag.StringVar(&sortBy, "sort", "date", "Sort by date or alphabetically")
+	pflag.StringVar(&sortBy, "sort", "date", "Sort by date/alphabetical/size")
 
 	if allPackages {
 		count = 0
@@ -79,6 +79,6 @@ Options:
   -e, --explicit          Show only explicitly installed packages
   -d, --dependencies      Show only packages installed as dependencies
       --date <YYYY-MM-DD> Filter packages installed on a specific date
-      --sort <mode>       Sort by date (default) or "alphabetical"
+      --sort <mode>       Sort by date (default) or "alphabetical" or "size"
   -h, --help              Display this help message`)
 }

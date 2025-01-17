@@ -4,13 +4,14 @@ import (
 	"bufio"
 	"fmt"
 	"os/exec"
+	"strconv"
 	"strings"
 	"time"
 )
 
 func FetchPackages() ([]PackageInfo, error) {
 	// expac queries Arch Linux + Arch-based package DBs
-	cmd := exec.Command("expac", "--timefmt=%Y-%m-%d %T", "%l\t%n\t%w")
+	cmd := exec.Command("expac", "--timefmt=%Y-%m-%d %T", "%l\t%n\t%w\t%m")
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		return nil, fmt.Errorf("error starting command: %w", err)
@@ -28,20 +29,26 @@ func FetchPackages() ([]PackageInfo, error) {
 		fields := strings.Split(line, "\t")
 
 		// check for correct field format, skip if not
-		if len(fields) != 3 {
+		if len(fields) != 4 {
 			continue
 		}
 
-		timestampStr, name, reason := fields[0], fields[1], fields[2]
+		timestampStr, name, reason, sizeStr := fields[0], fields[1], fields[2], fields[3]
 		timestamp, err := time.Parse("2006-01-02 15:04:05", timestampStr)
 		if err != nil {
 			continue
+		}
+
+		size, err := strconv.ParseInt(sizeStr, 10, 64)
+		if err != nil {
+			size = 0
 		}
 
 		packages = append(packages, PackageInfo{
 			Timestamp: timestamp,
 			Name:      name,
 			Reason:    reason,
+			Size:      size,
 		})
 	}
 
