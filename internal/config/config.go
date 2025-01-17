@@ -79,6 +79,6 @@ Options:
   -e, --explicit          Show only explicitly installed packages
   -d, --dependencies      Show only packages installed as dependencies
       --date <YYYY-MM-DD> Filter packages installed on a specific date
-      --sort <mode>       Sort by date (default) or "alphabetical" or "size"
+      --sort <mode>       Sort by date (default) or "alphabetical" or "size:asc"/"size:desc"
   -h, --help              Display this help message`)
 }
