@@ -9,7 +9,6 @@ import (
 )
 
 func main() {
-	// parse cli args (excluding the program name itself: os.Args[0])
 	cfg := config.ParseFlags(os.Args[1:])
 
 	// on -h or --help: print help and exit
@@ -18,11 +17,8 @@ func main() {
 		return
 	}
 
-	// fetch mock package data
 	packages, err := pkgdata.FetchPackages()
 	if err != nil {
-		// if something went wrong in fetching, log it and exit
-
 		fmt.Printf("Error fetching packages: %v\n", err)
 		os.Exit(1)
 	}
@@ -32,18 +28,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	if cfg.ExplicitOnly {
-		packages = pkgdata.FilterExplicit(packages)
-	}
-
-	if cfg.DependenciesOnly {
-		packages = pkgdata.FilterDependencies(packages)
-	}
-
-	if !cfg.DateFilter.IsZero() {
-		packages = pkgdata.FilterByDate(packages, cfg.DateFilter)
-	}
-
+	packages = pkgdata.ConcurrentFilters(packages, cfg.DateFilter, cfg.ExplicitOnly, cfg.DependenciesOnly)
 	pkgdata.SortPackages(packages, cfg.SortBy)
 
 	if cfg.Count > 0 && !cfg.AllPackages && len(packages) > cfg.Count {

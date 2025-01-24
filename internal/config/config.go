@@ -39,6 +39,11 @@ func ParseFlags(args []string) Config {
 	pflag.StringVar(&dateFilter, "date", "", "Filter packages installed on a specific date (YYYY-MM-DD)")
 	pflag.StringVar(&sortBy, "sort", "date", "Sort by date/alphabetical/size")
 
+	if err := pflag.CommandLine.Parse(args); err != nil {
+		fmt.Printf("Error parsing flags: %v\n", err)
+		os.Exit(1)
+	}
+
 	if allPackages {
 		count = 0
 	}
@@ -51,12 +56,6 @@ func ParseFlags(args []string) Config {
 		if err != nil {
 			log.Fatalf("Invalid date format: %v\n", err)
 		}
-	}
-
-	// parse the flags in args
-	if err := pflag.CommandLine.Parse(args); err != nil {
-		fmt.Printf("Error parsing flags: %v\n", err)
-		os.Exit(1)
 	}
 
 	return Config{
