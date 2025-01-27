@@ -27,6 +27,7 @@ because yay is my preferred aur helper and the name has a good flow.
 - list possibly or confirmed stale/abandoned packages
 - ~~sort by size on disk~~ COMPLETE
 - dependency graph
+- ~~concurrent filtering~~ COMPLETE
 
 
 ## installation
