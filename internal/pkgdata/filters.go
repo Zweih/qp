@@ -1,6 +1,7 @@
 package pkgdata
 
 import (
+	"fmt"
 	"sync"
 	"time"
 	"yaylog/internal/config"
@@ -9,6 +10,13 @@ import (
 type FilterCondition struct {
 	Condition bool
 	Filter    func([]PackageInfo) []PackageInfo
+	PhaseName string
+}
+
+type ProgressMessage struct {
+	Phase       string
+	Progress    int
+	Description string
 }
 
 func FilterExplicit(pkgs []PackageInfo) []PackageInfo {
@@ -103,43 +111,72 @@ func applyConcurrentFilter(packages []PackageInfo, filterFunc func([]PackageInfo
 
 func ConcurrentFilters(
 	packages []PackageInfo,
+	progressChan chan ProgressMessage,
 	dateFilter time.Time,
 	sizeFilter config.SizeFilter,
 	explicitOnly bool,
 	dependenciesOnly bool,
 ) []PackageInfo {
-	type FilterCondition struct {
-		Condition bool
-		Filter    func([]PackageInfo) []PackageInfo
-	}
-
 	filters := []FilterCondition{
 		{
 			Condition: explicitOnly,
 			Filter:    FilterExplicit,
+			PhaseName: "filtering by explicit packages",
 		},
 		{
 			Condition: dependenciesOnly,
 			Filter:    FilterDependencies,
+			PhaseName: "filtering by dependencies",
 		},
 		{
 			Condition: !dateFilter.IsZero(),
 			Filter: func(pkgs []PackageInfo) []PackageInfo {
 				return FilterByDate(pkgs, dateFilter)
 			},
+			PhaseName: "filtering by date",
 		},
 		{
 			Condition: sizeFilter.IsFilter,
 			Filter: func(pkgs []PackageInfo) []PackageInfo {
 				return FilterBySize(pkgs, sizeFilter.Operator, sizeFilter.SizeInBytes)
 			},
+			PhaseName: "filtering by size",
 		},
 	}
 
+	totalFilters := 0
+
 	for _, f := range filters {
 		if f.Condition {
-			packages = applyConcurrentFilter(packages, f.Filter)
+			totalFilters++
 		}
+	}
+
+	filtersApplied := 0
+
+	for _, f := range filters {
+		if f.Condition {
+			progressChan <- ProgressMessage{
+				Phase:       f.PhaseName,
+				Progress:    (filtersApplied * 100) / totalFilters,
+				Description: fmt.Sprintf("Starting %s...", f.PhaseName),
+			}
+
+			packages = applyConcurrentFilter(packages, f.Filter)
+			filtersApplied++
+
+			progressChan <- ProgressMessage{
+				Phase:       f.PhaseName,
+				Progress:    (filtersApplied * 100) / totalFilters,
+				Description: fmt.Sprintf("%s completed", f.PhaseName),
+			}
+		}
+	}
+
+	progressChan <- ProgressMessage{
+		Phase:       "Filtering complete",
+		Progress:    100,
+		Description: "All filtering completed",
 	}
 
 	return packages
