@@ -52,6 +52,21 @@ Sort results by the specified mode. Available modes:
 .B size:desc
 : Sort by size, in descending order.
 .TP
+.B \-\-size <filter>
+Filter results by size. Specify a comparison operator and size, such as:
+.IP
+.B >10MB
+: Show packages larger than 10MB.
+.IP
+.B <500KB
+: Show packages smaller than 500KB.
+.IP
+Size units can be specified as B (bytes), KB, MB, or GB. Filtering by size does not automatically sort the results; use
+.B \-\-sort size:asc
+or
+.B \-\-sort size:desc
+to explicitly sort by size if desired.
+.TP
 .B \-h
 Display help information.
 

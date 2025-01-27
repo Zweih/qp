@@ -3,6 +3,7 @@ package pkgdata
 import (
 	"sync"
 	"time"
+	"yaylog/internal/config"
 )
 
 type FilterCondition struct {
@@ -47,6 +48,25 @@ func FilterByDate(pkgs []PackageInfo, date time.Time) []PackageInfo {
 	return filteredPackages
 }
 
+func FilterBySize(pkgs []PackageInfo, operator string, sizeInBytes int64) []PackageInfo {
+	var filteredPackages []PackageInfo
+
+	for _, pkg := range pkgs {
+		switch operator {
+		case ">":
+			if pkg.Size > sizeInBytes {
+				filteredPackages = append(filteredPackages, pkg)
+			}
+		case "<":
+			if pkg.Size < sizeInBytes {
+				filteredPackages = append(filteredPackages, pkg)
+			}
+		}
+	}
+
+	return filteredPackages
+}
+
 func applyConcurrentFilter(packages []PackageInfo, filterFunc func([]PackageInfo) []PackageInfo) []PackageInfo {
 	const chunkSize = 100
 
@@ -81,7 +101,13 @@ func applyConcurrentFilter(packages []PackageInfo, filterFunc func([]PackageInfo
 	return filteredPackages
 }
 
-func ConcurrentFilters(packages []PackageInfo, dateFilter time.Time, explicitOnly bool, dependenciesOnly bool) []PackageInfo {
+func ConcurrentFilters(
+	packages []PackageInfo,
+	dateFilter time.Time,
+	sizeFilter config.SizeFilter,
+	explicitOnly bool,
+	dependenciesOnly bool,
+) []PackageInfo {
 	type FilterCondition struct {
 		Condition bool
 		Filter    func([]PackageInfo) []PackageInfo
@@ -100,6 +126,12 @@ func ConcurrentFilters(packages []PackageInfo, dateFilter time.Time, explicitOnl
 			Condition: !dateFilter.IsZero(),
 			Filter: func(pkgs []PackageInfo) []PackageInfo {
 				return FilterByDate(pkgs, dateFilter)
+			},
+		},
+		{
+			Condition: sizeFilter.IsFilter,
+			Filter: func(pkgs []PackageInfo) []PackageInfo {
+				return FilterBySize(pkgs, sizeFilter.Operator, sizeFilter.SizeInBytes)
 			},
 		},
 	}

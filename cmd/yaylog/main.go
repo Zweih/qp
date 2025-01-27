@@ -28,7 +28,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	packages = pkgdata.ConcurrentFilters(packages, cfg.DateFilter, cfg.ExplicitOnly, cfg.DependenciesOnly)
+	packages = pkgdata.ConcurrentFilters(packages, cfg.DateFilter, cfg.SizeFilter, cfg.ExplicitOnly, cfg.DependenciesOnly)
 	pkgdata.SortPackages(packages, cfg.SortBy)
 
 	if cfg.Count > 0 && !cfg.AllPackages && len(packages) > cfg.Count {
