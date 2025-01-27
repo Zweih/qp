@@ -10,30 +10,19 @@ import (
 	"golang.org/x/term"
 )
 
-func startProgressListener(isInteractive bool, progressChan chan pkgdata.ProgressMessage) {
-	if isInteractive {
-		go func() {
-			for msg := range progressChan {
-				fmt.Printf("\r%-80s", fmt.Sprintf("[%s] %d%% - %s", msg.Phase, msg.Progress, msg.Description))
-			}
-		}()
-	} else {
-		go func() {
-			for range progressChan {
-				// discard messages in non-tty
-			}
-		}()
+func parseConfig() config.Config {
+	cfg := config.ParseFlags(os.Args[1:])
+
+	if cfg.ShowHelp {
+		config.PrintHelp()
+		os.Exit(0)
 	}
+
+	return cfg
 }
 
 func main() {
-	cfg := config.ParseFlags(os.Args[1:])
-
-	// on -h or --help: print help and exit
-	if cfg.ShowHelp {
-		config.PrintHelp()
-		return
-	}
+	cfg := parseConfig()
 
 	packages, err := pkgdata.FetchPackages()
 	if err != nil {
@@ -46,13 +35,58 @@ func main() {
 		os.Exit(1)
 	}
 
-	progressChan := make(chan pkgdata.ProgressMessage)
 	isInteractive := term.IsTerminal(int(os.Stdout.Fd()))
-	startProgressListener(isInteractive, progressChan)
-	packages = pkgdata.ConcurrentFilters(packages, progressChan, cfg.DateFilter, cfg.SizeFilter, cfg.ExplicitOnly, cfg.DependenciesOnly)
-	close(progressChan)
+	var progressChan chan pkgdata.ProgressMessage
 
 	if isInteractive {
+		progressChan = make(chan pkgdata.ProgressMessage)
+
+		go func() {
+			for msg := range progressChan {
+				fmt.Printf("\r%-80s", fmt.Sprintf("[%s] %d%% - %s", msg.Phase, msg.Progress, msg.Description))
+			}
+		}()
+	}
+
+	filters := []pkgdata.FilterCondition{
+		{
+			Condition: cfg.ExplicitOnly,
+			Filter:    pkgdata.FilterExplicit,
+			PhaseName: "Filtering explicit packages",
+		},
+		{
+			Condition: cfg.DependenciesOnly,
+			Filter:    pkgdata.FilterDependencies,
+			PhaseName: "Filtering dependencies",
+		},
+		{
+			Condition: !cfg.DateFilter.IsZero(),
+			Filter: func(pkgs []pkgdata.PackageInfo) []pkgdata.PackageInfo {
+				return pkgdata.FilterByDate(pkgs, cfg.DateFilter)
+			},
+			PhaseName: "Filtering by date",
+		},
+		{
+			Condition: cfg.SizeFilter.IsFilter,
+			Filter: func(pkgs []pkgdata.PackageInfo) []pkgdata.PackageInfo {
+				return pkgdata.FilterBySize(pkgs, cfg.SizeFilter.Operator, cfg.SizeFilter.SizeInBytes)
+			},
+			PhaseName: "Filtering by size",
+		},
+	}
+
+	packages = pkgdata.ApplyFilters(packages, filters, func(current, total int, phase string) {
+		if progressChan != nil {
+			progressChan <- pkgdata.ProgressMessage{
+				Phase:       phase,
+				Progress:    (current * 100) / total,
+				Description: "Filtering in progress...",
+			}
+		}
+	})
+
+	if isInteractive {
+		close(progressChan)
 		fmt.Println()
 	}
 

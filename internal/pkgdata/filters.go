@@ -1,23 +1,19 @@
 package pkgdata
 
 import (
-	"fmt"
 	"sync"
 	"time"
-	"yaylog/internal/config"
 )
+
+type Filter func([]PackageInfo) []PackageInfo
 
 type FilterCondition struct {
 	Condition bool
-	Filter    func([]PackageInfo) []PackageInfo
+	Filter    Filter
 	PhaseName string
 }
 
-type ProgressMessage struct {
-	Phase       string
-	Progress    int
-	Description string
-}
+type ProgressReporter func(current, total int, phase string)
 
 func FilterExplicit(pkgs []PackageInfo) []PackageInfo {
 	var explicitPackages []PackageInfo
@@ -75,7 +71,7 @@ func FilterBySize(pkgs []PackageInfo, operator string, sizeInBytes int64) []Pack
 	return filteredPackages
 }
 
-func applyConcurrentFilter(packages []PackageInfo, filterFunc func([]PackageInfo) []PackageInfo) []PackageInfo {
+func applyConcurrentFilter(packages []PackageInfo, filterFunc Filter) []PackageInfo {
 	const chunkSize = 100
 
 	var mu sync.Mutex
@@ -109,75 +105,32 @@ func applyConcurrentFilter(packages []PackageInfo, filterFunc func([]PackageInfo
 	return filteredPackages
 }
 
-func ConcurrentFilters(
-	packages []PackageInfo,
-	progressChan chan ProgressMessage,
-	dateFilter time.Time,
-	sizeFilter config.SizeFilter,
-	explicitOnly bool,
-	dependenciesOnly bool,
+func ApplyFilters(
+	pkgs []PackageInfo,
+	filters []FilterCondition,
+	reportProgress ProgressReporter,
 ) []PackageInfo {
-	filters := []FilterCondition{
-		{
-			Condition: explicitOnly,
-			Filter:    FilterExplicit,
-			PhaseName: "filtering by explicit packages",
-		},
-		{
-			Condition: dependenciesOnly,
-			Filter:    FilterDependencies,
-			PhaseName: "filtering by dependencies",
-		},
-		{
-			Condition: !dateFilter.IsZero(),
-			Filter: func(pkgs []PackageInfo) []PackageInfo {
-				return FilterByDate(pkgs, dateFilter)
-			},
-			PhaseName: "filtering by date",
-		},
-		{
-			Condition: sizeFilter.IsFilter,
-			Filter: func(pkgs []PackageInfo) []PackageInfo {
-				return FilterBySize(pkgs, sizeFilter.Operator, sizeFilter.SizeInBytes)
-			},
-			PhaseName: "filtering by size",
-		},
-	}
-
-	totalFilters := 0
+	totalFilters := len(filters)
+	currentFilter := 0
 
 	for _, f := range filters {
 		if f.Condition {
-			totalFilters++
-		}
-	}
-
-	filtersApplied := 0
-
-	for _, f := range filters {
-		if f.Condition {
-			progressChan <- ProgressMessage{
-				Phase:       f.PhaseName,
-				Progress:    (filtersApplied * 100) / totalFilters,
-				Description: fmt.Sprintf("Starting %s...", f.PhaseName),
+			if reportProgress != nil {
+				reportProgress(currentFilter, totalFilters, f.PhaseName)
 			}
 
-			packages = applyConcurrentFilter(packages, f.Filter)
-			filtersApplied++
+			pkgs = applyConcurrentFilter(pkgs, f.Filter)
 
-			progressChan <- ProgressMessage{
-				Phase:       f.PhaseName,
-				Progress:    (filtersApplied * 100) / totalFilters,
-				Description: fmt.Sprintf("%s completed", f.PhaseName),
+			if reportProgress != nil {
+				currentFilter++
+				reportProgress(currentFilter, totalFilters, f.PhaseName)
 			}
 		}
 	}
 
-	progressChan <- ProgressMessage{
-		Phase:       "Filtering complete",
-		Progress:    100,
-		Description: "All filtering completed",
+	if reportProgress != nil {
+		reportProgress(totalFilters, totalFilters, "All filters completed")
 	}
 
-	return packages
+	return pkgs
 }
