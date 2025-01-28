@@ -21,21 +21,24 @@ func parseConfig() config.Config {
 	return cfg
 }
 
-func main() {
-	cfg := parseConfig()
-
+func fetchPackages() []pkgdata.PackageInfo {
 	packages, err := pkgdata.FetchPackages()
 	if err != nil {
 		fmt.Printf("Error fetching packages: %v\n", err)
 		os.Exit(1)
 	}
 
+	return packages
+}
+
+func validateConfig(cfg config.Config) {
 	if cfg.ExplicitOnly && cfg.DependenciesOnly {
 		fmt.Println("Error: Cannot use both --explicit and --dependencies at the same time.")
 		os.Exit(1)
 	}
+}
 
-	isInteractive := term.IsTerminal(int(os.Stdout.Fd()))
+func applyFilters(cfg config.Config, packages []pkgdata.PackageInfo, isInteractive bool) []pkgdata.PackageInfo {
 	var progressChan chan pkgdata.ProgressMessage
 
 	if isInteractive {
@@ -75,7 +78,7 @@ func main() {
 		},
 	}
 
-	packages = pkgdata.ApplyFilters(packages, filters, func(current, total int, phase string) {
+	packages = pkgdata.ApplyFilters(packages, filters, func(current int, total int, phase string) {
 		if progressChan != nil {
 			progressChan <- pkgdata.ProgressMessage{
 				Phase:       phase,
@@ -85,11 +88,22 @@ func main() {
 		}
 	})
 
-	if isInteractive {
+	if progressChan != nil {
 		close(progressChan)
 		fmt.Println()
 	}
 
+	return packages
+}
+
+func main() {
+	cfg := parseConfig()
+	packages := fetchPackages()
+
+	validateConfig(cfg)
+
+	isInteractive := term.IsTerminal(int(os.Stdout.Fd()))
+	packages = applyFilters(cfg, packages, isInteractive)
 	pkgdata.SortPackages(packages, cfg.SortBy)
 
 	if cfg.Count > 0 && !cfg.AllPackages && len(packages) > cfg.Count {
