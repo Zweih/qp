@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"strings"
+	"sync"
 	"yaylog/internal/config"
+	"yaylog/internal/display"
 	"yaylog/internal/pkgdata"
 )
 
@@ -17,6 +18,7 @@ type PipelinePhase struct {
 	Name          string
 	Operation     func(cfg config.Config, packages []PackageInfo, progressReporter ProgressReporter) []PackageInfo
 	IsInteractive bool
+	wg            *sync.WaitGroup
 }
 
 func (phase PipelinePhase) Run(cfg config.Config, packages []PackageInfo) []PackageInfo {
@@ -47,7 +49,12 @@ func (phase PipelinePhase) startProgress() chan ProgressMessage {
 	}
 
 	progressChan := make(chan ProgressMessage)
-	go phase.displayProgress(progressChan)
+	phase.wg.Add(1)
+
+	go func() {
+		defer phase.wg.Done()
+		phase.displayProgress(progressChan)
+	}()
 
 	return progressChan
 }
@@ -55,18 +62,15 @@ func (phase PipelinePhase) startProgress() chan ProgressMessage {
 func (phase PipelinePhase) stopProgress(progressChan chan ProgressMessage) {
 	if progressChan != nil {
 		close(progressChan)
+		phase.wg.Wait()
+		display.Manager.ClearProgress()
 	}
 }
 
 func (phase PipelinePhase) displayProgress(progressChan chan ProgressMessage) {
 	for msg := range progressChan {
-		fmt.Print("\r" + strings.Repeat(" ", 80) + "\r")
-		progressMessageText := fmt.Sprintf("[%s] %d%% - %s", msg.Phase, msg.Progress, msg.Description)
-		fmt.Printf("%-80s", progressMessageText)
-
-		if msg.Progress == 100 {
-			// extra clear when done
-			fmt.Print("\r" + strings.Repeat(" ", 80) + "\r")
-		}
+		display.Manager.PrintProgress(msg.Phase, msg.Progress, msg.Description)
 	}
+
+	display.Manager.ClearProgress()
 }

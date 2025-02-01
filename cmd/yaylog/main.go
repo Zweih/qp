@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
-	"strings"
+	"sync"
 	"yaylog/internal/config"
 	"yaylog/internal/display"
 	"yaylog/internal/pkgdata"
@@ -18,10 +18,11 @@ func main() {
 	validateConfig(cfg)
 
 	isInteractive := term.IsTerminal(int(os.Stdout.Fd()))
+	var wg sync.WaitGroup
 
 	pipeline := []PipelinePhase{
-		{"Filtering", applyFilters, isInteractive},
-		{"Sorting", sortPackages, isInteractive},
+		{"Filtering", applyFilters, isInteractive, &wg},
+		{"Sorting", sortPackages, isInteractive, &wg},
 	}
 
 	for _, phase := range pipeline {
@@ -38,8 +39,7 @@ func main() {
 		packages = packages[cutoffIdx:]
 	}
 
-	fmt.Print("\r" + strings.Repeat(" ", 80) + "\r")
-	display.PrintTable(packages)
+	display.Manager.PrintTable(packages)
 }
 
 func parseConfig() config.Config {
