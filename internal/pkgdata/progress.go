@@ -5,3 +5,5 @@ type ProgressMessage struct {
 	Progress    int
 	Description string
 }
+
+type ProgressReporter func(current int, total int, phase string)

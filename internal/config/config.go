@@ -18,6 +18,7 @@ const (
 	GB = MB * MB
 )
 
+// TODO: make this more readable
 func ParseSizeFilter(input string) (operator string, sizeInBytes int64, err error) {
 	re := regexp.MustCompile(`(?i)^(<|>)?(\d+(?:\.\d+)?)(KB|MB|GB|B)?$`)
 	matches := re.FindStringSubmatch(input)
@@ -85,7 +86,7 @@ func ParseFlags(args []string) Config {
 	var sizeFilter string
 	var sortBy string
 
-	// pflag.*VarP specifies a long flag, a short flag, and a default value
+	// TODO: make this more readable
 	pflag.IntVarP(&count, "number", "n", 20, "Number of packages to show")
 	pflag.BoolVarP(&allPackages, "all", "a", false, "Show all packages (ignores -n)")
 	pflag.BoolVarP(&showHelp, "help", "h", false, "Display help")

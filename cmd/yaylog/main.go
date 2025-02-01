@@ -3,12 +3,44 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 	"yaylog/internal/config"
 	"yaylog/internal/display"
 	"yaylog/internal/pkgdata"
 
 	"golang.org/x/term"
 )
+
+func main() {
+	cfg := parseConfig()
+	packages := fetchPackages()
+
+	validateConfig(cfg)
+
+	isInteractive := term.IsTerminal(int(os.Stdout.Fd()))
+
+	pipeline := []PipelinePhase{
+		{"Filtering", applyFilters, isInteractive},
+		{"Sorting", sortPackages, isInteractive},
+	}
+
+	for _, phase := range pipeline {
+		packages = phase.Run(cfg, packages)
+
+		if len(packages) == 0 {
+			fmt.Println("\nNo packages remain after filtering.")
+			return
+		}
+	}
+
+	if cfg.Count > 0 && !cfg.AllPackages && len(packages) > cfg.Count {
+		cutoffIdx := len(packages) - cfg.Count
+		packages = packages[cutoffIdx:]
+	}
+
+	fmt.Print("\r" + strings.Repeat(" ", 80) + "\r")
+	display.PrintTable(packages)
+}
 
 func parseConfig() config.Config {
 	cfg := config.ParseFlags(os.Args[1:])
@@ -38,19 +70,11 @@ func validateConfig(cfg config.Config) {
 	}
 }
 
-func applyFilters(cfg config.Config, packages []pkgdata.PackageInfo, isInteractive bool) []pkgdata.PackageInfo {
-	var progressChan chan pkgdata.ProgressMessage
-
-	if isInteractive {
-		progressChan = make(chan pkgdata.ProgressMessage)
-
-		go func() {
-			for msg := range progressChan {
-				fmt.Printf("\r%-80s", fmt.Sprintf("[%s] %d%% - %s", msg.Phase, msg.Progress, msg.Description))
-			}
-		}()
-	}
-
+func applyFilters(
+	cfg config.Config,
+	packages []pkgdata.PackageInfo,
+	reportProgress pkgdata.ProgressReporter,
+) []pkgdata.PackageInfo {
 	filters := []pkgdata.FilterCondition{
 		{
 			Condition: cfg.ExplicitOnly,
@@ -78,38 +102,13 @@ func applyFilters(cfg config.Config, packages []pkgdata.PackageInfo, isInteracti
 		},
 	}
 
-	packages = pkgdata.ApplyFilters(packages, filters, func(current int, total int, phase string) {
-		if progressChan != nil {
-			progressChan <- pkgdata.ProgressMessage{
-				Phase:       phase,
-				Progress:    (current * 100) / total,
-				Description: "Filtering in progress...",
-			}
-		}
-	})
-
-	if progressChan != nil {
-		close(progressChan)
-		fmt.Println()
-	}
-
-	return packages
+	return pkgdata.ApplyFilters(packages, filters, reportProgress)
 }
 
-func main() {
-	cfg := parseConfig()
-	packages := fetchPackages()
-
-	validateConfig(cfg)
-
-	isInteractive := term.IsTerminal(int(os.Stdout.Fd()))
-	packages = applyFilters(cfg, packages, isInteractive)
-	pkgdata.SortPackages(packages, cfg.SortBy)
-
-	if cfg.Count > 0 && !cfg.AllPackages && len(packages) > cfg.Count {
-		cutoffIdx := len(packages) - cfg.Count
-		packages = packages[cutoffIdx:]
-	}
-
-	display.PrintTable(packages)
+func sortPackages(
+	cfg config.Config,
+	packages []pkgdata.PackageInfo,
+	reportProgress pkgdata.ProgressReporter,
+) []pkgdata.PackageInfo {
+	return pkgdata.SortPackages(packages, cfg.SortBy, reportProgress)
 }

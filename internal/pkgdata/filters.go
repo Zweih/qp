@@ -13,8 +13,6 @@ type FilterCondition struct {
 	PhaseName string
 }
 
-type ProgressReporter func(current int, total int, phase string)
-
 func FilterExplicit(pkgs []PackageInfo) []PackageInfo {
 	var explicitPackages []PackageInfo
 

@@ -30,6 +30,7 @@ func FetchPackages() ([]PackageInfo, error) {
 
 		// check for correct field format, skip if not
 		if len(fields) != 4 {
+			fmt.Printf("Skipping malformed line: %q\n", line) // Debugging output
 			continue
 		}
 
