@@ -6,7 +6,7 @@ import (
 	"sync"
 )
 
-const concurrentSortThreshold = 2000
+const concurrentSortThreshold = 500
 
 type PackageComparator func(a PackageInfo, b PackageInfo) bool
 
@@ -171,13 +171,17 @@ func sortNormally(
 	sortedPkgs := make([]PackageInfo, len(pkgs))
 	copy(sortedPkgs, pkgs)
 
-	reportProgress(0, 100, fmt.Sprintf("%s - normally", phase))
+	if reportProgress != nil {
+		reportProgress(0, 100, fmt.Sprintf("%s - normally", phase))
+	}
 
 	sort.SliceStable(sortedPkgs, func(i int, j int) bool {
 		return comparator(sortedPkgs[i], sortedPkgs[j])
 	})
 
-	reportProgress(100, 100, fmt.Sprintf("%s completed", phase))
+	if reportProgress != nil {
+		reportProgress(100, 100, fmt.Sprintf("%s completed", phase))
+	}
 
 	return sortedPkgs
 }
