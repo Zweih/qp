@@ -3,7 +3,6 @@ package display
 import (
 	"fmt"
 	"os"
-	"strings"
 	"sync"
 	"text/tabwriter"
 	"yaylog/internal/pkgdata"
@@ -34,6 +33,8 @@ func (o *OutputManager) PrintProgress(phase string, progress int, description st
 	defer o.mu.Unlock()
 
 	o.progressActive = true
+
+	fmt.Print("\r\033[K")
 	fmt.Printf("\r[%s] %d%% - %s", phase, progress, description)
 }
 
@@ -42,7 +43,7 @@ func (o *OutputManager) ClearProgress() {
 	defer o.mu.Unlock()
 
 	if o.progressActive {
-		fmt.Print("\r" + strings.Repeat(" ", 80) + "\r")
+		fmt.Print("\r\033[K")
 		o.progressActive = false
 	}
 }
