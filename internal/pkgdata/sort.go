@@ -198,9 +198,9 @@ func SortPackages(pkgs []PackageInfo, sortBy string, reportProgress ProgressRepo
 
 	phase := "Sorting packages"
 
-	// if len(pkgs) < concurrentSortThreshold {
-	return sortNormally(pkgs, comparator, phase, reportProgress)
-	// }
+	if len(pkgs) < concurrentSortThreshold {
+		return sortNormally(pkgs, comparator, phase, reportProgress)
+	}
 
-	// return sortConcurrently(pkgs, comparator, phase, reportProgress)
+	return sortConcurrently(pkgs, comparator, phase, reportProgress)
 }
