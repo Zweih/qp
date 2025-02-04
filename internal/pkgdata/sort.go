@@ -2,6 +2,7 @@ package pkgdata
 
 import (
 	"fmt"
+	"runtime"
 	"sort"
 	"sync"
 )
@@ -80,7 +81,9 @@ func sortConcurrently(
 		return nil
 	}
 
-	chunkSize := 100
+	numCPUs := runtime.NumCPU()
+	baseChunkSize := total / (2 * numCPUs)
+	chunkSize := max(100, baseChunkSize)
 
 	var mu sync.Mutex
 	var wg sync.WaitGroup
@@ -195,9 +198,9 @@ func SortPackages(pkgs []PackageInfo, sortBy string, reportProgress ProgressRepo
 
 	phase := "Sorting packages"
 
-	if len(pkgs) < concurrentSortThreshold {
-		return sortNormally(pkgs, comparator, phase, reportProgress)
-	}
+	// if len(pkgs) < concurrentSortThreshold {
+	return sortNormally(pkgs, comparator, phase, reportProgress)
+	// }
 
-	return sortConcurrently(pkgs, comparator, phase, reportProgress)
+	// return sortConcurrently(pkgs, comparator, phase, reportProgress)
 }
