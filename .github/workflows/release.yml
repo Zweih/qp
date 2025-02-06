@@ -66,17 +66,28 @@ jobs:
         run: |
           cp yaylog.1 ./release/
 
+      - name: Package binaries with manpage
+        run: |
+          for binary in ./release/yaylog-*; do
+            arch=$(basename "$binary" | cut -d'-' -f2)
+      
+            tar -czvf ./release/yaylog-${arch}.tar.gz -C ./release "$(basename "$binary")" yaylog.1
+          done
+
+      - name: Create source tarball
+        run: |
+          git archive --format=tar.gz --prefix=yaylog-${{ github.ref_name }}/ -o ./release/yaylog-${{ github.ref_name }}.tar.gz HEAD
+
       - name: Generate SHA256 checksums
         run: |
           cd ./release
-          sha256sum yaylog-* yaylog.1 > SHA256SUMS.txt
+          sha256sum yaylog-*.tar.gz > SHA256SUMS.txt
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            ./release/yaylog-*
-            ./release/yaylog.1
+            ./release/yaylog-*.tar.gz
             ./release/SHA256SUMS.txt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
