@@ -1,0 +1,83 @@
+name: Build and Release yaylog
+
+on:
+  push:
+    tags:
+      - 'v*'  # trigger on version tags
+  workflow_dispatch:  # allow manual trigger from github UI
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build yaylog for ${{ matrix.arch }}
+    runs-on: ubuntu-latest  # ubuntu includes cross-compilation toolchains
+
+    strategy:
+      matrix:
+        arch: [x86_64, armv7h, aarch64]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Go 1.23.2
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.23.2 # version from go.mod
+
+      - name: Build yaylog binary
+        run: |
+          case "${{ matrix.arch }}" in
+            armv7h)
+              GOARCH=arm GOARM=7 GOOS=linux go build -o yaylog-armv7h ./cmd/yaylog
+              ;;
+            aarch64)
+              GOARCH=arm64 GOOS=linux go build -o yaylog-aarch64 ./cmd/yaylog
+              ;;
+            x86_64)
+              GOARCH=amd64 GOOS=linux go build -o yaylog-x86_64 ./cmd/yaylog
+              ;;
+          esac
+
+      - name: Upload built binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: yaylog-${{ matrix.arch }}
+          path: yaylog-${{ matrix.arch }}
+
+  release:
+    name: Release yaylog
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./release
+          merge-multiple: true
+
+      - name: Copy manpage
+        run: |
+          cp yaylog.1 ./release/
+
+      - name: Generate SHA256 checksums
+        run: |
+          cd ./release
+          sha256sum yaylog-* yaylog.1 > SHA256SUMS.txt
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            ./release/yaylog-*
+            ./release/yaylog.1
+            ./release/SHA256SUMS.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
