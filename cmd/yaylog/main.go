@@ -110,5 +110,11 @@ func sortPackages(
 	packages []pkgdata.PackageInfo,
 	reportProgress pkgdata.ProgressReporter,
 ) []pkgdata.PackageInfo {
-	return pkgdata.SortPackages(packages, cfg.SortBy, reportProgress)
+	sortedPackages, err := pkgdata.SortPackages(packages, cfg.SortBy, reportProgress)
+	if err != nil {
+		fmt.Printf("Error: %v \n", err)
+		os.Exit(1)
+	}
+
+	return sortedPackages
 }

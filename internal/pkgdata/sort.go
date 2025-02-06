@@ -20,11 +20,11 @@ func dateComparator(a PackageInfo, b PackageInfo) bool {
 }
 
 func sizeDecComparator(a PackageInfo, b PackageInfo) bool {
-	return a.Size < b.Size
+	return a.Size > b.Size
 }
 
 func sizeAscComparator(a PackageInfo, b PackageInfo) bool {
-	return a.Size > b.Size
+	return a.Size < b.Size
 }
 
 func getComparator(sortBy string) (PackageComparator, bool) {
@@ -33,7 +33,7 @@ func getComparator(sortBy string) (PackageComparator, bool) {
 		return alphabeticalComparator, true
 	case "date":
 		return dateComparator, true
-	case "size:dec":
+	case "size:desc":
 		return sizeDecComparator, true
 	case "size:asc":
 		return sizeAscComparator, true
@@ -189,18 +189,18 @@ func sortNormally(
 	return sortedPkgs
 }
 
-func SortPackages(pkgs []PackageInfo, sortBy string, reportProgress ProgressReporter) []PackageInfo {
+func SortPackages(pkgs []PackageInfo, sortBy string, reportProgress ProgressReporter) ([]PackageInfo, error) {
 	comparator, valid := getComparator(sortBy)
 
 	if !valid {
-		panic(fmt.Sprintf("invalid sort mode: %s", sortBy))
+		return nil, fmt.Errorf("invalid sort mode: %s", sortBy)
 	}
 
 	phase := "Sorting packages"
 
 	if len(pkgs) < concurrentSortThreshold {
-		return sortNormally(pkgs, comparator, phase, reportProgress)
+		return sortNormally(pkgs, comparator, phase, reportProgress), nil
 	}
 
-	return sortConcurrently(pkgs, comparator, phase, reportProgress)
+	return sortConcurrently(pkgs, comparator, phase, reportProgress), nil
 }
