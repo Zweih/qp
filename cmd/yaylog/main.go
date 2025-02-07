@@ -5,7 +5,7 @@ import (
 	"os"
 	"sync"
 	"yaylog/internal/config"
-	"yaylog/internal/display"
+	out "yaylog/internal/display"
 	"yaylog/internal/pkgdata"
 
 	"golang.org/x/term"
@@ -29,7 +29,7 @@ func main() {
 		packages = phase.Run(cfg, packages)
 
 		if len(packages) == 0 {
-			fmt.Println("\nNo packages remain after filtering.")
+			out.WriteLine("No packages to display.")
 			return
 		}
 	}
@@ -39,7 +39,7 @@ func main() {
 		packages = packages[cutoffIdx:]
 	}
 
-	display.Manager.PrintTable(packages)
+	out.PrintTable(packages)
 }
 
 func parseConfig() config.Config {
@@ -56,7 +56,7 @@ func parseConfig() config.Config {
 func fetchPackages() []pkgdata.PackageInfo {
 	packages, err := pkgdata.FetchPackages()
 	if err != nil {
-		fmt.Printf("Error fetching packages: %v\n", err)
+		out.WriteLine(fmt.Sprintf("Error fetching packages: %v", err))
 		os.Exit(1)
 	}
 
@@ -65,7 +65,7 @@ func fetchPackages() []pkgdata.PackageInfo {
 
 func validateConfig(cfg config.Config) {
 	if cfg.ExplicitOnly && cfg.DependenciesOnly {
-		fmt.Println("Error: Cannot use both --explicit and --dependencies at the same time.")
+		out.WriteLine("Error: Cannot use both --explicit and --dependencies at the same time.")
 		os.Exit(1)
 	}
 }
@@ -112,7 +112,7 @@ func sortPackages(
 ) []pkgdata.PackageInfo {
 	sortedPackages, err := pkgdata.SortPackages(packages, cfg.SortBy, reportProgress)
 	if err != nil {
-		fmt.Printf("Error: %v \n", err)
+		out.WriteLine(fmt.Sprintf("Error: %v", err))
 		os.Exit(1)
 	}
 

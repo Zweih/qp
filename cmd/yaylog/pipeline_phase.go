@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sync"
 	"yaylog/internal/config"
-	"yaylog/internal/display"
+	out "yaylog/internal/display"
 	"yaylog/internal/pkgdata"
 )
 
@@ -63,14 +63,14 @@ func (phase PipelinePhase) stopProgress(progressChan chan ProgressMessage) {
 	if progressChan != nil {
 		close(progressChan)
 		phase.wg.Wait()
-		display.Manager.ClearProgress()
+		out.ClearProgress()
 	}
 }
 
 func (phase PipelinePhase) displayProgress(progressChan chan ProgressMessage) {
 	for msg := range progressChan {
-		display.Manager.PrintProgress(msg.Phase, msg.Progress, msg.Description)
+		out.PrintProgress(msg.Phase, msg.Progress, msg.Description)
 	}
 
-	display.Manager.ClearProgress()
+	out.ClearProgress()
 }

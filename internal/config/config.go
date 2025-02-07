@@ -86,15 +86,16 @@ func ParseFlags(args []string) Config {
 	var sizeFilter string
 	var sortBy string
 
-	// TODO: make this more readable
 	pflag.IntVarP(&count, "number", "n", 20, "Number of packages to show")
+
 	pflag.BoolVarP(&allPackages, "all", "a", false, "Show all packages (ignores -n)")
 	pflag.BoolVarP(&showHelp, "help", "h", false, "Display help")
 	pflag.BoolVarP(&explicitOnly, "explicit", "e", false, "Show only explicitly installed packages")
 	pflag.BoolVarP(&dependenciesOnly, "dependencies", "d", false, "Show only packages installed as dependencies")
+
 	pflag.StringVar(&dateFilter, "date", "", "Filter packages installed on a specific date (YYYY-MM-DD)")
-	pflag.StringVar(&sizeFilter, "size", "", "Filter pacakges by size (e.g. >20MB, <1GB)")
-	pflag.StringVar(&sortBy, "sort", "date", "Sort by date/alphabetical/size")
+	pflag.StringVar(&sizeFilter, "size", "", "Filter packages by size, must be in quotes (e.g. \">20MB\", \"<1GB\")")
+	pflag.StringVar(&sortBy, "sort", "date", "Sort packages by: 'date', 'alphabetical', 'size:desc', 'size:asc'")
 
 	if err := pflag.CommandLine.Parse(args); err != nil {
 		fmt.Printf("Error parsing flags: %v\n", err)
@@ -144,15 +145,26 @@ func ParseFlags(args []string) Config {
 }
 
 func PrintHelp() {
-	fmt.Println(`Usage: yaylog [options]
+	fmt.Println("Usage: yaylog [options]")
 
-Options:
-  -n, --number <number>   Display the specified number of recent packages (default: 20)
-  -a, --all               Show all installed packages (ignores -n)
-  -e, --explicit          Show only explicitly installed packages
-  -d, --dependencies      Show only packages installed as dependencies
-      --date <YYYY-MM-DD> Filter packages installed on a specific date
-      --sort <mode>       Sort by date (default) or "alphabetical" or "size:asc"/"size:desc"
-      --size <filter>     Filter packages by size (e.g., >10MB, <1GB)
-  -h, --help              Display this help message`)
+	fmt.Println("\nOptions:")
+	pflag.PrintDefaults()
+
+	fmt.Println("\nSorting Options:")
+	fmt.Println("  --sort date          Sort packages by installation date (default)")
+	fmt.Println("  --sort alphabetical  Sort packages alphabetically")
+	fmt.Println("  --sort size:desc     Sort packages by size in descending order")
+	fmt.Println("  --sort size:asc      Sort packages by size in ascending order")
+
+	fmt.Println("\nFiltering Options:")
+	fmt.Println("  --date YYYY-MM-DD    Filter packages installed on a specific date")
+	fmt.Println("  --size <filter>      Filter packages by size with operators like:")
+	fmt.Println("                         >20MB  (greater than 20 megabytes)")
+	fmt.Println("                         <1GB   (less than 1 gigabyte)")
+
+	fmt.Println("\nExamples:")
+	fmt.Println("  yaylog --sort size:asc           # Sort by size (smallest to largest)")
+	fmt.Println("  yaylog --size '>50MB'            # Show packages larger than 50MB")
+	fmt.Println("  yaylog --date 2024-12-28         # Show packages installed on Dec 28, 2024")
+	fmt.Println("  yaylog --size '<100MB' --sort alphabetical  # Filter packages smaller than 100MB and sort alphabetically")
 }

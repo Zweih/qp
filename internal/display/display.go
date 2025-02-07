@@ -1,8 +1,8 @@
 package display
 
 import (
+	"bytes"
 	"fmt"
-	"os"
 	"sync"
 	"text/tabwriter"
 	"yaylog/internal/pkgdata"
@@ -19,16 +19,36 @@ type OutputManager struct {
 	progressActive bool
 }
 
-var Manager = &OutputManager{}
+var manager = &OutputManager{}
 
-func (o *OutputManager) Write(msg string) {
+func Write(msg string) {
+	manager.write(msg)
+}
+
+func WriteLine(msg string) {
+	manager.write(msg + "\n")
+}
+
+func PrintProgress(phase string, progress int, description string) {
+	manager.printProgress(phase, progress, description)
+}
+
+func ClearProgress() {
+	manager.clearProgress()
+}
+
+func PrintTable(pkgs []pkgdata.PackageInfo) {
+	manager.printTable(pkgs)
+}
+
+func (o *OutputManager) write(msg string) {
 	o.mu.Lock()
 	defer o.mu.Unlock()
 
 	fmt.Print(msg)
 }
 
-func (o *OutputManager) PrintProgress(phase string, progress int, description string) {
+func (o *OutputManager) printProgress(phase string, progress int, description string) {
 	o.mu.Lock()
 	defer o.mu.Unlock()
 
@@ -38,7 +58,7 @@ func (o *OutputManager) PrintProgress(phase string, progress int, description st
 	fmt.Printf("\r[%s] %d%% - %s", phase, progress, description)
 }
 
-func (o *OutputManager) ClearProgress() {
+func (o *OutputManager) clearProgress() {
 	o.mu.Lock()
 	defer o.mu.Unlock()
 
@@ -49,13 +69,12 @@ func (o *OutputManager) ClearProgress() {
 }
 
 // displays data in tab format
-func (o *OutputManager) PrintTable(pkgs []pkgdata.PackageInfo) {
-	o.ClearProgress()
+func (o *OutputManager) printTable(pkgs []pkgdata.PackageInfo) {
+	o.clearProgress()
 
-	o.mu.Lock()
-	defer o.mu.Unlock()
+	var buffer bytes.Buffer
+	w := tabwriter.NewWriter(&buffer, 0, 8, 2, ' ', 0)
 
-	w := tabwriter.NewWriter(os.Stdout, 0, 8, 2, ' ', 0)
 	fmt.Fprintln(w, "DATE\tNAME\tREASON\tSIZE")
 
 	for _, pkg := range pkgs {
@@ -70,6 +89,8 @@ func (o *OutputManager) PrintTable(pkgs []pkgdata.PackageInfo) {
 	}
 
 	w.Flush()
+
+	o.write(buffer.String())
 }
 
 func formatSize(size int64) string {
