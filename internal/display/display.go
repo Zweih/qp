@@ -9,6 +9,11 @@ import (
 )
 
 const (
+	dateOnlyFormat = "2006-01-02"
+	dateTimeFormat = "2006-01-02 15:04:05"
+)
+
+const (
 	KB = 1024
 	MB = KB * KB
 	GB = MB * MB
@@ -37,8 +42,14 @@ func ClearProgress() {
 	manager.clearProgress()
 }
 
-func PrintTable(pkgs []pkgdata.PackageInfo) {
-	manager.printTable(pkgs)
+func PrintTable(pkgs []pkgdata.PackageInfo, showFullTimestamp bool) {
+	dateFormat := dateOnlyFormat
+
+	if showFullTimestamp {
+		dateFormat = dateTimeFormat
+	}
+
+	manager.printTable(pkgs, dateFormat)
 }
 
 func (o *OutputManager) write(msg string) {
@@ -69,7 +80,7 @@ func (o *OutputManager) clearProgress() {
 }
 
 // displays data in tab format
-func (o *OutputManager) printTable(pkgs []pkgdata.PackageInfo) {
+func (o *OutputManager) printTable(pkgs []pkgdata.PackageInfo, dateFormat string) {
 	o.clearProgress()
 
 	var buffer bytes.Buffer
@@ -81,7 +92,7 @@ func (o *OutputManager) printTable(pkgs []pkgdata.PackageInfo) {
 		fmt.Fprintf(
 			w,
 			"%s\t%s\t%s\t%s\n",
-			pkg.Timestamp.Format("2006-01-02 15:04:05"),
+			pkg.Timestamp.Format(dateFormat),
 			pkg.Name,
 			pkg.Reason,
 			formatSize(pkg.Size),

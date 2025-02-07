@@ -39,7 +39,7 @@ func main() {
 		packages = packages[cutoffIdx:]
 	}
 
-	out.PrintTable(packages)
+	out.PrintTable(packages, cfg.ShowFullTimestamp)
 }
 
 func parseConfig() config.Config {
