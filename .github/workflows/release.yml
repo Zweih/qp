@@ -17,6 +17,14 @@ jobs:
     strategy:
       matrix:
         arch: [x86_64, armv7h, aarch64]
+        include:
+          - arch: x86_64
+            goarch: amd64
+          - arch: armv7h
+            goarch: arm
+            goarm: 7
+          - arch: aarch64
+            goarch: arm64
 
     steps:
       - name: Checkout repository
@@ -29,17 +37,13 @@ jobs:
 
       - name: Build yaylog binary
         run: |
-          case "${{ matrix.arch }}" in
-            armv7h)
-              GOARCH=arm GOARM=7 GOOS=linux go build -o yaylog-armv7h ./cmd/yaylog
-              ;;
-            aarch64)
-              GOARCH=arm64 GOOS=linux go build -o yaylog-aarch64 ./cmd/yaylog
-              ;;
-            x86_64)
-              GOARCH=amd64 GOOS=linux go build -o yaylog-x86_64 ./cmd/yaylog
-              ;;
-          esac
+          export GOOS=linux GOARCH=${{ matrix.goarch }}
+          
+          if [ -n "${{ matrix.goarm }}" ]; then
+            export GOARM=${{ matrix.goarm }}
+          fi
+          
+          go build -v -o yaylog-${{ matrix.arch }} ./cmd/yaylog
 
       - name: Upload built binary
         uses: actions/upload-artifact@v4
@@ -53,6 +57,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Install makepkg for .SRCINFO generation
+        run: |
+          sudo apt update
+          sudo apt install -y pacman fakeroot makepkg
+
       - name: Checkout repository
         uses: actions/checkout@v3
 
@@ -62,12 +71,10 @@ jobs:
           path: ./release
           merge-multiple: true
 
-      - name: Copy manpage
+      - name: Package binaries with manpage
         run: |
           cp yaylog.1 ./release/
 
-      - name: Package binaries with manpage
-        run: |
           for binary in ./release/yaylog-*; do
             arch=$(basename "$binary" | cut -d'-' -f2)
       
@@ -83,12 +90,47 @@ jobs:
           cd ./release
           sha256sum yaylog-*.tar.gz > SHA256SUMS.txt
 
+      - name: Update yaylog-bin and yaylog-git PKGBUILDs with version and checksums  
+        run: |
+          git fetch origin packaging
+          git checkout packaging
+          
+          VERSION="${GITHUB_REF#refs/tags/v}"
+          CHECKSUMS_FILE=./release/SHA256SUMS.txt
+
+          for pkg in yaylog-bin yaylog-git; do
+            sed -i "s/^pkgver=.*/pkgver=${VERSION}/" $pkg/PKGBUILD
+            sed -i "s/^pkgrel=.*/pkgrel=1/" $pkg/PKGBUILD
+          done
+
+          for pkg in yaylog-bin yaylog-git; do
+            chmod +x update_checksums.sh
+            ./update_checksums.sh $pkg/PKGBUILD $CHECKSUMS_FILE 
+          done
+
+      - name: Generate .SRCINFO for yaylog-bin and yaylog-git
+        run: |
+          for pkg in yaylog-bin yaylog-git; do
+            (cd $pkg && makepkg --printsrcinfo --noconfirm > .SRCINFO)
+          done
+
+      - name: Commit updated PKGBUILD and .SRCINFO to packaging branch
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          for pkg in yaylog-bin yaylog-git; do
+            git add $pkg/PKGBUILD $pkg/.SRCINFO
+          done
+          
+          git commit -m "Update packaging for release ${{ github.ref_name }}"
+          git push origin packaging
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
             ./release/yaylog-*.tar.gz
-            ./release/SHA256SUMS.txt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
