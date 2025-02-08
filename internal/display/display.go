@@ -3,9 +3,13 @@ package display
 import (
 	"bytes"
 	"fmt"
+	"os"
+	"strings"
 	"sync"
 	"text/tabwriter"
 	"yaylog/internal/pkgdata"
+
+	"golang.org/x/term"
 )
 
 const (
@@ -22,9 +26,26 @@ const (
 type OutputManager struct {
 	mu             sync.Mutex
 	progressActive bool
+	lastMsgLength  int
+	terminalWidth  int
 }
 
-var manager = &OutputManager{}
+var manager = newOutputManager()
+
+func newOutputManager() *OutputManager {
+	width := getTerminalWidth()
+
+	return &OutputManager{terminalWidth: width}
+}
+
+func getTerminalWidth() int {
+	width, _, err := term.GetSize(int(os.Stdout.Fd()))
+	if err != nil {
+		return 80 // default width if unable to detect
+	}
+
+	return width
+}
 
 func Write(msg string) {
 	manager.write(msg)
@@ -60,22 +81,36 @@ func (o *OutputManager) write(msg string) {
 }
 
 func (o *OutputManager) printProgress(phase string, progress int, description string) {
-	o.mu.Lock()
-	defer o.mu.Unlock()
-
 	o.progressActive = true
 
-	fmt.Print("\r\033[K")
-	fmt.Printf("\r[%s] %d%% - %s", phase, progress, description)
+	msg := o.formatProgessMsg(phase, progress, description)
+	o.clearPrevMsg(len(msg))
+
+	o.write("\r\033[K" + msg)
+	o.lastMsgLength = len(msg)
 }
 
 func (o *OutputManager) clearProgress() {
-	o.mu.Lock()
-	defer o.mu.Unlock()
-
 	if o.progressActive {
-		fmt.Print("\r\033[K")
+		o.clearPrevMsg(0)
 		o.progressActive = false
+	}
+}
+
+func (o *OutputManager) formatProgessMsg(phase string, progress int, description string) string {
+	msg := fmt.Sprintf("[%s] %d%% - %s", phase, progress, description)
+
+	if len(msg) > o.terminalWidth {
+		msg = msg[:o.terminalWidth-1] // truncate message to fit terminal
+	}
+
+	return msg
+}
+
+func (o *OutputManager) clearPrevMsg(newMsgLength int) {
+	if o.lastMsgLength > newMsgLength {
+		clearSpace := strings.Repeat(" ", o.lastMsgLength)
+		o.write("\r" + clearSpace + "\r")
 	}
 }
 
