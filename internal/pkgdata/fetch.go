@@ -3,63 +3,113 @@ package pkgdata
 import (
 	"bufio"
 	"fmt"
-	"os/exec"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
 )
 
-func FetchPackages() ([]PackageInfo, error) {
-	// expac queries Arch Linux + Arch-based package DBs
-	cmd := exec.Command("expac", "--timefmt=%Y-%m-%d %T", "%l\t%n\t%w\t%m")
-	stdout, err := cmd.StdoutPipe()
-	if err != nil {
-		return nil, fmt.Errorf("error starting command: %w", err)
-	}
+const (
+	fieldName        = "%NAME%"
+	fieldInstallDate = "%INSTALLDATE%"
+	fieldSize        = "%SIZE%"
+	fieldReason      = "%REASON%"
+)
 
-	if err := cmd.Start(); err != nil {
-		return nil, fmt.Errorf("error starting command: %w", err)
+func FetchPackages() ([]PackageInfo, error) {
+	pacmanDbPath := "/var/lib/pacman/local"
+	// entries instead of dirs since there can be files or directories
+	entries, err := os.ReadDir(pacmanDbPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read pacman database: %v", err)
 	}
 
 	var packages []PackageInfo
-	scanner := bufio.NewScanner(stdout)
 
-	for scanner.Scan() {
-		line := scanner.Text()
-		fields := strings.Split(line, "\t")
-
-		// check for correct field format, skip if not
-		if len(fields) != 4 {
-			fmt.Printf("Skipping malformed line: %q\n", line) // Debugging output
+	for _, entry := range entries {
+		if !entry.IsDir() {
 			continue
 		}
 
-		timestampStr, name, reason, sizeStr := fields[0], fields[1], fields[2], fields[3]
-		timestamp, err := time.Parse("2006-01-02 15:04:05", timestampStr)
-		if err != nil {
-			continue
+		descPath := filepath.Join(pacmanDbPath, entry.Name(), "desc")
+		pkg, err := parseDescFile(descPath)
+
+		if err == nil {
+			packages = append(packages, pkg)
 		}
-
-		size, err := strconv.ParseInt(sizeStr, 10, 64)
-		if err != nil {
-			size = 0
-		}
-
-		packages = append(packages, PackageInfo{
-			Timestamp: timestamp,
-			Name:      name,
-			Reason:    reason,
-			Size:      size,
-		})
-	}
-
-	if err := scanner.Err(); err != nil {
-		return nil, fmt.Errorf("error reading command output: %w", err)
-	}
-
-	if err := cmd.Wait(); err != nil {
-		return nil, fmt.Errorf("comand exited with error: %w", err)
 	}
 
 	return packages, nil
+}
+
+func parseDescFile(descPath string) (PackageInfo, error) {
+	file, err := os.Open(descPath)
+	if err != nil {
+		return PackageInfo{}, fmt.Errorf("failed to open file: %v", err)
+	}
+
+	defer file.Close()
+
+	var pkg PackageInfo
+	var currentField string
+
+	scanner := bufio.NewScanner(file)
+
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+
+		switch line {
+		case fieldName, fieldInstallDate, fieldSize, fieldReason:
+			currentField = line
+		default:
+			if err := applyField(&pkg, currentField, line); err != nil {
+				return PackageInfo{}, fmt.Errorf("error reading desc file %s: %w", descPath, err)
+			}
+
+			currentField = "" // reset
+		}
+
+	}
+
+	if pkg.Name == "" {
+		return PackageInfo{}, fmt.Errorf("package name is missing in file: %s", descPath)
+	}
+
+	if pkg.Reason == "" {
+		pkg.Reason = "explicit"
+	}
+
+	return pkg, nil
+}
+
+func applyField(pkg *PackageInfo, field string, value string) error {
+	switch field {
+	case fieldName:
+		pkg.Name = value
+	case fieldReason:
+		if value == "1" {
+			pkg.Reason = "dependency"
+		} else {
+			pkg.Reason = "explicit"
+		}
+	case fieldInstallDate:
+		installDate, err := strconv.ParseInt(value, 10, 64)
+		if err != nil {
+			return fmt.Errorf("invalid install date value %q: %w", value, err)
+		}
+
+		pkg.Timestamp = time.Unix(installDate, 0)
+	case fieldSize:
+		size, err := strconv.ParseInt(value, 10, 64)
+		if err != nil {
+			return fmt.Errorf("invalid size value %q: %w", value, err)
+		}
+
+		pkg.Size = size
+	default:
+		// ignore unknown fields
+	}
+
+	return nil
 }

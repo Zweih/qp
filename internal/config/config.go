@@ -112,7 +112,6 @@ func ParseFlags(args []string) Config {
 	var sizeFilterParsed SizeFilter
 
 	if sizeFilter != "" {
-		var err error
 		sizeOperator, sizeInBytes, err := ParseSizeFilter(sizeFilter)
 		if err != nil {
 			log.Fatalf("Invalid size filter: %v\n", err)
