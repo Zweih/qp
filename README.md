@@ -104,6 +104,8 @@ yaylog [options]
   - `date` (default): sort by installation date
   - `alphabetical`: sort alphabetically by package name
   - `size:asc` / `size:desc`: sort by package size on disk; ascending or descending, respectively
+- `--full-timestamp`: display the full timestamp (date and time) of package installations instead of just the date
+- `--no-progress`: force no progress bar outside of non-interactive environments
 - `-h`: print help info
 
 ### examples
