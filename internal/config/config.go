@@ -2,8 +2,6 @@ package config
 
 import (
 	"fmt"
-	"log"
-	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -18,15 +16,13 @@ const (
 	GB = MB * MB
 )
 
-// TODO: make this more readable
 func ParseSizeFilter(input string) (operator string, sizeInBytes int64, err error) {
+	// matches for input of ">2KB" should be an array of [">2KB", ">", "2", "KB"]
 	re := regexp.MustCompile(`(?i)^(<|>)?(\d+(?:\.\d+)?)(KB|MB|GB|B)?$`)
 	matches := re.FindStringSubmatch(input)
 
-	// matches for input of ">2KB" should be an array of [">2KB", ">", "2", "KB"]
-
 	if len(matches) < 1 {
-		return "", 0, fmt.Errorf("invalid size filter format")
+		return "", 0, fmt.Errorf("invalid size filter format: %q", input)
 	}
 
 	operator = matches[1]
@@ -77,7 +73,7 @@ type Config struct {
 	SortBy            string
 }
 
-func ParseFlags(args []string) Config {
+func ParseFlags(args []string) (Config, error) {
 	var count int
 	var allPackages bool
 	var showHelp bool
@@ -101,8 +97,7 @@ func ParseFlags(args []string) Config {
 	pflag.StringVar(&sortBy, "sort", "date", "Sort packages by: 'date', 'alphabetical', 'size:desc', 'size:asc'")
 
 	if err := pflag.CommandLine.Parse(args); err != nil {
-		fmt.Printf("Error parsing flags: %v\n", err)
-		os.Exit(1)
+		return Config{}, fmt.Errorf("Error parsing flags: %v\n", err)
 	}
 
 	if allPackages {
@@ -114,7 +109,7 @@ func ParseFlags(args []string) Config {
 	if sizeFilter != "" {
 		sizeOperator, sizeInBytes, err := ParseSizeFilter(sizeFilter)
 		if err != nil {
-			log.Fatalf("Invalid size filter: %v\n", err)
+			return Config{}, fmt.Errorf("Invalid size filter: %v\n", err)
 		}
 
 		sizeFilterParsed = SizeFilter{
@@ -130,7 +125,7 @@ func ParseFlags(args []string) Config {
 		var err error
 		parsedDate, err = time.Parse("2006-01-02", dateFilter)
 		if err != nil {
-			log.Fatalf("Invalid date format: %v\n", err)
+			return Config{}, fmt.Errorf("Invalid date format: %v\n", err)
 		}
 	}
 
@@ -144,7 +139,7 @@ func ParseFlags(args []string) Config {
 		DateFilter:        parsedDate,
 		SizeFilter:        sizeFilterParsed,
 		SortBy:            sortBy,
-	}
+	}, nil
 }
 
 func PrintHelp() {

@@ -104,7 +104,6 @@ func sortConcurrently(
 
 		wg.Add(1)
 
-		// TODO: c is a bad name, maybe make this a seperate function
 		go func(c []PackageInfo) {
 			defer wg.Done()
 

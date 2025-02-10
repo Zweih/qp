@@ -15,7 +15,10 @@ func main() {
 	cfg := parseConfig()
 	packages := fetchPackages()
 
-	validateConfig(cfg)
+	err := validateConfig(cfg)
+	if err != nil {
+		out.WriteLine(fmt.Sprintf("Configuration error: %v", err))
+	}
 
 	isInteractive := term.IsTerminal(int(os.Stdout.Fd()))
 	var wg sync.WaitGroup
@@ -43,7 +46,11 @@ func main() {
 }
 
 func parseConfig() config.Config {
-	cfg := config.ParseFlags(os.Args[1:])
+	cfg, err := config.ParseFlags(os.Args[1:])
+	if err != nil {
+		out.WriteLine(fmt.Sprintf("Error parsing arguments: %v", err))
+		os.Exit(0)
+	}
 
 	if cfg.ShowHelp {
 		config.PrintHelp()
@@ -56,18 +63,18 @@ func parseConfig() config.Config {
 func fetchPackages() []pkgdata.PackageInfo {
 	packages, err := pkgdata.FetchPackages()
 	if err != nil {
-		out.WriteLine(fmt.Sprintf("Error fetching packages: %v", err))
-		os.Exit(1)
+		out.WriteLine(fmt.Sprintf("Warning: Some packages may be missing due to corrupted package database: %v", err))
 	}
 
 	return packages
 }
 
-func validateConfig(cfg config.Config) {
+func validateConfig(cfg config.Config) error {
 	if cfg.ExplicitOnly && cfg.DependenciesOnly {
-		out.WriteLine("Error: Cannot use both --explicit and --dependencies at the same time.")
-		os.Exit(1)
+		return fmt.Errorf("Error: Cannot use both --explicit and --dependencies at the same time.")
 	}
+
+	return nil
 }
 
 func applyFilters(
@@ -112,8 +119,8 @@ func sortPackages(
 ) []pkgdata.PackageInfo {
 	sortedPackages, err := pkgdata.SortPackages(packages, cfg.SortBy, reportProgress)
 	if err != nil {
-		out.WriteLine(fmt.Sprintf("Error: %v", err))
-		os.Exit(1)
+		out.WriteLine(fmt.Sprintf("Error sorting packages: %v. Displaying unsorted packages.", err))
+		return packages
 	}
 
 	return sortedPackages
