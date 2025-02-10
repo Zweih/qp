@@ -28,8 +28,7 @@ func ParseSizeFilter(input string) (operator string, sizeInBytes int64, err erro
 	operator = matches[1]
 
 	if operator == "" {
-		operator = ">" // default to greater than
-		// TODO: implement greater/less than or equal to
+		return "", 0, fmt.Errorf("invalid size operand: %q", operator)
 	}
 
 	value, err := strconv.ParseFloat(matches[2], 64) // parseFloat for fractional input e.g. ">2.5KB"
@@ -97,7 +96,7 @@ func ParseFlags(args []string) (Config, error) {
 	pflag.StringVar(&sortBy, "sort", "date", "Sort packages by: 'date', 'alphabetical', 'size:desc', 'size:asc'")
 
 	if err := pflag.CommandLine.Parse(args); err != nil {
-		return Config{}, fmt.Errorf("Error parsing flags: %v\n", err)
+		return Config{}, fmt.Errorf("Error parsing flags: %v", err)
 	}
 
 	if allPackages {
@@ -109,7 +108,7 @@ func ParseFlags(args []string) (Config, error) {
 	if sizeFilter != "" {
 		sizeOperator, sizeInBytes, err := ParseSizeFilter(sizeFilter)
 		if err != nil {
-			return Config{}, fmt.Errorf("Invalid size filter: %v\n", err)
+			return Config{}, fmt.Errorf("Invalid size filter: %v", err)
 		}
 
 		sizeFilterParsed = SizeFilter{
@@ -125,7 +124,7 @@ func ParseFlags(args []string) (Config, error) {
 		var err error
 		parsedDate, err = time.Parse("2006-01-02", dateFilter)
 		if err != nil {
-			return Config{}, fmt.Errorf("Invalid date format: %v\n", err)
+			return Config{}, fmt.Errorf("Invalid date format: %v", err)
 		}
 	}
 
