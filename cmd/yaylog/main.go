@@ -17,7 +17,7 @@ func main() {
 
 	validateConfig(cfg)
 
-	isInteractive := term.IsTerminal(int(os.Stdout.Fd()))
+	isInteractive := term.IsTerminal(int(os.Stdout.Fd())) || cfg.ShowProgress
 	var wg sync.WaitGroup
 
 	pipeline := []PipelinePhase{

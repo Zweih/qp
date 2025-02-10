@@ -70,6 +70,7 @@ type Config struct {
 	AllPackages       bool
 	ShowHelp          bool
 	ShowFullTimestamp bool
+	ShowProgress      bool
 	ExplicitOnly      bool
 	DependenciesOnly  bool
 	DateFilter        time.Time
@@ -82,6 +83,7 @@ func ParseFlags(args []string) Config {
 	var allPackages bool
 	var showHelp bool
 	var showFullTimestamp bool
+	var disableProgress bool
 	var explicitOnly bool
 	var dependenciesOnly bool
 	var dateFilter string
@@ -93,6 +95,7 @@ func ParseFlags(args []string) Config {
 	pflag.BoolVarP(&allPackages, "all", "a", false, "Show all packages (ignores -n)")
 	pflag.BoolVarP(&showHelp, "help", "h", false, "Display help")
 	pflag.BoolVarP(&showFullTimestamp, "full-timestamp", "", false, "Show full timestamp instead of just the date")
+	pflag.BoolVarP(&disableProgress, "no-progress", "", false, "Force suppress progress output")
 	pflag.BoolVarP(&explicitOnly, "explicit", "e", false, "Show only explicitly installed packages")
 	pflag.BoolVarP(&dependenciesOnly, "dependencies", "d", false, "Show only packages installed as dependencies")
 
@@ -139,6 +142,7 @@ func ParseFlags(args []string) Config {
 		AllPackages:       allPackages,
 		ShowHelp:          showHelp,
 		ShowFullTimestamp: showFullTimestamp,
+		ShowProgress:      !disableProgress,
 		ExplicitOnly:      explicitOnly,
 		DependenciesOnly:  dependenciesOnly,
 		DateFilter:        parsedDate,
