@@ -2,11 +2,14 @@ package pkgdata
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -15,32 +18,89 @@ const (
 	fieldInstallDate = "%INSTALLDATE%"
 	fieldSize        = "%SIZE%"
 	fieldReason      = "%REASON%"
+	pacmanDbPath     = "/var/lib/pacman/local"
 )
 
 func FetchPackages() ([]PackageInfo, error) {
-	pacmanDbPath := "/var/lib/pacman/local"
-	// entries instead of dirs since there can be files or directories
-	entries, err := os.ReadDir(pacmanDbPath)
+	packagePaths, err := os.ReadDir(pacmanDbPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read pacman database: %v", err)
 	}
 
-	var packages []PackageInfo
+	numPackages := len(packagePaths)
 
-	for _, entry := range entries {
-		if !entry.IsDir() {
-			continue
-		}
+	var wg sync.WaitGroup
+	descPaths := make(chan string, numPackages)
+	packagesChan := make(chan PackageInfo, numPackages)
+	errorsChan := make(chan error, numPackages)
 
-		descPath := filepath.Join(pacmanDbPath, entry.Name(), "desc")
-		pkg, err := parseDescFile(descPath)
+	// fun fact: NumCPU() does account for hyperthreading
+	numWorkers := getWorkerCount(runtime.NumCPU(), numPackages)
 
-		if err == nil {
-			packages = append(packages, pkg)
+	numWorkers = min(12, numWorkers) // avoid overthreading on high-core systems
+
+	for i := 0; i < numWorkers; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for descPath := range descPaths {
+				pkg, err := parseDescFile(descPath)
+				if err != nil {
+					errorsChan <- err
+					continue
+				}
+
+				packagesChan <- pkg
+			}
+		}()
+	}
+
+	for _, packagePath := range packagePaths {
+		if packagePath.IsDir() {
+			descPath := filepath.Join(pacmanDbPath, packagePath.Name(), "desc")
+			descPaths <- descPath
 		}
 	}
 
+	close(descPaths)
+
+	wg.Wait()
+	close(packagesChan)
+	close(errorsChan)
+
+	packages := make([]PackageInfo, 0, numPackages)
+	for pkg := range packagesChan {
+		packages = append(packages, pkg)
+	}
+
+	if len(errorsChan) > 0 {
+		var collectedErrors []error
+
+		for err := range errorsChan {
+			collectedErrors = append(collectedErrors, err)
+		}
+
+		return nil, errors.Join(collectedErrors...)
+	}
+
 	return packages, nil
+}
+
+func getWorkerCount(numCPUs int, numFiles int) int {
+	var numWorkers int
+
+	if numCPUs <= 2 {
+		// let's keep it simple for devices like rPi zeroes
+		numWorkers = numCPUs
+	} else {
+		numWorkers = numCPUs * 2
+	}
+
+	if numWorkers > numFiles {
+		return numFiles // don't use more workers than files
+	}
+
+	return min(numWorkers, 12) // avoid overthreading on high-core systems
 }
 
 func parseDescFile(descPath string) (PackageInfo, error) {
