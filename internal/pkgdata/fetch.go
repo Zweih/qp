@@ -37,8 +37,6 @@ func FetchPackages() ([]PackageInfo, error) {
 	// fun fact: NumCPU() does account for hyperthreading
 	numWorkers := getWorkerCount(runtime.NumCPU(), numPackages)
 
-	numWorkers = min(12, numWorkers) // avoid overthreading on high-core systems
-
 	for i := 0; i < numWorkers; i++ {
 		wg.Add(1)
 		go func() {
