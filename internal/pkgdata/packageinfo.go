@@ -8,4 +8,5 @@ type PackageInfo struct {
 	Name      string
 	Reason    string // "explicit" or "dependency"
 	Size      int64  // package size in bytes
+	Version   string // current installed version
 }

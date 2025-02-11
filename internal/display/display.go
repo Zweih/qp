@@ -63,14 +63,14 @@ func ClearProgress() {
 	manager.clearProgress()
 }
 
-func PrintTable(pkgs []pkgdata.PackageInfo, showFullTimestamp bool) {
+func PrintTable(pkgs []pkgdata.PackageInfo, showFullTimestamp bool, optionalColumns []string) {
 	dateFormat := dateOnlyFormat
 
 	if showFullTimestamp {
 		dateFormat = dateTimeFormat
 	}
 
-	manager.printTable(pkgs, dateFormat)
+	manager.printTable(pkgs, dateFormat, optionalColumns)
 }
 
 func (o *OutputManager) write(msg string) {
@@ -115,28 +115,49 @@ func (o *OutputManager) clearPrevMsg(newMsgLength int) {
 }
 
 // displays data in tab format
-func (o *OutputManager) printTable(pkgs []pkgdata.PackageInfo, dateFormat string) {
+func (o *OutputManager) printTable(
+	packages []pkgdata.PackageInfo,
+	dateFormat string,
+	optionalColumns []string,
+) {
 	o.clearProgress()
+
+	columns, err := GetActiveColumns(true, optionalColumns)
+	if err != nil {
+		WriteLine(fmt.Sprintf("Warning: %v", err))
+	}
+
+	ctx := DisplayContext{DateFormat: dateFormat}
 
 	var buffer bytes.Buffer
 	w := tabwriter.NewWriter(&buffer, 0, 8, 2, ' ', 0)
 
-	fmt.Fprintln(w, "DATE\tNAME\tREASON\tSIZE")
+	renderHeaders(w, columns)
 
-	for _, pkg := range pkgs {
-		fmt.Fprintf(
-			w,
-			"%s\t%s\t%s\t%s\n",
-			pkg.Timestamp.Format(dateFormat),
-			pkg.Name,
-			pkg.Reason,
-			formatSize(pkg.Size),
-		)
+	for _, pkg := range packages {
+		renderRows(w, pkg, columns, ctx)
 	}
 
 	w.Flush()
-
 	o.write(buffer.String())
+}
+
+func renderHeaders(w *tabwriter.Writer, columns []Column) {
+	headers := make([]string, len(columns))
+	for i, col := range columns {
+		headers[i] = col.Header
+	}
+
+	fmt.Fprintln(w, strings.Join(headers, "\t"))
+}
+
+func renderRows(w *tabwriter.Writer, pkg PackageInfo, columns []Column, ctx DisplayContext) {
+	row := make([]string, len(columns))
+	for i, col := range columns {
+		row[i] = col.Getter(pkg, ctx)
+	}
+
+	fmt.Fprintln(w, strings.Join(row, "\t"))
 }
 
 func formatSize(size int64) string {
