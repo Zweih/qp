@@ -96,11 +96,8 @@ func ParseFlags(args []string) (Config, error) {
 	}, nil
 }
 
-func parseDateFilter(dateFilterInput string) (time.Time, error) {
-	var parsedDate time.Time
-
-	if len(dateFilterInput) < 1 {
-		var err error
+func parseDateFilter(dateFilterInput string) (parsedDate time.Time, err error) {
+	if len(dateFilterInput) > 0 {
 		parsedDate, err = time.Parse("2006-01-02", dateFilterInput)
 		if err != nil {
 			return time.Time{}, fmt.Errorf("Invalid date format %v:", err)
@@ -142,12 +139,21 @@ func parseSizeInput(input string) (operator string, sizeInBytes int64, err error
 		return "", 0, fmt.Errorf("invalid size operand: %q", operator)
 	}
 
-	value, err := strconv.ParseFloat(matches[2], 64) // parseFloat for fractional input e.g. ">2.5KB"
+	sizeInBytes, err = parseSizeInBytes(matches[2], matches[3])
 	if err != nil {
-		return "", 0, fmt.Errorf("invalid size value")
+		return "", 0, err
 	}
 
-	unit := strings.ToUpper(matches[3])
+	return operator, sizeInBytes, nil
+}
+
+func parseSizeInBytes(valueInput string, unitInput string) (sizeInBytes int64, err error) {
+	value, err := strconv.ParseFloat(valueInput, 64) // parseFloat for fractional input e.g. ">2.5KB"
+	if err != nil {
+		return sizeInBytes, fmt.Errorf("invalid size value")
+	}
+
+	unit := strings.ToUpper(unitInput)
 
 	switch unit {
 	case "KB":
@@ -159,15 +165,13 @@ func parseSizeInput(input string) (operator string, sizeInBytes int64, err error
 	case "B":
 		sizeInBytes = int64(value)
 	default:
-		return "", 0, fmt.Errorf("invalid size unit: %v", unit)
+		return sizeInBytes, fmt.Errorf("invalid size unit: %v", unit)
 	}
 
-	return operator, sizeInBytes, nil
+	return sizeInBytes, nil
 }
 
-func parseOptionalColumns(showVersion bool) []string {
-	var optionalColumns []string
-
+func parseOptionalColumns(showVersion bool) (optionalColumns []string) {
 	if showVersion {
 		optionalColumns = append(optionalColumns, "version")
 	}
