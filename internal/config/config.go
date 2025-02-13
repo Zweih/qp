@@ -16,44 +16,6 @@ const (
 	GB = MB * MB
 )
 
-func ParseSizeFilter(input string) (operator string, sizeInBytes int64, err error) {
-	// matches for input of ">2KB" should be an array of [">2KB", ">", "2", "KB"]
-	re := regexp.MustCompile(`(?i)^(<|>)?(\d+(?:\.\d+)?)(KB|MB|GB|B)?$`)
-	matches := re.FindStringSubmatch(input)
-
-	if len(matches) < 1 {
-		return "", 0, fmt.Errorf("invalid size filter format: %q", input)
-	}
-
-	operator = matches[1]
-
-	if operator == "" {
-		return "", 0, fmt.Errorf("invalid size operand: %q", operator)
-	}
-
-	value, err := strconv.ParseFloat(matches[2], 64) // parseFloat for fractional input e.g. ">2.5KB"
-	if err != nil {
-		return "", 0, fmt.Errorf("invalid size value")
-	}
-
-	unit := strings.ToUpper(matches[3])
-
-	switch unit {
-	case "KB":
-		sizeInBytes = int64(value * KB)
-	case "MB":
-		sizeInBytes = int64(value * MB)
-	case "GB":
-		sizeInBytes = int64(value * GB)
-	case "B":
-		sizeInBytes = int64(value)
-	default:
-		return "", 0, fmt.Errorf("invalid size unit: %v", unit)
-	}
-
-	return operator, sizeInBytes, nil
-}
-
 type SizeFilter struct {
 	IsFilter    bool
 	SizeInBytes int64
@@ -65,7 +27,7 @@ type Config struct {
 	AllPackages       bool
 	ShowHelp          bool
 	ShowFullTimestamp bool
-	ShowProgress      bool
+	DisableProgress   bool
 	ExplicitOnly      bool
 	DependenciesOnly  bool
 	DateFilter        time.Time
@@ -109,35 +71,14 @@ func ParseFlags(args []string) (Config, error) {
 		count = 0
 	}
 
-	var sizeFilterParsed SizeFilter
-
-	if sizeFilter != "" {
-		sizeOperator, sizeInBytes, err := ParseSizeFilter(sizeFilter)
-		if err != nil {
-			return Config{}, fmt.Errorf("Invalid size filter: %v", err)
-		}
-
-		sizeFilterParsed = SizeFilter{
-			IsFilter:    true,
-			SizeInBytes: sizeInBytes,
-			Operator:    sizeOperator,
-		}
+	sizeFilterParsed, err := parseSizeFilter(sizeFilter)
+	if err != nil {
+		return Config{}, err
 	}
 
-	var parsedDate time.Time
-
-	if dateFilter != "" {
-		var err error
-		parsedDate, err = time.Parse("2006-01-02", dateFilter)
-		if err != nil {
-			return Config{}, fmt.Errorf("Invalid date format: %v", err)
-		}
-	}
-
-	var optionalColumns []string
-
-	if showVersion {
-		optionalColumns = append(optionalColumns, "version")
+	dateFilterParsed, err := parseDateFilter(dateFilter)
+	if err != nil {
+		return Config{}, err
 	}
 
 	return Config{
@@ -145,14 +86,93 @@ func ParseFlags(args []string) (Config, error) {
 		AllPackages:       allPackages,
 		ShowHelp:          showHelp,
 		ShowFullTimestamp: showFullTimestamp,
-		ShowProgress:      !disableProgress,
+		DisableProgress:   disableProgress,
 		ExplicitOnly:      explicitOnly,
 		DependenciesOnly:  dependenciesOnly,
-		DateFilter:        parsedDate,
+		DateFilter:        dateFilterParsed,
 		SizeFilter:        sizeFilterParsed,
 		SortBy:            sortBy,
-		OptionalColumns:   optionalColumns,
+		OptionalColumns:   parseOptionalColumns(showVersion),
 	}, nil
+}
+
+func parseDateFilter(dateFilterInput string) (time.Time, error) {
+	var parsedDate time.Time
+
+	if len(dateFilterInput) < 1 {
+		var err error
+		parsedDate, err = time.Parse("2006-01-02", dateFilterInput)
+		if err != nil {
+			return time.Time{}, fmt.Errorf("Invalid date format %v:", err)
+		}
+	}
+
+	return parsedDate, nil
+}
+
+func parseSizeFilter(sizeFilterInput string) (SizeFilter, error) {
+	if sizeFilterInput != "" {
+		sizeOperator, sizeInBytes, err := parseSizeInput(sizeFilterInput)
+		if err != nil {
+			return SizeFilter{}, fmt.Errorf("Invalid size filter: %v", err)
+		}
+
+		return SizeFilter{
+			IsFilter:    true,
+			SizeInBytes: sizeInBytes,
+			Operator:    sizeOperator,
+		}, nil
+	}
+
+	return SizeFilter{}, nil
+}
+
+func parseSizeInput(input string) (operator string, sizeInBytes int64, err error) {
+	// matches for input of ">2KB" should be an array of [">2KB", ">", "2", "KB"]
+	re := regexp.MustCompile(`(?i)^(<|>)?(\d+(?:\.\d+)?)(KB|MB|GB|B)?$`)
+	matches := re.FindStringSubmatch(input)
+
+	if len(matches) < 1 {
+		return "", 0, fmt.Errorf("invalid size filter format: %q", input)
+	}
+
+	operator = matches[1]
+
+	if operator == "" {
+		return "", 0, fmt.Errorf("invalid size operand: %q", operator)
+	}
+
+	value, err := strconv.ParseFloat(matches[2], 64) // parseFloat for fractional input e.g. ">2.5KB"
+	if err != nil {
+		return "", 0, fmt.Errorf("invalid size value")
+	}
+
+	unit := strings.ToUpper(matches[3])
+
+	switch unit {
+	case "KB":
+		sizeInBytes = int64(value * KB)
+	case "MB":
+		sizeInBytes = int64(value * MB)
+	case "GB":
+		sizeInBytes = int64(value * GB)
+	case "B":
+		sizeInBytes = int64(value)
+	default:
+		return "", 0, fmt.Errorf("invalid size unit: %v", unit)
+	}
+
+	return operator, sizeInBytes, nil
+}
+
+func parseOptionalColumns(showVersion bool) []string {
+	var optionalColumns []string
+
+	if showVersion {
+		optionalColumns = append(optionalColumns, "version")
+	}
+
+	return optionalColumns
 }
 
 func PrintHelp() {

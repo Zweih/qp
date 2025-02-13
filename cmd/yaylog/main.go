@@ -20,7 +20,7 @@ func main() {
 		out.WriteLine(fmt.Sprintf("Configuration error: %v", err))
 	}
 
-	isInteractive := term.IsTerminal(int(os.Stdout.Fd())) && cfg.ShowProgress
+	isInteractive := term.IsTerminal(int(os.Stdout.Fd())) && !cfg.DisableProgress
 	var wg sync.WaitGroup
 
 	pipeline := []PipelinePhase{
