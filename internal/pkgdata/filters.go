@@ -1,11 +1,10 @@
 package pkgdata
 
 import (
-	"sync"
 	"time"
 )
 
-type Filter func([]PackageInfo) []PackageInfo
+type Filter func(PackageInfo) bool
 
 type FilterCondition struct {
 	Condition bool
@@ -13,122 +12,86 @@ type FilterCondition struct {
 	PhaseName string
 }
 
-func FilterExplicit(pkgs []PackageInfo) []PackageInfo {
-	var explicitPackages []PackageInfo
-
-	for _, pkg := range pkgs {
-		if pkg.Reason == "explicit" {
-			explicitPackages = append(explicitPackages, pkg)
-		}
-	}
-
-	return explicitPackages
+func FilterExplicit(pkg PackageInfo) bool {
+	return pkg.Reason == "explicit"
 }
 
-func FilterDependencies(pkgs []PackageInfo) []PackageInfo {
-	var dependencyPackages []PackageInfo
-
-	for _, pkg := range pkgs {
-		if pkg.Reason == "dependency" {
-			dependencyPackages = append(dependencyPackages, pkg)
-		}
-	}
-
-	return dependencyPackages
+func FilterDependencies(pkg PackageInfo) bool {
+	return pkg.Reason == "dependency"
 }
 
-// filters packages installed on specific date
-func FilterByDate(pkgs []PackageInfo, date time.Time) []PackageInfo {
+// filters for packages installed on specific date
+func FilterByDate(pkg PackageInfo, date time.Time) bool {
+	return pkg.Timestamp.Year() == date.Year() && pkg.Timestamp.YearDay() == date.YearDay()
+}
+
+func FilterBySize(pkg PackageInfo, operator string, sizeInBytes int64) bool {
+	switch operator {
+	case ">":
+		return pkg.Size > sizeInBytes
+	case "<":
+		return pkg.Size < sizeInBytes
+	default:
+		return false
+	}
+}
+
+func ApplyFilters(pkgs []PackageInfo, filters []FilterCondition, reportProgress ProgressReporter) []PackageInfo {
+	if len(filters) < 1 {
+		return pkgs
+	}
+
+	inputChan := populateInitialInputChannel(pkgs)
+	outputChan := applyFilterPipeline(inputChan, filters)
+	return collectFilteredResults(outputChan)
+}
+
+func collectFilteredResults(outputChan <-chan PackageInfo) []PackageInfo {
 	var filteredPackages []PackageInfo
 
-	for _, pkg := range pkgs {
-		if pkg.Timestamp.Year() == date.Year() && pkg.Timestamp.YearDay() == date.YearDay() {
-			filteredPackages = append(filteredPackages, pkg)
-		}
+	for pkg := range outputChan {
+		filteredPackages = append(filteredPackages, pkg)
 	}
 
 	return filteredPackages
 }
 
-func FilterBySize(pkgs []PackageInfo, operator string, sizeInBytes int64) []PackageInfo {
-	var filteredPackages []PackageInfo
-
-	for _, pkg := range pkgs {
-		switch operator {
-		case ">":
-			if pkg.Size > sizeInBytes {
-				filteredPackages = append(filteredPackages, pkg)
-			}
-		case "<":
-			if pkg.Size < sizeInBytes {
-				filteredPackages = append(filteredPackages, pkg)
-			}
-		}
-	}
-
-	return filteredPackages
-}
-
-func applyConcurrentFilter(packages []PackageInfo, filterFunc Filter) []PackageInfo {
-	const chunkSize = 100
-
-	var mu sync.Mutex
-	var wg sync.WaitGroup
-	var filteredPackages []PackageInfo
-
-	for i := 0; i < len(packages); i += chunkSize {
-		endIdx := i + chunkSize
-
-		if endIdx > len(packages) {
-			endIdx = len(packages)
-		}
-
-		chunk := packages[i:endIdx]
-
-		wg.Add(1)
-
-		go func(chunk []PackageInfo) {
-			defer wg.Done()
-
-			filteredChunk := filterFunc(chunk)
-
-			mu.Lock()
-			filteredPackages = append(filteredPackages, filteredChunk...)
-			mu.Unlock()
-		}(chunk)
-	}
-
-	wg.Wait()
-
-	return filteredPackages
-}
-
-func ApplyFilters(
-	pkgs []PackageInfo,
-	filters []FilterCondition,
-	reportProgress ProgressReporter,
-) []PackageInfo {
-	totalFilters := len(filters)
-	currentFilter := 0
+func applyFilterPipeline(inputChan <-chan PackageInfo, filters []FilterCondition) <-chan PackageInfo {
+	outputChan := inputChan
 
 	for _, f := range filters {
-		if f.Condition {
-			if reportProgress != nil {
-				reportProgress(currentFilter, totalFilters, f.PhaseName)
-			}
-
-			pkgs = applyConcurrentFilter(pkgs, f.Filter)
-
-			if reportProgress != nil {
-				currentFilter++
-				reportProgress(currentFilter, totalFilters, f.PhaseName)
-			}
+		if !f.Condition {
+			continue
 		}
+
+		nextOutputChan := make(chan PackageInfo, cap(inputChan))
+
+		go func(inChan <-chan PackageInfo, outChan chan<- PackageInfo, filter Filter, phaseName string) {
+			for pkg := range inChan {
+				if filter(pkg) {
+					outChan <- pkg
+				}
+			}
+
+			close(outChan)
+		}(outputChan, nextOutputChan, f.Filter, f.PhaseName)
+
+		outputChan = nextOutputChan
 	}
 
-	if reportProgress != nil {
-		reportProgress(totalFilters, totalFilters, "All filters completed")
-	}
+	return outputChan
+}
 
-	return pkgs
+func populateInitialInputChannel(pkgs []PackageInfo) <-chan PackageInfo {
+	inputChan := make(chan PackageInfo, len(pkgs))
+
+	go func() {
+		for _, pkg := range pkgs {
+			inputChan <- pkg
+		}
+
+		close(inputChan)
+	}()
+
+	return inputChan
 }

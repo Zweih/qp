@@ -95,15 +95,15 @@ func applyFilters(
 		},
 		{
 			Condition: !cfg.DateFilter.IsZero(),
-			Filter: func(pkgs []pkgdata.PackageInfo) []pkgdata.PackageInfo {
-				return pkgdata.FilterByDate(pkgs, cfg.DateFilter)
+			Filter: func(pkg pkgdata.PackageInfo) bool {
+				return pkgdata.FilterByDate(pkg, cfg.DateFilter)
 			},
 			PhaseName: "Filtering by date",
 		},
 		{
 			Condition: cfg.SizeFilter.IsFilter,
-			Filter: func(pkgs []pkgdata.PackageInfo) []pkgdata.PackageInfo {
-				return pkgdata.FilterBySize(pkgs, cfg.SizeFilter.Operator, cfg.SizeFilter.SizeInBytes)
+			Filter: func(pkg pkgdata.PackageInfo) bool {
+				return pkgdata.FilterBySize(pkg, cfg.SizeFilter.Operator, cfg.SizeFilter.SizeInBytes)
 			},
 			PhaseName: "Filtering by size",
 		},
