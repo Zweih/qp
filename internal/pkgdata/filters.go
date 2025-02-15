@@ -1,6 +1,7 @@
 package pkgdata
 
 import (
+	"strings"
 	"time"
 )
 
@@ -34,6 +35,10 @@ func FilterBySize(pkg PackageInfo, operator string, sizeInBytes int64) bool {
 	default:
 		return false
 	}
+}
+
+func FilterByName(pkg PackageInfo, searchTerm string) bool {
+	return strings.Contains(pkg.Name, searchTerm)
 }
 
 func ApplyFilters(pkgs []PackageInfo, filters []FilterCondition, reportProgress ProgressReporter) []PackageInfo {

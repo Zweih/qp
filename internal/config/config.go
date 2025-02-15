@@ -32,6 +32,7 @@ type Config struct {
 	DependenciesOnly  bool
 	DateFilter        time.Time
 	SizeFilter        SizeFilter
+	NameFilter        string
 	SortBy            string
 	OptionalColumns   []string
 }
@@ -47,6 +48,7 @@ func ParseFlags(args []string) (Config, error) {
 	var dependenciesOnly bool
 	var dateFilter string
 	var sizeFilter string
+	var nameFilter string
 	var sortBy string
 
 	pflag.IntVarP(&count, "number", "n", 20, "Number of packages to show")
@@ -61,6 +63,7 @@ func ParseFlags(args []string) (Config, error) {
 
 	pflag.StringVar(&dateFilter, "date", "", "Filter packages installed on a specific date (YYYY-MM-DD)")
 	pflag.StringVar(&sizeFilter, "size", "", "Filter packages by size, must be in quotes (e.g. \">20MB\", \"<1GB\")")
+	pflag.StringVar(&nameFilter, "name", "", "Filter packages by name (or similar name)")
 	pflag.StringVar(&sortBy, "sort", "date", "Sort packages by: 'date', 'alphabetical', 'size:desc', 'size:asc'")
 
 	if err := pflag.CommandLine.Parse(args); err != nil {
@@ -91,6 +94,7 @@ func ParseFlags(args []string) (Config, error) {
 		DependenciesOnly:  dependenciesOnly,
 		DateFilter:        dateFilterParsed,
 		SizeFilter:        sizeFilterParsed,
+		NameFilter:        nameFilter,
 		SortBy:            sortBy,
 		OptionalColumns:   parseOptionalColumns(showVersion),
 	}, nil

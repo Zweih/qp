@@ -107,6 +107,13 @@ func applyFilters(
 			},
 			PhaseName: "Filtering by size",
 		},
+		{
+			Condition: len(cfg.NameFilter) > 0,
+			Filter: func(pkg pkgdata.PackageInfo) bool {
+				return pkgdata.FilterByName(pkg, cfg.NameFilter)
+			},
+			PhaseName: "Filtering by name",
+		},
 	}
 
 	return pkgdata.ApplyFilters(packages, filters, reportProgress)
