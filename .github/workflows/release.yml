@@ -90,7 +90,7 @@ jobs:
           cd ./release
           sha256sum yaylog-*.tar.gz > SHA256SUMS.txt
 
-      - name: Update yaylog-bin and yaylog-git PKGBUILDs with version and checksums  
+      - name: Update yaylog-bin and yaylog-src PKGBUILDs with version and checksums  
         run: |
           git fetch origin packaging
           git checkout packaging
@@ -98,19 +98,19 @@ jobs:
           VERSION="${GITHUB_REF#refs/tags/v}"
           CHECKSUMS_FILE=./release/SHA256SUMS.txt
 
-          for pkg in yaylog-bin yaylog-git; do
+          for pkg in yaylog-bin yaylog-src; do
             sed -i "s/^pkgver=.*/pkgver=${VERSION}/" $pkg/PKGBUILD
             sed -i "s/^pkgrel=.*/pkgrel=1/" $pkg/PKGBUILD
           done
 
-          for pkg in yaylog-bin yaylog-git; do
+          for pkg in yaylog-bin yaylog-src; do
             chmod +x update_checksums.sh
             ./update_checksums.sh $pkg/PKGBUILD $CHECKSUMS_FILE 
           done
 
-      - name: Generate .SRCINFO for yaylog-bin and yaylog-git
+      - name: Generate .SRCINFO for yaylog-bin and yaylog-src
         run: |
-          for pkg in yaylog-bin yaylog-git; do
+          for pkg in yaylog-bin yaylog-src; do
             (cd $pkg && makepkg --printsrcinfo --noconfirm > .SRCINFO)
           done
 
@@ -119,7 +119,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-          for pkg in yaylog-bin yaylog-git; do
+          for pkg in yaylog-bin yaylog-src; do
             git add $pkg/PKGBUILD $pkg/.SRCINFO
           done
           
