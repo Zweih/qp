@@ -45,7 +45,7 @@ because yay is my preferred AUR helper and the name has a good flow.
 - [x] asynchronous progress bar
 - [ ] channel-based aggregation
 - [x] concurrent sorting
-- [ ] search by text input
+- [x] search by text input
 - [x] list package versions
 - [ ] filter by date range
 - [x] concurrent file reading (2x speed boost)
@@ -58,10 +58,17 @@ because yay is my preferred AUR helper and the name has a good flow.
 ## installation
 
 ### from AUR (**recommended**)
-install using an AUR helper like `yay`:
+install the binary using an AUR helper like `yay`:
 ```bash
-yay -S yaylog
+yay -S yaylog-bin
 ```
+
+if you prefer to install from source using the AUR, use the `yaylog` package instead.
+
+for the latest (unstable) version from git w/ the AUR, use `yaylog-git`*.  
+
+***note**: this is not reccomended for most users 
+
 
 ### building from source + manual installation
 **note**: this packages is specific to arch-based linux distributions
