@@ -146,12 +146,14 @@ func applyField(pkg *PackageInfo, field string, value string) error {
 	switch field {
 	case fieldName:
 		pkg.Name = value
+
 	case fieldReason:
 		if value == "1" {
 			pkg.Reason = "dependency"
 		} else {
 			pkg.Reason = "explicit"
 		}
+
 	case fieldInstallDate:
 		installDate, err := strconv.ParseInt(value, 10, 64)
 		if err != nil {
@@ -159,8 +161,10 @@ func applyField(pkg *PackageInfo, field string, value string) error {
 		}
 
 		pkg.Timestamp = time.Unix(installDate, 0)
+
 	case fieldVersion:
 		pkg.Version = value
+
 	case fieldSize:
 		size, err := strconv.ParseInt(value, 10, 64)
 		if err != nil {
@@ -168,6 +172,7 @@ func applyField(pkg *PackageInfo, field string, value string) error {
 		}
 
 		pkg.Size = size
+
 	default:
 		// ignore unknown fields
 	}

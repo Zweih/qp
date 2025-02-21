@@ -31,7 +31,7 @@ func (phase PipelinePhase) Run(cfg config.Config, packages []PackageInfo) []Pack
 
 func (phase PipelinePhase) reportProgress(progressChan chan ProgressMessage) ProgressReporter {
 	if progressChan == nil {
-		return ProgressReporter(func(current int, total int, phaseName string) {})
+		return ProgressReporter(func(_ int, _ int, _ string) {})
 	}
 
 	return ProgressReporter(func(current int, total int, phaseName string) {

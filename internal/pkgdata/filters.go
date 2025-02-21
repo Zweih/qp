@@ -26,6 +26,11 @@ func FilterByDate(pkg PackageInfo, date time.Time) bool {
 	return pkg.Timestamp.Year() == date.Year() && pkg.Timestamp.YearDay() == date.YearDay()
 }
 
+// inclusive
+func FilterByDateRange(pkg PackageInfo, startDate time.Time, endDate time.Time) bool {
+	return !(pkg.Timestamp.Before(startDate) || pkg.Timestamp.After(endDate))
+}
+
 func FilterBySize(pkg PackageInfo, operator string, sizeInBytes int64) bool {
 	switch operator {
 	case ">":

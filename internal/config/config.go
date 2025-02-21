@@ -22,6 +22,12 @@ type SizeFilter struct {
 	Operator    string
 }
 
+type DateFilter struct {
+	StartDate    time.Time
+	EndDate      time.Time
+	IsExactMatch bool
+}
+
 type Config struct {
 	Count             int
 	AllPackages       bool
@@ -30,7 +36,7 @@ type Config struct {
 	DisableProgress   bool
 	ExplicitOnly      bool
 	DependenciesOnly  bool
-	DateFilter        time.Time
+	DateFilter        DateFilter
 	SizeFilter        SizeFilter
 	NameFilter        string
 	SortBy            string
@@ -100,12 +106,51 @@ func ParseFlags(args []string) (Config, error) {
 	}, nil
 }
 
-func parseDateFilter(dateFilterInput string) (parsedDate time.Time, err error) {
-	if len(dateFilterInput) > 0 {
-		parsedDate, err = time.Parse("2006-01-02", dateFilterInput)
-		if err != nil {
-			return time.Time{}, fmt.Errorf("Invalid date format %v:", err)
+func parseDateFilter(dateFilterInput string) (DateFilter, error) {
+	if dateFilterInput == "" {
+		return DateFilter{}, fmt.Errorf("No date specified for --date flag")
+	}
+
+	dateParts := strings.Split(dateFilterInput, ":")
+
+	var isExactMatch bool
+	var startDate, endDate time.Time
+	var err error
+
+	switch {
+	case len(dateParts) == 1:
+		startDate, err = parseValidDate(dateParts[0])
+		isExactMatch = true
+
+	case dateParts[0] == "":
+		endDate, err = parseValidDate(dateParts[1])
+
+	case dateParts[1] == "":
+		startDate, err = parseValidDate(dateParts[0])
+		endDate = time.Now()
+
+	default:
+		startDate, err = parseValidDate(dateParts[0])
+		if err == nil {
+			endDate, err = parseValidDate(dateParts[1])
 		}
+	}
+
+	if err != nil {
+		return DateFilter{}, err
+	}
+
+	return DateFilter{
+		startDate,
+		endDate,
+		isExactMatch,
+	}, nil
+}
+
+func parseValidDate(dateInput string) (time.Time, error) {
+	parsedDate, err := time.Parse("2006-01-02", dateInput)
+	if err != nil {
+		return time.Time{}, err
 	}
 
 	return parsedDate, nil

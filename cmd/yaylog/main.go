@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"sync"
+	"time"
 	"yaylog/internal/config"
 	out "yaylog/internal/display"
 	"yaylog/internal/pkgdata"
@@ -71,7 +72,7 @@ func fetchPackages() []pkgdata.PackageInfo {
 
 func validateConfig(cfg config.Config) error {
 	if cfg.ExplicitOnly && cfg.DependenciesOnly {
-		return fmt.Errorf("Error: Cannot use both --explicit and --dependencies at the same time.")
+		return fmt.Errorf("Error: Cannot use both --explicit and --dependencies at the same time")
 	}
 
 	return nil
@@ -82,6 +83,8 @@ func applyFilters(
 	packages []pkgdata.PackageInfo,
 	reportProgress pkgdata.ProgressReporter,
 ) []pkgdata.PackageInfo {
+	adjustedEndDate := cfg.DateFilter.EndDate.Add(24 * time.Hour)
+
 	filters := []pkgdata.FilterCondition{
 		{
 			Condition: cfg.ExplicitOnly,
@@ -94,9 +97,18 @@ func applyFilters(
 			PhaseName: "Filtering dependencies",
 		},
 		{
-			Condition: !cfg.DateFilter.IsZero(),
+			Condition: !cfg.DateFilter.StartDate.IsZero() || !cfg.DateFilter.EndDate.IsZero(),
 			Filter: func(pkg pkgdata.PackageInfo) bool {
-				return pkgdata.FilterByDate(pkg, cfg.DateFilter)
+				// TODO: let's not compute this on every iteration
+				if cfg.DateFilter.IsExactMatch {
+					return pkgdata.FilterByDate(pkg, cfg.DateFilter.StartDate)
+				}
+
+				return pkgdata.FilterByDateRange(
+					pkg,
+					cfg.DateFilter.StartDate,
+					adjustedEndDate,
+				)
 			},
 			PhaseName: "Filtering by date",
 		},
