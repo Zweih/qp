@@ -108,7 +108,7 @@ func ParseFlags(args []string) (Config, error) {
 
 func parseDateFilter(dateFilterInput string) (DateFilter, error) {
 	if dateFilterInput == "" {
-		return DateFilter{}, fmt.Errorf("No date specified for --date flag")
+		return DateFilter{}, nil
 	}
 
 	dateParts := strings.Split(dateFilterInput, ":")
