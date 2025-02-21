@@ -78,7 +78,7 @@ jobs:
           for binary in ./release/yaylog-*; do
             arch=$(basename "$binary" | cut -d'-' -f2)
           
-          tar -czvf ./release/yaylog-${{ github.ref_name }}-${arch}.tar.gz -C ./release "$(basename "$binary")" yaylog.1
+            tar -czvf ./release/yaylog-${{ github.ref_name }}-${arch}.tar.gz -C ./release "$(basename "$binary")" yaylog.1
           done
 
       - name: Create source tarball
