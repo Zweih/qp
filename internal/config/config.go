@@ -112,31 +112,25 @@ func parseDateFilter(dateFilterInput string) (DateFilter, error) {
 		return DateFilter{}, nil
 	}
 
-	dateParts := strings.Split(dateFilterInput, ":")
-
-	var isExactMatch bool
-	var startDate, endDate time.Time
-	var err error
-
-	switch {
-	case len(dateParts) == 1:
-		startDate, err = parseValidDate(dateParts[0])
-		isExactMatch = true
-
-	case dateParts[0] == "":
-		endDate, err = parseValidDate(dateParts[1])
-
-	case dateParts[1] == "":
-		startDate, err = parseValidDate(dateParts[0])
-		endDate = time.Now()
-
-	default:
-		startDate, err = parseValidDate(dateParts[0])
-		if err == nil {
-			endDate, err = parseValidDate(dateParts[1])
-		}
+	if dateFilterInput == ":" {
+		return DateFilter{}, fmt.Errorf("invalid date filter: ':' must be accompanied by a date")
 	}
 
+	pattern := `^(\d{4}-\d{2}-\d{2})?(?::(\d{4}-\d{2}-\d{2})?)?$`
+	re := regexp.MustCompile(pattern)
+	matches := re.FindStringSubmatch(dateFilterInput)
+	isExactMatch := !strings.Contains(dateFilterInput, ":")
+
+	if matches == nil {
+		return DateFilter{}, fmt.Errorf("invalid date filter format: %q", dateFilterInput)
+	}
+
+	startDate, err := parseDateMatch(matches[1], time.Time{})
+	if err != nil {
+		return DateFilter{}, err
+	}
+
+	endDate, err := parseDateMatch(matches[2], time.Now())
 	if err != nil {
 		return DateFilter{}, err
 	}
@@ -146,6 +140,14 @@ func parseDateFilter(dateFilterInput string) (DateFilter, error) {
 		endDate,
 		isExactMatch,
 	}, nil
+}
+
+func parseDateMatch(dateInput string, defaultDate time.Time) (time.Time, error) {
+	if dateInput == "" {
+		return defaultDate, nil
+	}
+
+	return parseValidDate(dateInput)
 }
 
 func parseValidDate(dateInput string) (time.Time, error) {
