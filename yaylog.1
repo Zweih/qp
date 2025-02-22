@@ -1,10 +1,10 @@
 .\" Man page for yaylog
-.TH yaylog 1 "February 2025" "yaylog 2.4.0" "User Commands"
+.TH yaylog 1 "February 2025" "yaylog 3.9.0" "User Commands"
 .SH NAME
 yaylog \- List and filter recently installed packages on Arch-based systems.
 .SH SYNOPSIS
 .B yaylog
-.RI [ \-n | \-\-number <number> ] [ \-e | \-\-explicit ] [ \-a | \-\-all ] [ \-d | \-\-dependencies ] [ \-\-date <YYYY-MM-DD> ] [ \-\-size <filter> ] [ \-\-sort <mode> ] [ \-\-full-timestamp ] [ \-h | \-\-help ]
+.RI [ \-n | \-\-number <number> ] [ \-e | \-\-explicit ] [ \-a | \-\-all ] [ \-d | \-\-dependencies ] [ \-\-date <filter> ] [ \-\-size <filter> ] [ \-\-name <search-term> ] [ \-\-sort <mode> ] [ \-\-full-timestamp ] [ \-h | \-\-help ]
 .SH DESCRIPTION
 .B yaylog
 is a standalone CLI utility for Arch and Arch-based Linux distributions to list and filter recently installed packages. It works with any package manager based on pacman
@@ -13,7 +13,7 @@ including
 .B paru,
 and others.
 
-The utility provides options to filter by explicitly installed packages, dependencies, installation dates, and package sizes. It also supports sorting results by date, alphabetical order, or size.
+The utility provides options to filter by explicitly installed packages, dependencies, installation dates, package sizes, and package names. It also supports sorting results by date, alphabetical order, or size.
 
 .SH OPTIONS
 .TP
@@ -40,21 +40,46 @@ option.
 .B \-v
 Show the current version of each installed package.
 .TP
-.B \-\-date <YYYY-MM-DD>
-Show packages installed on the specified date.
+.B \-\-date <filter>
+Filter packages by installation date. Supports exact dates and ranges:
+.IP
+.B YYYY-MM-DD
+: Show packages installed on the specified date.
+.IP
+.B YYYY-MM-DD:
+: Show packages installed on or after the specified date.
+.IP
+.B :YYYY-MM-DD
+: Show packages installed up to the specified date.
+.IP
+.B YYYY-MM-DD:YYYY-MM-DD
+: Show packages installed within a date range.
 .TP
 .B \-\-size <filter>
-Filter results by package size. Specify a comparison operator and size, such as:
+Filter results by package size. Supports exact sizes and ranges:
 .IP
-.B ">10MB"
-: Show packages larger than 10MB.
+.B 10MB
+: Show packages exactly 10MB in size.
 .IP
-.B "<500KB"
-: Show packages smaller than 500KB.
+.B 5GB:
+: Show packages 5GB and larger.
 .IP
-Valid units are B (bytes), KB, MB, or GB. If no operator is specified,
-.B ">"
-is assumed by default.
+.B :20KB
+: Show packages up to 20KB.
+.IP
+.B 1.5MB:2GB
+: Show packages between 1.5MB and 2GB.
+.IP
+Valid units are B (bytes), KB, MB, or GB.
+.TP
+.B \-\-name <search-term>
+Filter packages by name. Performs a substring match against package names.
+For example, searching
+.B python
+will match both
+.B python
+and
+.B python-pip.
 .TP
 .B \-\-sort <mode>
 Sort results by the specified mode. Available modes:
@@ -75,7 +100,7 @@ Sort results by the specified mode. Available modes:
 Display the full timestamp (date and time) of package installations instead of just the date.
 .TP
 .B \-\-no-progress 
-Force disable progress bar outside non-interactive environments
+Force disable progress bar outside non-interactive environments.
 .TP
 .B \-h, \-\-help
 Display help information.
@@ -89,51 +114,64 @@ yaylog -n 10
 yaylog --number 10
 .EE
 .TP
-Show all explicitly installed packages:
+Show all explicitly installed packages installed after January 1, 2024:
 .PP
 .EX
-yaylog -ae
-yaylog --all --explicit
+yaylog -e --date 2024-01-01:
 .EE
 .TP
-Show only dependencies installed on a specific date:
+Show only dependencies installed between July 1, 2023, and December 31, 2023:
 .PP
 .EX
-yaylog -d --date 2024-12-25
-yaylog --dependencies --date 2024-12-25
+yaylog -d --date 2023-07-01:2023-12-31
 .EE
 .TP
-Show all packages sorted alphabetically:
+Show packages between 500KB and 5MB installed up to June 30, 2024:
 .PP
 .EX
-yaylog -a --sort alphabetical
-yaylog --all --sort alphabetical
+yaylog --size 500KB:5MB --date :2024-06-30
 .EE
 .TP
-Show the 15 most recent explicitly installed packages:
+Show packages larger than 1GB installed on December 1, 2024:
 .PP
 .EX
-yaylog -en 15
-yaylog --explicit --number 15
+yaylog --size 1GB: --date 2024-12-01
 .EE
 .TP
-Show packages larger than 50MB:
+Show all packages sorted by size in descending order, installed after January 1, 2024:
 .PP
 .EX
-yaylog --size ">50MB"
+yaylog -a --sort size:desc --date 2024-01-01:
 .EE
 .TP
-Show packages smaller than 100MB and sort them alphabetically:
+Show packages up to 50MB sorted alphabetically:
 .PP
 .EX
-yaylog --size "<100MB" --sort alphabetical
+yaylog --size :50MB --sort alphabetical
 .EE
 .TP
-Show all packages sorted by size in descending order:
+Search for installed packages containing "python":
 .PP
 .EX
-yaylog -a --sort size:desc
-yaylog --all --sort size:desc
+yaylog --name python
+.EE
+.TP
+Search for explicitly installed packages containing "lib" that are between 10MB and 1GB in size:
+.PP
+.EX
+yaylog -e --name lib --size 10MB:1GB
+.EE
+.TP
+Search for packages containing "linux" that were installed between January 1 and June 30, 2024:
+.PP
+.EX
+yaylog --name linux --date 2024-01-01:2024-06-30
+.EE
+.TP
+Search for packages containing "gtk" that were installed after January 1, 2023, and are at least 5MB in size:
+.PP
+.EX
+yaylog --name gtk --date 2023-01-01: --size 5MB:
 .EE
 
 .SH AUTHOR
