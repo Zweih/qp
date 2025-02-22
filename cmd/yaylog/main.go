@@ -83,50 +83,74 @@ func applyFilters(
 	packages []pkgdata.PackageInfo,
 	reportProgress pkgdata.ProgressReporter,
 ) []pkgdata.PackageInfo {
-	adjustedEndDate := cfg.DateFilter.EndDate.Add(24 * time.Hour)
+	filters := make([]pkgdata.FilterCondition, 0)
 
-	filters := []pkgdata.FilterCondition{
-		{
-			Condition: cfg.ExplicitOnly,
+	if cfg.ExplicitOnly {
+		filters = append(filters, pkgdata.FilterCondition{
 			Filter:    pkgdata.FilterExplicit,
-			PhaseName: "Filtering explicit packages",
-		},
-		{
-			Condition: cfg.DependenciesOnly,
-			Filter:    pkgdata.FilterDependencies,
-			PhaseName: "Filtering dependencies",
-		},
-		{
-			Condition: !cfg.DateFilter.StartDate.IsZero() || !cfg.DateFilter.EndDate.IsZero(),
-			Filter: func(pkg pkgdata.PackageInfo) bool {
-				// TODO: let's not compute this on every iteration
-				if cfg.DateFilter.IsExactMatch {
-					return pkgdata.FilterByDate(pkg, cfg.DateFilter.StartDate)
-				}
+			PhaseName: "Filtering explicit only",
+		})
+	}
 
-				return pkgdata.FilterByDateRange(
-					pkg,
-					cfg.DateFilter.StartDate,
-					adjustedEndDate,
-				)
-			},
+	if cfg.DependenciesOnly {
+		filters = append(filters, pkgdata.FilterCondition{
+			Filter:    pkgdata.FilterDependencies,
+			PhaseName: "Filtering dependencies only",
+		})
+	}
+
+	if !cfg.DateFilter.StartDate.IsZero() || !cfg.DateFilter.EndDate.IsZero() {
+		var dateFilter pkgdata.Filter
+
+		if cfg.DateFilter.IsExactMatch {
+			dateFilter = func(pkg pkgdata.PackageInfo) bool {
+				return pkgdata.FilterByDate(pkg, cfg.DateFilter.StartDate)
+			}
+		} else {
+			adjustedEndDate := cfg.DateFilter.EndDate.Add(24 * time.Hour)
+			dateFilter = func(pkg pkgdata.PackageInfo) bool {
+				return pkgdata.FilterByDateRange(pkg, cfg.DateFilter.StartDate, adjustedEndDate)
+			}
+		}
+
+		filters = append(filters, pkgdata.FilterCondition{
+			Filter:    dateFilter,
 			PhaseName: "Filtering by date",
-		},
-		{
-			Condition: cfg.SizeFilter.IsFilter,
-			Filter: func(pkg pkgdata.PackageInfo) bool {
-				return pkgdata.FilterBySize(pkg, cfg.SizeFilter.Operator, cfg.SizeFilter.SizeInBytes)
-			},
+		})
+	}
+
+	if !(cfg.SizeFilter.StartSize == 0 && cfg.SizeFilter.EndSize == 0) {
+		var sizeFilter pkgdata.Filter
+
+		fmt.Println(cfg.SizeFilter.IsExactMatch)
+
+		if cfg.SizeFilter.IsExactMatch {
+			sizeFilter = func(pkg pkgdata.PackageInfo) bool {
+				return pkgdata.FilterBySize(pkg, cfg.SizeFilter.StartSize)
+			}
+		} else {
+			fmt.Println(cfg.SizeFilter.EndSize)
+			sizeFilter = func(pkg pkgdata.PackageInfo) bool {
+				return pkgdata.FilterBySizeRange(pkg, cfg.SizeFilter.StartSize, cfg.SizeFilter.EndSize)
+			}
+		}
+
+		filters = append(filters, pkgdata.FilterCondition{
+			Filter:    sizeFilter,
 			PhaseName: "Filtering by size",
-		},
-		{
-			Condition: len(cfg.NameFilter) > 0,
+		})
+	}
+
+	if len(cfg.NameFilter) > 0 {
+		filters = append(filters, pkgdata.FilterCondition{
 			Filter: func(pkg pkgdata.PackageInfo) bool {
 				return pkgdata.FilterByName(pkg, cfg.NameFilter)
 			},
 			PhaseName: "Filtering by name",
-		},
+		})
 	}
+
+	fmt.Println(filters)
 
 	return pkgdata.ApplyFilters(packages, filters, reportProgress)
 }

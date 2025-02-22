@@ -1,6 +1,7 @@
 package pkgdata
 
 import (
+	"math"
 	"strings"
 	"time"
 )
@@ -8,7 +9,6 @@ import (
 type Filter func(PackageInfo) bool
 
 type FilterCondition struct {
-	Condition bool
 	Filter    Filter
 	PhaseName string
 }
@@ -31,15 +31,23 @@ func FilterByDateRange(pkg PackageInfo, startDate time.Time, endDate time.Time) 
 	return !(pkg.Timestamp.Before(startDate) || pkg.Timestamp.After(endDate))
 }
 
-func FilterBySize(pkg PackageInfo, operator string, sizeInBytes int64) bool {
-	switch operator {
-	case ">":
-		return pkg.Size > sizeInBytes
-	case "<":
-		return pkg.Size < sizeInBytes
-	default:
-		return false
+func roundSizeInBytes(num int64) int64 {
+	if num < 1000 {
+		return num
 	}
+
+	numDigits := int(math.Log10(float64(num))) + 1
+	scaleFactor := int64(math.Pow10(numDigits - 3))
+
+	return num / scaleFactor
+}
+
+func FilterBySize(pkg PackageInfo, size int64) bool {
+	return roundSizeInBytes(pkg.Size) == roundSizeInBytes(size)
+}
+
+func FilterBySizeRange(pkg PackageInfo, startSize int64, endSize int64) bool {
+	return pkg.Size >= startSize && pkg.Size <= endSize
 }
 
 func FilterByName(pkg PackageInfo, searchTerm string) bool {
@@ -70,10 +78,6 @@ func applyFilterPipeline(inputChan <-chan PackageInfo, filters []FilterCondition
 	outputChan := inputChan
 
 	for _, f := range filters {
-		if !f.Condition {
-			continue
-		}
-
 		nextOutputChan := make(chan PackageInfo, cap(inputChan))
 
 		go func(inChan <-chan PackageInfo, outChan chan<- PackageInfo, filter Filter, phaseName string) {

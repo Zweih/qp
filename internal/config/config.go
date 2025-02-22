@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"math"
 	"regexp"
 	"strconv"
 	"strings"
@@ -17,9 +18,9 @@ const (
 )
 
 type SizeFilter struct {
-	IsFilter    bool
-	SizeInBytes int64
-	Operator    string
+	StartSize    int64
+	EndSize      int64
+	IsExactMatch bool
 }
 
 type DateFilter struct {
@@ -67,8 +68,8 @@ func ParseFlags(args []string) (Config, error) {
 	pflag.BoolVarP(&explicitOnly, "explicit", "e", false, "Show only explicitly installed packages")
 	pflag.BoolVarP(&dependenciesOnly, "dependencies", "d", false, "Show only packages installed as dependencies")
 
-	pflag.StringVar(&dateFilter, "date", "", "Filter packages installed on a specific date (YYYY-MM-DD)")
-	pflag.StringVar(&sizeFilter, "size", "", "Filter packages by size, must be in quotes (e.g. \">20MB\", \"<1GB\")")
+	pflag.StringVar(&dateFilter, "date", "", "Filter packages by installation date. Supports exact dates (YYYY-MM-DD), ranges (YYYY-MM-DD:YYYY-MM-DD), and open-ended filters (:YYYY-MM-DD or YYYY-MM-DD:).")
+	pflag.StringVar(&sizeFilter, "size", "", "Filter packages by size. Supports ranges (e.g., 10MB:20GB), exact matches (e.g., 5MB), and open-ended values (e.g., :2GB or 500KB:)")
 	pflag.StringVar(&nameFilter, "name", "", "Filter packages by name (or similar name)")
 	pflag.StringVar(&sortBy, "sort", "date", "Sort packages by: 'date', 'alphabetical', 'size:desc', 'size:asc'")
 
@@ -157,49 +158,53 @@ func parseValidDate(dateInput string) (time.Time, error) {
 }
 
 func parseSizeFilter(sizeFilterInput string) (SizeFilter, error) {
-	if sizeFilterInput != "" {
-		sizeOperator, sizeInBytes, err := parseSizeInput(sizeFilterInput)
-		if err != nil {
-			return SizeFilter{}, fmt.Errorf("Invalid size filter: %v", err)
-		}
-
-		return SizeFilter{
-			IsFilter:    true,
-			SizeInBytes: sizeInBytes,
-			Operator:    sizeOperator,
-		}, nil
+	if sizeFilterInput == "" {
+		return SizeFilter{}, nil
 	}
 
-	return SizeFilter{}, nil
+	if sizeFilterInput == ":" {
+		return SizeFilter{}, fmt.Errorf("invalid size filter: ':' must be accompanied by a value")
+	}
+
+	// valid size format: "10MB", "5GB:", ":20KB", "1.5MB:2GB" (value + unit, optional range)
+	pattern := `(?i)^(?:(\d+(?:\.\d+)?)(B|KB|MB|GB))?(?::(?:(\d+(?:\.\d+)?)(B|KB|MB|GB))?)?$`
+	re := regexp.MustCompile(pattern)
+	matches := re.FindStringSubmatch(sizeFilterInput)
+	isExactMatch := !strings.Contains(sizeFilterInput, ":")
+
+	if matches == nil {
+		return SizeFilter{}, fmt.Errorf("invalid size filter format: %q", sizeFilterInput)
+	}
+
+	startSize, err := parseSizeMatch(matches[1], matches[2], 0)
+	if err != nil {
+		return SizeFilter{}, err
+	}
+
+	endSize, err := parseSizeMatch(matches[3], matches[4], math.MaxInt64)
+	if err != nil {
+		return SizeFilter{}, err
+	}
+
+	return SizeFilter{
+		startSize,
+		endSize,
+		isExactMatch,
+	}, nil
 }
 
-func parseSizeInput(input string) (operator string, sizeInBytes int64, err error) {
-	// matches for input of ">2KB" should be an array of [">2KB", ">", "2", "KB"]
-	re := regexp.MustCompile(`(?i)^(<|>)?(\d+(?:\.\d+)?)(KB|MB|GB|B)?$`)
-	matches := re.FindStringSubmatch(input)
-
-	if len(matches) < 1 {
-		return "", 0, fmt.Errorf("invalid size filter format: %q", input)
+func parseSizeMatch(value string, unit string, defaultSize int64) (int64, error) {
+	if value == "" {
+		return defaultSize, nil
 	}
 
-	operator = matches[1]
-
-	if operator == "" {
-		return "", 0, fmt.Errorf("invalid size operand: %q", operator)
-	}
-
-	sizeInBytes, err = parseSizeInBytes(matches[2], matches[3])
-	if err != nil {
-		return "", 0, err
-	}
-
-	return operator, sizeInBytes, nil
+	return parseSizeInBytes(value, unit)
 }
 
 func parseSizeInBytes(valueInput string, unitInput string) (sizeInBytes int64, err error) {
 	value, err := strconv.ParseFloat(valueInput, 64) // parseFloat for fractional input e.g. ">2.5KB"
 	if err != nil {
-		return sizeInBytes, fmt.Errorf("invalid size value")
+		return 0, fmt.Errorf("invalid size value")
 	}
 
 	unit := strings.ToUpper(unitInput)
@@ -214,7 +219,7 @@ func parseSizeInBytes(valueInput string, unitInput string) (sizeInBytes int64, e
 	case "B":
 		sizeInBytes = int64(value)
 	default:
-		return sizeInBytes, fmt.Errorf("invalid size unit: %v", unit)
+		return 0, fmt.Errorf("invalid size unit: %v", unit)
 	}
 
 	return sizeInBytes, nil
@@ -241,14 +246,27 @@ func PrintHelp() {
 	fmt.Println("  --sort size:asc      Sort packages by size in ascending order")
 
 	fmt.Println("\nFiltering Options:")
-	fmt.Println("  --date YYYY-MM-DD    Filter packages installed on a specific date")
-	fmt.Println("  --size <filter>      Filter packages by size with operators like:")
-	fmt.Println("                         >20MB  (greater than 20 megabytes)")
-	fmt.Println("                         <1GB   (less than 1 gigabyte)")
+	fmt.Println("  --date <filter>      Filter packages by installation date. Supports:")
+	fmt.Println("                         YYYY-MM-DD       (exact date match)")
+	fmt.Println("                         YYYY-MM-DD:      (installed on or after the date)")
+	fmt.Println("                         :YYYY-MM-DD      (installed up to the date)")
+	fmt.Println("                         YYYY-MM-DD:YYYY-MM-DD  (installed within a date range)")
+
+	fmt.Println("  --size <filter>      Filter packages by size. Supports:")
+	fmt.Println("                         10MB       (exactly 10MB)")
+	fmt.Println("                         5GB:       (5GB and larger)")
+	fmt.Println("                         :20KB      (up to 20KB)")
+	fmt.Println("                         1.5MB:2GB  (between 1.5MB and 2GB)")
+
+	fmt.Println("  --name <search-term> Filter packages by name (substring match).")
+	fmt.Println("                         Example: 'gtk' matches 'gtk3', 'libgtk', etc.")
 
 	fmt.Println("\nExamples:")
-	fmt.Println("  yaylog --sort size:asc           # Sort by size (smallest to largest)")
-	fmt.Println("  yaylog --size '>50MB'            # Show packages larger than 50MB")
-	fmt.Println("  yaylog --date 2024-12-28         # Show packages installed on Dec 28, 2024")
-	fmt.Println("  yaylog --size '<100MB' --sort alphabetical  # Filter packages smaller than 100MB and sort alphabetically")
+	fmt.Println("  yaylog --size 50MB --date 2024-12-28       # Show 50MB packages installed on Dec 28, 2024")
+	fmt.Println("  yaylog --size 100MB: --date :2024-06-30    # Show packages >100MB installed up to June 30, 2024")
+	fmt.Println("  yaylog --size 10MB:1GB --date 2023-01-01:  # Packages 10MB-1GB installed after Jan 1, 2023")
+	fmt.Println("  yaylog --sort size:desc --date 2024-01-01: # Sort by largest, installed on/after Jan 1, 2024")
+	fmt.Println("  yaylog --size :50MB --sort alphabetical    # Sort small packages alphabetically")
+	fmt.Println("  yaylog --name python                       # Show installed packages containing 'python'")
+	fmt.Println("  yaylog --name gtk --size 5MB: --date 2023-01-01: # Packages with 'gtk', >5MB, installed after Jan 1, 2023")
 }
