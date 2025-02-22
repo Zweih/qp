@@ -122,14 +122,11 @@ func applyFilters(
 	if !(cfg.SizeFilter.StartSize == 0 && cfg.SizeFilter.EndSize == 0) {
 		var sizeFilter pkgdata.Filter
 
-		fmt.Println(cfg.SizeFilter.IsExactMatch)
-
 		if cfg.SizeFilter.IsExactMatch {
 			sizeFilter = func(pkg pkgdata.PackageInfo) bool {
 				return pkgdata.FilterBySize(pkg, cfg.SizeFilter.StartSize)
 			}
 		} else {
-			fmt.Println(cfg.SizeFilter.EndSize)
 			sizeFilter = func(pkg pkgdata.PackageInfo) bool {
 				return pkgdata.FilterBySizeRange(pkg, cfg.SizeFilter.StartSize, cfg.SizeFilter.EndSize)
 			}
@@ -149,8 +146,6 @@ func applyFilters(
 			PhaseName: "Filtering by name",
 		})
 	}
-
-	fmt.Println(filters)
 
 	return pkgdata.ApplyFilters(packages, filters, reportProgress)
 }
