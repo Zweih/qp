@@ -126,7 +126,7 @@ yaylog [options]
   - `size:asc` / `size:desc` → sort by package size (ascending or descending)
 - `--full-timestamp`: display the full timestamp (date and time) of package installations instead of just the date
 - `--no-progress`: force no progress bar outside of non-interactive environments
-- `-h`: print help info
+- `-h` | `--help`: print help info
 
 
 ### examples
