@@ -1,0 +1,8 @@
+linters:
+  enable:
+    - gocritic
+    - govet
+    - staticcheck
+    - errcheck
+    - revive 
+  disable-all: false
