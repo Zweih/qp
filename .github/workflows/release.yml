@@ -108,18 +108,28 @@ jobs:
             ./update_checksums.sh $pkg/PKGBUILD $CHECKSUMS_FILE 
           done
 
-      - name: Generate .SRCINFO for yaylog-bin and yaylog-src
+      - name: Generate pkgver for yaylog-git
         run: |
-          for pkg in yaylog-bin yaylog-src; do
+          cd yaylog-git
+          rm -rf src pkg yaylog
+
+          makepkg --nodeps --nobuild --noconfirm
+          echo "Updated yaylog-git/pkgver to $(grep '^pkgver=' PKGBUILD | cut -d'=' -f2)"
+
+          rm -rf src pkg yaylog          
+
+      - name: Generate .SRCINFO for yaylog-bin, yaylog-src, and yaylog-git
+        run: |
+          for pkg in yaylog-bin yaylog-src yaylog-git; do
             (cd $pkg && makepkg --printsrcinfo --noconfirm > .SRCINFO)
           done
 
-      - name: Commit updated PKGBUILD and .SRCINFO to packaging branch
+      - name: Commit updated PKGBUILDs and .SRCINFOs to packaging branch
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-          for pkg in yaylog-bin yaylog-src; do
+          for pkg in yaylog-bin yaylog-src yaylog-git; do
             git add $pkg/PKGBUILD $pkg/.SRCINFO
           done
           
