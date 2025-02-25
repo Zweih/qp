@@ -19,6 +19,7 @@ const (
 	fieldSize        = "%SIZE%"
 	fieldReason      = "%REASON%"
 	fieldVersion     = "%VERSION%"
+	fieldDepends     = "%DEPENDS%"
 	pacmanDbPath     = "/var/lib/pacman/local"
 )
 
@@ -119,16 +120,15 @@ func parseDescFile(descPath string) (PackageInfo, error) {
 		line := strings.TrimSpace(scanner.Text())
 
 		switch line {
-		case fieldName, fieldInstallDate, fieldSize, fieldReason, fieldVersion:
+		case fieldName, fieldInstallDate, fieldSize, fieldReason, fieldVersion, fieldDepends:
 			currentField = line
+		case "":
+			currentField = "" // reset if line is blank
 		default:
 			if err := applyField(&pkg, currentField, line); err != nil {
 				return PackageInfo{}, fmt.Errorf("error reading desc file %s: %w", descPath, err)
 			}
-
-			currentField = "" // reset
 		}
-
 	}
 
 	if pkg.Name == "" {
@@ -172,6 +172,10 @@ func applyField(pkg *PackageInfo, field string, value string) error {
 		}
 
 		pkg.Size = size
+
+	case fieldDepends:
+		// use this if we ever need to separate the package name from its dependencies re := regexp.MustCompile(`^([^<>=]+)`)
+		pkg.Depends = append(pkg.Depends, value)
 
 	default:
 		// ignore unknown fields

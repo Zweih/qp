@@ -9,4 +9,5 @@ type PackageInfo struct {
 	Reason    string // "explicit" or "dependency"
 	Size      int64  // package size in bytes
 	Version   string // current installed version
+	Depends   []string
 }
