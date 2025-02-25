@@ -45,33 +45,31 @@ func ParseFlags(args []string) (Config, error) {
 	var allPackages bool
 	var showHelp bool
 	var showFullTimestamp bool
-	var showVersion bool
 	var disableProgress bool
 	var explicitOnly bool
 	var dependenciesOnly bool
-	var noDefaults bool
 	var dateFilter string
 	var sizeFilter string
 	var nameFilter string
 	var sortBy string
-	var columns string
+	var columnsInput string
+	var addColumnsInput string
 
 	pflag.IntVarP(&count, "number", "n", 20, "Number of packages to show")
 
 	pflag.BoolVarP(&allPackages, "all", "a", false, "Show all packages (ignores -n)")
 	pflag.BoolVarP(&showHelp, "help", "h", false, "Display help")
 	pflag.BoolVarP(&showFullTimestamp, "full-timestamp", "", false, "Show full timestamp instead of just the date")
-	pflag.BoolVarP(&showVersion, "", "v", false, "Show column for package versions")
 	pflag.BoolVarP(&disableProgress, "no-progress", "", false, "Force suppress progress output")
 	pflag.BoolVarP(&explicitOnly, "explicit", "e", false, "Show only explicitly installed packages")
 	pflag.BoolVarP(&dependenciesOnly, "dependencies", "d", false, "Show only packages installed as dependencies")
-	pflag.BoolVarP(&noDefaults, "no-defaults", "", false, "Show only columns specified by `--columns`")
 
 	pflag.StringVar(&dateFilter, "date", "", "Filter packages by installation date. Supports exact dates (YYYY-MM-DD), ranges (YYYY-MM-DD:YYYY-MM-DD), and open-ended filters (:YYYY-MM-DD or YYYY-MM-DD:).")
 	pflag.StringVar(&sizeFilter, "size", "", "Filter packages by size. Supports ranges (e.g., 10MB:20GB), exact matches (e.g., 5MB), and open-ended values (e.g., :2GB or 500KB:)")
 	pflag.StringVar(&nameFilter, "name", "", "Filter packages by name (or similar name)")
 	pflag.StringVar(&sortBy, "sort", "date", "Sort packages by: 'date', 'alphabetical', 'size:desc', 'size:asc'")
-	pflag.StringVar(&columns, "columns", "", "Comma-separated list of columns to display (overrides defaults)")
+	pflag.StringVar(&columnsInput, "columns", "", "Comma-separated list of columns to display (overrides defaults)")
+	pflag.StringVar(&addColumnsInput, "add-columns", "", "Comma-separated list of columns to add to defaults")
 
 	if err := pflag.CommandLine.Parse(args); err != nil {
 		return Config{}, fmt.Errorf("Error parsing flags: %v", err)
@@ -91,13 +89,7 @@ func ParseFlags(args []string) (Config, error) {
 		return Config{}, err
 	}
 
-	var otherColumns []string
-
-	if showVersion {
-		otherColumns = append(otherColumns, consts.VERSION)
-	}
-
-	columnsParsed, err := parseColumns(columns, !noDefaults, otherColumns)
+	columnsParsed, err := parseColumns(columnsInput, addColumnsInput)
 	if err != nil {
 		return Config{}, err
 	}
@@ -110,7 +102,6 @@ func ParseFlags(args []string) (Config, error) {
 		DisableProgress:   disableProgress,
 		ExplicitOnly:      explicitOnly,
 		DependenciesOnly:  dependenciesOnly,
-		NoDefaults:        noDefaults,
 		DateFilter:        dateFilterParsed,
 		SizeFilter:        sizeFilterParsed,
 		NameFilter:        nameFilter,
@@ -239,23 +230,34 @@ func parseSizeInBytes(valueInput string, unitInput string) (sizeInBytes int64, e
 	return sizeInBytes, nil
 }
 
-func parseColumns(columnInput string, isDefault bool, otherColumns []string) ([]string, error) {
-	defaultColumns := []string{consts.DATE, consts.NAME, consts.REASON, consts.SIZE}
-
-	var columns []string
-
-	if isDefault {
-		columns = defaultColumns
+func parseColumns(columnsInput string, addColumnsInput string) ([]string, error) {
+	if columnsInput != "" && addColumnsInput != "" {
+		return nil, fmt.Errorf("cannot use --columns and --add-columns together. Use --columns to fully define the columns you want")
 	}
 
-	columns = append(columns, otherColumns...)
+	var specifiedColumnsRaw string
+	var columns []string
 
-	specifiedColumns, err := validateColumns(columnInput)
+	switch {
+	case columnsInput != "":
+		specifiedColumnsRaw = columnsInput
+	case addColumnsInput != "":
+		specifiedColumnsRaw = addColumnsInput
+		fallthrough
+	default:
+		columns = []string{consts.DATE, consts.NAME, consts.REASON, consts.SIZE}
+	}
+
+	specifiedColumns, err := validateColumns(specifiedColumnsRaw)
 	if err != nil {
-		return specifiedColumns, err
+		return nil, err
 	}
 
 	columns = append(columns, specifiedColumns...)
+
+	if len(columns) < 1 {
+		return nil, fmt.Errorf("no columns selected: use --columns to specify at least one column")
+	}
 
 	return columns, nil
 }
@@ -280,7 +282,7 @@ func validateColumns(columnInput string) ([]string, error) {
 		cleanColumn := strings.TrimSpace(column)
 
 		if !validColumns[strings.TrimSpace(column)] {
-			return []string{}, fmt.Errorf("%s is not a valid column", cleanColumn)
+			return nil, fmt.Errorf("%s is not a valid column", cleanColumn)
 		}
 
 		columns = append(columns, cleanColumn)
