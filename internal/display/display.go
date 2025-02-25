@@ -7,20 +7,10 @@ import (
 	"strings"
 	"sync"
 	"text/tabwriter"
+	"yaylog/internal/consts"
 	"yaylog/internal/pkgdata"
 
 	"golang.org/x/term"
-)
-
-const (
-	dateOnlyFormat = "2006-01-02"
-	dateTimeFormat = "2006-01-02 15:04:05"
-)
-
-const (
-	KB = 1024
-	MB = KB * KB
-	GB = MB * MB
 )
 
 type OutputManager struct {
@@ -41,7 +31,7 @@ func newOutputManager() *OutputManager {
 func getTerminalWidth() int {
 	width, _, err := term.GetSize(int(os.Stdout.Fd()))
 	if err != nil {
-		return 80 // default width if unable to detect
+		return consts.DefaultTerminalWidth // default width if unable to detect
 	}
 
 	return width
@@ -63,14 +53,14 @@ func ClearProgress() {
 	manager.clearProgress()
 }
 
-func PrintTable(pkgs []pkgdata.PackageInfo, showFullTimestamp bool, optionalColumns []string) {
-	dateFormat := dateOnlyFormat
+func PrintTable(pkgs []pkgdata.PackageInfo, showFullTimestamp bool, columnNames []string) {
+	dateFormat := consts.DateOnlyFormat
 
 	if showFullTimestamp {
-		dateFormat = dateTimeFormat
+		dateFormat = consts.DateTimeFormat
 	}
 
-	manager.printTable(pkgs, dateFormat, optionalColumns)
+	manager.printTable(pkgs, dateFormat, columnNames)
 }
 
 func (o *OutputManager) write(msg string) {
@@ -118,16 +108,16 @@ func (o *OutputManager) clearPrevMsg(newMsgLength int) {
 func (o *OutputManager) printTable(
 	packages []pkgdata.PackageInfo,
 	dateFormat string,
-	optionalColumns []string,
+	columnNames []string,
 ) {
 	o.clearProgress()
+	columns := []Column{}
 
-	columns, err := GetActiveColumns(true, optionalColumns)
-	if err != nil {
-		WriteLine(fmt.Sprintf("Warning: %v", err))
+	for _, columnName := range columnNames {
+		columns = append(columns, GetColumnByName(columnName))
 	}
 
-	ctx := DisplayContext{DateFormat: dateFormat}
+	ctx := displayContext{DateFormat: dateFormat}
 
 	var buffer bytes.Buffer
 	w := tabwriter.NewWriter(&buffer, 0, 8, 2, ' ', 0)
@@ -151,24 +141,11 @@ func renderHeaders(w *tabwriter.Writer, columns []Column) {
 	fmt.Fprintln(w, strings.Join(headers, "\t"))
 }
 
-func renderRows(w *tabwriter.Writer, pkg PackageInfo, columns []Column, ctx DisplayContext) {
+func renderRows(w *tabwriter.Writer, pkg PackageInfo, columns []Column, ctx displayContext) {
 	row := make([]string, len(columns))
 	for i, col := range columns {
 		row[i] = col.Getter(pkg, ctx)
 	}
 
 	fmt.Fprintln(w, strings.Join(row, "\t"))
-}
-
-func formatSize(size int64) string {
-	switch {
-	case size >= GB:
-		return fmt.Sprintf("%.2f GB", float64(size)/(GB))
-	case size >= MB:
-		return fmt.Sprintf("%.2f MB", float64(size)/(MB))
-	case size >= KB:
-		return fmt.Sprintf("%.2f KB", float64(size)/(KB))
-	default:
-		return fmt.Sprintf("%d B", size)
-	}
 }

@@ -7,14 +7,9 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"yaylog/internal/consts"
 
 	"github.com/spf13/pflag"
-)
-
-const (
-	KB = 1024
-	MB = KB * KB
-	GB = MB * MB
 )
 
 type SizeFilter struct {
@@ -37,11 +32,12 @@ type Config struct {
 	DisableProgress   bool
 	ExplicitOnly      bool
 	DependenciesOnly  bool
+	NoDefaults        bool
 	DateFilter        DateFilter
 	SizeFilter        SizeFilter
 	NameFilter        string
 	SortBy            string
-	OptionalColumns   []string
+	ColumnNames       []string
 }
 
 func ParseFlags(args []string) (Config, error) {
@@ -53,10 +49,12 @@ func ParseFlags(args []string) (Config, error) {
 	var disableProgress bool
 	var explicitOnly bool
 	var dependenciesOnly bool
+	var noDefaults bool
 	var dateFilter string
 	var sizeFilter string
 	var nameFilter string
 	var sortBy string
+	var columns string
 
 	pflag.IntVarP(&count, "number", "n", 20, "Number of packages to show")
 
@@ -67,11 +65,13 @@ func ParseFlags(args []string) (Config, error) {
 	pflag.BoolVarP(&disableProgress, "no-progress", "", false, "Force suppress progress output")
 	pflag.BoolVarP(&explicitOnly, "explicit", "e", false, "Show only explicitly installed packages")
 	pflag.BoolVarP(&dependenciesOnly, "dependencies", "d", false, "Show only packages installed as dependencies")
+	pflag.BoolVarP(&noDefaults, "no-defaults", "", false, "Show only columns specified by `--columns`")
 
 	pflag.StringVar(&dateFilter, "date", "", "Filter packages by installation date. Supports exact dates (YYYY-MM-DD), ranges (YYYY-MM-DD:YYYY-MM-DD), and open-ended filters (:YYYY-MM-DD or YYYY-MM-DD:).")
 	pflag.StringVar(&sizeFilter, "size", "", "Filter packages by size. Supports ranges (e.g., 10MB:20GB), exact matches (e.g., 5MB), and open-ended values (e.g., :2GB or 500KB:)")
 	pflag.StringVar(&nameFilter, "name", "", "Filter packages by name (or similar name)")
 	pflag.StringVar(&sortBy, "sort", "date", "Sort packages by: 'date', 'alphabetical', 'size:desc', 'size:asc'")
+	pflag.StringVar(&columns, "columns", "", "Comma-separated list of columns to display (overrides defaults)")
 
 	if err := pflag.CommandLine.Parse(args); err != nil {
 		return Config{}, fmt.Errorf("Error parsing flags: %v", err)
@@ -91,6 +91,17 @@ func ParseFlags(args []string) (Config, error) {
 		return Config{}, err
 	}
 
+	var otherColumns []string
+
+	if showVersion {
+		otherColumns = append(otherColumns, consts.VERSION)
+	}
+
+	columnsParsed, err := parseColumns(columns, !noDefaults, otherColumns)
+	if err != nil {
+		return Config{}, err
+	}
+
 	return Config{
 		Count:             count,
 		AllPackages:       allPackages,
@@ -99,11 +110,12 @@ func ParseFlags(args []string) (Config, error) {
 		DisableProgress:   disableProgress,
 		ExplicitOnly:      explicitOnly,
 		DependenciesOnly:  dependenciesOnly,
+		NoDefaults:        noDefaults,
 		DateFilter:        dateFilterParsed,
 		SizeFilter:        sizeFilterParsed,
 		NameFilter:        nameFilter,
 		SortBy:            sortBy,
-		OptionalColumns:   parseOptionalColumns(showVersion),
+		ColumnNames:       columnsParsed,
 	}, nil
 }
 
@@ -151,7 +163,7 @@ func parseDateMatch(dateInput string, defaultDate time.Time) (time.Time, error) 
 }
 
 func parseValidDate(dateInput string) (time.Time, error) {
-	parsedDate, err := time.Parse("2006-01-02", dateInput)
+	parsedDate, err := time.Parse(consts.DateOnlyFormat, dateInput)
 	if err != nil {
 		return time.Time{}, err
 	}
@@ -213,11 +225,11 @@ func parseSizeInBytes(valueInput string, unitInput string) (sizeInBytes int64, e
 
 	switch unit {
 	case "KB":
-		sizeInBytes = int64(value * KB)
+		sizeInBytes = int64(value * consts.KB)
 	case "MB":
-		sizeInBytes = int64(value * MB)
+		sizeInBytes = int64(value * consts.MB)
 	case "GB":
-		sizeInBytes = int64(value * GB)
+		sizeInBytes = int64(value * consts.GB)
 	case "B":
 		sizeInBytes = int64(value)
 	default:
@@ -227,12 +239,54 @@ func parseSizeInBytes(valueInput string, unitInput string) (sizeInBytes int64, e
 	return sizeInBytes, nil
 }
 
-func parseOptionalColumns(showVersion bool) (optionalColumns []string) {
-	if showVersion {
-		optionalColumns = append(optionalColumns, "version")
+func parseColumns(columnInput string, isDefault bool, otherColumns []string) ([]string, error) {
+	defaultColumns := []string{consts.DATE, consts.NAME, consts.REASON, consts.SIZE}
+
+	var columns []string
+
+	if isDefault {
+		columns = defaultColumns
 	}
 
-	return optionalColumns
+	columns = append(columns, otherColumns...)
+
+	specifiedColumns, err := validateColumns(columnInput)
+	if err != nil {
+		return specifiedColumns, err
+	}
+
+	columns = append(columns, specifiedColumns...)
+
+	return columns, nil
+}
+
+func validateColumns(columnInput string) ([]string, error) {
+	if columnInput == "" {
+		return []string{}, nil
+	}
+
+	validColumns := map[string]bool{
+		consts.DATE:    true,
+		consts.NAME:    true,
+		consts.REASON:  true,
+		consts.SIZE:    true,
+		consts.VERSION: true,
+		consts.DEPENDS: true,
+	}
+
+	var columns []string
+
+	for _, column := range strings.Split(columnInput, ",") {
+		cleanColumn := strings.TrimSpace(column)
+
+		if !validColumns[strings.TrimSpace(column)] {
+			return []string{}, fmt.Errorf("%s is not a valid column", cleanColumn)
+		}
+
+		columns = append(columns, cleanColumn)
+	}
+
+	return columns, nil
 }
 
 func PrintHelp() {
