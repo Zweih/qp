@@ -248,7 +248,7 @@ func parseColumns(columnsInput string, addColumnsInput string) ([]string, error)
 		columns = []string{consts.DATE, consts.NAME, consts.REASON, consts.SIZE}
 	}
 
-	specifiedColumns, err := validateColumns(specifiedColumnsRaw)
+	specifiedColumns, err := validateColumns(strings.ToLower(specifiedColumnsRaw))
 	if err != nil {
 		return nil, err
 	}
