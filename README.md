@@ -138,34 +138,43 @@ yaylog [options]
 - `version` - installed package version
 - `depends` - list of dependencies (output can be long)
 
-### additional notes
+### tips & tricks
 
-- all options that take an argument can also be used in the `--<flag>=<argument>` format.  
-  for example:
-  ```bash
-  yaylog --size=100MB:1GB --date=:2024-06-30
-  yaylog --name="gtk" --sort=alphabetical
-  ```
-- boolean flags can be explicitly set using `--<flag>=true` or `--<flag>=false`.  
-  for example:
-  ```bash
-  yaylog --explicit=true --dependencies=false
-  ```
 - when using multiple short flags, the -n flag must be last since it consumes the next argument.
 this follows standard unix-style flag parsing, where positional arguments (like numbers)
 are treated as separate parameters.
+  
   invalid:
   ```bash
-  yaylog -ne 15  # 
+  yaylog -ne 15  # incorrect usage 
   ```
   valid:
   ```bash
   yaylog -en 15
   ```
+
 - the `depends` column output can be lengthy. to improve readability, pipe the output to `less`:
   ```bash
   yaylog --columns name,depends | less
   ```
+- all options that take an argument can also be used in the `--<flag>=<argument>` format:
+  ```bash
+  yaylog --size=100MB:1GB --date=:2024-06-30 --number=100
+  yaylog --name=gtk --sort=alphabetical
+  ```
+  boolean flags can also be explicitly set using `--<flag>=true` or `--<flag>=false`:
+  ```bash
+  yaylog --explicit=true --dependencies=false --no-progress=true
+  ```
+  string arguments can also be surrounded with quotes or double-quotes:
+  ```bash
+  yaylog --sort="alphabetical" --name="vim"
+  ```
+
+  this can be useful for scripts and automation where you might want to avoid any and all ambiguity.
+
+  **note**: `--no-progress` is automatically set to true when in a non-interactive environment, so you can pipe `|` into programs like `cat` or `grep` without issue
+
 
 ### examples
 
