@@ -1,16 +1,18 @@
 .\" Man page for yaylog
-.TH yaylog 1 "February 2025" "yaylog 3.9.0" "User Commands"
+.TH yaylog 1 "February 2025" "yaylog 3.11.0" "User Commands"
 .SH NAME
-yaylog \- List and filter recently installed packages on Arch-based systems.
+yaylog \- List and filter installed packages on Arch-based systems.
 .SH SYNOPSIS
 .B yaylog
-.RI [ \-n | \-\-number <number> ] [ \-e | \-\-explicit ] [ \-a | \-\-all ] [ \-d | \-\-dependencies ] [ \-\-date <filter> ] [ \-\-size <filter> ] [ \-\-name <search-term> ] [ \-\-sort <mode> ] [ \-\-full-timestamp ] [ \-h | \-\-help ]
+.RI [ \-n | \-\-number <number> ] [ \-e | \-\-explicit ] [ \-a | \-\-all ] [ \-d | \-\-dependencies ] [ \-\-date <filter> ] [ \-\-size <filter> ] [ \-\-name <search-term> ] [ \-\-sort <mode> ] [ \-\-columns <list> ] [ \-\-add-columns <list> ] [ \-\-full-timestamp ] [ \-\-no-progress ] [ \-h | \-\-help ]
 .SH DESCRIPTION
 .B yaylog
-is a standalone CLI utility for Arch and Arch-based Linux distributions to list and filter recently installed packages. It works with any package manager based on pacman
+is a standalone CLI utility for Arch and Arch-based Linux distributions to list and filter installed packages. It works with any package manager that uses ALPM,
 including
 .B yay,
 .B paru,
+.B pamac,
+.B pacman,
 and others.
 
 The utility provides options to filter by explicitly installed packages, dependencies, installation dates, package sizes, and package names. It also supports sorting results by date, alphabetical order, or size.
@@ -36,9 +38,6 @@ Show all installed packages, ignoring the
 or
 .B \-\-number
 option.
-.TP
-.B \-v
-Show the current version of each installed package.
 .TP
 .B \-\-date <filter>
 Filter packages by installation date. Supports exact dates and ranges:
@@ -96,6 +95,31 @@ Sort results by the specified mode. Available modes:
 .B size:desc
 : Sort by package size in descending order.
 .TP
+.B \-\-columns <list>
+Specify a comma-separated list of columns to display. Overrides default columns.
+Available columns:
+.IP
+.B date
+: Installation date of the package.
+.IP
+.B name
+: Package name.
+.IP
+.B reason
+: Installation reason (explicit/dependency).
+.IP
+.B size
+: Package size on disk.
+.IP
+.B version
+: Installed package version.
+.IP
+.B depends
+: List of dependencies (output can be long).
+.TP
+.B \-\-add-columns <list>
+Add additional columns to the default display without overriding them.
+.TP
 .B \-\-full-timestamp
 Display the full timestamp (date and time) of package installations instead of just the date.
 .TP
@@ -104,6 +128,42 @@ Force disable progress bar outside non-interactive environments.
 .TP
 .B \-h, \-\-help
 Display help information.
+
+.SH ADDITIONAL NOTES
+.TP
+- All options that take an argument can also be used in the `--<flag>=<argument>` format.
+For example:
+.PP
+.EX
+yaylog --size=100MB:1GB --date=:2024-06-30
+yaylog --name="gtk" --sort=alphabetical
+.EE
+.TP
+- Boolean flags can be explicitly set using `--<flag>=true` or `--<flag>=false`.
+For example:
+.PP
+.EX
+yaylog --explicit=true --dependencies=false
+.EE
+.TP
+- When using multiple short flags, the `-n` flag must be last since it consumes the next argument.
+This follows standard Unix-style flag parsing, where positional arguments (like numbers) are treated as separate parameters.
+Invalid:
+.PP
+.EX
+yaylog -ne 15  # incorrect usage
+.EE
+Valid:
+.PP
+.EX
+yaylog -en 15
+.EE
+.TP
+- The `depends` column output can be lengthy. To improve readability, pipe the output to `less`:
+.PP
+.EX
+yaylog --columns name,depends | less
+.EE
 
 .SH EXAMPLES
 .TP
@@ -173,6 +233,12 @@ Search for packages containing "gtk" that were installed after January 1, 2023, 
 .EX
 yaylog --name gtk --date 2023-01-01: --size 5MB:
 .EE
+.TP
+Show package names and dependencies with `less` for readability:
+.PP
+.EX
+yaylog --columns name,depends | less
+.EE
 
 .SH AUTHOR
 Written by Fernando Nunez <me@fernandonunez.io>.
@@ -190,3 +256,4 @@ Report bugs to the GitHub repository:
 .SH SEE ALSO
 .B pacman(8),
 .B yay(8)
+

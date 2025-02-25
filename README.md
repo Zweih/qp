@@ -56,7 +56,8 @@ because yay is my preferred AUR helper and the name has a good flow.
 - [x] add CI to release binaries
 - [x] remove go as a dependency
 - [x] filter by range of size on disk
-- [ ] list dependencies of each package
+- [x] user defined columns
+- [x] list dependencies of each package
 - [ ] list packages that depend on each package
 
 ## installation
@@ -106,65 +107,101 @@ yaylog [options]
 - `-a` | `all`: show all installed packages (ignores `-n`)
 - `-e` | `--explicit`: show only explicitly installed packages
 - `-d` | `--dependencies`: show only packages installed as dependencies
-- `-v`: show column for current version of packages
 - `--date <filter>`: filter packages by installation date. Supports:
-  - `YYYY-MM-DD` → show packages installed on the specified date
-  - `YYYY-MM-DD:` → show packages installed on or after the date
-  - `:YYYY-MM-DD` → show packages installed up to the date
-  - `YYYY-MM-DD:YYYY-MM-DD` → show packages installed within a date range
+  - `YYYY-MM-DD` - show packages installed on the specified date
+  - `YYYY-MM-DD:` - show packages installed on or after the date
+  - `:YYYY-MM-DD` - show packages installed up to the date
+  - `YYYY-MM-DD:YYYY-MM-DD` - show packages installed within a date range
 - `--size <filter>`: filter packages by size on disk. Supports:
-  - `10MB` → show packages exactly 10MB in size
-  - `5GB:` → show packages 5GB and larger
-  - `:20KB` → show packages up to 20KB
-  - `1.5MB:2GB` → show packages between 1.5MB and 2GB
-  - Valid units: B (bytes), KB, MB, GB
+  - `10MB` - show packages exactly 10MB in size
+  - `5GB:` - show packages 5GB and larger
+  - `:20KB` - show packages up to 20KB
+  - `1.5MB:2GB` - show packages between 1.5MB and 2GB
+  - valid units: B (bytes), KB, MB, GB
 - `--name <search-term>`: filter packages by name (substring match)
-  - Example: `gtk` matches `gtk3`, `libgtk`, etc.
+  - example: `gtk` matches `gtk3`, `libgtk`, etc.
 - `--sort <mode>`: sort results by:
-  - `date` (default) → sort by installation date
-  - `alphabetical` → sort alphabetically by package name
-  - `size:asc` / `size:desc` → sort by package size (ascending or descending)
+  - `date` (default) - sort by installation date
+  - `alphabetical` - sort alphabetically by package name
+  - `size:asc` / `size:desc` - sort by package size (ascending or descending)
+- `--columns <list>`: comma-separated list of columns to display (overrides defaults)
+- `--add-columns <list>`: comma-separated list of columns to add to defaults
 - `--full-timestamp`: display the full timestamp (date and time) of package installations instead of just the date
 - `--no-progress`: force no progress bar outside of non-interactive environments
 - `-h` | `--help`: print help info
 
+### available columns
+- `date` - installation date of the package
+- `name` - package name
+- `reason` - installation reason (explicit/dependency)
+- `size` - package size on disk
+- `version` - installed package version
+- `depends` - list of dependencies (output can be long)
+
+### additional notes
+
+- all options that take an argument can also be used in the `--<flag>=<argument>` format.  
+  for example:
+  ```bash
+  yaylog --size=100MB:1GB --date=:2024-06-30
+  yaylog --name="gtk" --sort=alphabetical
+  ```
+- boolean flags can be explicitly set using `--<flag>=true` or `--<flag>=false`.  
+  for example:
+  ```bash
+  yaylog --explicit=true --dependencies=false
+  ```
+- when using multiple short flags, the -n flag must be last since it consumes the next argument.
+this follows standard unix-style flag parsing, where positional arguments (like numbers)
+are treated as separate parameters.
+  invalid:
+  ```bash
+  yaylog -ne 15  # 
+  ```
+  valid:
+  ```bash
+  yaylog -en 15
+  ```
+- the `depends` column output can be lengthy. to improve readability, pipe the output to `less`:
+  ```bash
+  yaylog --columns name,depends | less
+  ```
 
 ### examples
 
-1. show the last 10 installed packages:
+ 1. show the last 10 installed packages:
    ```bash
    yaylog -n 10
    ```
-2. show all explicitly installed packages:
+ 2. show all explicitly installed packages:
    ```bash
    yaylog -ae
    ```
-3. show only dependencies installed on a specific date:
+ 3. show only dependencies installed on a specific date:
    ```bash
    yaylog -d --date 2024-12-25
    ```
-4. show all packages sorted alphabetically:
+ 4. show all packages sorted alphabetically:
    ```bash
    yaylog -a --sort alphabetical
    ```
-5. show the 15 most recent explicitly installed packages:
+ 5. show the 15 most recent explicitly installed packages:
    ```bash
    yaylog -en 15
    ```
-   **note**: the `-e` flag must be used before the `-n` flag as the n flag consumes the next argument.
-6. show packages installed between July 1, 2023, and December 31, 2023:
+ 6. show packages installed between July 1, 2023, and December 31, 2023:
    ```bash
    yaylog --date 2023-07-01:2023-12-31
    ```
-7. show the 20 most recently installed packages larger than 20MB:
+ 7. show the 20 most recently installed packages larger than 20MB:
    ```bash
    yaylog --size 20MB:
    ```
-8. show all dependencies smaller than 500KB:
+ 8. show all dependencies smaller than 500KB:
    ```bash
    yaylog -ad --size :500KB
    ```
-9. show packages between 100MB and 1GB installed up to June 30, 2024:
+ 9. show packages between 100MB and 1GB installed up to June 30, 2024:
    ```bash
    yaylog --size 100MB:1GB --date :2024-06-30
    ```
@@ -188,7 +225,11 @@ yaylog [options]
    ```bash
    yaylog --name gtk --date 2023-01-01: --size 5MB:
    ```
-
-## license
-
-this project is licensed under the MIT license. see [license](LICENSE) for details.
+15. show packages with name, version, and size:
+   ```bash
+   yaylog --columns name,version,size
+   ```
+16. show package names and dependencies with `less` for readability:
+   ```bash
+   yaylog --columns name,depends | less
+   ```
