@@ -173,7 +173,7 @@ are treated as separate parameters.
 
   this can be useful for scripts and automation where you might want to avoid any and all ambiguity.
 
-  **note**: `--no-progress` is automatically set to true when in a non-interactive environment, so you can pipe `|` into programs like `cat` or `grep` without issue
+  **note**: `--no-progress` is automatically set to `true` when in a non-interactive environment, so you can pipe `|` into programs like `cat`, `grep`, or `less` without issue
 
 
 ### examples
