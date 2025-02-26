@@ -75,7 +75,11 @@ func collectFilteredResults(outputChan <-chan PackageInfo) []PackageInfo {
 	return filteredPackages
 }
 
-func applyFilterPipeline(inputChan <-chan PackageInfo, filters []FilterCondition, reportProgress ProgressReporter) <-chan PackageInfo {
+func applyFilterPipeline(
+	inputChan <-chan PackageInfo,
+	filters []FilterCondition,
+	reportProgress ProgressReporter,
+) <-chan PackageInfo {
 	outputChan := inputChan
 	totalPhases := len(filters)
 	completedPhases := 0
@@ -83,18 +87,27 @@ func applyFilterPipeline(inputChan <-chan PackageInfo, filters []FilterCondition
 	for filterIndex, f := range filters {
 		nextOutputChan := make(chan PackageInfo, cap(inputChan))
 
-		go func(inChan <-chan PackageInfo, outChan chan<- PackageInfo, filter Filter, phaseName string) {
+		go func(
+			inChan <-chan PackageInfo,
+			outChan chan<- PackageInfo,
+			filter Filter,
+			phaseName string,
+		) {
 			for pkg := range inChan {
 				if filter(pkg) {
 					outChan <- pkg
 				}
 			}
+			close(outChan)
 
 			if reportProgress != nil {
 				completedPhases++
-				reportProgress(completedPhases, totalPhases, fmt.Sprintf("%s - Step %d/%d completed", phaseName, filterIndex+1, totalPhases))
+				reportProgress(
+					completedPhases,
+					totalPhases,
+					fmt.Sprintf("%s - Step %d/%d completed", phaseName, filterIndex+1, totalPhases),
+				)
 			}
-			close(outChan)
 		}(outputChan, nextOutputChan, f.Filter, f.PhaseName)
 
 		outputChan = nextOutputChan
