@@ -25,6 +25,7 @@ func main() {
 	var wg sync.WaitGroup
 
 	pipeline := []PipelinePhase{
+		{"Calculating reverse dependencies", pkgdata.CalculateReverseDependencies, isInteractive, &wg},
 		{"Filtering", applyFilters, isInteractive, &wg},
 		{"Sorting", sortPackages, isInteractive, &wg},
 	}
