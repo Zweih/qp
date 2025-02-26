@@ -20,7 +20,7 @@ this package is compatible with the following distributions:
 
 ## features
 
-- list installed packages with timestamps
+- list installed packages with date/timestamps, dependencies, provisions, size on disk, and version
 - display package versions 
 - filter results by explicitly installed packages
 - filter results by packages installed as dependencies
@@ -48,17 +48,22 @@ because yay is my preferred AUR helper and the name has a good flow.
 - [x] channel-based aggregation
 - [x] concurrent sorting
 - [x] search by text input
-- [x] list package versions
+- [x] package versions
 - [x] filter by date range
 - [x] concurrent file reading (2x speed boost)
 - [x] remove expac as a dependency (3x speed boost)
+- [x] package provisions
 - [x] optional full timestamp 
 - [x] add CI to release binaries
 - [x] remove go as a dependency
 - [x] filter by range of size on disk
 - [x] user defined columns
-- [x] list dependencies of each package
-- [ ] list packages that depend on each package
+- [x] dependencies of each package
+- [ ] reverse-dependencies of each package (required-by field)
+- [ ] package descriptions
+- [ ] package URLs
+- [ ] package architecture
+- [ ] name exclusion filter
 
 ## installation
 
@@ -137,6 +142,7 @@ yaylog [options]
 - `size` - package size on disk
 - `version` - installed package version
 - `depends` - list of dependencies (output can be long)
+- `provides` - list of alternative package names or shared libraries provided by package (output can be long)
 
 ### tips & tricks
 
@@ -153,7 +159,7 @@ are treated as separate parameters.
   yaylog -en 15
   ```
 
-- the `depends` column output can be lengthy. to improve readability, pipe the output to `less`:
+- the `depends` and `provides` columns output can be lengthy, packages like `perl` provide about a thousand libraries. to improve readability, pipe the output to `less`:
   ```bash
   yaylog --columns name,depends | less
   ```
