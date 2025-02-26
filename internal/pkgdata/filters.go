@@ -1,6 +1,7 @@
 package pkgdata
 
 import (
+	"fmt"
 	"math"
 	"strings"
 	"time"
@@ -60,7 +61,7 @@ func ApplyFilters(pkgs []PackageInfo, filters []FilterCondition, reportProgress 
 	}
 
 	inputChan := populateInitialInputChannel(pkgs)
-	outputChan := applyFilterPipeline(inputChan, filters)
+	outputChan := applyFilterPipeline(inputChan, filters, reportProgress)
 	return collectFilteredResults(outputChan)
 }
 
@@ -74,10 +75,12 @@ func collectFilteredResults(outputChan <-chan PackageInfo) []PackageInfo {
 	return filteredPackages
 }
 
-func applyFilterPipeline(inputChan <-chan PackageInfo, filters []FilterCondition) <-chan PackageInfo {
+func applyFilterPipeline(inputChan <-chan PackageInfo, filters []FilterCondition, reportProgress ProgressReporter) <-chan PackageInfo {
 	outputChan := inputChan
+	totalPhases := len(filters)
+	completedPhases := 0
 
-	for _, f := range filters {
+	for filterIndex, f := range filters {
 		nextOutputChan := make(chan PackageInfo, cap(inputChan))
 
 		go func(inChan <-chan PackageInfo, outChan chan<- PackageInfo, filter Filter, phaseName string) {
@@ -87,6 +90,10 @@ func applyFilterPipeline(inputChan <-chan PackageInfo, filters []FilterCondition
 				}
 			}
 
+			if reportProgress != nil {
+				completedPhases++
+				reportProgress(completedPhases, totalPhases, fmt.Sprintf("%s - Step %d/%d completed", phaseName, filterIndex+1, totalPhases))
+			}
 			close(outChan)
 		}(outputChan, nextOutputChan, f.Filter, f.PhaseName)
 
