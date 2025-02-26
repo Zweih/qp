@@ -20,6 +20,7 @@ const (
 	fieldReason      = "%REASON%"
 	fieldVersion     = "%VERSION%"
 	fieldDepends     = "%DEPENDS%"
+	fieldProvides    = "%PROVIDES%"
 	pacmanDbPath     = "/var/lib/pacman/local"
 )
 
@@ -120,7 +121,7 @@ func parseDescFile(descPath string) (PackageInfo, error) {
 		line := strings.TrimSpace(scanner.Text())
 
 		switch line {
-		case fieldName, fieldInstallDate, fieldSize, fieldReason, fieldVersion, fieldDepends:
+		case fieldName, fieldInstallDate, fieldSize, fieldReason, fieldVersion, fieldDepends, fieldProvides:
 			currentField = line
 		case "":
 			currentField = "" // reset if line is blank
@@ -176,6 +177,9 @@ func applyField(pkg *PackageInfo, field string, value string) error {
 	case fieldDepends:
 		// use this if we ever need to separate the package name from its dependencies re := regexp.MustCompile(`^([^<>=]+)`)
 		pkg.Depends = append(pkg.Depends, value)
+
+	case fieldProvides:
+		pkg.Provides = append(pkg.Provides, value)
 
 	default:
 		// ignore unknown fields

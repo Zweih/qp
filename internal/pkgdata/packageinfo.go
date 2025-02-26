@@ -10,4 +10,5 @@ type PackageInfo struct {
 	Size      int64  // package size in bytes
 	Version   string // current installed version
 	Depends   []string
+	Provides  []string
 }

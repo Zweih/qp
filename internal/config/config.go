@@ -245,7 +245,7 @@ func parseColumns(columnsInput string, addColumnsInput string) ([]string, error)
 		specifiedColumnsRaw = addColumnsInput
 		fallthrough
 	default:
-		columns = []string{consts.DATE, consts.NAME, consts.REASON, consts.SIZE}
+		columns = consts.DefaultColumns
 	}
 
 	specifiedColumns, err := validateColumns(strings.ToLower(specifiedColumnsRaw))
@@ -268,12 +268,13 @@ func validateColumns(columnInput string) ([]string, error) {
 	}
 
 	validColumns := map[string]bool{
-		consts.DATE:    true,
-		consts.NAME:    true,
-		consts.REASON:  true,
-		consts.SIZE:    true,
-		consts.VERSION: true,
-		consts.DEPENDS: true,
+		consts.Date:     true,
+		consts.Name:     true,
+		consts.Reason:   true,
+		consts.Size:     true,
+		consts.Version:  true,
+		consts.Depends:  true,
+		consts.Provides: true,
 	}
 
 	var columns []string
@@ -330,6 +331,7 @@ func PrintHelp() {
 	fmt.Println("  size      - Package size on disk")
 	fmt.Println("  version   - Installed package version")
 	fmt.Println("  depends   - List of dependencies (output can be long)")
+	fmt.Println("  provides  - List of alternative package names or shared libraries provided by package (output can be long)")
 
 	fmt.Println("\nCaveat:")
 	fmt.Println("  The 'depends' column output can be lengthy. It's recommended to use `less` for better readability:")
