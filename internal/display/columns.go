@@ -19,21 +19,24 @@ type Column struct {
 }
 
 var allColumns = map[string]Column{
-	consts.DATE: {"DATE", formatDate},
-	consts.NAME: {"NAME", func(pkg PackageInfo, _ displayContext) string {
+	consts.Date: {"DATE", formatDate},
+	consts.Name: {"NAME", func(pkg PackageInfo, _ displayContext) string {
 		return pkg.Name
 	}},
-	consts.VERSION: {"VERSION", func(pkg PackageInfo, _ displayContext) string {
+	consts.Version: {"VERSION", func(pkg PackageInfo, _ displayContext) string {
 		return pkg.Version
 	}},
-	consts.REASON: {"REASON", func(pkg PackageInfo, _ displayContext) string {
+	consts.Reason: {"REASON", func(pkg PackageInfo, _ displayContext) string {
 		return pkg.Reason
 	}},
-	consts.SIZE: {"SIZE", func(pkg PackageInfo, _ displayContext) string {
+	consts.Size: {"SIZE", func(pkg PackageInfo, _ displayContext) string {
 		return formatSize(pkg.Size)
 	}},
-	consts.DEPENDS: {"DEPENDS", func(pkg PackageInfo, _ displayContext) string {
-		return formatDependencies(pkg.Depends)
+	consts.Depends: {"DEPENDS", func(pkg PackageInfo, _ displayContext) string {
+		return formatPackageList(pkg.Depends)
+	}},
+	consts.Provides: {"PROVIDES", func(pkg PackageInfo, _ displayContext) string {
+		return formatPackageList(pkg.Provides)
 	}},
 }
 
@@ -41,11 +44,11 @@ func formatDate(pkg PackageInfo, ctx displayContext) string {
 	return pkg.Timestamp.Format(ctx.DateFormat)
 }
 
-func formatDependencies(depends []string) string {
-	if len(depends) == 0 {
+func formatPackageList(packages []string) string {
+	if len(packages) == 0 {
 		return "-"
 	}
-	return strings.Join(depends, ", ")
+	return strings.Join(packages, ", ")
 }
 
 func GetColumnByName(name string) Column {

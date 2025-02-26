@@ -11,4 +11,5 @@ type PackageInfo struct {
 	Version    string // current installed version
 	Depends    []string
 	RequiredBy []string
+	Provides   []string
 }

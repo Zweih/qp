@@ -1,13 +1,14 @@
 package consts
 
 const (
-	DATE       = "date"
-	NAME       = "name"
-	REASON     = "reason"
-	SIZE       = "size"
-	VERSION    = "version"
-	DEPENDS    = "depends"
+	Date       = "date"
+	Name       = "name"
+	Reason     = "reason"
+	Size       = "size"
+	Version    = "version"
+	Depends    = "depends"
 	RequiredBy = "required-by"
+	Provides   = "provides"
 )
 
-var DefaultColumns = []string{DATE, NAME, REASON, SIZE}
+var DefaultColumns = []string{Date, Name, Reason, Size}
