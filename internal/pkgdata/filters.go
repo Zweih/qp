@@ -98,7 +98,6 @@ func applyFilterPipeline(
 					outChan <- pkg
 				}
 			}
-			close(outChan)
 
 			if reportProgress != nil {
 				completedPhases++
@@ -108,6 +107,8 @@ func applyFilterPipeline(
 					fmt.Sprintf("%s - Step %d/%d completed", phaseName, filterIndex+1, totalPhases),
 				)
 			}
+
+			close(outChan)
 		}(outputChan, nextOutputChan, f.Filter, f.PhaseName)
 
 		outputChan = nextOutputChan

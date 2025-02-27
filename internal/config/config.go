@@ -268,13 +268,14 @@ func validateColumns(columnInput string) ([]string, error) {
 	}
 
 	validColumns := map[string]bool{
-		consts.Date:     true,
-		consts.Name:     true,
-		consts.Reason:   true,
-		consts.Size:     true,
-		consts.Version:  true,
-		consts.Depends:  true,
-		consts.Provides: true,
+		consts.Date:       true,
+		consts.Name:       true,
+		consts.Reason:     true,
+		consts.Size:       true,
+		consts.Version:    true,
+		consts.Depends:    true,
+		consts.RequiredBy: true,
+		consts.Provides:   true,
 	}
 
 	var columns []string

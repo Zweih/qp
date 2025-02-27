@@ -35,6 +35,9 @@ var allColumns = map[string]Column{
 	consts.Depends: {"DEPENDS", func(pkg PackageInfo, _ displayContext) string {
 		return formatPackageList(pkg.Depends)
 	}},
+	consts.RequiredBy: {"REQUIRED BY", func(pkg PackageInfo, _ displayContext) string {
+		return formatPackageList(pkg.RequiredBy)
+	}},
 	consts.Provides: {"PROVIDES", func(pkg PackageInfo, _ displayContext) string {
 		return formatPackageList(pkg.Provides)
 	}},

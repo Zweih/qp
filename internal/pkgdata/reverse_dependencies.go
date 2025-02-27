@@ -1,9 +1,10 @@
 package pkgdata
 
 import (
-	"fmt"
 	"regexp"
+	"slices"
 	"yaylog/internal/config"
+	"yaylog/internal/consts"
 )
 
 func CalculateReverseDependencies(
@@ -11,21 +12,44 @@ func CalculateReverseDependencies(
 	packages []PackageInfo,
 	reportProgress ProgressReporter,
 ) []PackageInfo {
+	if !slices.Contains(cfg.ColumnNames, consts.RequiredBy) {
+		return packages
+	}
+
 	packagePointerMap := make(map[string]*PackageInfo)
 	packageDependencyMap := make(map[string][]string)
-	re := regexp.MustCompile(`^([^<>=]+)`)
+	providesMap := make(map[string]string) // key: provided library/package, value: package that providers it (provider)
+	re := regexp.MustCompile(`^([^<>=]+)`) // pulls package name out of `package-name>=2.0.1`
 
 	for i := range packages {
-		packagePointerMap[packages[i].Name] = &packages[i]
+		pkg := &packages[i]
+		packagePointerMap[pkg.Name] = pkg
 
-		if len(packages[i].Depends) > 0 {
-			for _, depPackage := range packages[i].Depends {
-				matches := re.FindStringSubmatch(depPackage)
-				depPackageName := matches[1]
+		// populate providesMap
+		for _, provided := range pkg.Provides {
+			matches := re.FindStringSubmatch(provided)
+			if len(matches) >= 2 {
+				providesMap[matches[1]] = pkg.Name
+			}
+		}
+	}
 
-				if len(matches) >= 2 {
-					packageDependencyMap[depPackageName] = append(packageDependencyMap[depPackageName], packages[i].Name)
+	for _, pkg := range packages {
+		for _, depPackage := range pkg.Depends {
+			matches := re.FindStringSubmatch(depPackage)
+
+			if len(matches) >= 2 {
+				depName := matches[1]
+
+				if provider, exists := providesMap[depName]; exists {
+					depName = provider
 				}
+
+				if depName == pkg.Name {
+					continue // skip if a package names itself as a dependency
+				}
+
+				packageDependencyMap[depName] = append(packageDependencyMap[depName], pkg.Name)
 			}
 		}
 	}
@@ -33,10 +57,7 @@ func CalculateReverseDependencies(
 	for name, requiredBy := range packageDependencyMap {
 		if pkg, exists := packagePointerMap[name]; exists {
 			pkg.RequiredBy = requiredBy
-		} else {
-			fmt.Printf("[COULDN'T FIND] Name: %s RequiredBy: %v", name, requiredBy)
 		}
-		// packagePointerMap[name].RequiredBy = requiredBy
 	}
 
 	return packages

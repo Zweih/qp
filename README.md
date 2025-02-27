@@ -64,6 +64,7 @@ because yay is my preferred AUR helper and the name has a good flow.
 - [ ] package URLs
 - [ ] package architecture
 - [ ] name exclusion filter
+- [ ] self-referencing column
 
 ## installation
 
