@@ -3,6 +3,7 @@
 *.so
 *.dylib
 /yaylog
+src-bundle
 
 /bin/
 /build/

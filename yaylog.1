@@ -117,6 +117,9 @@ Available columns:
 .B depends
 : List of dependencies (output can be long).
 .IP
+.B required-by
+: List of packages required by the package and are dependent on it (output can be long)
+.IP
 .B provides
 : List of alternative package names or shared libraries provided by package (output can be long).
 .TP
@@ -162,7 +165,7 @@ Valid:
 yaylog -en 15
 .EE
 .TP
-- The `depends` column output can be lengthy. To improve readability, pipe the output to `less`:
+- The `depends`, `required-by`, `depends` columns output can be lengthy. To improve readability, pipe the output to `less`:
 .PP
 .EX
 yaylog --columns name,depends | less
@@ -252,8 +255,8 @@ file for details.
 
 .SH BUGS
 Report bugs to the GitHub repository:
-.UR https://github.com/zweih/yaylog
-.LI https://github.com/zweih/yaylog
+.UR https://github.com/Zweih/yaylog
+.LI https://github.com/Zweih/yaylog
 .UE
 
 .SH SEE ALSO
