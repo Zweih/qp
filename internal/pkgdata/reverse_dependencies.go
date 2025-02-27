@@ -10,7 +10,7 @@ import (
 func CalculateReverseDependencies(
 	cfg config.Config,
 	packages []PackageInfo,
-	reportProgress ProgressReporter,
+	_ ProgressReporter, // TODO: Add progress reporting
 ) []PackageInfo {
 	if !slices.Contains(cfg.ColumnNames, consts.RequiredBy) {
 		return packages
