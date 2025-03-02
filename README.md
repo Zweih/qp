@@ -28,6 +28,7 @@ this package is compatible with the following distributions:
 - filter results by a specific installation date or date range
 - filter results by package size or size range
 - filter results by package name (substring match)
+- output as a table or JSON
 
 ## why is it called yaylog if it works with other AUR helpers?
 because yay is my preferred AUR helper and the name has a good flow.
@@ -65,6 +66,12 @@ because yay is my preferred AUR helper and the name has a good flow.
 - [ ] package architecture
 - [ ] name exclusion filter
 - [ ] self-referencing column
+- [x] JSON output
+- [ ] no-headers option
+- [ ] provides filter
+- [ ] depends filter
+- [ ] all-columns option
+- [ ] required-by filter
 
 ## installation
 
@@ -133,6 +140,7 @@ yaylog [options]
 - `--columns <list>`: comma-separated list of columns to display (overrides defaults)
 - `--add-columns <list>`: comma-separated list of columns to add to defaults
 - `--full-timestamp`: display the full timestamp (date and time) of package installations instead of just the date
+- `--json`: output results in JSON format (overrides table output and `--full-timestamp`)
 - `--no-progress`: force no progress bar outside of non-interactive environments
 - `-h` | `--help`: print help info
 
@@ -145,6 +153,30 @@ yaylog [options]
 - `depends` - list of dependencies (output can be long)
 - `required-by` - list of packages required by the package and are dependent (output can be long) 
 - `provides` - list of alternative package names or shared libraries provided by package (output can be long)
+
+### JSON output
+the `--json` flag outputs the package data as structured JSON instead of a table. this can be useful for scripts or automation.
+
+Example:
+```bash
+yaylog --add-columns=version,depends --size 700MB:1GB --date :2025-03-01 --json
+```
+
+Output format:
+```json
+[
+  {
+    "timestamp": "2025-02-11T17:17:30Z",
+    "name": "linux-firmware",
+    "reason": "dependency",
+    "size": 756086774,
+    "version": "20250109.7673dffd-1",
+    "depends": [
+      "linux-firmware-whence"
+    ]
+  }
+]
+```
 
 ### tips & tricks
 
@@ -249,4 +281,20 @@ are treated as separate parameters.
 16. show package names and dependencies with `less` for readability:
    ```bash
    yaylog --columns name,depends | less
+   ```
+17. Output package data in JSON format:
+   ```bash
+   yaylog --json
+   ```
+18. Save all explicitly installed packages to a JSON file:
+   ```bash
+   yaylog --json -e > explicit-packages.json
+   ```
+19. Output all packages sorted by size (descending) in JSON:
+   ```bash
+   yaylog --json -a --sort size:desc
+   ```
+20. Output JSON with specific columns:
+   ```bash
+   yaylog --json --columns name,version,size
    ```
