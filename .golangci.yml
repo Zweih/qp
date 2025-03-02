@@ -6,3 +6,8 @@ linters:
     - errcheck
     - revive 
   disable-all: false
+linters-settings:
+  revive:
+    rules:
+      - name: var-naming
+        disabled: true
