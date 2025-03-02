@@ -28,6 +28,7 @@ type Config struct {
 	Count             int
 	AllPackages       bool
 	ShowHelp          bool
+	OutputJson        bool
 	ShowFullTimestamp bool
 	DisableProgress   bool
 	ExplicitOnly      bool
@@ -44,6 +45,7 @@ func ParseFlags(args []string) (Config, error) {
 	var count int
 	var allPackages bool
 	var showHelp bool
+	var outputJson bool
 	var showFullTimestamp bool
 	var disableProgress bool
 	var explicitOnly bool
@@ -59,6 +61,7 @@ func ParseFlags(args []string) (Config, error) {
 
 	pflag.BoolVarP(&allPackages, "all", "a", false, "Show all packages (ignores -n)")
 	pflag.BoolVarP(&showHelp, "help", "h", false, "Display help")
+	pflag.BoolVarP(&outputJson, "json", "", false, "Output results in JSON format")
 	pflag.BoolVarP(&showFullTimestamp, "full-timestamp", "", false, "Show full timestamp instead of just the date")
 	pflag.BoolVarP(&disableProgress, "no-progress", "", false, "Force suppress progress output")
 	pflag.BoolVarP(&explicitOnly, "explicit", "e", false, "Show only explicitly installed packages")
@@ -98,6 +101,7 @@ func ParseFlags(args []string) (Config, error) {
 		Count:             count,
 		AllPackages:       allPackages,
 		ShowHelp:          showHelp,
+		OutputJson:        outputJson,
 		ShowFullTimestamp: showFullTimestamp,
 		DisableProgress:   disableProgress,
 		ExplicitOnly:      explicitOnly,

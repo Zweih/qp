@@ -2,6 +2,7 @@ package display
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
@@ -42,7 +43,7 @@ func Write(msg string) {
 }
 
 func WriteLine(msg string) {
-	manager.write(msg + "\n")
+	manager.writeLine(msg)
 }
 
 func PrintProgress(phase string, progress int, description string) {
@@ -63,11 +64,19 @@ func PrintTable(pkgs []pkgdata.PackageInfo, showFullTimestamp bool, columnNames 
 	manager.printTable(pkgs, dateFormat, columnNames)
 }
 
+func PrintJson(pkgs []pkgdata.PackageInfo, columnNames []string) {
+	manager.printJson(pkgs, columnNames)
+}
+
 func (o *OutputManager) write(msg string) {
 	o.mu.Lock()
 	defer o.mu.Unlock()
 
 	fmt.Print(msg)
+}
+
+func (o *OutputManager) writeLine(msg string) {
+	o.write(msg + "\n")
 }
 
 func (o *OutputManager) printProgress(phase string, progress int, description string) {
@@ -111,41 +120,49 @@ func (o *OutputManager) printTable(
 	columnNames []string,
 ) {
 	o.clearProgress()
-	columns := []Column{}
-
-	for _, columnName := range columnNames {
-		columns = append(columns, GetColumnByName(columnName))
-	}
-
 	ctx := displayContext{DateFormat: dateFormat}
 
 	var buffer bytes.Buffer
 	w := tabwriter.NewWriter(&buffer, 0, 8, 2, ' ', 0)
 
-	renderHeaders(w, columns)
+	renderHeaders(w, columnNames)
 
 	for _, pkg := range packages {
-		renderRows(w, pkg, columns, ctx)
+		renderRows(w, pkg, columnNames, ctx)
 	}
 
 	w.Flush()
 	o.write(buffer.String())
 }
 
-func renderHeaders(w *tabwriter.Writer, columns []Column) {
-	headers := make([]string, len(columns))
-	for i, col := range columns {
-		headers[i] = col.Header
+func renderHeaders(w *tabwriter.Writer, columnNames []string) {
+	headers := make([]string, len(columnNames))
+	for i, columnName := range columnNames {
+		headers[i] = columnHeaders[columnName]
 	}
 
 	fmt.Fprintln(w, strings.Join(headers, "\t"))
 }
 
-func renderRows(w *tabwriter.Writer, pkg PackageInfo, columns []Column, ctx displayContext) {
-	row := make([]string, len(columns))
-	for i, col := range columns {
-		row[i] = col.Getter(pkg, ctx)
+func renderRows(w *tabwriter.Writer, pkg pkgdata.PackageInfo, columnNames []string, ctx displayContext) {
+	row := make([]string, len(columnNames))
+	for i, columnName := range columnNames {
+		row[i] = GetColumnTableValue(pkg, columnName, ctx)
 	}
 
 	fmt.Fprintln(w, strings.Join(row, "\t"))
+}
+
+func (o *OutputManager) printJson(pkgs []pkgdata.PackageInfo, columnNames []string) {
+	filteredPackages := make([]pkgdata.PackageInfoJson, len(pkgs))
+	for i, pkg := range pkgs {
+		filteredPackages[i] = GetColumnJsonValues(pkg, columnNames)
+	}
+
+	jsonOutput, err := json.MarshalIndent(filteredPackages, "", "  ")
+	if err != nil {
+		o.writeLine(fmt.Sprintf("Error genereating JSON output: %v", err))
+	}
+
+	o.writeLine(string(jsonOutput))
 }

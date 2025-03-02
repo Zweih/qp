@@ -12,3 +12,5 @@ const (
 )
 
 var DefaultColumns = []string{Date, Name, Reason, Size}
+
+var ValidColumns = []string{Date, Name, Reason, Size, Version, Depends, RequiredBy, Provides}

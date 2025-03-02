@@ -11,39 +11,66 @@ type displayContext struct {
 	DateFormat string
 }
 
-type PackageInfo = pkgdata.PackageInfo
-
-type Column struct {
-	Header string
-	Getter func(pkg PackageInfo, ctx displayContext) string
+var columnHeaders = map[string]string{
+	consts.Date:       "DATE",
+	consts.Name:       "NAME",
+	consts.Version:    "VERSION",
+	consts.Size:       "SIZE",
+	consts.Depends:    "DEPENDS",
+	consts.RequiredBy: "REQUIRED BY",
+	consts.Provides:   "PROVIDES",
 }
 
-var allColumns = map[string]Column{
-	consts.Date: {"DATE", formatDate},
-	consts.Name: {"NAME", func(pkg PackageInfo, _ displayContext) string {
+func GetColumnJsonValues(pkg pkgdata.PackageInfo, columnNames []string) pkgdata.PackageInfoJson {
+	filteredPackage := pkgdata.PackageInfoJson{}
+
+	for _, columnName := range columnNames {
+		switch columnName {
+		case consts.Date:
+			filteredPackage.Timestamp = &pkg.Timestamp
+		case consts.Name:
+			filteredPackage.Name = pkg.Name
+		case consts.Reason:
+			filteredPackage.Reason = pkg.Reason
+		case consts.Size:
+			filteredPackage.Size = pkg.Size // return in bytes for json
+		case consts.Version:
+			filteredPackage.Version = pkg.Version
+		case consts.Depends:
+			filteredPackage.Depends = pkg.Depends
+		case consts.RequiredBy:
+			filteredPackage.RequiredBy = pkg.RequiredBy
+		case consts.Provides:
+			filteredPackage.Provides = pkg.Provides
+		}
+	}
+
+	return filteredPackage
+}
+
+func GetColumnTableValue(pkg pkgdata.PackageInfo, columnName string, ctx displayContext) string {
+	switch columnName {
+	case consts.Date:
+		return formatDate(pkg, ctx)
+	case consts.Name:
 		return pkg.Name
-	}},
-	consts.Version: {"VERSION", func(pkg PackageInfo, _ displayContext) string {
-		return pkg.Version
-	}},
-	consts.Reason: {"REASON", func(pkg PackageInfo, _ displayContext) string {
+	case consts.Reason:
 		return pkg.Reason
-	}},
-	consts.Size: {"SIZE", func(pkg PackageInfo, _ displayContext) string {
+	case consts.Size:
 		return formatSize(pkg.Size)
-	}},
-	consts.Depends: {"DEPENDS", func(pkg PackageInfo, _ displayContext) string {
+	case consts.Depends:
 		return formatPackageList(pkg.Depends)
-	}},
-	consts.RequiredBy: {"REQUIRED BY", func(pkg PackageInfo, _ displayContext) string {
+	case consts.RequiredBy:
 		return formatPackageList(pkg.RequiredBy)
-	}},
-	consts.Provides: {"PROVIDES", func(pkg PackageInfo, _ displayContext) string {
+	case consts.Provides:
 		return formatPackageList(pkg.Provides)
-	}},
+	default:
+		return ""
+	}
 }
 
-func formatDate(pkg PackageInfo, ctx displayContext) string {
+// use time as parameter
+func formatDate(pkg pkgdata.PackageInfo, ctx displayContext) string {
 	return pkg.Timestamp.Format(ctx.DateFormat)
 }
 
@@ -52,11 +79,6 @@ func formatPackageList(packages []string) string {
 		return "-"
 	}
 	return strings.Join(packages, ", ")
-}
-
-func GetColumnByName(name string) Column {
-	col := allColumns[name]
-	return col
 }
 
 func formatSize(size int64) string {
