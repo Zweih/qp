@@ -1,10 +1,10 @@
 .\" Man page for yaylog
-.TH yaylog 1 "February 2025" "yaylog 3.11.0" "User Commands"
+.TH yaylog 1 "March 2025" "yaylog 3.14.0" "User Commands"
 .SH NAME
 yaylog \- List and filter installed packages on Arch-based systems.
 .SH SYNOPSIS
 .B yaylog
-.RI [ \-n | \-\-number <number> ] [ \-e | \-\-explicit ] [ \-a | \-\-all ] [ \-d | \-\-dependencies ] [ \-\-date <filter> ] [ \-\-size <filter> ] [ \-\-name <search-term> ] [ \-\-sort <mode> ] [ \-\-columns <list> ] [ \-\-add-columns <list> ] [ \-\-full-timestamp ] [ \-\-no-progress ] [ \-h | \-\-help ]
+.RI [ \-n | \-\-number <number> ] [ \-e | \-\-explicit ] [ \-a | \-\-all ] [ \-d | \-\-dependencies ] [ \-\-date <filter> ] [ \-\-size <filter> ] [ \-\-name <search-term> ] [ \-\-sort <mode> ] [ \-\-columns <list> ] [ \-\-add-columns <list> ] [ \-\-json ] [ \-\-full-timestamp ] [ \-\-no-progress ] [ \-h | \-\-help ]
 .SH DESCRIPTION
 .B yaylog
 is a standalone CLI utility for Arch and Arch-based Linux distributions to list and filter installed packages. It works with any package manager that uses ALPM,
@@ -126,8 +126,39 @@ Available columns:
 .B \-\-add-columns <list>
 Add additional columns to the default display without overriding them.
 .TP
+.B \-\-json
+Output results in JSON format instead of a table. Overrides
+.B \-\-full-timestamp
+and ensures all fields are structured for automation.
+.PP
+Example usage:
+.PP
+.EX
+yaylog --json --columns name,version,size
+.EE
+.PP
+JSON output example:
+.PP
+.EX
+[
+  {
+    "timestamp": "2025-02-11T17:17:30Z",
+    "name": "linux-firmware",
+    "reason": "dependency",
+    "size": 756086774,
+    "version": "20250109.7673dffd-1",
+    "depends": [
+      "linux-firmware-whence"
+    ]
+  }
+]
+.EE
+.TP
 .B \-\-full-timestamp
 Display the full timestamp (date and time) of package installations instead of just the date.
+Ignored if
+.B \-\-json
+is used.
 .TP
 .B \-\-no-progress 
 Force disable progress bar outside non-interactive environments.
@@ -165,7 +196,7 @@ Valid:
 yaylog -en 15
 .EE
 .TP
-- The `depends`, `required-by`, `depends` columns output can be lengthy. To improve readability, pipe the output to `less`:
+- The `depends`, `required-by`, and `provides` columns output can be lengthy. To improve readability, pipe the output to `less`:
 .PP
 .EX
 yaylog --columns name,depends | less
@@ -210,40 +241,28 @@ Show all packages sorted by size in descending order, installed after January 1,
 yaylog -a --sort size:desc --date 2024-01-01:
 .EE
 .TP
-Show packages up to 50MB sorted alphabetically:
+Output package data in JSON format:
 .PP
 .EX
-yaylog --size :50MB --sort alphabetical
+yaylog --json
 .EE
 .TP
-Search for installed packages containing "python":
+Save all explicitly installed packages to a JSON file:
 .PP
 .EX
-yaylog --name python
+yaylog --json -e > explicit-packages.json
 .EE
 .TP
-Search for explicitly installed packages containing "lib" that are between 10MB and 1GB in size:
+Output all packages sorted by size (descending) in JSON:
 .PP
 .EX
-yaylog -e --name lib --size 10MB:1GB
+yaylog --json -a --sort size:desc
 .EE
 .TP
-Search for packages containing "linux" that were installed between January 1 and June 30, 2024:
+Output JSON with specific columns:
 .PP
 .EX
-yaylog --name linux --date 2024-01-01:2024-06-30
-.EE
-.TP
-Search for packages containing "gtk" that were installed after January 1, 2023, and are at least 5MB in size:
-.PP
-.EX
-yaylog --name gtk --date 2023-01-01: --size 5MB:
-.EE
-.TP
-Show package names and dependencies with `less` for readability:
-.PP
-.EX
-yaylog --columns name,depends | less
+yaylog --json --columns name,version,size
 .EE
 
 .SH AUTHOR

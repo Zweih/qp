@@ -282,19 +282,19 @@ are treated as separate parameters.
    ```bash
    yaylog --columns name,depends | less
    ```
-17. Output package data in JSON format:
+17. output package data in JSON format:
    ```bash
    yaylog --json
    ```
-18. Save all explicitly installed packages to a JSON file:
+18. save all explicitly installed packages to a JSON file:
    ```bash
    yaylog --json -e > explicit-packages.json
    ```
-19. Output all packages sorted by size (descending) in JSON:
+19. output all packages sorted by size (descending) in JSON:
    ```bash
    yaylog --json -a --sort size:desc
    ```
-20. Output JSON with specific columns:
+20. output JSON with specific columns:
    ```bash
    yaylog --json --columns name,version,size
    ```
