@@ -271,15 +271,9 @@ func validateColumns(columnInput string) ([]string, error) {
 		return []string{}, nil
 	}
 
-	validColumns := map[string]bool{
-		consts.Date:       true,
-		consts.Name:       true,
-		consts.Reason:     true,
-		consts.Size:       true,
-		consts.Version:    true,
-		consts.Depends:    true,
-		consts.RequiredBy: true,
-		consts.Provides:   true,
+	validColumnsSet := map[string]bool{}
+	for _, columnName := range consts.ValidColumns {
+		validColumnsSet[columnName] = true
 	}
 
 	var columns []string
@@ -287,7 +281,7 @@ func validateColumns(columnInput string) ([]string, error) {
 	for _, column := range strings.Split(columnInput, ",") {
 		cleanColumn := strings.TrimSpace(column)
 
-		if !validColumns[strings.TrimSpace(column)] {
+		if !validColumnsSet[strings.TrimSpace(column)] {
 			return nil, fmt.Errorf("%s is not a valid column", cleanColumn)
 		}
 
