@@ -14,8 +14,9 @@ type displayContext struct {
 var columnHeaders = map[string]string{
 	consts.Date:       "DATE",
 	consts.Name:       "NAME",
-	consts.Version:    "VERSION",
+	consts.Reason:     "REASON",
 	consts.Size:       "SIZE",
+	consts.Version:    "VERSION",
 	consts.Depends:    "DEPENDS",
 	consts.RequiredBy: "REQUIRED BY",
 	consts.Provides:   "PROVIDES",
