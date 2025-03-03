@@ -59,6 +59,8 @@ func GetColumnTableValue(pkg pkgdata.PackageInfo, columnName string, ctx display
 		return pkg.Reason
 	case consts.Size:
 		return formatSize(pkg.Size)
+	case consts.Version:
+		return pkg.Version
 	case consts.Depends:
 		return formatPackageList(pkg.Depends)
 	case consts.RequiredBy:
