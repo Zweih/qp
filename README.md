@@ -70,7 +70,7 @@ because yay is my preferred AUR helper and the name has a good flow.
 - [ ] no-headers option
 - [ ] provides filter
 - [ ] depends filter
-- [ ] all-columns option
+- [x] all-columns option
 - [ ] required-by filter
 
 ## installation
