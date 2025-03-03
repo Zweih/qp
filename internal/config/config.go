@@ -44,6 +44,7 @@ type Config struct {
 func ParseFlags(args []string) (Config, error) {
 	var count int
 	var allPackages bool
+	var hasAllColumns bool
 	var showHelp bool
 	var outputJson bool
 	var showFullTimestamp bool
@@ -60,6 +61,7 @@ func ParseFlags(args []string) (Config, error) {
 	pflag.IntVarP(&count, "number", "n", 20, "Number of packages to show")
 
 	pflag.BoolVarP(&allPackages, "all", "a", false, "Show all packages (ignores -n)")
+	pflag.BoolVarP(&hasAllColumns, "all-columns", "", false, "Show all columns/fields in output")
 	pflag.BoolVarP(&showHelp, "help", "h", false, "Display help")
 	pflag.BoolVarP(&outputJson, "json", "", false, "Output results in JSON format")
 	pflag.BoolVarP(&showFullTimestamp, "full-timestamp", "", false, "Show full timestamp instead of just the date")
@@ -92,7 +94,7 @@ func ParseFlags(args []string) (Config, error) {
 		return Config{}, err
 	}
 
-	columnsParsed, err := parseColumns(columnsInput, addColumnsInput)
+	columnsParsed, err := parseColumns(columnsInput, addColumnsInput, hasAllColumns)
 	if err != nil {
 		return Config{}, err
 	}
@@ -234,9 +236,13 @@ func parseSizeInBytes(valueInput string, unitInput string) (sizeInBytes int64, e
 	return sizeInBytes, nil
 }
 
-func parseColumns(columnsInput string, addColumnsInput string) ([]string, error) {
+func parseColumns(columnsInput string, addColumnsInput string, hasAllColumns bool) ([]string, error) {
 	if columnsInput != "" && addColumnsInput != "" {
 		return nil, fmt.Errorf("cannot use --columns and --add-columns together. Use --columns to fully define the columns you want")
+	}
+
+	if hasAllColumns {
+		return consts.ValidColumns, nil
 	}
 
 	var specifiedColumnsRaw string
