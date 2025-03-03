@@ -54,14 +54,14 @@ func ClearProgress() {
 	manager.clearProgress()
 }
 
-func PrintTable(pkgs []pkgdata.PackageInfo, showFullTimestamp bool, columnNames []string) {
+func PrintTable(pkgs []pkgdata.PackageInfo, columnNames []string, showFullTimestamp bool, hasNoHeaders bool) {
 	dateFormat := consts.DateOnlyFormat
 
 	if showFullTimestamp {
 		dateFormat = consts.DateTimeFormat
 	}
 
-	manager.printTable(pkgs, dateFormat, columnNames)
+	manager.printTable(pkgs, dateFormat, columnNames, hasNoHeaders)
 }
 
 func PrintJson(pkgs []pkgdata.PackageInfo, columnNames []string) {
@@ -118,6 +118,7 @@ func (o *OutputManager) printTable(
 	packages []pkgdata.PackageInfo,
 	dateFormat string,
 	columnNames []string,
+	hasNoHeaders bool,
 ) {
 	o.clearProgress()
 	ctx := displayContext{DateFormat: dateFormat}
@@ -125,7 +126,9 @@ func (o *OutputManager) printTable(
 	var buffer bytes.Buffer
 	w := tabwriter.NewWriter(&buffer, 0, 8, 2, ' ', 0)
 
-	renderHeaders(w, columnNames)
+	if !hasNoHeaders {
+		renderHeaders(w, columnNames)
+	}
 
 	for _, pkg := range packages {
 		renderRows(w, pkg, columnNames, ctx)

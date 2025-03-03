@@ -29,6 +29,7 @@ type Config struct {
 	AllPackages       bool
 	ShowHelp          bool
 	OutputJson        bool
+	HasNoHeaders      bool
 	ShowFullTimestamp bool
 	DisableProgress   bool
 	ExplicitOnly      bool
@@ -43,13 +44,16 @@ type Config struct {
 
 func ParseFlags(args []string) (Config, error) {
 	var count int
+
 	var allPackages bool
 	var showHelp bool
 	var outputJson bool
+	var hasNoHeaders bool
 	var showFullTimestamp bool
 	var disableProgress bool
 	var explicitOnly bool
 	var dependenciesOnly bool
+
 	var dateFilter string
 	var sizeFilter string
 	var nameFilter string
@@ -62,6 +66,7 @@ func ParseFlags(args []string) (Config, error) {
 	pflag.BoolVarP(&allPackages, "all", "a", false, "Show all packages (ignores -n)")
 	pflag.BoolVarP(&showHelp, "help", "h", false, "Display help")
 	pflag.BoolVarP(&outputJson, "json", "", false, "Output results in JSON format")
+	pflag.BoolVarP(&hasNoHeaders, "no-headers", "", false, "Hide headers for columns (useful for scripts/automation)")
 	pflag.BoolVarP(&showFullTimestamp, "full-timestamp", "", false, "Show full timestamp instead of just the date")
 	pflag.BoolVarP(&disableProgress, "no-progress", "", false, "Force suppress progress output")
 	pflag.BoolVarP(&explicitOnly, "explicit", "e", false, "Show only explicitly installed packages")
@@ -102,6 +107,7 @@ func ParseFlags(args []string) (Config, error) {
 		AllPackages:       allPackages,
 		ShowHelp:          showHelp,
 		OutputJson:        outputJson,
+		HasNoHeaders:      hasNoHeaders,
 		ShowFullTimestamp: showFullTimestamp,
 		DisableProgress:   disableProgress,
 		ExplicitOnly:      explicitOnly,
