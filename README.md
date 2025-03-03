@@ -67,7 +67,7 @@ because yay is my preferred AUR helper and the name has a good flow.
 - [ ] name exclusion filter
 - [ ] self-referencing column
 - [x] JSON output
-- [ ] no-headers option
+- [x] no-headers option
 - [ ] provides filter
 - [ ] depends filter
 - [ ] all-columns option
