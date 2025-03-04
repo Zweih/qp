@@ -3,6 +3,7 @@ package pkgdata
 import (
 	"fmt"
 	"math"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -12,6 +13,22 @@ type Filter func(PackageInfo) bool
 type FilterCondition struct {
 	Filter    Filter
 	PhaseName string
+}
+
+// I feel like this shouldn't be here, let's find a better spot for it
+var re = regexp.MustCompile(`^([^<>=]+)`) // pulls package name out of `package-name>=2.0.1`
+
+func FilterRequiredBy(pkg PackageInfo, target string) bool {
+	for _, requiredByPkgName := range pkg.RequiredBy {
+		matches := re.FindStringSubmatch(requiredByPkgName)
+		if len(matches) >= 2 {
+			if matches[1] == target { // TODO: condense
+				return true
+			}
+		}
+	}
+
+	return false
 }
 
 func FilterExplicit(pkg PackageInfo) bool {

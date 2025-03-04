@@ -90,6 +90,15 @@ func applyFilters(
 ) []pkgdata.PackageInfo {
 	filters := make([]pkgdata.FilterCondition, 0)
 
+	if len(cfg.RequiredByFilter) > 0 {
+		filters = append(filters, pkgdata.FilterCondition{
+			Filter: func(pkg pkgdata.PackageInfo) bool {
+				return pkgdata.FilterRequiredBy(pkg, cfg.RequiredByFilter)
+			},
+			PhaseName: "Filter by required package",
+		})
+	}
+
 	if cfg.ExplicitOnly {
 		filters = append(filters, pkgdata.FilterCondition{
 			Filter:    pkgdata.FilterExplicit,

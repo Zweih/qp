@@ -37,6 +37,7 @@ type Config struct {
 	DateFilter        DateFilter
 	SizeFilter        SizeFilter
 	NameFilter        string
+	RequiredByFilter  string
 	SortBy            string
 	ColumnNames       []string
 }
@@ -53,6 +54,7 @@ func ParseFlags(args []string) (Config, error) {
 	var dateFilter string
 	var sizeFilter string
 	var nameFilter string
+	var requiredByFilter string
 	var sortBy string
 	var columnsInput string
 	var addColumnsInput string
@@ -70,6 +72,8 @@ func ParseFlags(args []string) (Config, error) {
 	pflag.StringVar(&dateFilter, "date", "", "Filter packages by installation date. Supports exact dates (YYYY-MM-DD), ranges (YYYY-MM-DD:YYYY-MM-DD), and open-ended filters (:YYYY-MM-DD or YYYY-MM-DD:).")
 	pflag.StringVar(&sizeFilter, "size", "", "Filter packages by size. Supports ranges (e.g., 10MB:20GB), exact matches (e.g., 5MB), and open-ended values (e.g., :2GB or 500KB:)")
 	pflag.StringVar(&nameFilter, "name", "", "Filter packages by name (or similar name)")
+	pflag.StringVar(&requiredByFilter, "required-by", "", "Filter packages by names of packages that require them")
+
 	pflag.StringVar(&sortBy, "sort", "date", "Sort packages by: 'date', 'alphabetical', 'size:desc', 'size:asc'")
 	pflag.StringVar(&columnsInput, "columns", "", "Comma-separated list of columns to display (overrides defaults)")
 	pflag.StringVar(&addColumnsInput, "add-columns", "", "Comma-separated list of columns to add to defaults")
@@ -109,6 +113,7 @@ func ParseFlags(args []string) (Config, error) {
 		DateFilter:        dateFilterParsed,
 		SizeFilter:        sizeFilterParsed,
 		NameFilter:        nameFilter,
+		RequiredByFilter:  requiredByFilter,
 		SortBy:            sortBy,
 		ColumnNames:       columnsParsed,
 	}, nil
