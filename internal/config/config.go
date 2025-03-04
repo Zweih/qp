@@ -61,7 +61,7 @@ func ParseFlags(args []string) (Config, error) {
 	pflag.IntVarP(&count, "number", "n", 20, "Number of packages to show")
 
 	pflag.BoolVarP(&allPackages, "all", "a", false, "Show all packages (ignores -n)")
-	pflag.BoolVarP(&hasAllColumns, "all-columns", "", false, "Show all columns/fields in output")
+	pflag.BoolVarP(&hasAllColumns, "all-columns", "", false, "Show all available columns/fields in the output (overrides defaults)")
 	pflag.BoolVarP(&showHelp, "help", "h", false, "Display help")
 	pflag.BoolVarP(&outputJson, "json", "", false, "Output results in JSON format")
 	pflag.BoolVarP(&showFullTimestamp, "full-timestamp", "", false, "Show full timestamp instead of just the date")
