@@ -333,6 +333,7 @@ func PrintHelp() {
 	fmt.Println("\nColumn Options:")
 	fmt.Println("  --columns <list>     Comma-separated list of columns to display (overrides defaults)")
 	fmt.Println("  --add-columns <list> Comma-separated list of columns to add to defaults")
+	fmt.Println("  --no-headers         Omit column headers in output (useful for scripts and automation)")
 
 	fmt.Println("\nAvailable Columns:")
 	fmt.Println("  date         - Installation date of the package")

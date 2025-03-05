@@ -139,6 +139,7 @@ yaylog [options]
   - `date` (default) - sort by installation date
   - `alphabetical` - sort alphabetically by package name
   - `size:asc` / `size:desc` - sort by package size (ascending or descending)
+- `--no-headers`: omit column headers in table output (useful for scripting)
 - `--columns <list>`: comma-separated list of columns to display (overrides defaults)
 - `--add-columns <list>`: comma-separated list of columns to add to defaults
 - `--all-columns`: show all available columns in the output (overrides defaults)
@@ -218,6 +219,10 @@ are treated as separate parameters.
 
   **note**: `--no-progress` is automatically set to `true` when in a non-interactive environment, so you can pipe `|` into programs like `cat`, `grep`, or `less` without issue
 
+- the `--no-headers` flag is useful when processing output in scripts. It removes the header row, making it easier to parse package lists with tools like `awk`, `sed`, or `cut`:
+  ```bash
+  yaylog --no-headers --columns name,size | awk '{print $1, $2}'
+  ```
 
 ### examples
 
@@ -308,4 +313,8 @@ are treated as separate parameters.
 22. output all packages with all columns/fields in JSON format:
    ```bash
    yaylog -a --all-columns --json
+   ```
+23. show package names and sizes without headers for scripting:
+   ```bash
+   yaylog --no-headers --columns name,size
    ```

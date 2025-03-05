@@ -95,6 +95,9 @@ Sort results by the specified mode. Available modes:
 .B size:desc
 : Sort by package size in descending order.
 .TP
+.TP
+.B \-\-no-headers
+Omit column headers in table output. This is useful for scripting, as it produces cleaner output without requiring manual header removal.
 .B \-\-columns <list>
 Specify a comma-separated list of columns to display. Overrides default columns.
 Available columns:
@@ -231,6 +234,24 @@ Output JSON with specific columns:
 .EX
 yaylog --json --columns name,version,size
 .EE
+.TP
+Show package names and sizes without headers (useful for scripting):
+.PP
+.EX
+yaylog --no-headers --columns name,size
+.EE
+.TP
+Output all package names, sorted by size in descending order, without headers:
+.PP
+.EX
+yaylog --no-headers --sort size:desc | awk '{print $1}'
+.EE
+.TP
+Save a clean list of installed package names to a file:
+.PP
+.EX
+yaylog --no-headers --columns name > installed-packages.txt
+.EE
 
 .SH ADDITIONAL NOTES
 .TP
@@ -253,6 +274,12 @@ yaylog --explicit=true --dependencies=false
 .PP
 .EX
 yaylog --columns name,depends | less
+.EE
+.TP
+- The `--no-headers` flag is particularly useful when processing package lists in scripts. It removes the header row, making it easier to parse package names and sizes using tools like `awk`, `sed`, or `cut`:
+.PP
+.EX
+yaylog --no-headers --columns name,size | awk '{print $1, $2}'
 .EE
 
 .SH AUTHOR
