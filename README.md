@@ -26,6 +26,7 @@ this package is compatible with the following distributions:
 - display package versions 
 - filter results by explicitly installed packages
 - filter results by packages installed as dependencies
+- filter by packages required by a specific package
 - sort results by installation date, alphabetically, or by size on disk
 - filter results by a specific installation date or date range
 - filter results by package size or size range
@@ -73,7 +74,7 @@ because yay is my preferred AUR helper and the name has a good flow.
 - [ ] provides filter
 - [ ] depends filter
 - [x] all-columns option
-- [ ] required-by filter
+- [x] required-by filter
 
 ## installation
 
@@ -146,6 +147,7 @@ yaylog [options]
 - `--full-timestamp`: display the full timestamp (date and time) of package installations instead of just the date
 - `--json`: output results in JSON format (overrides table output and `--full-timestamp`)
 - `--no-progress`: force no progress bar outside of non-interactive environments
+- `--required-by <package-name>`: show only packages that are required by the specified package
 - `-h` | `--help`: print help info
 
 ### available columns
@@ -317,4 +319,16 @@ are treated as separate parameters.
 23. show package names and sizes without headers for scripting:
    ```bash
    yaylog --no-headers --columns name,size
+   ```
+24. show all packages required by "firefox":
+   ```bash
+   yaylog --required-by firefox
+   ```
+25. show all packages required by "gtk3" that are at least 50MB in size:
+   ```bash
+   yaylog --required-by gtk3 --size 50MB:
+   ```
+26. show packages required by "vlc" and installed after January 1, 2024:
+   ```bash
+   yaylog --required-by vlc --date 2024-01-01:
    ```
