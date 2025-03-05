@@ -1,13 +1,11 @@
 package display
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
 	"sync"
-	"text/tabwriter"
 	"yaylog/internal/consts"
 	"yaylog/internal/pkgdata"
 
@@ -54,14 +52,13 @@ func ClearProgress() {
 	manager.clearProgress()
 }
 
-func PrintTable(pkgs []pkgdata.PackageInfo, columnNames []string, showFullTimestamp bool, hasNoHeaders bool) {
-	dateFormat := consts.DateOnlyFormat
-
-	if showFullTimestamp {
-		dateFormat = consts.DateTimeFormat
-	}
-
-	manager.printTable(pkgs, dateFormat, columnNames, hasNoHeaders)
+func RenderTable(
+	packages []pkgdata.PackageInfo,
+	columnNames []string,
+	showFullTimestamp bool,
+	hasNoHeaders bool,
+) {
+	manager.renderTable(packages, columnNames, showFullTimestamp, hasNoHeaders)
 }
 
 func PrintJson(pkgs []pkgdata.PackageInfo, columnNames []string) {
@@ -111,49 +108,6 @@ func (o *OutputManager) clearPrevMsg(newMsgLength int) {
 		clearSpace := strings.Repeat(" ", o.lastMsgLength)
 		o.write("\r" + clearSpace + "\r")
 	}
-}
-
-// displays data in tab format
-func (o *OutputManager) printTable(
-	packages []pkgdata.PackageInfo,
-	dateFormat string,
-	columnNames []string,
-	hasNoHeaders bool,
-) {
-	o.clearProgress()
-	ctx := displayContext{DateFormat: dateFormat}
-
-	var buffer bytes.Buffer
-	w := tabwriter.NewWriter(&buffer, 0, 8, 2, ' ', 0)
-
-	if !hasNoHeaders {
-		renderHeaders(w, columnNames)
-	}
-
-	for _, pkg := range packages {
-		renderRows(w, pkg, columnNames, ctx)
-	}
-
-	w.Flush()
-	o.write(buffer.String())
-}
-
-func renderHeaders(w *tabwriter.Writer, columnNames []string) {
-	headers := make([]string, len(columnNames))
-	for i, columnName := range columnNames {
-		headers[i] = columnHeaders[columnName]
-	}
-
-	fmt.Fprintln(w, strings.Join(headers, "\t"))
-}
-
-func renderRows(w *tabwriter.Writer, pkg pkgdata.PackageInfo, columnNames []string, ctx displayContext) {
-	row := make([]string, len(columnNames))
-	for i, columnName := range columnNames {
-		row[i] = GetColumnTableValue(pkg, columnName, ctx)
-	}
-
-	fmt.Fprintln(w, strings.Join(row, "\t"))
 }
 
 func (o *OutputManager) printJson(pkgs []pkgdata.PackageInfo, columnNames []string) {
