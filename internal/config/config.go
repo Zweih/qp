@@ -63,26 +63,32 @@ func ParseFlags(args []string) (Config, error) {
 	var columnsInput string
 	var addColumnsInput string
 
-	pflag.IntVarP(&count, "number", "n", 20, "Number of packages to show")
+	pflag.CommandLine.SortFlags = false
 
+	pflag.IntVarP(&count, "number", "n", 20, "Number of packages to show")
 	pflag.BoolVarP(&allPackages, "all", "a", false, "Show all packages (ignores -n)")
-	pflag.BoolVarP(&hasAllColumns, "all-columns", "", false, "Show all available columns/fields in the output (overrides defaults)")
-	pflag.BoolVarP(&showHelp, "help", "h", false, "Display help")
-	pflag.BoolVarP(&outputJson, "json", "", false, "Output results in JSON format")
-	pflag.BoolVarP(&hasNoHeaders, "no-headers", "", false, "Hide headers for columns (useful for scripts/automation)")
-	pflag.BoolVarP(&showFullTimestamp, "full-timestamp", "", false, "Show full timestamp instead of just the date")
-	pflag.BoolVarP(&disableProgress, "no-progress", "", false, "Force suppress progress output")
+
 	pflag.BoolVarP(&explicitOnly, "explicit", "e", false, "Show only explicitly installed packages")
 	pflag.BoolVarP(&dependenciesOnly, "dependencies", "d", false, "Show only packages installed as dependencies")
 
 	pflag.StringVar(&dateFilter, "date", "", "Filter packages by installation date. Supports exact dates (YYYY-MM-DD), ranges (YYYY-MM-DD:YYYY-MM-DD), and open-ended filters (:YYYY-MM-DD or YYYY-MM-DD:).")
 	pflag.StringVar(&sizeFilter, "size", "", "Filter packages by size. Supports ranges (e.g., 10MB:20GB), exact matches (e.g., 5MB), and open-ended values (e.g., :2GB or 500KB:)")
 	pflag.StringVar(&nameFilter, "name", "", "Filter packages by name (or similar name)")
-	pflag.StringVar(&requiredByFilter, "required-by", "", "Filter packages by names of packages that require them")
 
 	pflag.StringVar(&sortBy, "sort", "date", "Sort packages by: 'date', 'alphabetical', 'size:desc', 'size:asc'")
+
+	pflag.BoolVarP(&hasNoHeaders, "no-headers", "", false, "Hide headers for columns (useful for scripts/automation)")
+
+	pflag.BoolVarP(&hasAllColumns, "all-columns", "", false, "Show all available columns/fields in the output (overrides defaults)")
 	pflag.StringVar(&columnsInput, "columns", "", "Comma-separated list of columns to display (overrides defaults)")
 	pflag.StringVar(&addColumnsInput, "add-columns", "", "Comma-separated list of columns to add to defaults")
+
+	pflag.BoolVarP(&showFullTimestamp, "full-timestamp", "", false, "Show full timestamp instead of just the date")
+	pflag.BoolVarP(&outputJson, "json", "", false, "Output results in JSON format")
+	pflag.BoolVarP(&disableProgress, "no-progress", "", false, "Force suppress progress output")
+	pflag.StringVar(&requiredByFilter, "required-by", "", "Show only packages that are required by the specified package")
+
+	pflag.BoolVarP(&showHelp, "help", "h", false, "Display help")
 
 	if err := pflag.CommandLine.Parse(args); err != nil {
 		return Config{}, fmt.Errorf("Error parsing flags: %v", err)
@@ -335,9 +341,13 @@ func PrintHelp() {
 	fmt.Println("  --name <search-term> Filter packages by name (substring match)")
 	fmt.Println("                         Example: 'gtk' matches 'gtk3', 'libgtk', etc")
 
+	fmt.Println("  --required-by <name> Show only packages that are required by the specified package")
+	fmt.Println("                         Example: 'yaylog --required-by firefox' lists packages that firefox depends on")
+
 	fmt.Println("\nColumn Options:")
 	fmt.Println("  --columns <list>     Comma-separated list of columns to display (overrides defaults)")
 	fmt.Println("  --add-columns <list> Comma-separated list of columns to add to defaults")
+	fmt.Println("  --all-columns        Display all available columns")
 	fmt.Println("  --no-headers         Omit column headers in output (useful for scripts and automation)")
 
 	fmt.Println("\nAvailable Columns:")
