@@ -75,6 +75,8 @@ because yay is my preferred AUR helper and the name has a good flow.
 - [ ] depends filter
 - [x] all-columns option
 - [x] required-by filter
+- [ ] key/value output
+- [ ] list of packages in required-by filter
 
 ## installation
 
