@@ -4,7 +4,7 @@
 yaylog \- List and filter installed packages on Arch-based systems.
 .SH SYNOPSIS
 .B yaylog
-.RI [ \-n | \-\-number <number> ] [ \-e | \-\-explicit ] [ \-a | \-\-all ] [ \-d | \-\-dependencies ] [ \-\-date <filter> ] [ \-\-size <filter> ] [ \-\-name <search-term> ] [ \-\-sort <mode> ] [ \-\-columns <list> ] [ \-\-add-columns <list> ] [ \-\-json ] [ \-\-full-timestamp ] [ \-\-no-progress ] [ \-h | \-\-help ]
+.RI [ \-n | \-\-number <number> ] [ \-e | \-\-explicit ] [ \-a | \-\-all ] [ \-d | \-\-dependencies ] [ \-\-date <filter> ] [ \-\-size <filter> ] [ \-\-name <search-term> ] [ \-\-sort <mode> ] [ \-\-columns <list> ] [ \-\-add-columns <list> ] [ \-\-all-columns ] [ \-\-json ] [ \-\-full-timestamp ] [ \-\-no-progress ] [ \-h | \-\-help ]
 .SH DESCRIPTION
 .B yaylog
 is a standalone CLI utility for Arch and Arch-based Linux distributions to list and filter installed packages. It works with any package manager that uses ALPM,
@@ -95,6 +95,9 @@ Sort results by the specified mode. Available modes:
 .B size:desc
 : Sort by package size in descending order.
 .TP
+.TP
+.B \-\-no-headers
+Omit column headers in table output. This is useful for scripting, as it produces cleaner output without requiring manual header removal.
 .B \-\-columns <list>
 Specify a comma-separated list of columns to display. Overrides default columns.
 Available columns:
@@ -118,13 +121,16 @@ Available columns:
 : List of dependencies (output can be long).
 .IP
 .B required-by
-: List of packages required by the package and are dependent on it (output can be long)
+: List of packages required by the package and are dependent on it (output can be long).
 .IP
 .B provides
 : List of alternative package names or shared libraries provided by package (output can be long).
 .TP
 .B \-\-add-columns <list>
 Add additional columns to the default display without overriding them.
+.TP
+.B \-\-all-columns
+Show all available columns in the output (overrides defaults).
 .TP
 .B \-\-json
 Output results in JSON format instead of a table. Overrides
@@ -165,42 +171,6 @@ Force disable progress bar outside non-interactive environments.
 .TP
 .B \-h, \-\-help
 Display help information.
-
-.SH ADDITIONAL NOTES
-.TP
-- All options that take an argument can also be used in the `--<flag>=<argument>` format.
-For example:
-.PP
-.EX
-yaylog --size=100MB:1GB --date=:2024-06-30
-yaylog --name="gtk" --sort=alphabetical
-.EE
-.TP
-- Boolean flags can be explicitly set using `--<flag>=true` or `--<flag>=false`.
-For example:
-.PP
-.EX
-yaylog --explicit=true --dependencies=false
-.EE
-.TP
-- When using multiple short flags, the `-n` flag must be last since it consumes the next argument.
-This follows standard Unix-style flag parsing, where positional arguments (like numbers) are treated as separate parameters.
-Invalid:
-.PP
-.EX
-yaylog -ne 15  # incorrect usage
-.EE
-Valid:
-.PP
-.EX
-yaylog -en 15
-.EE
-.TP
-- The `depends`, `required-by`, and `provides` columns output can be lengthy. To improve readability, pipe the output to `less`:
-.PP
-.EX
-yaylog --columns name,depends | less
-.EE
 
 .SH EXAMPLES
 .TP
@@ -263,6 +233,53 @@ Output JSON with specific columns:
 .PP
 .EX
 yaylog --json --columns name,version,size
+.EE
+.TP
+Show package names and sizes without headers (useful for scripting):
+.PP
+.EX
+yaylog --no-headers --columns name,size
+.EE
+.TP
+Output all package names, sorted by size in descending order, without headers:
+.PP
+.EX
+yaylog --no-headers --sort size:desc | awk '{print $1}'
+.EE
+.TP
+Save a clean list of installed package names to a file:
+.PP
+.EX
+yaylog --no-headers --columns name > installed-packages.txt
+.EE
+
+.SH ADDITIONAL NOTES
+.TP
+- All options that take an argument can also be used in the `--<flag>=<argument>` format.
+For example:
+.PP
+.EX
+yaylog --size=100MB:1GB --date=:2024-06-30
+yaylog --name="gtk" --sort=alphabetical
+.EE
+.TP
+- Boolean flags can be explicitly set using `--<flag>=true` or `--<flag>=false`.
+For example:
+.PP
+.EX
+yaylog --explicit=true --dependencies=false
+.EE
+.TP
+- The `depends`, `required-by`, and `provides` columns output can be lengthy. To improve readability, pipe the output to `less`:
+.PP
+.EX
+yaylog --columns name,depends | less
+.EE
+.TP
+- The `--no-headers` flag is particularly useful when processing package lists in scripts. It removes the header row, making it easier to parse package names and sizes using tools like `awk`, `sed`, or `cut`:
+.PP
+.EX
+yaylog --no-headers --columns name,size | awk '{print $1, $2}'
 .EE
 
 .SH AUTHOR

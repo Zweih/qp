@@ -29,11 +29,11 @@ type Config struct {
 	AllPackages       bool
 	ShowHelp          bool
 	OutputJson        bool
+	HasNoHeaders      bool
 	ShowFullTimestamp bool
 	DisableProgress   bool
 	ExplicitOnly      bool
 	DependenciesOnly  bool
-	NoDefaults        bool
 	DateFilter        DateFilter
 	SizeFilter        SizeFilter
 	NameFilter        string
@@ -44,13 +44,17 @@ type Config struct {
 
 func ParseFlags(args []string) (Config, error) {
 	var count int
+
 	var allPackages bool
+	var hasAllColumns bool
 	var showHelp bool
 	var outputJson bool
+	var hasNoHeaders bool
 	var showFullTimestamp bool
 	var disableProgress bool
 	var explicitOnly bool
 	var dependenciesOnly bool
+
 	var dateFilter string
 	var sizeFilter string
 	var nameFilter string
@@ -62,8 +66,10 @@ func ParseFlags(args []string) (Config, error) {
 	pflag.IntVarP(&count, "number", "n", 20, "Number of packages to show")
 
 	pflag.BoolVarP(&allPackages, "all", "a", false, "Show all packages (ignores -n)")
+	pflag.BoolVarP(&hasAllColumns, "all-columns", "", false, "Show all available columns/fields in the output (overrides defaults)")
 	pflag.BoolVarP(&showHelp, "help", "h", false, "Display help")
 	pflag.BoolVarP(&outputJson, "json", "", false, "Output results in JSON format")
+	pflag.BoolVarP(&hasNoHeaders, "no-headers", "", false, "Hide headers for columns (useful for scripts/automation)")
 	pflag.BoolVarP(&showFullTimestamp, "full-timestamp", "", false, "Show full timestamp instead of just the date")
 	pflag.BoolVarP(&disableProgress, "no-progress", "", false, "Force suppress progress output")
 	pflag.BoolVarP(&explicitOnly, "explicit", "e", false, "Show only explicitly installed packages")
@@ -96,7 +102,7 @@ func ParseFlags(args []string) (Config, error) {
 		return Config{}, err
 	}
 
-	columnsParsed, err := parseColumns(columnsInput, addColumnsInput)
+	columnsParsed, err := parseColumns(columnsInput, addColumnsInput, hasAllColumns)
 	if err != nil {
 		return Config{}, err
 	}
@@ -106,6 +112,7 @@ func ParseFlags(args []string) (Config, error) {
 		AllPackages:       allPackages,
 		ShowHelp:          showHelp,
 		OutputJson:        outputJson,
+		HasNoHeaders:      hasNoHeaders,
 		ShowFullTimestamp: showFullTimestamp,
 		DisableProgress:   disableProgress,
 		ExplicitOnly:      explicitOnly,
@@ -239,9 +246,13 @@ func parseSizeInBytes(valueInput string, unitInput string) (sizeInBytes int64, e
 	return sizeInBytes, nil
 }
 
-func parseColumns(columnsInput string, addColumnsInput string) ([]string, error) {
+func parseColumns(columnsInput string, addColumnsInput string, hasAllColumns bool) ([]string, error) {
 	if columnsInput != "" && addColumnsInput != "" {
 		return nil, fmt.Errorf("cannot use --columns and --add-columns together. Use --columns to fully define the columns you want")
+	}
+
+	if hasAllColumns {
+		return consts.ValidColumns, nil
 	}
 
 	var specifiedColumnsRaw string
@@ -327,6 +338,7 @@ func PrintHelp() {
 	fmt.Println("\nColumn Options:")
 	fmt.Println("  --columns <list>     Comma-separated list of columns to display (overrides defaults)")
 	fmt.Println("  --add-columns <list> Comma-separated list of columns to add to defaults")
+	fmt.Println("  --no-headers         Omit column headers in output (useful for scripts and automation)")
 
 	fmt.Println("\nAvailable Columns:")
 	fmt.Println("  date         - Installation date of the package")
