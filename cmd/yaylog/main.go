@@ -45,9 +45,9 @@ func main() {
 	}
 
 	if cfg.OutputJson {
-		out.PrintJson(packages, cfg.ColumnNames)
+		out.RenderJson(packages, cfg.ColumnNames)
 	} else {
-		out.PrintTable(packages, cfg.ColumnNames, cfg.ShowFullTimestamp, cfg.HasNoHeaders)
+		out.RenderTable(packages, cfg.ColumnNames, cfg.ShowFullTimestamp, cfg.HasNoHeaders)
 	}
 }
 

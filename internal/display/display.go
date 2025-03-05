@@ -1,7 +1,6 @@
 package display
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
@@ -53,16 +52,16 @@ func ClearProgress() {
 }
 
 func RenderTable(
-	packages []pkgdata.PackageInfo,
+	pkgs []pkgdata.PackageInfo,
 	columnNames []string,
 	showFullTimestamp bool,
 	hasNoHeaders bool,
 ) {
-	manager.renderTable(packages, columnNames, showFullTimestamp, hasNoHeaders)
+	manager.renderTable(pkgs, columnNames, showFullTimestamp, hasNoHeaders)
 }
 
-func PrintJson(pkgs []pkgdata.PackageInfo, columnNames []string) {
-	manager.printJson(pkgs, columnNames)
+func RenderJson(pkgs []pkgdata.PackageInfo, columnNames []string) {
+	manager.renderJson(pkgs, columnNames)
 }
 
 func (o *OutputManager) write(msg string) {
@@ -108,18 +107,4 @@ func (o *OutputManager) clearPrevMsg(newMsgLength int) {
 		clearSpace := strings.Repeat(" ", o.lastMsgLength)
 		o.write("\r" + clearSpace + "\r")
 	}
-}
-
-func (o *OutputManager) printJson(pkgs []pkgdata.PackageInfo, columnNames []string) {
-	filteredPackages := make([]pkgdata.PackageInfoJson, len(pkgs))
-	for i, pkg := range pkgs {
-		filteredPackages[i] = GetColumnJsonValues(pkg, columnNames)
-	}
-
-	jsonOutput, err := json.MarshalIndent(filteredPackages, "", "  ")
-	if err != nil {
-		o.writeLine(fmt.Sprintf("Error genereating JSON output: %v", err))
-	}
-
-	o.writeLine(string(jsonOutput))
 }

@@ -11,7 +11,7 @@ import (
 
 // displays data in tab format
 func (o *OutputManager) renderTable(
-	packages []pkgdata.PackageInfo,
+	pkgs []pkgdata.PackageInfo,
 	columnNames []string,
 	showFullTimestamp bool,
 	hasNoHeaders bool,
@@ -28,11 +28,11 @@ func (o *OutputManager) renderTable(
 	var buffer bytes.Buffer
 	w := tabwriter.NewWriter(&buffer, 0, 8, 2, ' ', 0)
 
-	if hasNoHeaders {
+	if !hasNoHeaders {
 		renderHeaders(w, columnNames)
 	}
 
-	for _, pkg := range packages {
+	for _, pkg := range pkgs {
 		renderRows(w, pkg, columnNames, ctx)
 	}
 
