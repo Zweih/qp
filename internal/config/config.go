@@ -34,7 +34,6 @@ type Config struct {
 	DisableProgress   bool
 	ExplicitOnly      bool
 	DependenciesOnly  bool
-	NoDefaults        bool
 	DateFilter        DateFilter
 	SizeFilter        SizeFilter
 	NameFilter        string
