@@ -205,6 +205,66 @@ Show only dependencies installed between July 1, 2023, and December 31, 2023:
 yaylog -d --date 2023-07-01:2023-12-31
 .EE
 .TP
+Show packages between 500KB and 5MB installed up to June 30, 2024:
+.PP
+.EX
+yaylog --size 500KB:5MB --date :2024-06-30
+.EE
+.TP
+Show packages larger than 1GB installed on December 1, 2024:
+.PP
+.EX
+yaylog --size 1GB: --date 2024-12-01
+.EE
+.TP
+Show all packages sorted by size in descending order, installed after January 1, 2024:
+.PP
+.EX
+yaylog -a --sort size:desc --date 2024-01-01:
+.EE
+.TP
+Output package data in JSON format:
+.PP
+.EX
+yaylog --json
+.EE
+.TP
+Save all explicitly installed packages to a JSON file:
+.PP
+.EX
+yaylog --json -e > explicit-packages.json
+.EE
+.TP
+Output all packages sorted by size (descending) in JSON:
+.PP
+.EX
+yaylog --json -a --sort size:desc
+.EE
+.TP
+Output JSON with specific columns:
+.PP
+.EX
+yaylog --json --columns name,version,size
+.EE
+.TP
+Show package names and sizes without headers (useful for scripting):
+.PP
+.EX
+yaylog --no-headers --columns name,size
+.EE
+.TP
+Output all package names, sorted by size in descending order, without headers:
+.PP
+.EX
+yaylog --no-headers --sort size:desc | awk '{print $1}'
+.EE
+.TP
+Save a clean list of installed package names to a file:
+.PP
+.EX
+yaylog --no-headers --columns name > installed-packages.txt
+.EE
+.TP
 Show all packages required by "firefox":
 .PP
 .EX
@@ -222,11 +282,34 @@ Show packages required by "vlc" and installed after January 1, 2024:
 .EX
 yaylog --required-by vlc --date 2024-01-01:
 .EE
+
+.SH ADDITIONAL NOTES
 .TP
-Show packages between 500KB and 5MB installed up to June 30, 2024:
+- All options that take an argument can also be used in the `--<flag>=<argument>` format.
+For example:
 .PP
 .EX
-yaylog --size 500KB:5MB --date :2024-06-30
+yaylog --size=100MB:1GB --date=:2024-06-30
+yaylog --name="gtk" --sort=alphabetical
+.EE
+.TP
+- Boolean flags can be explicitly set using `--<flag>=true` or `--<flag>=false`.
+For example:
+.PP
+.EX
+yaylog --explicit=true --dependencies=false
+.EE
+.TP
+- The `depends`, `required-by`, and `provides` columns output can be lengthy. To improve readability, pipe the output to `less`:
+.PP
+.EX
+yaylog --columns name,depends | less
+.EE
+.TP
+- The `--no-headers` flag is particularly useful when processing package lists in scripts. It removes the header row, making it easier to parse package names and sizes using tools like `awk`, `sed`, or `cut`:
+.PP
+.EX
+yaylog --no-headers --columns name,size | awk '{print $1, $2}'
 .EE
 
 .SH AUTHOR
