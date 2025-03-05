@@ -9,6 +9,7 @@ import (
 
 var packageNameRegex = regexp.MustCompile(`^([^<>=]+)`) // pulls package name out of `package-name>=2.0.1`
 
+// TODO: we can do this concurrent. let's get on that.
 func CalculateReverseDependencies(
 	cfg config.Config,
 	packages []PackageInfo,

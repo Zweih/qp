@@ -17,10 +17,8 @@ type FilterCondition struct {
 func FilterRequiredBy(pkg PackageInfo, target string) bool {
 	for _, requiredByPkgName := range pkg.RequiredBy {
 		matches := packageNameRegex.FindStringSubmatch(requiredByPkgName)
-		if len(matches) >= 2 {
-			if matches[1] == target { // TODO: condense
-				return true
-			}
+		if len(matches) >= 2 && matches[1] == target {
+			return true
 		}
 	}
 
