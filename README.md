@@ -6,9 +6,9 @@ despite the name, it's not limited to `yay` and works with any package manager t
 
 `yaylog` supports optional filters/sorting for install date, package name, install reason (explicit/dependency), and size on disk.
 
-[![Packaging status](https://repology.org/badge/vertical-allrepos/yaylog.svg)](https://repology.org/project/yaylog/versions)
+[![Packaging status](https://repology.org/badge/vertical-allrepos/yaylog.svg)](https://repology.org/project/yaylog/versions) ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/Zweih/yaylog/total?style=for-the-badge&logo=archlinux&label=Downloads%20Since%202%2F4%2F2025&color=%20%231793d0)
 
-![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/Zweih/yaylog/total?style=for-the-badge&logo=archlinux&label=Downloads%20Since%202%2F4%2F2025&color=%20%231793d0)
+![Alt](https://repobeats.axiom.co/api/embed/7a20b73b689d45d678001c582a9d1f124dca31ba.svg "Repobeats analytics image")
 
 
 this package is compatible with the following distributions:
