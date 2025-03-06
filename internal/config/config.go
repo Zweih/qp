@@ -76,6 +76,11 @@ func ParseFlags(args []string) (Config, error) {
 		return Config{}, fmt.Errorf("Error parsing flags: %v", err)
 	}
 
+	err := validateFlagCombinations(columnsInput, addColumnsInput, hasAllColumns, explicitOnly, dependenciesOnly)
+	if err != nil {
+		return Config{}, err
+	}
+
 	if allPackages {
 		count = 0
 	}

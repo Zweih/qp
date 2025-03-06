@@ -16,11 +16,6 @@ func main() {
 	cfg := parseConfig()
 	packages := fetchPackages()
 
-	err := validateConfig(cfg)
-	if err != nil {
-		out.WriteLine(fmt.Sprintf("Configuration error: %v", err))
-	}
-
 	isInteractive := term.IsTerminal(int(os.Stdout.Fd())) && !cfg.DisableProgress
 	var wg sync.WaitGroup
 
@@ -73,14 +68,6 @@ func fetchPackages() []pkgdata.PackageInfo {
 	}
 
 	return packages
-}
-
-func validateConfig(cfg config.Config) error {
-	if cfg.ExplicitOnly && cfg.DependenciesOnly {
-		return fmt.Errorf("Error: Cannot use both --explicit and --dependencies at the same time")
-	}
-
-	return nil
 }
 
 func applyFilters(

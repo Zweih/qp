@@ -7,14 +7,6 @@ import (
 )
 
 func parseColumns(columnsInput string, addColumnsInput string, hasAllColumns bool) ([]string, error) {
-	if columnsInput != "" && addColumnsInput != "" {
-		return nil, fmt.Errorf("cannot use --columns and --add-columns together. Use --columns to fully define the columns you want")
-	}
-
-	if hasAllColumns {
-		return consts.ValidColumns, nil
-	}
-
 	var specifiedColumnsRaw string
 	var columns []string
 
@@ -24,8 +16,14 @@ func parseColumns(columnsInput string, addColumnsInput string, hasAllColumns boo
 	case addColumnsInput != "":
 		specifiedColumnsRaw = addColumnsInput
 		fallthrough
+	case hasAllColumns:
+		columns = consts.ValidColumns
 	default:
-		columns = consts.DefaultColumns
+		if hasAllColumns {
+			columns = consts.ValidColumns
+		} else {
+			columns = consts.DefaultColumns
+		}
 	}
 
 	specifiedColumns, err := validateColumns(strings.ToLower(specifiedColumnsRaw))
@@ -36,7 +34,7 @@ func parseColumns(columnsInput string, addColumnsInput string, hasAllColumns boo
 	columns = append(columns, specifiedColumns...)
 
 	if len(columns) < 1 {
-		return nil, fmt.Errorf("no columns selected: use --columns to specify at least one column")
+		return nil, fmt.Errorf("no valid columns selected: use --columns to specify at least one column")
 	}
 
 	return columns, nil
