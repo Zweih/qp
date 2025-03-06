@@ -38,8 +38,8 @@ func PrintHelp() {
 	fmt.Println("                         Example: 'yaylog --required-by firefox' lists packages that firefox depends on")
 
 	fmt.Println("\nColumn Options:")
-	fmt.Println("  --columns <list>     Comma-separated list of columns to display (overrides defaults)")
-	fmt.Println("  --add-columns <list> Comma-separated list of columns to add to defaults")
+	fmt.Println("  --columns <list>     Comma-separated list of columns to display (cannot use with --all-columns or --add-columns)")
+	fmt.Println("  --add-columns <list> Comma-separated list of columns to add to defaults or --all-columns")
 	fmt.Println("  --all-columns        Display all available columns")
 	fmt.Println("  --no-headers         Omit column headers in output (useful for scripts and automation)")
 

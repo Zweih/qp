@@ -143,8 +143,8 @@ yaylog [options]
   - `alphabetical` - sort alphabetically by package name
   - `size:asc` / `size:desc` - sort by package size (ascending or descending)
 - `--no-headers`: omit column headers in table output (useful for scripting)
-- `--columns <list>`: comma-separated list of columns to display (overrides defaults)
-- `--add-columns <list>`: comma-separated list of columns to add to defaults
+- `--columns <list>`: comma-separated list of columns to display (cannot use with `--all-columns` or `--add-columns`)
+- `--add-columns <list>`: comma-separated list of columns to add to defaults or `all-columns`
 - `--all-columns`: show all available columns in the output (overrides defaults)
 - `--full-timestamp`: display the full timestamp (date and time) of package installations instead of just the date
 - `--json`: output results in JSON format (overrides table output and `--full-timestamp`)
