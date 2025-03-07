@@ -194,6 +194,7 @@ func SortPackages(
 	comparator := getComparator(cfg.SortBy)
 	phase := "Sorting packages"
 
+	// threshold is 500 as that is where merge sorting chunk performance overtakes timsort
 	if len(pkgs) < concurrentSortThreshold {
 		return sortNormally(pkgs, comparator, phase, reportProgress)
 	}

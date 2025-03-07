@@ -2,9 +2,25 @@ package config
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/spf13/pflag"
 )
+
+type ConfigProvider interface {
+	GetConfig() Config
+}
+
+type CliConfigProvider struct{}
+
+func (c *CliConfigProvider) GetConfig() Config {
+	cfg, err := ParseFlags(os.Args[1:])
+	if err != nil {
+		fmt.Println("Error parsing config:", err)
+	}
+
+	return cfg
+}
 
 type Config struct {
 	Count             int

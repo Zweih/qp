@@ -13,7 +13,11 @@ import (
 )
 
 func main() {
-	cfg := parseConfig()
+	mainWithConfig(&config.CliConfigProvider{})
+}
+
+func mainWithConfig(configProvider config.ConfigProvider) {
+	cfg := configProvider.GetConfig()
 	packages := fetchPackages()
 
 	isInteractive := term.IsTerminal(int(os.Stdout.Fd())) && !cfg.DisableProgress
@@ -36,21 +40,6 @@ func main() {
 
 	packages = trimPackagesLen(packages, cfg)
 	renderOutput(packages, cfg)
-}
-
-func parseConfig() config.Config {
-	cfg, err := config.ParseFlags(os.Args[1:])
-	if err != nil {
-		out.WriteLine(fmt.Sprintf("Error parsing arguments: %v", err))
-		os.Exit(0)
-	}
-
-	if cfg.ShowHelp {
-		config.PrintHelp()
-		os.Exit(0)
-	}
-
-	return cfg
 }
 
 func fetchPackages() []pkgdata.PackageInfo {
