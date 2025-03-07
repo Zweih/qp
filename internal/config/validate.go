@@ -13,7 +13,7 @@ func validateFlagCombinations(
 	dependenciesOnly bool,
 ) error {
 	if columnsInput != "" && (addColumnsInput != "" || hasAllColumns) {
-		return fmt.Errorf("Error: Cannot use --columns and --add-columns or --all-columnstogether. Use --columns to fully define the output columns")
+		return fmt.Errorf("Error: Cannot use --columns and --add-columns or --all-columns together. Use --columns to fully define the output columns")
 	}
 
 	if explicitOnly && dependenciesOnly {
