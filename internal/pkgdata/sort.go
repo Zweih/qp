@@ -5,6 +5,7 @@ import (
 	"runtime"
 	"sort"
 	"sync"
+	"yaylog/internal/config"
 )
 
 const concurrentSortThreshold = 500
@@ -27,18 +28,18 @@ func sizeAscComparator(a PackageInfo, b PackageInfo) bool {
 	return a.Size < b.Size
 }
 
-func getComparator(sortBy string) (PackageComparator, bool) {
+func getComparator(sortBy string) PackageComparator {
 	switch sortBy {
 	case "alphabetical":
-		return alphabeticalComparator, true
+		return alphabeticalComparator
 	case "date":
-		return dateComparator, true
+		return dateComparator
 	case "size:desc":
-		return sizeDecComparator, true
+		return sizeDecComparator
 	case "size:asc":
-		return sizeAscComparator, true
+		return sizeAscComparator
 	default:
-		return nil, false
+		return nil
 	}
 }
 
@@ -91,13 +92,9 @@ func sortConcurrently(
 	numChunks := (total + chunkSize - 1) / chunkSize
 	chunks := make([][]PackageInfo, 0, numChunks) // pre-allocate
 
-	for chunkIdx := 0; chunkIdx < numChunks; chunkIdx++ {
+	for chunkIdx := range numChunks {
 		startIdx := chunkIdx * chunkSize
-		endIdx := startIdx + chunkSize
-
-		if endIdx > total {
-			endIdx = total
-		}
+		endIdx := min(startIdx+chunkSize, total)
 
 		chunk := make([]PackageInfo, endIdx-startIdx)
 		copy(chunk, pkgs[startIdx:endIdx]) // avoid mutating the original array
@@ -141,6 +138,7 @@ func sortConcurrently(
 
 				continue
 			}
+
 			newChunks = append(newChunks, chunks[i]) // move odd chunk forward
 		}
 
@@ -188,18 +186,17 @@ func sortNormally(
 	return sortedPkgs
 }
 
-func SortPackages(pkgs []PackageInfo, sortBy string, reportProgress ProgressReporter) ([]PackageInfo, error) {
-	comparator, valid := getComparator(sortBy)
-
-	if !valid {
-		return nil, fmt.Errorf("invalid sort mode: %s", sortBy)
-	}
-
+func SortPackages(
+	cfg config.Config,
+	pkgs []PackageInfo,
+	reportProgress ProgressReporter,
+) []PackageInfo {
+	comparator := getComparator(cfg.SortBy)
 	phase := "Sorting packages"
 
 	if len(pkgs) < concurrentSortThreshold {
-		return sortNormally(pkgs, comparator, phase, reportProgress), nil
+		return sortNormally(pkgs, comparator, phase, reportProgress)
 	}
 
-	return sortConcurrently(pkgs, comparator, phase, reportProgress), nil
+	return sortConcurrently(pkgs, comparator, phase, reportProgress)
 }

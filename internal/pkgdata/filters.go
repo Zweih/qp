@@ -66,7 +66,11 @@ func FilterByName(pkg PackageInfo, searchTerm string) bool {
 	return strings.Contains(pkg.Name, searchTerm)
 }
 
-func ApplyFilters(pkgs []PackageInfo, filters []FilterCondition, reportProgress ProgressReporter) []PackageInfo {
+func FilterPackages(
+	pkgs []PackageInfo,
+	filters []FilterCondition,
+	reportProgress ProgressReporter,
+) []PackageInfo {
 	if len(filters) < 1 {
 		return pkgs
 	}

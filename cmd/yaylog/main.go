@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 	"sync"
-	"time"
 	"yaylog/internal/config"
 	out "yaylog/internal/display"
+	"yaylog/internal/pipeline"
 	"yaylog/internal/pkgdata"
 
 	"golang.org/x/term"
@@ -21,8 +21,8 @@ func main() {
 
 	pipeline := []PipelinePhase{
 		{"Calculating reverse dependencies", pkgdata.CalculateReverseDependencies, isInteractive, &wg},
-		{"Filtering", applyFilters, isInteractive, &wg},
-		{"Sorting", sortPackages, isInteractive, &wg},
+		{"Filtering", pipeline.PreprocessFiltering, isInteractive, &wg},
+		{"Sorting", pkgdata.SortPackages, isInteractive, &wg},
 	}
 
 	for _, phase := range pipeline {
@@ -34,16 +34,8 @@ func main() {
 		}
 	}
 
-	if cfg.Count > 0 && !cfg.AllPackages && len(packages) > cfg.Count {
-		cutoffIdx := len(packages) - cfg.Count
-		packages = packages[cutoffIdx:]
-	}
-
-	if cfg.OutputJson {
-		out.RenderJson(packages, cfg.ColumnNames)
-	} else {
-		out.RenderTable(packages, cfg.ColumnNames, cfg.ShowFullTimestamp, cfg.HasNoHeaders)
-	}
+	packages = trimPackagesLen(packages, cfg)
+	renderOutput(packages, cfg)
 }
 
 func parseConfig() config.Config {
@@ -70,97 +62,22 @@ func fetchPackages() []pkgdata.PackageInfo {
 	return packages
 }
 
-func applyFilters(
-	cfg config.Config,
+func trimPackagesLen(
 	packages []pkgdata.PackageInfo,
-	reportProgress pkgdata.ProgressReporter,
+	cfg config.Config,
 ) []pkgdata.PackageInfo {
-	filters := make([]pkgdata.FilterCondition, 0)
-
-	if len(cfg.RequiredByFilter) > 0 {
-		filters = append(filters, pkgdata.FilterCondition{
-			Filter: func(pkg pkgdata.PackageInfo) bool {
-				return pkgdata.FilterRequiredBy(pkg, cfg.RequiredByFilter)
-			},
-			PhaseName: "Filter by required package",
-		})
+	if cfg.Count > 0 && !cfg.AllPackages && len(packages) > cfg.Count {
+		cutoffIdx := len(packages) - cfg.Count
+		packages = packages[cutoffIdx:]
 	}
 
-	if cfg.ExplicitOnly {
-		filters = append(filters, pkgdata.FilterCondition{
-			Filter:    pkgdata.FilterExplicit,
-			PhaseName: "Filtering explicit only",
-		})
-	}
-
-	if cfg.DependenciesOnly {
-		filters = append(filters, pkgdata.FilterCondition{
-			Filter:    pkgdata.FilterDependencies,
-			PhaseName: "Filtering dependencies only",
-		})
-	}
-
-	if !cfg.DateFilter.StartDate.IsZero() || !cfg.DateFilter.EndDate.IsZero() {
-		var dateFilter pkgdata.Filter
-
-		if cfg.DateFilter.IsExactMatch {
-			dateFilter = func(pkg pkgdata.PackageInfo) bool {
-				return pkgdata.FilterByDate(pkg, cfg.DateFilter.StartDate)
-			}
-		} else {
-			adjustedEndDate := cfg.DateFilter.EndDate.Add(24 * time.Hour)
-			dateFilter = func(pkg pkgdata.PackageInfo) bool {
-				return pkgdata.FilterByDateRange(pkg, cfg.DateFilter.StartDate, adjustedEndDate)
-			}
-		}
-
-		filters = append(filters, pkgdata.FilterCondition{
-			Filter:    dateFilter,
-			PhaseName: "Filtering by date",
-		})
-	}
-
-	if !(cfg.SizeFilter.StartSize == 0 && cfg.SizeFilter.EndSize == 0) {
-		var sizeFilter pkgdata.Filter
-
-		if cfg.SizeFilter.IsExactMatch {
-			sizeFilter = func(pkg pkgdata.PackageInfo) bool {
-				return pkgdata.FilterBySize(pkg, cfg.SizeFilter.StartSize)
-			}
-		} else {
-			sizeFilter = func(pkg pkgdata.PackageInfo) bool {
-				return pkgdata.FilterBySizeRange(pkg, cfg.SizeFilter.StartSize, cfg.SizeFilter.EndSize)
-			}
-		}
-
-		filters = append(filters, pkgdata.FilterCondition{
-			Filter:    sizeFilter,
-			PhaseName: "Filtering by size",
-		})
-	}
-
-	if len(cfg.NameFilter) > 0 {
-		filters = append(filters, pkgdata.FilterCondition{
-			Filter: func(pkg pkgdata.PackageInfo) bool {
-				return pkgdata.FilterByName(pkg, cfg.NameFilter)
-			},
-			PhaseName: "Filtering by name",
-		})
-	}
-
-	return pkgdata.ApplyFilters(packages, filters, reportProgress)
+	return packages
 }
 
-func sortPackages(
-	cfg config.Config,
-	packages []pkgdata.PackageInfo,
-	reportProgress pkgdata.ProgressReporter,
-) []pkgdata.PackageInfo {
-	sortedPackages, err := pkgdata.SortPackages(packages, cfg.SortBy, reportProgress)
-	if err != nil {
-		out.WriteLine(fmt.Sprintf("Error sorting packages: %v. Displaying unsorted packages.", err))
-		return packages
+func renderOutput(packages []pkgdata.PackageInfo, cfg config.Config) {
+	if cfg.OutputJson {
+		out.RenderJson(packages, cfg.ColumnNames)
+	} else {
+		out.RenderTable(packages, cfg.ColumnNames, cfg.ShowFullTimestamp, cfg.HasNoHeaders)
 	}
-
-	return sortedPackages
 }
