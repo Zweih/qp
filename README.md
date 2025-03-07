@@ -1,10 +1,10 @@
 # yaylog
 
-`yaylog` is a CLI util, written in **Go** / **Golang**, for arch and arch-based linux distros to sort/filter installed packages.
+`yaylog` is a CLI util, written in **Go** / **Golang**, for (arch linux)[https://archlinux.org] and arch-based linux distros to sort/filter installed packages.
 
 despite the name, it's not limited to `yay` and works with any package manager that uses ALPM; so it can be used with `pacman`, `yay`, `paru`, `aura`, `pamac`, and even `yaourt` if you're somehow still using it.
 
-`yaylog` supports optional filters/sorting for install date, package name, install reason (explicit/dependency), and size on disk.
+`yaylog` supports optional filters/sorting for install date, package name, install reason (explicit/dependency), size on disk, reverse dependencies, dependency requirements, and more. check [usage](#usage) for all available options.
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/yaylog.svg)](https://repology.org/project/yaylog/versions) ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/Zweih/yaylog/total?style=for-the-badge&logo=archlinux&label=Downloads%20Since%202%2F4%2F2025&color=%20%231793d0)
 
@@ -12,12 +12,12 @@ despite the name, it's not limited to `yay` and works with any package manager t
 
 
 this package is compatible with the following distributions:
- - arch linux
- - manjaro
- - steamOS
- - garuda linux
- - endeavourOS
- - artix linux
+ - [arch linux](https://archlinux.org)
+ - [manjaro](https://manjaro.org/)
+ - [steamOS](https://store.steampowered.com/steamos)
+ - [garuda linux](https://garudalinux.org/)
+ - [endeavourOS](https://endeavouros.com/)
+ - [artix linux](https://artixlinux.org/)
  - the 50 other arch-based distros, as long as it has pacman installed 
 
 ## features
@@ -77,16 +77,19 @@ because yay is my preferred AUR helper and the name has a good flow.
 - [x] required-by filter
 - [ ] key/value output
 - [ ] list of packages in required-by filter
+- [ ] config dependency injection for testing
 
 ## installation
 
 ### from AUR (**recommended**)
-install the binary using an AUR helper like `yay`:
+install using [AUR helper](https://wiki.archlinux.org/title/AUR_helpers) like `yay`:
 ```bash
-yay -S yaylog-bin
+yay -S yaylog
 ```
 
-if you prefer to install from source using the AUR, use the `yaylog` package instead.
+if you prefer to install a pre-compiled binary* using the AUR, use the `yaylog-bin` package instead.
+
+***note**: binaries are automatically, securely, and transparently compiled with github CI when a version release is created. you can audit the binary creation by checking the relevant github action for each release version.
 
 for the latest (unstable) version from git w/ the AUR, use `yaylog-git`*.  
 
