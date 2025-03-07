@@ -165,22 +165,39 @@ yaylog [options]
 ### JSON output
 the `--json` flag outputs the package data as structured JSON instead of a table. this can be useful for scripts or automation.
 
-Example:
+example:
 ```bash
-yaylog --add-columns=version,depends --size 700MB:1GB --date :2025-03-01 --json
+yaylog --name sqlite --all-columns --json
 ```
 
-Output format:
+`sqlite` is one of the few packages that actually has all the fields populated.
+
+output format:
 ```json
 [
   {
-    "timestamp": "2025-02-11T17:17:30Z",
-    "name": "linux-firmware",
+    "timestamp": "2025-02-26T16:33:47Z",
+    "name": "sqlite",
     "reason": "dependency",
-    "size": 756086774,
-    "version": "20250109.7673dffd-1",
+    "size": 21074944,
+    "version": "3.48.0-2",
     "depends": [
-      "linux-firmware-whence"
+      "readline",
+      "zlib",
+      "glibc"
+    ],
+    "requiredBy": [
+      "docker",
+      "gnupg",
+      "libsoup3",
+      "nss",
+      "openslide",
+      "tinysparql",
+      "util-linux-libs"
+    ],
+    "provides": [
+      "sqlite3=3.48.0",
+      "libsqlite3.so=0-64"
     ]
   }
 ]
