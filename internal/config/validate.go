@@ -1,6 +1,9 @@
 package config
 
-import "fmt"
+import (
+	"fmt"
+	"yaylog/internal/consts"
+)
 
 func validateFlagCombinations(
 	columnsInput string,
@@ -9,18 +12,86 @@ func validateFlagCombinations(
 	explicitOnly bool,
 	dependenciesOnly bool,
 ) error {
-	if columnsInput != "" {
-		if addColumnsInput != "" {
-			return fmt.Errorf("Error: Cannot use --columns and --add-columns together. Use --columns to fully define the output columns")
-		}
-
-		if hasAllColumns {
-			return fmt.Errorf("Error: Cannot use --columns and --add-columns together. Use --columns to fully define the output columns")
-		}
+	if columnsInput != "" && (addColumnsInput != "" || hasAllColumns) {
+		return fmt.Errorf("Error: Cannot use --columns and --add-columns or --all-columnstogether. Use --columns to fully define the output columns")
 	}
 
 	if explicitOnly && dependenciesOnly {
 		return fmt.Errorf("Error: cannot use --explicit and --dependencies at the same time")
+	}
+
+	return nil
+}
+
+func validateConfig(cfg Config) error {
+	if err := validateSortOption(cfg.SortBy); err != nil {
+		return err
+	}
+
+	if err := validateDateFilter(cfg.DateFilter); err != nil {
+		return err
+	}
+
+	if err := validateSizeFilter(cfg.SizeFilter); err != nil {
+		return err
+	}
+
+	if err := validateColumnSelection(cfg.ColumnNames); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func validateSortOption(sortBy string) error {
+	validSortOptions := map[string]bool{
+		"date":         true,
+		"alphabetical": true,
+		"size:desc":    true,
+		"size:asc":     true,
+	}
+
+	if !validSortOptions[sortBy] {
+		return fmt.Errorf("Error: Invalid sort option %s", sortBy)
+	}
+
+	return nil
+}
+
+func validateDateFilter(dateFilter DateFilter) error {
+	if !dateFilter.StartDate.IsZero() && !dateFilter.EndDate.IsZero() {
+		if dateFilter.StartDate.After(dateFilter.EndDate) {
+			return fmt.Errorf("Error invalid date range. The start date cannot be after the end date")
+		}
+	}
+
+	return nil
+}
+
+func validateSizeFilter(sizeFilter SizeFilter) error {
+	if sizeFilter.StartSize > 0 && sizeFilter.EndSize > 0 {
+		if sizeFilter.StartSize > sizeFilter.EndSize {
+			return fmt.Errorf("Error: invalid size range. Start size cannot be greater than the end size")
+		}
+	}
+
+	return nil
+}
+
+func validateColumnSelection(columns []string) error {
+	if len(columns) == 0 {
+		return fmt.Errorf("Error: No columns selected. Use --columns to specify at least one column")
+	}
+
+	validColumnsSet := make(map[string]bool)
+	for _, columnName := range consts.ValidColumns {
+		validColumnsSet[columnName] = true
+	}
+
+	for _, column := range columns {
+		if !validColumnsSet[column] {
+			return fmt.Errorf("Error: %s is not a valid column", column)
+		}
 	}
 
 	return nil

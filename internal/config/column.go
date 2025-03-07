@@ -1,12 +1,11 @@
 package config
 
 import (
-	"fmt"
 	"strings"
 	"yaylog/internal/consts"
 )
 
-func parseColumns(columnsInput string, addColumnsInput string, hasAllColumns bool) ([]string, error) {
+func parseColumns(columnsInput string, addColumnsInput string, hasAllColumns bool) []string {
 	var specifiedColumnsRaw string
 	var columns []string
 
@@ -26,41 +25,23 @@ func parseColumns(columnsInput string, addColumnsInput string, hasAllColumns boo
 		}
 	}
 
-	specifiedColumns, err := validateColumns(strings.ToLower(specifiedColumnsRaw))
-	if err != nil {
-		return nil, err
+	specifiedColumns := strings.Split(strings.ToLower(strings.TrimSpace(specifiedColumnsRaw)), ",")
+	for i, column := range specifiedColumns {
+		specifiedColumns[i] = strings.TrimSpace(column)
 	}
 
 	columns = append(columns, specifiedColumns...)
-
-	if len(columns) < 1 {
-		return nil, fmt.Errorf("no valid columns selected: use --columns to specify at least one column")
-	}
-
-	return columns, nil
+	return cleanColumns(columns)
 }
 
-func validateColumns(columnInput string) ([]string, error) {
-	if columnInput == "" {
-		return []string{}, nil
-	}
-
-	validColumnsSet := map[string]bool{}
-	for _, columnName := range consts.ValidColumns {
-		validColumnsSet[columnName] = true
-	}
-
-	var columns []string
-
-	for _, column := range strings.Split(columnInput, ",") {
-		cleanColumn := strings.TrimSpace(column)
-
-		if !validColumnsSet[strings.TrimSpace(column)] {
-			return nil, fmt.Errorf("%s is not a valid column", cleanColumn)
+// in case of input like ",,"
+func cleanColumns(columns []string) []string {
+	cleanedColumns := []string{}
+	for _, column := range columns {
+		if column != "" {
+			cleanedColumns = append(cleanedColumns, column)
 		}
-
-		columns = append(columns, cleanColumn)
 	}
 
-	return columns, nil
+	return cleanedColumns
 }

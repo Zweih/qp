@@ -76,7 +76,13 @@ func ParseFlags(args []string) (Config, error) {
 		return Config{}, fmt.Errorf("Error parsing flags: %v", err)
 	}
 
-	err := validateFlagCombinations(columnsInput, addColumnsInput, hasAllColumns, explicitOnly, dependenciesOnly)
+	err := validateFlagCombinations(
+		columnsInput,
+		addColumnsInput,
+		hasAllColumns,
+		explicitOnly,
+		dependenciesOnly,
+	)
 	if err != nil {
 		return Config{}, err
 	}
@@ -95,12 +101,9 @@ func ParseFlags(args []string) (Config, error) {
 		return Config{}, err
 	}
 
-	columnsParsed, err := parseColumns(columnsInput, addColumnsInput, hasAllColumns)
-	if err != nil {
-		return Config{}, err
-	}
+	columnsParsed := parseColumns(columnsInput, addColumnsInput, hasAllColumns)
 
-	return Config{
+	cfg := Config{
 		Count:             count,
 		AllPackages:       allPackages,
 		ShowHelp:          showHelp,
@@ -116,5 +119,11 @@ func ParseFlags(args []string) (Config, error) {
 		RequiredByFilter:  requiredByFilter,
 		SortBy:            sortBy,
 		ColumnNames:       columnsParsed,
-	}, nil
+	}
+
+	if err := validateConfig(cfg); err != nil {
+		return Config{}, err
+	}
+
+	return cfg, nil
 }
