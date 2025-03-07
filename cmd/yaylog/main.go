@@ -66,7 +66,8 @@ func trimPackagesLen(
 func renderOutput(packages []pkgdata.PackageInfo, cfg config.Config) {
 	if cfg.OutputJson {
 		out.RenderJson(packages, cfg.ColumnNames)
-	} else {
-		out.RenderTable(packages, cfg.ColumnNames, cfg.ShowFullTimestamp, cfg.HasNoHeaders)
+		return
 	}
+
+	out.RenderTable(packages, cfg.ColumnNames, cfg.ShowFullTimestamp, cfg.HasNoHeaders)
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"os"
+	"strings"
 	"testing"
 	"yaylog/internal/config"
 )
@@ -41,11 +42,7 @@ func TestMainWithConfig(t *testing.T) {
 	}
 
 	expectedSubstring := "{"
-	if mockCfg.OutputJson && !contains(output, expectedSubstring) {
+	if mockCfg.OutputJson && !strings.Contains(output, expectedSubstring) {
 		t.Errorf("Expected JSON output but did not find JSON structure")
 	}
-}
-
-func contains(str, substr string) bool {
-	return bytes.Contains([]byte(str), []byte(substr))
 }

@@ -15,8 +15,6 @@ func parseColumns(columnsInput string, addColumnsInput string, hasAllColumns boo
 	case addColumnsInput != "":
 		specifiedColumnsRaw = addColumnsInput
 		fallthrough
-	case hasAllColumns:
-		columns = consts.ValidColumns
 	default:
 		if hasAllColumns {
 			columns = consts.ValidColumns

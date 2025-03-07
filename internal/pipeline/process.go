@@ -70,23 +70,24 @@ func getDateFilterCondition(cfg config.Config) *pkgdata.FilterCondition {
 		return nil
 	}
 
-	var dateFilter func(pkgdata.PackageInfo) bool
-
-	if cfg.DateFilter.IsExactMatch {
-		dateFilter = func(pkg pkgdata.PackageInfo) bool {
-			return pkgdata.FilterByDate(pkg, cfg.DateFilter.StartDate)
-		}
-	} else {
-		adjustedEndDate := cfg.DateFilter.EndDate.Add(24 * time.Hour)
-		dateFilter = func(pkg pkgdata.PackageInfo) bool {
-			return pkgdata.FilterByDateRange(pkg, cfg.DateFilter.StartDate, adjustedEndDate)
-		}
-	}
-
-	return &pkgdata.FilterCondition{
-		Filter:    dateFilter,
+	filterCondition := &pkgdata.FilterCondition{
 		PhaseName: "Filtering by date",
 	}
+
+	if cfg.DateFilter.IsExactMatch {
+		filterCondition.Filter = func(pkg pkgdata.PackageInfo) bool {
+			return pkgdata.FilterByDate(pkg, cfg.DateFilter.StartDate)
+		}
+
+		return filterCondition
+	}
+
+	adjustedEndDate := cfg.DateFilter.EndDate.Add(24 * time.Hour)
+	filterCondition.Filter = func(pkg pkgdata.PackageInfo) bool {
+		return pkgdata.FilterByDateRange(pkg, cfg.DateFilter.StartDate, adjustedEndDate)
+	}
+
+	return filterCondition
 }
 
 func getSizeFilterCondition(cfg config.Config) *pkgdata.FilterCondition {
@@ -95,21 +96,24 @@ func getSizeFilterCondition(cfg config.Config) *pkgdata.FilterCondition {
 	}
 
 	var sizeFilter func(pkgdata.PackageInfo) bool
-
-	if cfg.SizeFilter.IsExactMatch {
-		sizeFilter = func(pkg pkgdata.PackageInfo) bool {
-			return pkgdata.FilterBySize(pkg, cfg.SizeFilter.StartSize)
-		}
-	} else {
-		sizeFilter = func(pkg pkgdata.PackageInfo) bool {
-			return pkgdata.FilterBySizeRange(pkg, cfg.SizeFilter.StartSize, cfg.SizeFilter.EndSize)
-		}
-	}
-
-	return &pkgdata.FilterCondition{
+	filterCondition := &pkgdata.FilterCondition{
 		Filter:    sizeFilter,
 		PhaseName: "Filtering by size",
 	}
+
+	if cfg.SizeFilter.IsExactMatch {
+		filterCondition.Filter = func(pkg pkgdata.PackageInfo) bool {
+			return pkgdata.FilterBySize(pkg, cfg.SizeFilter.StartSize)
+		}
+
+		return filterCondition
+	}
+
+	filterCondition.Filter = func(pkg pkgdata.PackageInfo) bool {
+		return pkgdata.FilterBySizeRange(pkg, cfg.SizeFilter.StartSize, cfg.SizeFilter.EndSize)
+	}
+
+	return filterCondition
 }
 
 func getNameFilterCondition(cfg config.Config) *pkgdata.FilterCondition {
