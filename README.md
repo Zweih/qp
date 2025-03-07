@@ -1,6 +1,6 @@
 # yaylog
 
-`yaylog` is a CLI util, written in **Go** / **Golang**, for (arch linux)[https://archlinux.org] and arch-based linux distros to sort/filter installed packages.
+`yaylog` is a CLI util, written in **Go** / **Golang**, for [arch linux](https://archlinux.org) and arch-based linux distros to sort/filter installed packages.
 
 despite the name, it's not limited to `yay` and works with any package manager that uses ALPM; so it can be used with `pacman`, `yay`, `paru`, `aura`, `pamac`, and even `yaourt` if you're somehow still using it.
 
