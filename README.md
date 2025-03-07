@@ -77,7 +77,8 @@ because yay is my preferred AUR helper and the name has a good flow.
 - [x] required-by filter
 - [ ] key/value output
 - [ ] list of packages in required-by filter
-- [ ] config dependency injection for testing
+- [x] config dependency injection for testing
+- [ ] more extensive testing
 
 ## installation
 
