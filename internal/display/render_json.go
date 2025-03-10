@@ -7,10 +7,10 @@ import (
 	"yaylog/internal/pkgdata"
 )
 
-func (o *OutputManager) renderJson(pkgs []pkgdata.PackageInfo, columnNames []string) {
+func (o *OutputManager) renderJson(pkgs []pkgdata.PackageInfo, fields []consts.FieldType) {
 	filteredPackages := make([]pkgdata.PackageInfoJson, len(pkgs))
 	for i, pkg := range pkgs {
-		filteredPackages[i] = getJsonValues(pkg, columnNames)
+		filteredPackages[i] = getJsonValues(pkg, fields)
 	}
 
 	jsonOutput, err := json.MarshalIndent(filteredPackages, "", "  ")
@@ -21,26 +21,26 @@ func (o *OutputManager) renderJson(pkgs []pkgdata.PackageInfo, columnNames []str
 	o.writeLine(string(jsonOutput))
 }
 
-func getJsonValues(pkg pkgdata.PackageInfo, columnNames []string) pkgdata.PackageInfoJson {
+func getJsonValues(pkg pkgdata.PackageInfo, fields []consts.FieldType) pkgdata.PackageInfoJson {
 	filteredPackage := pkgdata.PackageInfoJson{}
 
-	for _, columnName := range columnNames {
-		switch columnName {
-		case consts.Date:
+	for _, field := range fields {
+		switch field {
+		case consts.FieldDate:
 			filteredPackage.Timestamp = &pkg.Timestamp
-		case consts.Name:
+		case consts.FieldName:
 			filteredPackage.Name = pkg.Name
-		case consts.Reason:
+		case consts.FieldReason:
 			filteredPackage.Reason = pkg.Reason
-		case consts.Size:
+		case consts.FieldSize:
 			filteredPackage.Size = pkg.Size // return in bytes for json
-		case consts.Version:
+		case consts.FieldVersion:
 			filteredPackage.Version = pkg.Version
-		case consts.Depends:
+		case consts.FieldDepends:
 			filteredPackage.Depends = pkg.Depends
-		case consts.RequiredBy:
+		case consts.FieldRequiredBy:
 			filteredPackage.RequiredBy = pkg.RequiredBy
-		case consts.Provides:
+		case consts.FieldProvides:
 			filteredPackage.Provides = pkg.Provides
 		}
 	}

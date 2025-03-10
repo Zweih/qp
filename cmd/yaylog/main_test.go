@@ -6,23 +6,24 @@ import (
 	"strings"
 	"testing"
 	"yaylog/internal/config"
+	"yaylog/internal/consts"
 )
 
 type MockConfigProvider struct {
 	mockConfig config.Config
 }
 
-func (m *MockConfigProvider) GetConfig() config.Config {
-	return m.mockConfig
+func (m *MockConfigProvider) GetConfig() (config.Config, error) {
+	return m.mockConfig, nil
 }
 
 // TODO: more testing, this is just validating if the depenendency injection works for testing
 func TestMainWithConfig(t *testing.T) {
 	mockCfg := config.Config{
-		Count:       5,
-		SortBy:      "size:desc",
-		OutputJson:  true,
-		ColumnNames: []string{"name", "size"},
+		Count:      5,
+		SortBy:     "size:desc",
+		OutputJson: true,
+		Fields:     []consts.FieldType{consts.FieldName, consts.FieldSize},
 	}
 
 	var buf bytes.Buffer

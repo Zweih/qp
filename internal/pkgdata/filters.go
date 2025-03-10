@@ -5,6 +5,7 @@ import (
 	"math"
 	"strings"
 	"time"
+	"yaylog/internal/consts"
 )
 
 type Filter func(PackageInfo) bool
@@ -12,6 +13,12 @@ type Filter func(PackageInfo) bool
 type FilterCondition struct {
 	Filter    Filter
 	PhaseName string
+}
+
+func newBaseFilter(filterType consts.FieldType) FilterCondition {
+	return FilterCondition{
+		PhaseName: "Filtering by " + string(filterType),
+	}
 }
 
 func FilterRequiredBy(pkg PackageInfo, target string) bool {
@@ -23,6 +30,23 @@ func FilterRequiredBy(pkg PackageInfo, target string) bool {
 	}
 
 	return false
+}
+
+func FilterByPackages(packageNames []string, targetNames []string) bool {
+	for _, targetName := range targetNames {
+		for _, packageName := range packageNames {
+			matches := packageNameRegex.FindStringSubmatch(packageName)
+			if len(matches) >= 2 && matches[1] == targetName {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+func FilterByReason(installReason string, targetReason string) bool {
+	return installReason == targetReason
 }
 
 func FilterExplicit(pkg PackageInfo) bool {
@@ -64,6 +88,16 @@ func FilterBySizeRange(pkg PackageInfo, startSize int64, endSize int64) bool {
 
 func FilterByName(pkg PackageInfo, searchTerm string) bool {
 	return strings.Contains(pkg.Name, searchTerm)
+}
+
+func FilterByNames(pkg PackageInfo, targets []string) bool {
+	for _, targetName := range targets {
+		if strings.Contains(pkg.Name, targetName) {
+			return true
+		}
+	}
+
+	return false
 }
 
 func FilterPackages(

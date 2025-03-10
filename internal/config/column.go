@@ -1,13 +1,18 @@
 package config
 
 import (
+	"fmt"
 	"strings"
 	"yaylog/internal/consts"
 )
 
-func parseColumns(columnsInput string, addColumnsInput string, hasAllColumns bool) []string {
+func parseColumns(
+	columnsInput string,
+	addColumnsInput string,
+	hasAllColumns bool,
+) ([]consts.FieldType, error) {
 	var specifiedColumnsRaw string
-	var columns []string
+	var columns []consts.FieldType
 
 	switch {
 	case columnsInput != "":
@@ -17,29 +22,28 @@ func parseColumns(columnsInput string, addColumnsInput string, hasAllColumns boo
 		fallthrough
 	default:
 		if hasAllColumns {
-			columns = consts.ValidColumns
+			columns = consts.ValidFields
 		} else {
-			columns = consts.DefaultColumns
+			columns = consts.DefaultFields
 		}
 	}
 
-	specifiedColumns := strings.Split(strings.ToLower(strings.TrimSpace(specifiedColumnsRaw)), ",")
-	for i, column := range specifiedColumns {
-		specifiedColumns[i] = strings.TrimSpace(column)
-	}
+	if specifiedColumnsRaw != "" {
+		specifiedColumns := strings.Split(
+			strings.ToLower(strings.TrimSpace(specifiedColumnsRaw)),
+			",",
+		)
 
-	columns = append(columns, specifiedColumns...)
-	return cleanColumns(columns)
-}
+		for _, column := range specifiedColumns {
+			fieldType, exists := consts.FieldTypeLookup[strings.TrimSpace(column)]
 
-// in case of input like ",,"
-func cleanColumns(columns []string) []string {
-	cleanedColumns := []string{}
-	for _, column := range columns {
-		if column != "" {
-			cleanedColumns = append(cleanedColumns, column)
+			if !exists {
+				return nil, fmt.Errorf("Error: '%s' is not a valid column", column)
+			}
+
+			columns = append(columns, fieldType)
 		}
 	}
 
-	return cleanedColumns
+	return columns, nil
 }

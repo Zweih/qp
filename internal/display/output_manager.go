@@ -53,15 +53,15 @@ func ClearProgress() {
 
 func RenderTable(
 	pkgs []pkgdata.PackageInfo,
-	columnNames []string,
+	fields []consts.FieldType,
 	showFullTimestamp bool,
 	hasNoHeaders bool,
 ) {
-	manager.renderTable(pkgs, columnNames, showFullTimestamp, hasNoHeaders)
+	manager.renderTable(pkgs, fields, showFullTimestamp, hasNoHeaders)
 }
 
-func RenderJson(pkgs []pkgdata.PackageInfo, columnNames []string) {
-	manager.renderJson(pkgs, columnNames)
+func RenderJson(pkgs []pkgdata.PackageInfo, fields []consts.FieldType) {
+	manager.renderJson(pkgs, fields)
 }
 
 func (o *OutputManager) write(msg string) {

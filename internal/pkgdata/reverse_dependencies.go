@@ -17,7 +17,7 @@ func CalculateReverseDependencies(
 ) []PackageInfo {
 	hasRequiredByFilter := len(cfg.RequiredByFilter) > 0
 
-	if !slices.Contains(cfg.ColumnNames, consts.RequiredBy) && !hasRequiredByFilter {
+	if !slices.Contains(cfg.Fields, consts.FieldRequiredBy) && !hasRequiredByFilter {
 		return packages
 	}
 

@@ -3,23 +3,29 @@ package config
 import (
 	"fmt"
 	"os"
+	"yaylog/internal/consts"
 
 	"github.com/spf13/pflag"
 )
 
 type ConfigProvider interface {
-	GetConfig() Config
+	GetConfig() (Config, error)
 }
 
 type CliConfigProvider struct{}
 
-func (c *CliConfigProvider) GetConfig() Config {
+func (c *CliConfigProvider) GetConfig() (Config, error) {
 	cfg, err := ParseFlags(os.Args[1:])
 	if err != nil {
-		fmt.Println("Error parsing config:", err)
+		return Config{}, err
 	}
 
-	return cfg
+	if cfg.ShowHelp {
+		PrintHelp()
+		os.Exit(0)
+	}
+
+	return cfg, nil
 }
 
 type Config struct {
@@ -37,7 +43,7 @@ type Config struct {
 	NameFilter        string
 	RequiredByFilter  string
 	SortBy            string
-	ColumnNames       []string
+	Fields            []consts.FieldType
 }
 
 func ParseFlags(args []string) (Config, error) {
@@ -72,7 +78,6 @@ func ParseFlags(args []string) (Config, error) {
 	pflag.StringVar(&dateFilter, "date", "", "Filter packages by installation date. Supports exact dates (YYYY-MM-DD), ranges (YYYY-MM-DD:YYYY-MM-DD), and open-ended filters (:YYYY-MM-DD or YYYY-MM-DD:).")
 	pflag.StringVar(&sizeFilter, "size", "", "Filter packages by size. Supports ranges (e.g., 10MB:20GB), exact matches (e.g., 5MB), and open-ended values (e.g., :2GB or 500KB:)")
 	pflag.StringVar(&nameFilter, "name", "", "Filter packages by name (or similar name)")
-
 	pflag.StringVar(&sortBy, "sort", "date", "Sort packages by: 'date', 'alphabetical', 'size:desc', 'size:asc'")
 
 	pflag.BoolVarP(&hasNoHeaders, "no-headers", "", false, "Hide headers for columns (useful for scripts/automation)")
@@ -117,7 +122,10 @@ func ParseFlags(args []string) (Config, error) {
 		return Config{}, err
 	}
 
-	columnsParsed := parseColumns(columnsInput, addColumnsInput, hasAllColumns)
+	columnsParsed, err := parseColumns(columnsInput, addColumnsInput, hasAllColumns)
+	if err != nil {
+		return Config{}, err
+	}
 
 	cfg := Config{
 		Count:             count,
@@ -134,7 +142,7 @@ func ParseFlags(args []string) (Config, error) {
 		NameFilter:        nameFilter,
 		RequiredByFilter:  requiredByFilter,
 		SortBy:            sortBy,
-		ColumnNames:       columnsParsed,
+		Fields:            columnsParsed,
 	}
 
 	if err := validateConfig(cfg); err != nil {

@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"yaylog/internal/consts"
 )
 
 func validateFlagCombinations(
@@ -33,10 +32,6 @@ func validateConfig(cfg Config) error {
 	}
 
 	if err := validateSizeFilter(cfg.SizeFilter); err != nil {
-		return err
-	}
-
-	if err := validateColumnSelection(cfg.ColumnNames); err != nil {
 		return err
 	}
 
@@ -72,25 +67,6 @@ func validateSizeFilter(sizeFilter SizeFilter) error {
 	if sizeFilter.StartSize > 0 && sizeFilter.EndSize > 0 {
 		if sizeFilter.StartSize > sizeFilter.EndSize {
 			return fmt.Errorf("Error: invalid size range. Start size cannot be greater than the end size")
-		}
-	}
-
-	return nil
-}
-
-func validateColumnSelection(columns []string) error {
-	if len(columns) == 0 {
-		return fmt.Errorf("Error: No columns selected. Use --columns to specify at least one column")
-	}
-
-	validColumnsSet := make(map[string]bool)
-	for _, columnName := range consts.ValidColumns {
-		validColumnsSet[columnName] = true
-	}
-
-	for _, column := range columns {
-		if !validColumnsSet[column] {
-			return fmt.Errorf("Error: %s is not a valid column", column)
 		}
 	}
 

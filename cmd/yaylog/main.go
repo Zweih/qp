@@ -13,11 +13,19 @@ import (
 )
 
 func main() {
-	mainWithConfig(&config.CliConfigProvider{})
+	err := mainWithConfig(&config.CliConfigProvider{})
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "Error:", err)
+		os.Exit(1)
+	}
 }
 
-func mainWithConfig(configProvider config.ConfigProvider) {
-	cfg := configProvider.GetConfig()
+func mainWithConfig(configProvider config.ConfigProvider) error {
+	cfg, err := configProvider.GetConfig()
+	if err != nil {
+		return err
+	}
+
 	packages := fetchPackages()
 
 	isInteractive := term.IsTerminal(int(os.Stdout.Fd())) && !cfg.DisableProgress
@@ -34,12 +42,13 @@ func mainWithConfig(configProvider config.ConfigProvider) {
 
 		if len(packages) == 0 {
 			out.WriteLine("No packages to display.")
-			return
+			return nil
 		}
 	}
 
 	packages = trimPackagesLen(packages, cfg)
 	renderOutput(packages, cfg)
+	return nil
 }
 
 func fetchPackages() []pkgdata.PackageInfo {
@@ -65,9 +74,9 @@ func trimPackagesLen(
 
 func renderOutput(packages []pkgdata.PackageInfo, cfg config.Config) {
 	if cfg.OutputJson {
-		out.RenderJson(packages, cfg.ColumnNames)
+		out.RenderJson(packages, cfg.Fields)
 		return
 	}
 
-	out.RenderTable(packages, cfg.ColumnNames, cfg.ShowFullTimestamp, cfg.HasNoHeaders)
+	out.RenderTable(packages, cfg.Fields, cfg.ShowFullTimestamp, cfg.HasNoHeaders)
 }

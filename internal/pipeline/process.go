@@ -1,9 +1,14 @@
 package pipeline
 
 import (
-	"time"
 	"yaylog/internal/config"
+	"yaylog/internal/consts"
 	"yaylog/internal/pkgdata"
+)
+
+const (
+	FieldExplicit   = "explicit"
+	FieldDependency = "dependency"
 )
 
 func PreprocessFiltering(
@@ -13,14 +18,7 @@ func PreprocessFiltering(
 ) []pkgdata.PackageInfo {
 	var filters []pkgdata.FilterCondition
 
-	filterConditions := []*pkgdata.FilterCondition{
-		getRequiredByFilterCondition(cfg),
-		getExplicitFilterCondition(cfg),
-		getDependenciesFilterCondition(cfg),
-		getDateFilterCondition(cfg),
-		getSizeFilterCondition(cfg),
-		getNameFilterCondition(cfg),
-	}
+	filterConditions := getFiltersFromConfig(cfg)
 
 	for _, condition := range filterConditions {
 		if condition != nil {
@@ -31,100 +29,39 @@ func PreprocessFiltering(
 	return pkgdata.FilterPackages(packages, filters, reportProgress)
 }
 
-func getRequiredByFilterCondition(cfg config.Config) *pkgdata.FilterCondition {
-	if len(cfg.RequiredByFilter) == 0 {
-		return nil
-	}
-	return &pkgdata.FilterCondition{
-		Filter: func(pkg pkgdata.PackageInfo) bool {
-			return pkgdata.FilterRequiredBy(pkg, cfg.RequiredByFilter)
-		},
-		PhaseName: "Filter by required package",
-	}
-}
+// TODO: remove these if-statements when we consolidate all filters into one flag
+func getFiltersFromConfig(cfg config.Config) []*pkgdata.FilterCondition {
+	var conditions []*pkgdata.FilterCondition
 
-func getExplicitFilterCondition(cfg config.Config) *pkgdata.FilterCondition {
-	if !cfg.ExplicitOnly {
-		return nil
+	if len(cfg.RequiredByFilter) > 0 {
+		filter := pkgdata.NewPackageFilter(consts.FieldRequiredBy, []string{cfg.RequiredByFilter})
+		conditions = append(conditions, &filter)
 	}
 
-	return &pkgdata.FilterCondition{
-		Filter:    pkgdata.FilterExplicit,
-		PhaseName: "Filtering explicit only",
-	}
-}
-
-func getDependenciesFilterCondition(cfg config.Config) *pkgdata.FilterCondition {
-	if !cfg.DependenciesOnly {
-		return nil
+	if cfg.ExplicitOnly {
+		filter := pkgdata.NewReasonFilter(FieldExplicit)
+		conditions = append(conditions, &filter)
 	}
 
-	return &pkgdata.FilterCondition{
-		Filter:    pkgdata.FilterDependencies,
-		PhaseName: "Filtering dependencies only",
-	}
-}
-
-func getDateFilterCondition(cfg config.Config) *pkgdata.FilterCondition {
-	if cfg.DateFilter.StartDate.IsZero() && cfg.DateFilter.EndDate.IsZero() {
-		return nil
+	if cfg.DependenciesOnly {
+		filter := pkgdata.NewReasonFilter(FieldDependency)
+		conditions = append(conditions, &filter)
 	}
 
-	filterCondition := &pkgdata.FilterCondition{
-		PhaseName: "Filtering by date",
+	if !cfg.DateFilter.StartDate.IsZero() || !cfg.DateFilter.EndDate.IsZero() {
+		filter := pkgdata.NewDateFilter(cfg.DateFilter.StartDate, cfg.DateFilter.EndDate, cfg.DateFilter.IsExactMatch)
+		conditions = append(conditions, &filter)
 	}
 
-	if cfg.DateFilter.IsExactMatch {
-		filterCondition.Filter = func(pkg pkgdata.PackageInfo) bool {
-			return pkgdata.FilterByDate(pkg, cfg.DateFilter.StartDate)
-		}
-
-		return filterCondition
+	if cfg.SizeFilter.StartSize > 0 || cfg.SizeFilter.EndSize > 0 {
+		filter := pkgdata.NewSizeFilter(cfg.SizeFilter.StartSize, cfg.SizeFilter.EndSize, cfg.SizeFilter.IsExactMatch)
+		conditions = append(conditions, &filter)
 	}
 
-	adjustedEndDate := cfg.DateFilter.EndDate.Add(24 * time.Hour)
-	filterCondition.Filter = func(pkg pkgdata.PackageInfo) bool {
-		return pkgdata.FilterByDateRange(pkg, cfg.DateFilter.StartDate, adjustedEndDate)
+	if len(cfg.NameFilter) > 0 {
+		filter := pkgdata.NewPackageFilter(consts.FieldName, []string{cfg.NameFilter})
+		conditions = append(conditions, &filter)
 	}
 
-	return filterCondition
-}
-
-func getSizeFilterCondition(cfg config.Config) *pkgdata.FilterCondition {
-	if cfg.SizeFilter.StartSize == 0 && cfg.SizeFilter.EndSize == 0 {
-		return nil
-	}
-
-	var sizeFilter func(pkgdata.PackageInfo) bool
-	filterCondition := &pkgdata.FilterCondition{
-		Filter:    sizeFilter,
-		PhaseName: "Filtering by size",
-	}
-
-	if cfg.SizeFilter.IsExactMatch {
-		filterCondition.Filter = func(pkg pkgdata.PackageInfo) bool {
-			return pkgdata.FilterBySize(pkg, cfg.SizeFilter.StartSize)
-		}
-
-		return filterCondition
-	}
-
-	filterCondition.Filter = func(pkg pkgdata.PackageInfo) bool {
-		return pkgdata.FilterBySizeRange(pkg, cfg.SizeFilter.StartSize, cfg.SizeFilter.EndSize)
-	}
-
-	return filterCondition
-}
-
-func getNameFilterCondition(cfg config.Config) *pkgdata.FilterCondition {
-	if len(cfg.NameFilter) == 0 {
-		return nil
-	}
-
-	return &pkgdata.FilterCondition{
-		Filter: func(pkg pkgdata.PackageInfo) bool {
-			return pkgdata.FilterByName(pkg, cfg.NameFilter)
-		},
-		PhaseName: "Filtering by name",
-	}
+	return conditions
 }

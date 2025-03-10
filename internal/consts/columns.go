@@ -1,16 +1,64 @@
 package consts
 
+type FieldType string
+
 const (
-	Date       = "date"
-	Name       = "name"
-	Reason     = "reason"
-	Size       = "size"
-	Version    = "version"
-	Depends    = "depends"
-	RequiredBy = "required-by"
-	Provides   = "provides"
+	date       = "date"
+	name       = "name"
+	reason     = "reason"
+	size       = "size"
+	version    = "version"
+	depends    = "depends"
+	requiredBy = "required-by"
+	provides   = "provides"
 )
 
-var DefaultColumns = []string{Date, Name, Reason, Size}
+const (
+	FieldDate       FieldType = date
+	FieldName       FieldType = name
+	FieldReason     FieldType = reason
+	FieldSize       FieldType = size
+	FieldVersion    FieldType = version
+	FieldDepends    FieldType = depends
+	FieldRequiredBy FieldType = requiredBy
+	FieldProvides   FieldType = provides
+)
 
-var ValidColumns = []string{Date, Name, Reason, Size, Version, Depends, RequiredBy, Provides}
+var FieldTypeLookup = map[string]FieldType{
+	"d": FieldDate,
+	"n": FieldName,
+	"r": FieldReason,
+	"s": FieldSize,
+	"v": FieldVersion,
+	"D": FieldDepends,
+	"R": FieldRequiredBy,
+	"p": FieldProvides,
+
+	date:       FieldDate,
+	name:       FieldName,
+	reason:     FieldReason,
+	size:       FieldSize,
+	version:    FieldVersion,
+	depends:    FieldDepends,
+	requiredBy: FieldRequiredBy,
+	provides:   FieldProvides,
+}
+
+var (
+	DefaultFields = []FieldType{
+		FieldDate,
+		FieldName,
+		FieldReason,
+		FieldSize,
+	}
+	ValidFields = []FieldType{
+		FieldDate,
+		FieldName,
+		FieldReason,
+		FieldSize,
+		FieldVersion,
+		FieldDepends,
+		FieldRequiredBy,
+		FieldProvides,
+	}
+)

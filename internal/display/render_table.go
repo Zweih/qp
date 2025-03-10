@@ -13,21 +13,21 @@ type tableContext struct {
 	DateFormat string
 }
 
-var columnHeaders = map[string]string{
-	consts.Date:       "DATE",
-	consts.Name:       "NAME",
-	consts.Reason:     "REASON",
-	consts.Size:       "SIZE",
-	consts.Version:    "VERSION",
-	consts.Depends:    "DEPENDS",
-	consts.RequiredBy: "REQUIRED BY",
-	consts.Provides:   "PROVIDES",
+var columnHeaders = map[consts.FieldType]string{
+	consts.FieldDate:       "DATE",
+	consts.FieldName:       "NAME",
+	consts.FieldReason:     "REASON",
+	consts.FieldSize:       "SIZE",
+	consts.FieldVersion:    "VERSION",
+	consts.FieldDepends:    "DEPENDS",
+	consts.FieldRequiredBy: "REQUIRED BY",
+	consts.FieldProvides:   "PROVIDES",
 }
 
 // displays data in tab format
 func (o *OutputManager) renderTable(
 	pkgs []pkgdata.PackageInfo,
-	columnNames []string,
+	fields []consts.FieldType,
 	showFullTimestamp bool,
 	hasNoHeaders bool,
 ) {
@@ -44,52 +44,57 @@ func (o *OutputManager) renderTable(
 	w := tabwriter.NewWriter(&buffer, 0, 8, 2, ' ', 0)
 
 	if !hasNoHeaders {
-		renderHeaders(w, columnNames)
+		renderHeaders(w, fields)
 	}
 
 	for _, pkg := range pkgs {
-		renderRows(w, pkg, columnNames, ctx)
+		renderRows(w, pkg, fields, ctx)
 	}
 
 	w.Flush()
 	o.write(buffer.String())
 }
 
-func renderHeaders(w *tabwriter.Writer, columnNames []string) {
-	headers := make([]string, len(columnNames))
-	for i, columnName := range columnNames {
-		headers[i] = columnHeaders[columnName]
+func renderHeaders(w *tabwriter.Writer, fields []consts.FieldType) {
+	headers := make([]string, len(fields))
+	for i, field := range fields {
+		headers[i] = columnHeaders[field]
 	}
 
 	fmt.Fprintln(w, strings.Join(headers, "\t"))
 }
 
-func renderRows(w *tabwriter.Writer, pkg pkgdata.PackageInfo, columnNames []string, ctx tableContext) {
-	row := make([]string, len(columnNames))
-	for i, columnName := range columnNames {
-		row[i] = getTableValue(pkg, columnName, ctx)
+func renderRows(
+	w *tabwriter.Writer,
+	pkg pkgdata.PackageInfo,
+	fields []consts.FieldType,
+	ctx tableContext,
+) {
+	row := make([]string, len(fields))
+	for i, fields := range fields {
+		row[i] = getTableValue(pkg, fields, ctx)
 	}
 
 	fmt.Fprintln(w, strings.Join(row, "\t"))
 }
 
-func getTableValue(pkg pkgdata.PackageInfo, columnName string, ctx tableContext) string {
-	switch columnName {
-	case consts.Date:
+func getTableValue(pkg pkgdata.PackageInfo, field consts.FieldType, ctx tableContext) string {
+	switch field {
+	case consts.FieldDate:
 		return formatDate(pkg, ctx)
-	case consts.Name:
+	case consts.FieldName:
 		return pkg.Name
-	case consts.Reason:
+	case consts.FieldReason:
 		return pkg.Reason
-	case consts.Size:
+	case consts.FieldSize:
 		return formatSize(pkg.Size)
-	case consts.Version:
+	case consts.FieldVersion:
 		return pkg.Version
-	case consts.Depends:
+	case consts.FieldDepends:
 		return formatPackageList(pkg.Depends)
-	case consts.RequiredBy:
+	case consts.FieldRequiredBy:
 		return formatPackageList(pkg.RequiredBy)
-	case consts.Provides:
+	case consts.FieldProvides:
 		return formatPackageList(pkg.Provides)
 	default:
 		return ""
