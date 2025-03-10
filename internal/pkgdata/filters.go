@@ -21,17 +21,6 @@ func newBaseFilter(filterType consts.FieldType) FilterCondition {
 	}
 }
 
-func FilterRequiredBy(pkg PackageInfo, target string) bool {
-	for _, requiredByPkgName := range pkg.RequiredBy {
-		matches := packageNameRegex.FindStringSubmatch(requiredByPkgName)
-		if len(matches) >= 2 && matches[1] == target {
-			return true
-		}
-	}
-
-	return false
-}
-
 func FilterByPackages(packageNames []string, targetNames []string) bool {
 	for _, targetName := range targetNames {
 		for _, packageName := range packageNames {
@@ -84,10 +73,6 @@ func FilterBySize(pkg PackageInfo, size int64) bool {
 
 func FilterBySizeRange(pkg PackageInfo, startSize int64, endSize int64) bool {
 	return pkg.Size >= startSize && pkg.Size <= endSize
-}
-
-func FilterByName(pkg PackageInfo, searchTerm string) bool {
-	return strings.Contains(pkg.Name, searchTerm)
 }
 
 func FilterByNames(pkg PackageInfo, targets []string) bool {
