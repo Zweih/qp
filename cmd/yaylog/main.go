@@ -15,7 +15,7 @@ import (
 func main() {
 	err := mainWithConfig(&config.CliConfigProvider{})
 	if err != nil {
-		out.WriteLine(fmt.Sprintf("Error parsing arguments: %v", err))
+		out.WriteLine(err.Error())
 		os.Exit(1)
 	}
 }
@@ -38,7 +38,10 @@ func mainWithConfig(configProvider config.ConfigProvider) error {
 	}
 
 	for _, phase := range pipeline {
-		packages = phase.Run(cfg, packages)
+		packages, err = phase.Run(cfg, packages)
+		if err != nil {
+			return err
+		}
 
 		if len(packages) == 0 {
 			out.WriteLine("No packages to display.")

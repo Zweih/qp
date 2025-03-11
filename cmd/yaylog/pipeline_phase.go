@@ -14,19 +14,25 @@ type (
 	PackageInfo      = pkgdata.PackageInfo
 )
 
+type Operation func(cfg config.Config, packages []PackageInfo, progressReporter ProgressReporter) ([]PackageInfo, error)
+
 type PipelinePhase struct {
 	Name          string
-	Operation     func(cfg config.Config, packages []PackageInfo, progressReporter ProgressReporter) []PackageInfo
+	Operation     Operation
 	IsInteractive bool
 	wg            *sync.WaitGroup
 }
 
-func (phase PipelinePhase) Run(cfg config.Config, packages []PackageInfo) []PackageInfo {
+func (phase PipelinePhase) Run(cfg config.Config, packages []PackageInfo) ([]PackageInfo, error) {
 	progressChan := phase.startProgress()
-	outputPackages := phase.Operation(cfg, packages, phase.reportProgress(progressChan))
+	outputPackages, err := phase.Operation(cfg, packages, phase.reportProgress(progressChan))
 	phase.stopProgress(progressChan)
 
-	return outputPackages
+	if err != nil {
+		return nil, err
+	}
+
+	return outputPackages, nil
 }
 
 func (phase PipelinePhase) reportProgress(progressChan chan ProgressMessage) ProgressReporter {

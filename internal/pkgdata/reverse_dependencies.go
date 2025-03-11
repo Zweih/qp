@@ -7,23 +7,25 @@ import (
 	"yaylog/internal/consts"
 )
 
-var packageNameRegex = regexp.MustCompile(`^([^<>=]+)`) // pulls package name out of `package-name>=2.0.1`
+// pulls package name out of `package-name>=2.0.1`
+var packageNameRegex = regexp.MustCompile(`^([^<>=]+)`)
 
-// TODO: we can do this concurrent. let's get on that.
+// TODO: we can do this concurrently. let's get on that.
 func CalculateReverseDependencies(
 	cfg config.Config,
 	packages []PackageInfo,
 	_ ProgressReporter, // TODO: Add progress reporting
-) []PackageInfo {
-	hasRequiredByFilter := len(cfg.RequiredByFilter) > 0
+) ([]PackageInfo, error) {
+	_, hasRequiredByFilter := cfg.FilterQueries[consts.FieldRequiredBy]
 
 	if !slices.Contains(cfg.Fields, consts.FieldRequiredBy) && !hasRequiredByFilter {
-		return packages
+		return packages, nil
 	}
 
 	packagePointerMap := make(map[string]*PackageInfo)
 	packageDependencyMap := make(map[string][]string)
-	providesMap := make(map[string]string) // key: provided library/package, value: package that providers it (provider)
+	providesMap := make(map[string]string)
+	// key: provided library/package, value: package that provides it (provider)
 
 	for i := range packages {
 		pkg := &packages[i]
@@ -64,5 +66,5 @@ func CalculateReverseDependencies(
 		}
 	}
 
-	return packages
+	return packages, nil
 }

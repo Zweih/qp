@@ -1,67 +1,94 @@
 package pipeline
 
 import (
+	"fmt"
 	"yaylog/internal/config"
 	"yaylog/internal/consts"
 	"yaylog/internal/pkgdata"
 )
 
-const (
-	FieldExplicit   = "explicit"
-	FieldDependency = "dependency"
+type (
+	PackageInfo     = pkgdata.PackageInfo
+	FilterCondition = pkgdata.FilterCondition
 )
 
 func PreprocessFiltering(
 	cfg config.Config,
 	packages []pkgdata.PackageInfo,
 	reportProgress pkgdata.ProgressReporter,
-) []pkgdata.PackageInfo {
-	var filters []pkgdata.FilterCondition
-
-	filterConditions := getFiltersFromConfig(cfg)
-
-	for _, condition := range filterConditions {
-		if condition != nil {
-			filters = append(filters, *condition)
-		}
+) ([]pkgdata.PackageInfo, error) {
+	if len(cfg.FilterQueries) == 0 {
+		return packages, nil
 	}
 
-	return pkgdata.FilterPackages(packages, filters, reportProgress)
+	filterConditions, err := queriesToConditions(cfg.FilterQueries)
+	if err != nil {
+		return []pkgdata.PackageInfo{}, err
+	}
+
+	return pkgdata.FilterPackages(packages, filterConditions, reportProgress), nil
 }
 
-// TODO: remove these if-statements when we consolidate all filters into one flag
-func getFiltersFromConfig(cfg config.Config) []*pkgdata.FilterCondition {
-	var conditions []*pkgdata.FilterCondition
+func queriesToConditions(filterQueries map[consts.FieldType]string) ([]pkgdata.FilterCondition, error) {
+	conditions := make([]pkgdata.FilterCondition, 0, len(filterQueries))
 
-	if len(cfg.RequiredByFilter) > 0 {
-		filter := pkgdata.NewPackageFilter(consts.FieldRequiredBy, []string{cfg.RequiredByFilter})
-		conditions = append(conditions, &filter)
+	for fieldType, value := range filterQueries {
+		var condition pkgdata.FilterCondition
+		var err error
+
+		switch fieldType {
+		case consts.FieldDate:
+			condition, err = parseDateFilterCondition(value)
+		case consts.FieldSize:
+			condition, err = parseSizeFilterCondition(value)
+		case consts.FieldName, consts.FieldRequiredBy:
+			condition, err = NewPackageCondition(fieldType, []string{value})
+		case consts.FieldReason:
+			condition, err = parseReasonFilterCondition(value)
+		default:
+			err = fmt.Errorf("unsupported filter type: %s", fieldType)
+		}
+
+		if err != nil {
+			return []pkgdata.FilterCondition{}, err
+		}
+
+		conditions = append(conditions, condition)
 	}
 
-	if cfg.ExplicitOnly {
-		filter := pkgdata.NewReasonFilter(FieldExplicit)
-		conditions = append(conditions, &filter)
+	return conditions, nil
+}
+
+func parseReasonFilterCondition(installReason string) (FilterCondition, error) {
+	if installReason != config.ReasonExplicit && installReason != config.ReasonDependency {
+		return FilterCondition{}, fmt.Errorf("invalid install reason filter: %s", installReason)
 	}
 
-	if cfg.DependenciesOnly {
-		filter := pkgdata.NewReasonFilter(FieldDependency)
-		conditions = append(conditions, &filter)
+	return NewReasonCondition(installReason), nil
+}
+
+func parseDateFilterCondition(value string) (FilterCondition, error) {
+	dateFilter, err := parseDateFilter(value)
+	if err != nil {
+		return pkgdata.FilterCondition{}, fmt.Errorf("invalid date filter: %v", err)
 	}
 
-	if !cfg.DateFilter.StartDate.IsZero() || !cfg.DateFilter.EndDate.IsZero() {
-		filter := pkgdata.NewDateFilter(cfg.DateFilter.StartDate, cfg.DateFilter.EndDate, cfg.DateFilter.IsExactMatch)
-		conditions = append(conditions, &filter)
+	if err = validateDateFilter(dateFilter); err != nil {
+		return pkgdata.FilterCondition{}, err
 	}
 
-	if cfg.SizeFilter.StartSize > 0 || cfg.SizeFilter.EndSize > 0 {
-		filter := pkgdata.NewSizeFilter(cfg.SizeFilter.StartSize, cfg.SizeFilter.EndSize, cfg.SizeFilter.IsExactMatch)
-		conditions = append(conditions, &filter)
+	return NewDateCondition(dateFilter), nil
+}
+
+func parseSizeFilterCondition(value string) (FilterCondition, error) {
+	sizeFilter, err := parseSizeFilter(value)
+	if err != nil {
+		return FilterCondition{}, fmt.Errorf("invalid size filter: %v", err)
 	}
 
-	if len(cfg.NameFilter) > 0 {
-		filter := pkgdata.NewPackageFilter(consts.FieldName, []string{cfg.NameFilter})
-		conditions = append(conditions, &filter)
+	if err = validateSizeFilter(sizeFilter); err != nil {
+		return FilterCondition{}, err
 	}
 
-	return conditions
+	return NewSizeCondition(sizeFilter), nil
 }

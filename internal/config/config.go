@@ -9,6 +9,24 @@ import (
 	"github.com/spf13/pflag"
 )
 
+const (
+	ReasonExplicit   = "explicit"
+	ReasonDependency = "dependencies"
+)
+
+type Config struct {
+	Count             int
+	AllPackages       bool
+	ShowHelp          bool
+	OutputJson        bool
+	HasNoHeaders      bool
+	ShowFullTimestamp bool
+	DisableProgress   bool
+	SortBy            string
+	Fields            []consts.FieldType
+	FilterQueries     map[consts.FieldType]string
+}
+
 type ConfigProvider interface {
 	GetConfig() (Config, error)
 }
@@ -27,24 +45,6 @@ func (c *CliConfigProvider) GetConfig() (Config, error) {
 	}
 
 	return cfg, nil
-}
-
-type Config struct {
-	Count             int
-	AllPackages       bool
-	ShowHelp          bool
-	OutputJson        bool
-	HasNoHeaders      bool
-	ShowFullTimestamp bool
-	DisableProgress   bool
-	ExplicitOnly      bool
-	DependenciesOnly  bool
-	DateFilter        DateFilter
-	SizeFilter        SizeFilter
-	NameFilter        string
-	RequiredByFilter  string
-	SortBy            string
-	Fields            []consts.FieldType
 }
 
 func ParseFlags(args []string) (Config, error) {
@@ -115,25 +115,25 @@ func ParseFlags(args []string) (Config, error) {
 		count = 0
 	}
 
-	sizeFilterParsed, err := parseSizeFilter(sizeFilter)
-	if err != nil {
-		return Config{}, err
-	}
-
-	dateFilterParsed, err := parseDateFilter(dateFilter)
-	if err != nil {
-		return Config{}, err
-	}
-
 	columnsParsed, err := parseColumns(columnsInput, addColumnsInput, hasAllColumns)
 	if err != nil {
 		return Config{}, err
 	}
 
-	// filterQueries, err := parseFilterQueries(filterInputs)
-	// if err != nil {
-	// 	return Config{}, err
-	// }
+	filterQueries, err := parseFilterQueries(filterInputs)
+	if err != nil {
+		return Config{}, err
+	}
+
+	filterQueries = convertLegacyFilters(
+		filterQueries,
+		dateFilter,
+		nameFilter,
+		sizeFilter,
+		requiredByFilter,
+		explicitOnly,
+		dependenciesOnly,
+	)
 
 	cfg := Config{
 		Count:             count,
@@ -143,14 +143,9 @@ func ParseFlags(args []string) (Config, error) {
 		HasNoHeaders:      hasNoHeaders,
 		ShowFullTimestamp: showFullTimestamp,
 		DisableProgress:   disableProgress,
-		ExplicitOnly:      explicitOnly,
-		DependenciesOnly:  dependenciesOnly,
-		DateFilter:        dateFilterParsed,
-		SizeFilter:        sizeFilterParsed,
-		NameFilter:        nameFilter,
-		RequiredByFilter:  requiredByFilter,
 		SortBy:            sortBy,
 		Fields:            columnsParsed,
+		FilterQueries:     filterQueries,
 	}
 
 	if err := validateConfig(cfg); err != nil {
@@ -160,13 +155,8 @@ func ParseFlags(args []string) (Config, error) {
 	return cfg, nil
 }
 
-type FilterQuery struct {
-	FieldType consts.FieldType
-	Value     string
-}
-
-func parseFilterQueries(filterInputs []string) ([]FilterQuery, error) {
-	filterQueries := make([]FilterQuery, 0, len(filterInputs))
+func parseFilterQueries(filterInputs []string) (map[consts.FieldType]string, error) {
+	filterQueries := make(map[consts.FieldType]string)
 	filterRegex := regexp.MustCompile(`^([a-zA-Z0-9_-]+)=(.+)$`)
 
 	for _, input := range filterInputs {
@@ -178,14 +168,51 @@ func parseFilterQueries(filterInputs []string) ([]FilterQuery, error) {
 		field, value := matches[1], matches[2]
 		fieldType, exists := consts.FieldTypeLookup[field]
 		if !exists {
-			return nil, fmt.Errorf("Unknown filter field")
+			return nil, fmt.Errorf("Unknown filter field: %s", field)
 		}
 
-		filterQueries = append(filterQueries, FilterQuery{
-			FieldType: fieldType,
-			Value:     value,
-		})
+		if fieldType == consts.FieldReason && value != ReasonExplicit && value != ReasonDependency {
+			return nil, fmt.Errorf("Invalid reason filter value: %s. Allowed values are 'explicit' or 'dependency'", value)
+		}
+
+		filterQueries[fieldType] = value
 	}
 
 	return filterQueries, nil
+}
+
+func convertLegacyFilters(
+	filterQueries map[consts.FieldType]string,
+	dateFilter string,
+	nameFilter string,
+	sizeFilter string,
+	requiredByFilter string,
+	explicitOnly bool,
+	dependenciesOnly bool,
+) map[consts.FieldType]string {
+	if dateFilter != "" {
+		filterQueries[consts.FieldDate] = dateFilter
+	}
+
+	if nameFilter != "" {
+		filterQueries[consts.FieldName] = nameFilter
+	}
+
+	if sizeFilter != "" {
+		filterQueries[consts.FieldSize] = sizeFilter
+	}
+
+	if requiredByFilter != "" {
+		filterQueries[consts.FieldRequiredBy] = requiredByFilter
+	}
+
+	if explicitOnly {
+		filterQueries[consts.FieldReason] = ReasonExplicit
+	}
+
+	if dependenciesOnly {
+		filterQueries[consts.FieldReason] = ReasonDependency
+	}
+
+	return filterQueries
 }

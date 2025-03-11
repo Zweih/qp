@@ -5,7 +5,6 @@ import (
 	"math"
 	"strings"
 	"time"
-	"yaylog/internal/consts"
 )
 
 type Filter func(PackageInfo) bool
@@ -13,12 +12,6 @@ type Filter func(PackageInfo) bool
 type FilterCondition struct {
 	Filter    Filter
 	PhaseName string
-}
-
-func newBaseFilter(filterType consts.FieldType) FilterCondition {
-	return FilterCondition{
-		PhaseName: "Filtering by " + string(filterType),
-	}
 }
 
 func FilterByPackages(packageNames []string, targetNames []string) bool {

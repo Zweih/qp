@@ -1,4 +1,4 @@
-package config
+package pipeline
 
 import (
 	"fmt"
@@ -10,9 +10,9 @@ import (
 )
 
 type SizeFilter struct {
-	StartSize    int64
-	EndSize      int64
-	IsExactMatch bool
+	StartSize int64
+	EndSize   int64
+	IsExact   bool
 }
 
 func parseSizeFilter(sizeFilterInput string) (SizeFilter, error) {
@@ -28,7 +28,7 @@ func parseSizeFilter(sizeFilterInput string) (SizeFilter, error) {
 	pattern := `(?i)^(?:(\d+(?:\.\d+)?)(B|KB|MB|GB))?(?::(?:(\d+(?:\.\d+)?)(B|KB|MB|GB))?)?$`
 	re := regexp.MustCompile(pattern)
 	matches := re.FindStringSubmatch(sizeFilterInput)
-	isExactMatch := !strings.Contains(sizeFilterInput, ":")
+	isExact := !strings.Contains(sizeFilterInput, ":")
 
 	if matches == nil {
 		return SizeFilter{}, fmt.Errorf("invalid size filter format: %q", sizeFilterInput)
@@ -47,7 +47,7 @@ func parseSizeFilter(sizeFilterInput string) (SizeFilter, error) {
 	return SizeFilter{
 		startSize,
 		endSize,
-		isExactMatch,
+		isExact,
 	}, nil
 }
 
@@ -81,4 +81,14 @@ func parseSizeInBytes(valueInput string, unitInput string) (sizeInBytes int64, e
 	}
 
 	return sizeInBytes, nil
+}
+
+func validateSizeFilter(sizeFilter SizeFilter) error {
+	if sizeFilter.StartSize > 0 && sizeFilter.EndSize > 0 {
+		if sizeFilter.StartSize > sizeFilter.EndSize {
+			return fmt.Errorf("Error: invalid size range. Start size cannot be greater than the end size")
+		}
+	}
+
+	return nil
 }

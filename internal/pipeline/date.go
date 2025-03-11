@@ -1,4 +1,4 @@
-package config
+package pipeline
 
 import (
 	"fmt"
@@ -9,9 +9,9 @@ import (
 )
 
 type DateFilter struct {
-	StartDate    time.Time
-	EndDate      time.Time
-	IsExactMatch bool
+	StartDate time.Time
+	EndDate   time.Time
+	IsExact   bool
 }
 
 func parseDateFilter(dateFilterInput string) (DateFilter, error) {
@@ -26,7 +26,7 @@ func parseDateFilter(dateFilterInput string) (DateFilter, error) {
 	pattern := `^(\d{4}-\d{2}-\d{2})?(?::(\d{4}-\d{2}-\d{2})?)?$`
 	re := regexp.MustCompile(pattern)
 	matches := re.FindStringSubmatch(dateFilterInput)
-	isExactMatch := !strings.Contains(dateFilterInput, ":")
+	isExact := !strings.Contains(dateFilterInput, ":")
 
 	if matches == nil {
 		return DateFilter{}, fmt.Errorf("invalid date filter format: %q", dateFilterInput)
@@ -45,7 +45,7 @@ func parseDateFilter(dateFilterInput string) (DateFilter, error) {
 	return DateFilter{
 		startDate,
 		endDate,
-		isExactMatch,
+		isExact,
 	}, nil
 }
 
@@ -64,4 +64,14 @@ func parseValidDate(dateInput string) (time.Time, error) {
 	}
 
 	return parsedDate, nil
+}
+
+func validateDateFilter(dateFilter DateFilter) error {
+	if !dateFilter.StartDate.IsZero() && !dateFilter.EndDate.IsZero() {
+		if dateFilter.StartDate.After(dateFilter.EndDate) {
+			return fmt.Errorf("Error invalid date range. The start date cannot be after the end date")
+		}
+	}
+
+	return nil
 }

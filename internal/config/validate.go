@@ -27,14 +27,6 @@ func validateConfig(cfg Config) error {
 		return err
 	}
 
-	if err := validateDateFilter(cfg.DateFilter); err != nil {
-		return err
-	}
-
-	if err := validateSizeFilter(cfg.SizeFilter); err != nil {
-		return err
-	}
-
 	return nil
 }
 
@@ -48,26 +40,6 @@ func validateSortOption(sortBy string) error {
 
 	if !validSortOptions[sortBy] {
 		return fmt.Errorf("Error: Invalid sort option %s", sortBy)
-	}
-
-	return nil
-}
-
-func validateDateFilter(dateFilter DateFilter) error {
-	if !dateFilter.StartDate.IsZero() && !dateFilter.EndDate.IsZero() {
-		if dateFilter.StartDate.After(dateFilter.EndDate) {
-			return fmt.Errorf("Error invalid date range. The start date cannot be after the end date")
-		}
-	}
-
-	return nil
-}
-
-func validateSizeFilter(sizeFilter SizeFilter) error {
-	if sizeFilter.StartSize > 0 && sizeFilter.EndSize > 0 {
-		if sizeFilter.StartSize > sizeFilter.EndSize {
-			return fmt.Errorf("Error: invalid size range. Start size cannot be greater than the end size")
-		}
 	}
 
 	return nil
