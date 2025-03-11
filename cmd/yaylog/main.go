@@ -15,7 +15,7 @@ import (
 func main() {
 	err := mainWithConfig(&config.CliConfigProvider{})
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Error:", err)
+		out.WriteLine(fmt.Sprintf("Error parsing arguments: %v", err))
 		os.Exit(1)
 	}
 }
