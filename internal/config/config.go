@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"regexp"
 	"yaylog/internal/consts"
 
 	"github.com/spf13/pflag"
@@ -59,6 +60,7 @@ func ParseFlags(args []string) (Config, error) {
 	var explicitOnly bool
 	var dependenciesOnly bool
 
+	var filterInputs []string
 	var dateFilter string
 	var sizeFilter string
 	var nameFilter string
@@ -79,6 +81,7 @@ func ParseFlags(args []string) (Config, error) {
 	pflag.StringVar(&sizeFilter, "size", "", "Filter packages by size. Supports ranges (e.g., 10MB:20GB), exact matches (e.g., 5MB), and open-ended values (e.g., :2GB or 500KB:)")
 	pflag.StringVar(&nameFilter, "name", "", "Filter packages by name (or similar name)")
 	pflag.StringVar(&sortBy, "sort", "date", "Sort packages by: 'date', 'alphabetical', 'size:desc', 'size:asc'")
+	pflag.StringArrayVarP(&filterInputs, "filter", "f", []string{}, "Apply multiple filters (e.g. --filter size=2KB:3KB --filter name=vim)")
 
 	pflag.BoolVarP(&hasNoHeaders, "no-headers", "", false, "Hide headers for columns (useful for scripts/automation)")
 
@@ -127,6 +130,11 @@ func ParseFlags(args []string) (Config, error) {
 		return Config{}, err
 	}
 
+	// filterQueries, err := parseFilterQueries(filterInputs)
+	// if err != nil {
+	// 	return Config{}, err
+	// }
+
 	cfg := Config{
 		Count:             count,
 		AllPackages:       allPackages,
@@ -150,4 +158,34 @@ func ParseFlags(args []string) (Config, error) {
 	}
 
 	return cfg, nil
+}
+
+type FilterQuery struct {
+	FieldType consts.FieldType
+	Value     string
+}
+
+func parseFilterQueries(filterInputs []string) ([]FilterQuery, error) {
+	filterQueries := make([]FilterQuery, 0, len(filterInputs))
+	filterRegex := regexp.MustCompile(`^([a-zA-Z0-9_-]+)=(.+)$`)
+
+	for _, input := range filterInputs {
+		matches := filterRegex.FindStringSubmatch(input)
+		if matches == nil {
+			return nil, fmt.Errorf("Invalid filter format: %q. Must be in form field=value", input)
+		}
+
+		field, value := matches[1], matches[2]
+		fieldType, exists := consts.FieldTypeLookup[field]
+		if !exists {
+			return nil, fmt.Errorf("Unknown filter field")
+		}
+
+		filterQueries = append(filterQueries, FilterQuery{
+			FieldType: fieldType,
+			Value:     value,
+		})
+	}
+
+	return filterQueries, nil
 }
