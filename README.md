@@ -256,107 +256,107 @@ are treated as separate parameters.
 
 ### examples
 
- 1. **show the last 10 installed packages**  
+ 1. show the last 10 installed packages 
    ```bash
    yaylog -n 10
    ```
- 2. **show all explicitly installed packages**  
+ 2. show all explicitly installed packages
    ```bash
    yaylog -a -f reason=explicit
    ```
- 3. **show only dependencies installed on a specific date**  
+ 3. show only dependencies installed on a specific date
    ```bash
    yaylog -f reason=dependencies -f date=2024-12-25
    ```
- 4. **show all packages sorted alphabetically**  
+ 4. show all packages sorted alphabetically
    ```bash
    yaylog -a --sort alphabetical
    ```
- 5. **show the 15 most recent explicitly installed packages**  
+ 5. show the 15 most recent explicitly installed packages
    ```bash
    yaylog -f reason=explicit -n 15
    ```
- 6. **show packages installed between july 1, 2023, and december 31, 2023**  
+ 6. show packages installed between july 1, 2024, and december 31, 2024
    ```bash
-   yaylog -f date=2023-07-01:2023-12-31
+   yaylog -f date=2024-07-01:2024-12-31
    ```
- 7. **show the 20 most recently installed packages larger than 20MB**  
+ 7. show the 20 most recently installed packages larger than 20MB
    ```bash
    yaylog -f size=20MB: -n 20
    ```
- 8. **show all dependencies smaller than 500KB**  
+ 8. show all dependencies smaller than 500KB  
    ```bash
    yaylog -f reason=dependencies -f size=:500KB
    ```
- 9. **show packages between 100MB and 1GB installed up to june 30, 2024**  
+ 9. show packages between 100MB and 1GB installed up to june 30, 2024
    ```bash
    yaylog -f size=100MB:1GB -f date=:2024-06-30
    ```
-10. **show all packages sorted by size in descending order, installed after january 1, 2024**  
+10. show all packages sorted by size in descending order, installed after january 1, 2024
    ```bash
    yaylog -a --sort size:desc -f date=2024-01-01:
    ```
-11. **search for installed packages containing "python"**  
+11. search for installed packages containing "python
    ```bash
    yaylog -f name=python
    ```
-12. **search for explicitly installed packages containing "lib" that are between 10MB and 1GB in size**  
+12. search for explicitly installed packages containing "lib" that are between 10MB and 1GB in size
    ```bash
    yaylog -f reason=explicit -f name=lib -f size=10MB:1GB
    ```
-13. **search for packages containing "linux" installed between january 1 and june 30, 2024**  
+13. search for packages containing "linux" installed between january 1 and june 30, 2024
    ```bash
    yaylog -f name=linux -f date=2024-01-01:2024-06-30
    ```
-14. **search for packages containing "gtk" installed after january 1, 2023, and at least 5MB in size**  
+14. search for packages containing "gtk" installed after january 1, 2023, and at least 5MB in size
    ```bash
    yaylog -f name=gtk -f date=2023-01-01: -f size=5MB:
    ```
-15. **show packages with name, version, and size**  
+15. show packages with name, version, and size
    ```bash
    yaylog --columns name,version,size
    ```
-16. **show package names and dependencies with `less` for readability**  
+16. show package names and dependencies with `less` for readability
    ```bash
    yaylog --columns name,depends | less
    ```
-17. **output package data in JSON format**  
+17. output package data in JSON format
    ```bash
    yaylog --json
    ```
-18. **save all explicitly installed packages to a JSON file**  
+18. save all explicitly installed packages to a JSON file
    ```bash
    yaylog -f reason=explicit --json > explicit-packages.json
    ```
-19. **output all packages sorted by size (descending) in JSON**  
+19. output all packages sorted by size (descending) in JSON
    ```bash
    yaylog --json -a --sort size:desc
    ```
-20. **output JSON with specific columns**  
+20. output JSON with specific columns
    ```bash
    yaylog --json --columns name,version,size
    ```
-21. **show all available package details**  
+21. show all available package details
    ```bash
    yaylog --all-columns
    ```
-22. **output all packages with all columns/fields in JSON format**  
+22. output all packages with all columns/fields in JSON format
    ```bash
    yaylog -a --all-columns --json
    ```
-23. **show package names and sizes without headers for scripting**  
+23. show package names and sizes without headers for scripting
    ```bash
    yaylog --no-headers --columns name,size
    ```
-24. **show all packages required by "firefox"**  
+24. show all packages required by "firefox"
    ```bash
    yaylog -f required-by=firefox
    ```
-25. **show all packages required by "gtk3" that are at least 50MB in size**  
+25. show all packages required by "gtk3" that are at least 50MB in size
    ```bash
    yaylog -f required-by=gtk3 -f size=50MB:
    ```
-26. **show packages required by "vlc" and installed after january 1, 2024**  
+26. show packages required by "vlc" and installed after january 1, 2024 
    ```bash
    yaylog -f required-by=vlc -f date=2024-01-01:
    ```
