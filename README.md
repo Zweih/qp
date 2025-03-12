@@ -155,7 +155,7 @@ short-flag filters and long-flag filters can be combined.
 #### available filters
 | filter type  | syntax | description |
 |-------------|--------|-------------|
-| **date** | `date=<value>` | filters by installation date. Supports exact dates, ranges (`YYYY-MM-DD:YYYY-MM-DD`), and open-ended ranges (`YYYY-MM-DD:` or `:YYYY-MM-DD`) |
+| **date** | `date=<value>` | filters by installation date. supports exact dates, ranges (`YYYY-MM-DD:YYYY-MM-DD`), and open-ended ranges (`YYYY-MM-DD:` or `:YYYY-MM-DD`) |
 | **required by** | `required-by=<package>` | shows only packages that are required by a specific package |
 | **nme** | `name=<package>` |  filters by package name (substring match) |
 | **installation reason** | `reason=explicit` / `reason=dependencies` | filters packages by installation reason: explicitly installed or installed as a dependency |
