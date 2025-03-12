@@ -127,7 +127,7 @@ yaylog [options]
 ### options
 - `-n <number>` | `--number <number>`: number of recent packages to display (default: 20)
 - `-a` | `all`: show all installed packages (ignores `-n`)
-- `-f <filter>` | `--filter <field>=<value>`: apply multiple filters for a flexible query system. Can be used multiple times. example:
+- `-f <field>=<value>` | `--filter <field>=<value>`: apply multiple filters for a flexible query system. can be used multiple times. example:
   - `--filter size=10MB:1GB` -> filter by size range
   - `--filter date=2024-01-01:` -> filter by installation date
   - `--filter name=firefox` -> filter by package name
