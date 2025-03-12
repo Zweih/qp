@@ -1,10 +1,10 @@
 .\" Man page for yaylog
-.TH yaylog 1 "March 2025" "yaylog 3.17.0" "User Commands"
+.TH yaylog 1 "March 2025" "yaylog 3.18.0" "User Commands"
 .SH NAME
 yaylog \- List and filter installed packages on Arch-based systems.
 .SH SYNOPSIS
 .B yaylog
-.RI [ \-n | \-\-number <number> ] [ \-e | \-\-explicit ] [ \-a | \-\-all ] [ \-d | \-\-dependencies ] [ \-\-required-by <package> ] [ \-\-date <filter> ] [ \-\-size <filter> ] [ \-\-name <search-term> ] [ \-\-sort <mode> ] [ \-\-columns <list> ] [ \-\-add-columns <list> ] [ \-\-all-columns ] [ \-\-json ] [ \-\-full-timestamp ] [ \-\-no-progress ] [ \-h | \-\-help ]
+.RI [ \-n | \-\-number <number> ] [ \-a | \-\-all ] [ \-f <field>=<value> ] [ \-e | \-\-explicit ] [ \-d | \-\-dependencies ] [ \-\-required-by <package> ] [ \-\-date <filter> ] [ \-\-size <filter> ] [ \-\-name <search-term> ] [ \-\-sort <mode> ] [ \-\-columns <list> ] [ \-\-add-columns <list> ] [ \-\-all-columns ] [ \-\-json ] [ \-\-full-timestamp ] [ \-\-no-progress ] [ \-h | \-\-help ]
 .SH DESCRIPTION
 .B yaylog
 is a standalone CLI utility for Arch and Arch-based Linux distributions to list and filter installed packages. It works with any package manager that uses ALPM,
@@ -15,7 +15,12 @@ including
 .B pacman,
 and others.
 
-The utility provides options to filter by explicitly installed packages, dependencies, installation dates, package sizes, package names, and by packages required by another package. It also supports sorting results by date, alphabetical order, or size.
+The utility provides powerful filtering capabilities, including:
+- Installation date filtering
+- Package size filtering
+- Explicit or dependency-based filtering
+- Reverse dependency lookup
+- Sorting and JSON output support
 
 .SH OPTIONS
 .TP
@@ -26,12 +31,6 @@ or
 .B \-\-all
 is used.
 .TP
-.B \-e, \-\-explicit
-Show only explicitly installed packages.
-.TP
-.B \-d, \-\-dependencies
-Show only packages installed as dependencies.
-.TP
 .B \-a, \-\-all
 Show all installed packages, ignoring the
 .B \-n
@@ -39,58 +38,50 @@ or
 .B \-\-number
 option.
 .TP
-.B \-\-required-by <package>
-Show only packages that are required by the specified package.
-For example, running:
+.B \-f, \-\-filter <field>=<value>
+Apply multiple filters for flexible package queries. This option can be used multiple times.
 .PP
-.EX
-yaylog --required-by firefox
-.EE
-.PP
-will display all packages that
-.B firefox
-depends on.
-.TP
-.B \-\-date <filter>
-Filter packages by installation date. Supports exact dates and ranges:
+Supported fields:
 .IP
-.B YYYY-MM-DD
+.B date=<YYYY-MM-DD>
 : Show packages installed on the specified date.
 .IP
-.B YYYY-MM-DD:
-: Show packages installed on or after the specified date.
+.B date=YYYY-MM-DD:
+: Show packages installed on or after the date.
 .IP
-.B :YYYY-MM-DD
+.B date=:YYYY-MM-DD
 : Show packages installed up to the specified date.
 .IP
-.B YYYY-MM-DD:YYYY-MM-DD
+.B date=YYYY-MM-DD:YYYY-MM-DD
 : Show packages installed within a date range.
-.TP
-.B \-\-size <filter>
-Filter results by package size. Supports exact sizes and ranges:
 .IP
-.B 10MB
-: Show packages exactly 10MB in size.
+.B size=10MB:
+: Show packages larger than 10MB.
 .IP
-.B 5GB:
-: Show packages 5GB and larger.
+.B size=:500KB
+: Show packages up to 500KB.
 .IP
-.B :20KB
-: Show packages up to 20KB.
+.B size=1GB:5GB
+: Show packages between 1GB and 5GB.
 .IP
-.B 1.5MB:2GB
-: Show packages between 1.5MB and 2GB.
+.B name=firefox
+: Filter packages by name.
 .IP
-Valid units are B (bytes), KB, MB, or GB.
-.TP
-.B \-\-name <search-term>
-Filter packages by name. Performs a substring match against package names.
-For example, searching
-.B python
-will match both
-.B python
-and
-.B python-pip.
+.B reason=explicit
+: Show only explicitly installed packages.
+.IP
+.B reason=dependencies
+: Show only packages installed as dependencies.
+.IP
+.B required-by=vlc
+: Show packages required by "vlc".
+
+.PP
+For example, to filter all explicitly installed packages larger than 100MB:
+.PP
+.EX
+yaylog -f reason=explicit -f size=100MB:
+.EE
 .TP
 .B \-\-sort <mode>
 Sort results by the specified mode. Available modes:
@@ -108,14 +99,13 @@ Sort results by the specified mode. Available modes:
 : Sort by package size in descending order.
 .TP
 .B \-\-no-headers
-Omit column headers in table output. This is useful for scripting, as it produces cleaner output without requiring manual header removal.
+Omit column headers in table output. Useful for scripting.
 .TP
 .B \-\-columns <list>
-Specify a comma-separated list of columns to display. Overrides default columns.
-Available columns:
+Specify a comma-separated list of columns to display. Available columns:
 .IP
 .B date
-: Installation date of the package.
+: Installation date.
 .IP
 .B name
 : Package name.
@@ -124,65 +114,94 @@ Available columns:
 : Installation reason (explicit/dependency).
 .IP
 .B size
-: Package size on disk.
+: Package size.
 .IP
 .B version
-: Installed package version.
+: Installed version.
 .IP
 .B depends
-: List of dependencies (output can be long).
+: List of dependencies.
 .IP
 .B required-by
-: List of packages required by the package and are dependent on it (output can be long).
+: Reverse dependencies (packages that depend on this one).
 .IP
 .B provides
-: List of alternative package names or shared libraries provided by package (output can be long).
-.TP
-.B \-\-add-columns <list>
-Add additional columns to the default display without overriding them.
+: Alternative package names or shared libraries provided.
 .TP
 .B \-\-all-columns
-Show all available columns in the output (overrides defaults).
+Show all available columns.
 .TP
 .B \-\-json
 Output results in JSON format instead of a table. Overrides
 .B \-\-full-timestamp
-and ensures all fields are structured for automation.
+for structured automation.
 .PP
-Example usage:
-.PP
-.EX
-yaylog --json --columns name,version,size
-.EE
-.PP
-JSON output example:
+Example:
 .PP
 .EX
-[
-  {
-    "timestamp": "2025-02-11T17:17:30Z",
-    "name": "linux-firmware",
-    "reason": "dependency",
-    "size": 756086774,
-    "version": "20250109.7673dffd-1",
-    "depends": [
-      "linux-firmware-whence"
-    ]
-  }
-]
+yaylog -f name=sqlite --json --columns name,version,size
 .EE
 .TP
 .B \-\-full-timestamp
-Display the full timestamp (date and time) of package installations instead of just the date.
-Ignored if
-.B \-\-json
-is used.
+Display the full timestamp instead of just the date.
 .TP
 .B \-\-no-progress 
-Force disable progress bar outside non-interactive environments.
+Suppress progress output.
 .TP
 .B \-h, \-\-help
 Display help information.
+
+.SH LEGACY OPTIONS (Deprecated)
+These options remain for backward compatibility but are superseded by
+.B \-\-filter (-f)
+.TP
+.B \-e, \-\-explicit
+(Deprecated) Show only explicitly installed packages.
+Equivalent to:
+.PP
+.EX
+yaylog -f reason=explicit
+.EE
+.TP
+.B \-d, \-\-dependencies
+(Deprecated) Show only packages installed as dependencies.
+Equivalent to:
+.PP
+.EX
+yaylog -f reason=dependencies
+.EE
+.TP
+.B \-\-required-by <package>
+(Deprecated) Show packages required by another package.
+Equivalent to:
+.PP
+.EX
+yaylog -f required-by=firefox
+.EE
+.TP
+.B \-\-date <filter>
+(Deprecated) Filter packages by installation date.
+Equivalent to:
+.PP
+.EX
+yaylog -f date=YYYY-MM-DD
+.EE
+.TP
+.B \-\-size <filter>
+(Deprecated) Filter packages by size.
+Equivalent to:
+.PP
+.EX
+yaylog -f size=100MB:1GB
+.EE
+.TP
+.B \-\-name <search-term>
+(Deprecated) Filter packages by name.
+Equivalent to:
+.PP
+.EX
+yaylog -f name=vim
+.EE
 
 .SH EXAMPLES
 .TP
@@ -190,37 +209,24 @@ Show the last 10 installed packages:
 .PP
 .EX
 yaylog -n 10
-yaylog --number 10
 .EE
 .TP
-Show all explicitly installed packages installed after January 1, 2024:
+Show all explicitly installed packages:
 .PP
 .EX
-yaylog -e --date 2024-01-01:
+yaylog -f reason=explicit
 .EE
 .TP
-Show only dependencies installed between July 1, 2023, and December 31, 2023:
+Show packages between 100MB and 1GB installed before June 30, 2024:
 .PP
 .EX
-yaylog -d --date 2023-07-01:2023-12-31
+yaylog -f size=100MB:1GB -f date=:2024-06-30
 .EE
 .TP
-Show packages between 500KB and 5MB installed up to June 30, 2024:
+Show all packages required by "firefox":
 .PP
 .EX
-yaylog --size 500KB:5MB --date :2024-06-30
-.EE
-.TP
-Show packages larger than 1GB installed on December 1, 2024:
-.PP
-.EX
-yaylog --size 1GB: --date 2024-12-01
-.EE
-.TP
-Show all packages sorted by size in descending order, installed after January 1, 2024:
-.PP
-.EX
-yaylog -a --sort size:desc --date 2024-01-01:
+yaylog -f required-by=firefox
 .EE
 .TP
 Output package data in JSON format:
@@ -232,84 +238,13 @@ yaylog --json
 Save all explicitly installed packages to a JSON file:
 .PP
 .EX
-yaylog --json -e > explicit-packages.json
-.EE
-.TP
-Output all packages sorted by size (descending) in JSON:
-.PP
-.EX
-yaylog --json -a --sort size:desc
-.EE
-.TP
-Output JSON with specific columns:
-.PP
-.EX
-yaylog --json --columns name,version,size
+yaylog -f reason=explicit --json > explicit-packages.json
 .EE
 .TP
 Show package names and sizes without headers (useful for scripting):
 .PP
 .EX
 yaylog --no-headers --columns name,size
-.EE
-.TP
-Output all package names, sorted by size in descending order, without headers:
-.PP
-.EX
-yaylog --no-headers --sort size:desc | awk '{print $1}'
-.EE
-.TP
-Save a clean list of installed package names to a file:
-.PP
-.EX
-yaylog --no-headers --columns name > installed-packages.txt
-.EE
-.TP
-Show all packages required by "firefox":
-.PP
-.EX
-yaylog --required-by firefox
-.EE
-.TP
-Show all packages required by "gtk3" that are at least 50MB in size:
-.PP
-.EX
-yaylog --required-by gtk3 --size 50MB:
-.EE
-.TP
-Show packages required by "vlc" and installed after January 1, 2024:
-.PP
-.EX
-yaylog --required-by vlc --date 2024-01-01:
-.EE
-
-.SH ADDITIONAL NOTES
-.TP
-- All options that take an argument can also be used in the `--<flag>=<argument>` format.
-For example:
-.PP
-.EX
-yaylog --size=100MB:1GB --date=:2024-06-30
-yaylog --name="gtk" --sort=alphabetical
-.EE
-.TP
-- Boolean flags can be explicitly set using `--<flag>=true` or `--<flag>=false`.
-For example:
-.PP
-.EX
-yaylog --explicit=true --dependencies=false
-.EE
-.TP
-- The `depends`, `required-by`, and `provides` columns output can be lengthy. To improve readability, pipe the output to `less`:
-.PP
-.EX
-yaylog --columns name,depends | less
-.EE
-.TP
-- The `--no-headers` flag is particularly useful when processing package lists in scripts. It removes the header row, making it easier to parse package names and sizes using tools like `awk`, `sed`, or `cut`:
-.PP
-.EX
-yaylog --no-headers --columns name,size | awk '{print $1, $2}'
 .EE
 
 .SH AUTHOR
@@ -322,11 +257,8 @@ file for details.
 .SH BUGS
 Report bugs at:
 .UR https://github.com/Zweih/yaylog
-https://github.com/Zweih/yaylog
 .UE
-
 
 .SH SEE ALSO
 .BR pacman(8),
 .BR yay(8)
-
