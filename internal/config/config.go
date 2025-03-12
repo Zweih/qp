@@ -11,7 +11,7 @@ import (
 
 const (
 	ReasonExplicit   = "explicit"
-	ReasonDependency = "dependencies"
+	ReasonDependency = "dependency"
 )
 
 type Config struct {
