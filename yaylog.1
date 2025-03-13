@@ -64,20 +64,20 @@ Supported fields:
 .B size=1GB:5GB
 : Show packages between 1GB and 5GB.
 .IP
-.B name=firefox
-: Filter packages by name.
-.IP
 .B reason=explicit
 : Show only explicitly installed packages.
 .IP
+.B name=firefox
+: Filter packages by name. Use a comma-separated list for multiple packages.
+.IP
 .B reason=dependencies
-: Show only packages installed as dependencies.
+: Show only packages installed as dependencies. Use a comma-separated list for multiple packages.
 .IP
 .B required-by=vlc
-: Show packages required by "vlc".
+: Show packages required by "vlc". Use a comma-separated list for multiple packages.
 .IP
 .B depends=glibc
-: Show packages that depend on glibc
+: Show packages that depend on "glibc". Use a comma-separated list for multiple packages.
 
 .PP
 For example, to filter all explicitly installed packages larger than 100MB:
@@ -254,6 +254,13 @@ Show all packages that have "glibc" as a dependency and are required by "ffmpeg"
 .PP
 .EX
 yaylog -f depends=glibc -f required-by=ffmpeg
+.EE
+.TP
+Inclusively show packages that require "gcc" or "pacman":
+.PP
+.EX
+.TP
+yaylog -f required-by=base-devel,gcc
 .EE
 
 .SH AUTHOR

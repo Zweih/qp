@@ -75,7 +75,7 @@ because yay is my preferred AUR helper and the name has a good flow.
 - [x] all-columns option
 - [x] required-by filter
 - [ ] key/value output
-- [ ] list of packages in required-by filter
+- [x] list of packages for package filters
 - [x] config dependency injection for testing
 - [ ] more extensive testing
 - [x] metaflag for all filters
@@ -132,8 +132,8 @@ yaylog [options]
 - `-f <field>=<value>` | `--filter <field>=<value>`: apply multiple filters for a flexible query system. can be used multiple times. example:
   - `--filter size=10MB:1GB`    -> filter by size range
   - `--filter date=2024-01-01:` -> filter by installation date
-  - `--filter name=firefox`     -> filter by package names that contain `firefox`
   - `--filter reason=explicit`  -> filter by explicit installations
+  - `--filter name=firefox`     -> filter by package names that contain `firefox`
   - `--filter required-by=vlc`  -> filter by packages required by `vlc`
   - `--filter depends=glibc`    -> filter by packages that depend on `glibc`
 - `--sort <mode>`: sort results by:
@@ -153,15 +153,17 @@ yaylog [options]
 ### filtering with `--filter`
 the `--filter` (short-flag: `-f`) flag allow for powerful filtering of installed packages. filters can be combined by using multiple filter flags. 
 
+all filters that take package/library/program names as arguments can also take a comma-separated list. this applies to the filters `name`, `depends`, and `required-by`. 
+
 short-flag filters and long-flag filters can be combined.
 
 #### available filters
 | filter type  | syntax | description |
 |-------------|--------|-------------|
 | **date** | `date=<value>` | filters by installation date. supports exact dates, ranges (`YYYY-MM-DD:YYYY-MM-DD`), and open-ended ranges (`YYYY-MM-DD:` or `:YYYY-MM-DD`) |
-| **required by** | `required-by=<package>` | filters by packages that are required by a specific package |
-| **depends** | `depends=<package>` | filters by packages that have a specific package as a dependency |
-| **name** | `name=<package>` |  filters by package name (substring match) |
+| **required by** | `required-by=<package>` / `required-by=<package-1>,<package-2>` | filters by packages that are required by a specific package |
+| **depends** | `depends=<package>` / `depends=<package-1>,<package-2>` | filters by packages that have a specific package as a dependency |
+| **name** | `name=<package>` / `name=<package-1>,<package-2>` |  filters by package name (substring match) |
 | **installation reason** | `reason=explicit` / `reason=dependencies` | filters packages by installation reason: explicitly installed or installed as a dependency |
 | **size** | `size=<value>` | filters by package size on disk. supports exact values (`10MB`), ranges (`10MB:1GB`), and open-ended ranges (`:500KB`, `1GB:`) |
 
@@ -354,11 +356,11 @@ are treated as separate parameters.
    ```
 24. show all packages required by `firefox`
    ```bash
-   yaylog -f required-by=firefox
+   yaylog -a -f required-by=firefox
    ```
 25. show all packages required by `gtk3` that are at least 50MB in size
    ```bash
-   yaylog -f required-by=gtk3 -f size=50MB:
+   yaylog -a -f required-by=gtk3 -f size=50MB:
    ```
 26. show packages required by `vlc` and installed after january 1, 2024 
    ```bash
@@ -366,5 +368,9 @@ are treated as separate parameters.
    ```
 27. show all packages that have `glibc` as a dependency and are required by `ffmpeg`
    ```bash
-   yaylog -f depends=glibc -f required-by=ffmpeg
+   yaylog -a -f depends=glibc -f required-by=ffmpeg
     ```
+28. inclusively show packages that require `gcc` or `pacman`:
+   ```bash
+   yaylog -f required-by=base-devel,gcc
+   ```
