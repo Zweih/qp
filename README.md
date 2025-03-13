@@ -370,7 +370,7 @@ are treated as separate parameters.
 27. show all packages that have `glibc` as a dependency and are required by `ffmpeg`
    ```bash
    yaylog -a -f depends=glibc -f required-by=ffmpeg
-    ```
+   ```
 28. inclusively show packages that require `gcc` or `pacman`:
    ```bash
    yaylog -f required-by=base-devel,gcc
