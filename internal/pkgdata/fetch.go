@@ -183,7 +183,7 @@ func applyField(pkg *PackageInfo, field string, value string) error {
 		pkg.Provides = append(pkg.Provides, value)
 
 	case fieldConflicts:
-		pkg.Conflicts = append(pkg.Provides, value)
+		pkg.Conflicts = append(pkg.Conflicts, value)
 
 	default:
 		// ignore unknown fields
