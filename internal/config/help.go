@@ -24,7 +24,6 @@ func PrintHelp() {
 	fmt.Println("    size=10MB:                      Show packages larger than 10MB")
 	fmt.Println("    size=:500KB                     Show packages up to 500KB")
 	fmt.Println("    size=1GB:5GB                    Show packages between 1GB and 5GB")
-	fmt.Println("    Note: all of the following package filters can also take a comma-separated list")
 	fmt.Println("    name=firefox              Filter packages by name (substring match)")
 	fmt.Println("    reason=explicit           Show only explicitly installed packages")
 	fmt.Println("    reason=dependencies       Show only packages installed as dependencies")

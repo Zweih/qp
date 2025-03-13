@@ -70,7 +70,7 @@ because yay is my preferred AUR helper and the name has a good flow.
 - [ ] self-referencing column
 - [x] JSON output
 - [x] no-headers option
-- [ ] provides filter
+- [x] provides filter
 - [x] depends filter
 - [x] all-columns option
 - [x] required-by filter
@@ -161,9 +161,10 @@ short-flag filters and long-flag filters can be combined.
 | filter type  | syntax | description |
 |-------------|--------|-------------|
 | **date** | `date=<value>` | filters by installation date. supports exact dates, ranges (`YYYY-MM-DD:YYYY-MM-DD`), and open-ended ranges (`YYYY-MM-DD:` or `:YYYY-MM-DD`) |
-| **required by** | `required-by=<package>` / `required-by=<package-1>,<package-2>` | filters by packages that are required by a specific package |
-| **depends** | `depends=<package>` / `depends=<package-1>,<package-2>` | filters by packages that have a specific package as a dependency |
-| **name** | `name=<package>` / `name=<package-1>,<package-2>` |  filters by package name (substring match) |
+| **required by** | `required-by=<package>` / <br> `required-by=<package-1>,<package-2>` | filters by packages that are required by a specific package |
+| **depends** | `depends=<package>` / <br> `depends=<package-1>,<package-2>` | filters by packages that have a specific package as a dependency |
+| **provides** | `provides=<package>` / <br> `provides=<package-1>,<package-2>` | filters by package provide a specific package/library |
+| **name** | `name=<package>` / <br> `name=<package-1>,<package-2>` |  filters by package name (substring match) |
 | **installation reason** | `reason=explicit` / `reason=dependencies` | filters packages by installation reason: explicitly installed or installed as a dependency |
 | **size** | `size=<value>` | filters by package size on disk. supports exact values (`10MB`), ranges (`10MB:1GB`), and open-ended ranges (`:500KB`, `1GB:`) |
 
@@ -239,16 +240,16 @@ are treated as separate parameters.
   ```
 - all options that take an argument can also be used in the `--<flag>=<argument>` format:
   ```bash
-  yaylog --size=100MB:1GB --date=:2024-06-30 --number=100
-  yaylog --name=gtk --sort=alphabetical
+  yaylog -f size=100MB:1GB -f date=:2024-06-30 --number=100
+  yaylog -f name=gtk --sort=alphabetical
   ```
   boolean flags can also be explicitly set using `--<flag>=true` or `--<flag>=false`:
   ```bash
-  yaylog --explicit=true --dependencies=false --no-progress=true
+  yaylog --no-headers=true --no-progress=true
   ```
   string arguments can also be surrounded with quotes or double-quotes:
   ```bash
-  yaylog --sort="alphabetical" --name="vim"
+  yaylog --sort="alphabetical" -f name="vim"
   ```
 
   this can be useful for scripts and automation where you might want to avoid any and all ambiguity.
@@ -374,3 +375,12 @@ are treated as separate parameters.
    ```bash
    yaylog -f required-by=base-devel,gcc
    ```
+29. show packages that provide `awk`:
+   ```bash
+   yaylog -f provides=awk
+   ```
+30. inclusively show packages that provide `rustc` or `python3`:
+   ```bash
+   yaylog -f provides=rustc,python3
+   ```
+
