@@ -29,6 +29,7 @@ func PrintHelp() {
 	fmt.Println("    reason=dependencies       Show only packages installed as dependencies")
 	fmt.Println("    required-by=vlc           Show packages required by the specified package")
 	fmt.Println("    depends=glibc             Show packages that depend upon a specific package")
+	fmt.Println("    provides=awk              Show packages that provide a specific library, program, or package")
 
 	fmt.Println("\nSorting Options:")
 	fmt.Println("  --sort date                 Sort packages by installation date (default)")
