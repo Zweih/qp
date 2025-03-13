@@ -161,7 +161,7 @@ short-flag filters and long-flag filters can be combined.
 | **date** | `date=<value>` | filters by installation date. supports exact dates, ranges (`YYYY-MM-DD:YYYY-MM-DD`), and open-ended ranges (`YYYY-MM-DD:` or `:YYYY-MM-DD`) |
 | **required by** | `required-by=<package>` | filters by packages that are required by a specific package |
 | **depends** | `depends=<package>` | filters by packages that have a specific package as a dependency |
-| **nme** | `name=<package>` |  filters by package name (substring match) |
+| **name** | `name=<package>` |  filters by package name (substring match) |
 | **installation reason** | `reason=explicit` / `reason=dependencies` | filters packages by installation reason: explicitly installed or installed as a dependency |
 | **size** | `size=<value>` | filters by package size on disk. supports exact values (`10MB`), ranges (`10MB:1GB`), and open-ended ranges (`:500KB`, `1GB:`) |
 
