@@ -79,6 +79,8 @@ because yay is my preferred AUR helper and the name has a good flow.
 - [x] config dependency injection for testing
 - [ ] more extensive testing
 - [x] metaflag for all filters
+- [ ] XML output
+- [ ] short-args for filters
 
 ## installation
 
