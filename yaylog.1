@@ -1,5 +1,5 @@
 .\" Man page for yaylog
-.TH yaylog 1 "March 2025" "yaylog 3.18.0" "User Commands"
+.TH yaylog 1 "March 2025" "yaylog 3.19.0" "User Commands"
 .SH NAME
 yaylog \- List and filter installed packages on Arch-based systems.
 .SH SYNOPSIS
@@ -75,6 +75,9 @@ Supported fields:
 .IP
 .B required-by=vlc
 : Show packages required by "vlc".
+.IP
+.B depends=glibc
+: Show packages that depend on glibc
 
 .PP
 For example, to filter all explicitly installed packages larger than 100MB:
@@ -245,6 +248,12 @@ Show package names and sizes without headers (useful for scripting):
 .PP
 .EX
 yaylog --no-headers --columns name,size
+.EE
+.TP
+Show all packages that have "glibc" as a dependency and are required by "ffmpeg":
+.PP
+.EX
+yaylog -f depends=glibc -f required-by=ffmpeg
 .EE
 
 .SH AUTHOR

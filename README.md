@@ -71,7 +71,7 @@ because yay is my preferred AUR helper and the name has a good flow.
 - [x] JSON output
 - [x] no-headers option
 - [ ] provides filter
-- [ ] depends filter
+- [x] depends filter
 - [x] all-columns option
 - [x] required-by filter
 - [ ] key/value output
@@ -128,11 +128,12 @@ yaylog [options]
 - `-n <number>` | `--number <number>`: number of recent packages to display (default: 20)
 - `-a` | `all`: show all installed packages (ignores `-n`)
 - `-f <field>=<value>` | `--filter <field>=<value>`: apply multiple filters for a flexible query system. can be used multiple times. example:
-  - `--filter size=10MB:1GB` -> filter by size range
+  - `--filter size=10MB:1GB`    -> filter by size range
   - `--filter date=2024-01-01:` -> filter by installation date
-  - `--filter name=firefox` -> filter by package name
-  - `--filter reason=explicit` -> filter by explicit installations
-  - `--filter required-by=vlc` -> show packages required by VLC
+  - `--filter name=firefox`     -> filter by package names that contain `firefox`
+  - `--filter reason=explicit`  -> filter by explicit installations
+  - `--filter required-by=vlc`  -> filter by packages required by `vlc`
+  - `--filter depends=glibc`    -> filter by packages that depend on `glibc`
 - `--sort <mode>`: sort results by:
   - `date` (default) - sort by installation date
   - `alphabetical` - sort alphabetically by package name
@@ -156,7 +157,8 @@ short-flag filters and long-flag filters can be combined.
 | filter type  | syntax | description |
 |-------------|--------|-------------|
 | **date** | `date=<value>` | filters by installation date. supports exact dates, ranges (`YYYY-MM-DD:YYYY-MM-DD`), and open-ended ranges (`YYYY-MM-DD:` or `:YYYY-MM-DD`) |
-| **required by** | `required-by=<package>` | shows only packages that are required by a specific package |
+| **required by** | `required-by=<package>` | filters by packages that are required by a specific package |
+| **depends** | `depends=<package>` | filters by packages that have a specific package as a dependency |
 | **nme** | `name=<package>` |  filters by package name (substring match) |
 | **installation reason** | `reason=explicit` / `reason=dependencies` | filters packages by installation reason: explicitly installed or installed as a dependency |
 | **size** | `size=<value>` | filters by package size on disk. supports exact values (`10MB`), ranges (`10MB:1GB`), and open-ended ranges (`:500KB`, `1GB:`) |
@@ -266,7 +268,7 @@ are treated as separate parameters.
    ```
  3. show only dependencies installed on a specific date
    ```bash
-   yaylog -f reason=dependencies -f date=2024-12-25
+   yaylog -f reason=dependencies -f date=2025-03-01
    ```
  4. show all packages sorted alphabetically
    ```bash
@@ -292,9 +294,9 @@ are treated as separate parameters.
    ```bash
    yaylog -f size=100MB:1GB -f date=:2024-06-30
    ```
-10. show all packages sorted by size in descending order, installed after january 1, 2024
+10. show all packages sorted by size in descending order, installed after january 1, 2025
    ```bash
-   yaylog -a --sort size:desc -f date=2024-01-01:
+   yaylog -a --sort size:desc -f date=2025-01-01:
    ```
 11. search for installed packages containing "python
    ```bash
@@ -304,13 +306,13 @@ are treated as separate parameters.
    ```bash
    yaylog -f reason=explicit -f name=lib -f size=10MB:1GB
    ```
-13. search for packages containing "linux" installed between january 1 and june 30, 2024
+13. search for packages with names containing "linux" installed between january 1 and june 30, 2024
    ```bash
    yaylog -f name=linux -f date=2024-01-01:2024-06-30
    ```
-14. search for packages containing "gtk" installed after january 1, 2023, and at least 5MB in size
+14. search for packages containing "gtk" installed after january 1, 2025, and at least 5MB in size
    ```bash
-   yaylog -f name=gtk -f date=2023-01-01: -f size=5MB:
+   yaylog -f name=gtk -f date=2025-01-01: -f size=5MB:
    ```
 15. show packages with name, version, and size
    ```bash
@@ -348,15 +350,19 @@ are treated as separate parameters.
    ```bash
    yaylog --no-headers --columns name,size
    ```
-24. show all packages required by "firefox"
+24. show all packages required by `firefox`
    ```bash
    yaylog -f required-by=firefox
    ```
-25. show all packages required by "gtk3" that are at least 50MB in size
+25. show all packages required by `gtk3` that are at least 50MB in size
    ```bash
    yaylog -f required-by=gtk3 -f size=50MB:
    ```
-26. show packages required by "vlc" and installed after january 1, 2024 
+26. show packages required by `vlc` and installed after january 1, 2024 
    ```bash
    yaylog -f required-by=vlc -f date=2024-01-01:
    ```
+27. show all packages that have `glibc` as a dependency and are required by `ffmpeg`
+   ```bash
+   yaylog -f depends=glibc -f required-by=ffmpeg
+    ```
