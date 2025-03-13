@@ -2,6 +2,8 @@ package pipeline
 
 import (
 	"fmt"
+	"regexp"
+	"strings"
 	"yaylog/internal/config"
 	"yaylog/internal/consts"
 	"yaylog/internal/pkgdata"
@@ -11,6 +13,8 @@ type (
 	PackageInfo     = pkgdata.PackageInfo
 	FilterCondition = pkgdata.FilterCondition
 )
+
+var packageListRegex = regexp.MustCompile(`^([a-z0-9][a-z0-9_-]*[a-z0-9])(,([a-z0-9][a-z0-9_-]*[a-z0-9]))*$`)
 
 func PreprocessFiltering(
 	cfg config.Config,
@@ -42,7 +46,7 @@ func queriesToConditions(filterQueries map[consts.FieldType]string) ([]pkgdata.F
 		case consts.FieldSize:
 			condition, err = parseSizeFilterCondition(value)
 		case consts.FieldName, consts.FieldRequiredBy, consts.FieldDepends:
-			condition, err = NewPackageCondition(fieldType, []string{value})
+			condition, err = parsePackageFilterCondition(fieldType, value)
 		case consts.FieldReason:
 			condition, err = parseReasonFilterCondition(value)
 		default:
@@ -57,6 +61,18 @@ func queriesToConditions(filterQueries map[consts.FieldType]string) ([]pkgdata.F
 	}
 
 	return conditions, nil
+}
+
+func parsePackageFilterCondition(
+	fieldType consts.FieldType,
+	packageListInput string,
+) (FilterCondition, error) {
+	if !packageListRegex.MatchString(packageListInput) {
+		return FilterCondition{}, fmt.Errorf("invalid package list: %s", packageListInput)
+	}
+
+	packageNames := strings.Split(packageListInput, ",")
+	return NewPackageCondition(fieldType, packageNames)
 }
 
 func parseReasonFilterCondition(installReason string) (FilterCondition, error) {
