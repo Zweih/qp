@@ -21,6 +21,7 @@ const (
 	fieldVersion     = "%VERSION%"
 	fieldDepends     = "%DEPENDS%"
 	fieldProvides    = "%PROVIDES%"
+	fieldConflicts   = "%CONFLICTS%"
 	pacmanDbPath     = "/var/lib/pacman/local"
 )
 
@@ -40,7 +41,7 @@ func FetchPackages() ([]PackageInfo, error) {
 	// fun fact: NumCPU() does account for hyperthreading
 	numWorkers := getWorkerCount(runtime.NumCPU(), numPackages)
 
-	for i := 0; i < numWorkers; i++ {
+	for range numWorkers {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -121,7 +122,7 @@ func parseDescFile(descPath string) (PackageInfo, error) {
 		line := strings.TrimSpace(scanner.Text())
 
 		switch line {
-		case fieldName, fieldInstallDate, fieldSize, fieldReason, fieldVersion, fieldDepends, fieldProvides:
+		case fieldName, fieldInstallDate, fieldSize, fieldReason, fieldVersion, fieldDepends, fieldProvides, fieldConflicts:
 			currentField = line
 		case "":
 			currentField = "" // reset if line is blank
@@ -180,6 +181,9 @@ func applyField(pkg *PackageInfo, field string, value string) error {
 
 	case fieldProvides:
 		pkg.Provides = append(pkg.Provides, value)
+
+	case fieldConflicts:
+		pkg.Conflicts = append(pkg.Provides, value)
 
 	default:
 		// ignore unknown fields

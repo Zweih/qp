@@ -10,6 +10,7 @@ type BasePackageInfo struct {
 	Depends    []string `json:"depends,omitempty"`
 	RequiredBy []string `json:"requiredBy,omitempty"`
 	Provides   []string `json:"provides,omitempty"`
+	Conflicts  []string `json:"conflicts,omitempty"`
 }
 
 // info about a single installed package
