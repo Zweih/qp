@@ -53,7 +53,8 @@ func PrintHelp() {
 	fmt.Println("  version      Installed package version")
 	fmt.Println("  depends      List of dependencies (output can be long)")
 	fmt.Println("  required-by  List of packages that depend on this package (output can be long)")
-	fmt.Println("  provides     List of alternative package names or shared libraries provided")
+	fmt.Println("  provides     List of alternative package names or shared libraries provided (output can be long)")
+	fmt.Println("  conflicts    List of packages that conflict, or cause problems, with the package")
 
 	fmt.Println("\nDeprecated Legacy Options (Use --filter Instead):")
 	fmt.Println("  -e, --explicit              (Deprecated) Show only explicitly installed packages")

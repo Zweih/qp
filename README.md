@@ -22,10 +22,11 @@ this package is compatible with the following distributions:
 
 ## features
 
-- list installed packages with date/timestamps, dependencies, provisions, requirements, size on disk, and version
+- list installed packages with date/timestamps, dependencies, provisions, requirements, size on disk, conflicts, and version
 - filter by explicitly installed packages
 - filter by packages installed as dependencies
-- filter by packages required by a specific package
+- filter by packages required by specified packages
+- filter by packages that depend upon specified packages 
 - filter by a specific installation date or date range
 - filter by package size or size range
 - filter by package name (substring match)
@@ -177,6 +178,7 @@ short-flag filters and long-flag filters can be combined.
 - `depends` - list of dependencies (output can be long)
 - `required-by` - list of packages required by the package and are dependent (output can be long) 
 - `provides` - list of alternative package names or shared libraries provided by package (output can be long)
+- `conficts` - list of packages that conflict, or cause problems, with the package
 
 ### JSON output
 the `--json` flag outputs the package data as structured JSON instead of a table. this can be useful for scripts or automation.
@@ -383,4 +385,3 @@ are treated as separate parameters.
    ```bash
    yaylog -f provides=rustc,python3
    ```
-
