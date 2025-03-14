@@ -42,6 +42,8 @@ func getJsonValues(pkg pkgdata.PackageInfo, fields []consts.FieldType) pkgdata.P
 			filteredPackage.RequiredBy = pkg.RequiredBy
 		case consts.FieldProvides:
 			filteredPackage.Provides = pkg.Provides
+		case consts.FieldConflicts:
+			filteredPackage.Conflicts = pkg.Conflicts
 		}
 	}
 
