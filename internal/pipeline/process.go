@@ -14,7 +14,7 @@ type (
 	FilterCondition = pkgdata.FilterCondition
 )
 
-var packageListRegex = regexp.MustCompile(`^([a-z0-9][a-z0-9_-]*[a-z0-9])(,([a-z0-9][a-z0-9_-]*[a-z0-9]))*$`)
+var packageListRegex = regexp.MustCompile(`^([a-z0-9][a-z0-9._-]*[a-z0-9])(,([a-z0-9][a-z0-9._-]*[a-z0-9]))*$`)
 
 func PreprocessFiltering(
 	cfg config.Config,
