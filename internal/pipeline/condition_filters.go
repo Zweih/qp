@@ -34,6 +34,10 @@ func NewPackageCondition(fieldType consts.FieldType, packageNames []string) (Fil
 		filterFunc = func(pkg PackageInfo) bool {
 			return pkgdata.FilterByPackages(pkg.Provides, packageNames)
 		}
+	case consts.FieldConflicts:
+		filterFunc = func(pkg PackageInfo) bool {
+			return pkgdata.FilterByPackages(pkg.Conflicts, packageNames)
+		}
 	default:
 		return FilterCondition{}, fmt.Errorf("invalid field for package filter: %s", fieldType)
 	}

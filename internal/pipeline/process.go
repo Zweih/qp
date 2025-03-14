@@ -45,7 +45,11 @@ func queriesToConditions(filterQueries map[consts.FieldType]string) ([]pkgdata.F
 			condition, err = parseDateFilterCondition(value)
 		case consts.FieldSize:
 			condition, err = parseSizeFilterCondition(value)
-		case consts.FieldName, consts.FieldRequiredBy, consts.FieldDepends, consts.FieldProvides:
+		case consts.FieldName,
+			consts.FieldRequiredBy,
+			consts.FieldDepends,
+			consts.FieldProvides,
+			consts.FieldConflicts:
 			condition, err = parsePackageFilterCondition(fieldType, value)
 		case consts.FieldReason:
 			condition, err = parseReasonFilterCondition(value)
