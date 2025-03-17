@@ -22,7 +22,7 @@ this package is compatible with the following distributions:
 
 ## features
 
-- list installed packages with date/timestamps, dependencies, provisions, requirements, size on disk, conflicts, and version
+- list installed packages with date/timestamps, dependencies, provisions, requirements, size on disk, conflicts, architecture, and version
 - filter by explicitly installed packages
 - filter by packages installed as dependencies
 - filter by packages required by specified packages
@@ -30,6 +30,7 @@ this package is compatible with the following distributions:
 - filter by packages that provide specified packages
 - filter by packages that conflict with specific packages
 - filter by a specific installation date or date range
+- filter by packages built with specified architectures
 - filter by package size or size range
 - filter by package name (substring match)
 - sort by installation date, alphabetically, or by size on disk
