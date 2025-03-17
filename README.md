@@ -26,7 +26,9 @@ this package is compatible with the following distributions:
 - filter by explicitly installed packages
 - filter by packages installed as dependencies
 - filter by packages required by specified packages
-- filter by packages that depend upon specified packages 
+- filter by packages that depend upon specified packages
+- filter by packages that provide specified packages
+- filter by packages that conflict with specific packages
 - filter by a specific installation date or date range
 - filter by package size or size range
 - filter by package name (substring match)
@@ -67,6 +69,8 @@ because yay is my preferred AUR helper and the name has a good flow.
 - [ ] package descriptions
 - [ ] package URLs
 - [ ] package architecture
+- [x] package conflicts
+- [x] conflicts filter
 - [ ] name exclusion filter
 - [ ] self-referencing column
 - [x] JSON output
@@ -162,10 +166,11 @@ short-flag filters and long-flag filters can be combined.
 | filter type  | syntax | description |
 |-------------|--------|-------------|
 | **date** | `date=<value>` | filters by installation date. supports exact dates, ranges (`YYYY-MM-DD:YYYY-MM-DD`), and open-ended ranges (`YYYY-MM-DD:` or `:YYYY-MM-DD`) |
-| **required by** | `required-by=<package>` / <br> `required-by=<package-1>,<package-2>` | filters by packages that are required by a specific package |
-| **depends** | `depends=<package>` / <br> `depends=<package-1>,<package-2>` | filters by packages that have a specific package as a dependency |
-| **provides** | `provides=<package>` / <br> `provides=<package-1>,<package-2>` | filters by package provide a specific package/library |
-| **name** | `name=<package>` / <br> `name=<package-1>,<package-2>` |  filters by package name (substring match) |
+| **required by** | `required-by=<package>` / <br> `required-by=<package-1>,<package-2>,<etc>` | filters by packages that are required by the specified packages |
+| **depends** | `depends=<package>` / <br> `depends=<package-1>,<package-2>,<etc>` | filters by packages that have the specified packages as dependencies |
+| **provides** | `provides=<package>` / <br> `provides=<package-1>,<package-2>,<etc>` | filters by package that provide the specified packages/libraries |
+| **conflicts** | `conflicts=<package>` / <br> `conflicts=<package-1,<package-2>,<etc>` | filters by packages that conflict with the specified packages |
+| **name** | `name=<package>` / <br> `name=<package-1>,<package-2>,<etc>` |  filters by package name (substring match) |
 | **installation reason** | `reason=explicit` / `reason=dependencies` | filters packages by installation reason: explicitly installed or installed as a dependency |
 | **size** | `size=<value>` | filters by package size on disk. supports exact values (`10MB`), ranges (`10MB:1GB`), and open-ended ranges (`:500KB`, `1GB:`) |
 
@@ -384,4 +389,8 @@ are treated as separate parameters.
 30. inclusively show packages that provide `rustc` or `python3`:
    ```bash
    yaylog -f provides=rustc,python3
+   ```
+31. show packages that conflict with `linuxqq`:
+   ```bash
+   yaylog -f conflicts=linuxqq
    ```

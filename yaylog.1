@@ -18,8 +18,11 @@ and others.
 The utility provides powerful filtering capabilities, including:
 - Installation date filtering
 - Package size filtering
-- Explicit or dependency-based filtering
-- Reverse dependency lookup
+- Install reason filtering
+- Reverse dependency lookup + filtering
+- Conflict filtering
+- Dependency filtering
+- Provision filtering
 - Sorting and JSON output support
 
 .SH OPTIONS
@@ -81,6 +84,9 @@ Supported fields:
 .IP
 .B provides=awk
 : Show packages that provide the "awk" program. Use a comma-separated list for multiple provisions.
+.IP
+.B conflicts=linuxqq
+: Show packages that conflict with the "linuxqq" package. Use a comma-separated list for multiple conflicts.
 
 .PP
 For example, to filter all explicitly installed packages larger than 100MB:
@@ -267,6 +273,13 @@ Inclusively show packages that require "gcc" or "pacman":
 .EX
 .TP
 yaylog -f required-by=base-devel,gcc
+.EE
+.TP
+Show packages that conflict with the "linuxqq" package
+.PP
+.EX
+.TP
+yaylog -f conflicts=linuxqq
 .EE
 
 .SH AUTHOR
