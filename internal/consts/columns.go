@@ -12,6 +12,7 @@ const (
 	requiredBy = "required-by"
 	provides   = "provides"
 	conflicts  = "conflicts"
+	arch       = "arch"
 )
 
 const (
@@ -24,6 +25,7 @@ const (
 	FieldRequiredBy FieldType = requiredBy
 	FieldProvides   FieldType = provides
 	FieldConflicts  FieldType = conflicts
+	FieldArch       FieldType = arch
 )
 
 var FieldTypeLookup = map[string]FieldType{
@@ -45,6 +47,7 @@ var FieldTypeLookup = map[string]FieldType{
 	requiredBy: FieldRequiredBy,
 	provides:   FieldProvides,
 	conflicts:  FieldConflicts,
+	arch:       FieldArch,
 }
 
 var (
@@ -64,5 +67,6 @@ var (
 		FieldRequiredBy,
 		FieldProvides,
 		FieldConflicts,
+		FieldArch,
 	}
 )

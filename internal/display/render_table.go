@@ -23,6 +23,7 @@ var columnHeaders = map[consts.FieldType]string{
 	consts.FieldRequiredBy: "REQUIRED BY",
 	consts.FieldProvides:   "PROVIDES",
 	consts.FieldConflicts:  "CONFLICTS",
+	consts.FieldArch:       "ARCH",
 }
 
 // displays data in tab format
@@ -99,6 +100,8 @@ func getTableValue(pkg pkgdata.PackageInfo, field consts.FieldType, ctx tableCon
 		return formatPackageList(pkg.Provides)
 	case consts.FieldConflicts:
 		return formatPackageList(pkg.Conflicts)
+	case consts.FieldArch:
+		return pkg.Arch
 	default:
 		return ""
 	}

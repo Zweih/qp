@@ -11,6 +11,7 @@ type BasePackageInfo struct {
 	RequiredBy []string `json:"requiredBy,omitempty"`
 	Provides   []string `json:"provides,omitempty"`
 	Conflicts  []string `json:"conflicts,omitempty"`
+	Arch       string   `json:"arch,omitempty"`
 }
 
 // info about a single installed package
