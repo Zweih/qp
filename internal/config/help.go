@@ -31,6 +31,7 @@ func PrintHelp() {
 	fmt.Println("    depends=glibc             Show packages that depend upon specified packages")
 	fmt.Println("    provides=awk              Show packages that provide specified libraries, programs, or packages")
 	fmt.Println("    conflicts=fuse            Show packages that conflict with the specified packages.")
+	fmt.Println("    arch=x86_64               Show packages built for the specified architectures. \"any\" is a valid category of architecture. ")
 
 	fmt.Println("\nSorting Options:")
 	fmt.Println("  --sort date                 Sort packages by installation date (default)")

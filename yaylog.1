@@ -23,6 +23,8 @@ The utility provides powerful filtering capabilities, including:
 - Conflict filtering
 - Dependency filtering
 - Provision filtering
+- Package name filtering
+- Architecture filtering
 - Sorting and JSON output support
 
 .SH OPTIONS
@@ -87,6 +89,10 @@ Supported fields:
 .IP
 .B conflicts=linuxqq
 : Show packages that conflict with the "linuxqq" package. Use a comma-separated list for multiple conflicts.
+.IP
+.B arch=x86_64
+: Show packages that are built for the specified (or unspecfied with "any) architecture. Use a comma-separated for multiple architectures.
+
 
 .PP
 For example, to filter all explicitly installed packages larger than 100MB:
@@ -274,15 +280,18 @@ yaylog -f depends=glibc -f required-by=ffmpeg
 Inclusively show packages that require "gcc" or "pacman":
 .PP
 .EX
-.TP
 yaylog -f required-by=base-devel,gcc
 .EE
 .TP
 Show packages that conflict with the "linuxqq" package
 .PP
 .EX
-.TP
 yaylog -f conflicts=linuxqq
+.EE
+.TP
+Show packages that are built for any architecure.
+.EX
+yaylog -f arch=any
 .EE
 
 .SH AUTHOR
