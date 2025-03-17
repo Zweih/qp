@@ -68,7 +68,7 @@ because yay is my preferred AUR helper and the name has a good flow.
 - [x] reverse-dependencies of each package (required-by field)
 - [ ] package descriptions
 - [ ] package URLs
-- [ ] package architecture
+- [x] package architecture
 - [x] package conflicts
 - [x] conflicts filter
 - [ ] name exclusion filter
@@ -184,6 +184,7 @@ short-flag filters and long-flag filters can be combined.
 - `required-by` - list of packages required by the package and are dependent (output can be long) 
 - `provides` - list of alternative package names or shared libraries provided by package (output can be long)
 - `conficts` - list of packages that conflict, or cause problems, with the package
+- `arch` - architecture the package was built for (e.g., x86_64, aarch64, any)
 
 ### JSON output
 the `--json` flag outputs the package data as structured JSON instead of a table. this can be useful for scripts or automation.
@@ -221,7 +222,8 @@ output format:
     "provides": [
       "sqlite3=3.48.0",
       "libsqlite3.so=0-64"
-    ]
+    ],
+    "arch": "x86_64"
   }
 ]
 ```
