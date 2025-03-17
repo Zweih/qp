@@ -13,38 +13,42 @@ func newBaseCondition(filterType consts.FieldType) FilterCondition {
 	}
 }
 
-func NewPackageCondition(fieldType consts.FieldType, packageNames []string) (FilterCondition, error) {
-	packageFilter := newBaseCondition(fieldType)
+func NewPackageCondition(fieldType consts.FieldType, targets []string) (FilterCondition, error) {
+	conditionFilter := newBaseCondition(fieldType)
 	var filterFunc pkgdata.Filter
 
 	switch fieldType {
 	case consts.FieldName:
 		filterFunc = func(pkg PackageInfo) bool {
-			return pkgdata.FilterByNames(pkg, packageNames)
+			return pkgdata.FilterByStrings(pkg.Name, targets)
+		}
+	case consts.FieldArch:
+		filterFunc = func(pkg PackageInfo) bool {
+			return pkgdata.FilterByStrings(pkg.Arch, targets)
 		}
 	case consts.FieldRequiredBy:
 		filterFunc = func(pkg PackageInfo) bool {
-			return pkgdata.FilterByPackages(pkg.RequiredBy, packageNames)
+			return pkgdata.FilterByRelation(pkg.RequiredBy, targets)
 		}
 	case consts.FieldDepends:
 		filterFunc = func(pkg PackageInfo) bool {
-			return pkgdata.FilterByPackages(pkg.Depends, packageNames)
+			return pkgdata.FilterByRelation(pkg.Depends, targets)
 		}
 	case consts.FieldProvides:
 		filterFunc = func(pkg PackageInfo) bool {
-			return pkgdata.FilterByPackages(pkg.Provides, packageNames)
+			return pkgdata.FilterByRelation(pkg.Provides, targets)
 		}
 	case consts.FieldConflicts:
 		filterFunc = func(pkg PackageInfo) bool {
-			return pkgdata.FilterByPackages(pkg.Conflicts, packageNames)
+			return pkgdata.FilterByRelation(pkg.Conflicts, targets)
 		}
 	default:
 		return FilterCondition{}, fmt.Errorf("invalid field for package filter: %s", fieldType)
 	}
 
-	packageFilter.Filter = filterFunc
+	conditionFilter.Filter = filterFunc
 
-	return packageFilter, nil
+	return conditionFilter, nil
 }
 
 func NewDateCondition(dateFilter DateFilter) FilterCondition {

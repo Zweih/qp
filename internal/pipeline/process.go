@@ -14,7 +14,7 @@ type (
 	FilterCondition = pkgdata.FilterCondition
 )
 
-var packageListRegex = regexp.MustCompile(`^([a-z0-9][a-z0-9._-]*[a-z0-9])(,([a-z0-9][a-z0-9._-]*[a-z0-9]))*$`)
+var targetListRegex = regexp.MustCompile(`^([a-z0-9][a-z0-9._-]*[a-z0-9])(,([a-z0-9][a-z0-9._-]*[a-z0-9]))*$`)
 
 func PreprocessFiltering(
 	cfg config.Config,
@@ -49,7 +49,8 @@ func queriesToConditions(filterQueries map[consts.FieldType]string) ([]pkgdata.F
 			consts.FieldRequiredBy,
 			consts.FieldDepends,
 			consts.FieldProvides,
-			consts.FieldConflicts:
+			consts.FieldConflicts,
+			consts.FieldArch:
 			condition, err = parsePackageFilterCondition(fieldType, value)
 		case consts.FieldReason:
 			condition, err = parseReasonFilterCondition(value)
@@ -69,14 +70,14 @@ func queriesToConditions(filterQueries map[consts.FieldType]string) ([]pkgdata.F
 
 func parsePackageFilterCondition(
 	fieldType consts.FieldType,
-	packageListInput string,
+	targetListInput string,
 ) (FilterCondition, error) {
-	if !packageListRegex.MatchString(packageListInput) {
-		return FilterCondition{}, fmt.Errorf("invalid package list: %s", packageListInput)
+	if !targetListRegex.MatchString(targetListInput) {
+		return FilterCondition{}, fmt.Errorf("invalid package list: %s", targetListInput)
 	}
 
-	packageNames := strings.Split(packageListInput, ",")
-	return NewPackageCondition(fieldType, packageNames)
+	targetList := strings.Split(targetListInput, ",")
+	return NewPackageCondition(fieldType, targetList)
 }
 
 func parseReasonFilterCondition(installReason string) (FilterCondition, error) {

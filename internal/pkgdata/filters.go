@@ -14,7 +14,7 @@ type FilterCondition struct {
 	PhaseName string
 }
 
-func FilterByPackages(packageNames []string, targetNames []string) bool {
+func FilterByRelation(packageNames []string, targetNames []string) bool {
 	for _, targetName := range targetNames {
 		for _, packageName := range packageNames {
 			matches := packageNameRegex.FindStringSubmatch(packageName)
@@ -68,9 +68,9 @@ func FilterBySizeRange(pkg PackageInfo, startSize int64, endSize int64) bool {
 	return pkg.Size >= startSize && pkg.Size <= endSize
 }
 
-func FilterByNames(pkg PackageInfo, targets []string) bool {
-	for _, targetName := range targets {
-		if strings.Contains(pkg.Name, targetName) {
+func FilterByStrings(pkgString string, targetStrings []string) bool {
+	for _, targetString := range targetStrings {
+		if strings.Contains(pkgString, targetString) {
 			return true
 		}
 	}
