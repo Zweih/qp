@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 	"text/tabwriter"
+	"time"
 	"yaylog/internal/consts"
 	"yaylog/internal/pkgdata"
 )
@@ -109,7 +110,9 @@ func getTableValue(pkg pkgdata.PackageInfo, field consts.FieldType, ctx tableCon
 
 // use time as parameter
 func formatDate(pkg pkgdata.PackageInfo, ctx tableContext) string {
-	return pkg.Timestamp.Format(ctx.DateFormat)
+	// return pkg.Timestamp.Format(ctx.DateFormat)
+	timestamp := time.Unix(pkg.Timestamp, 0)
+	return timestamp.Format(ctx.DateFormat)
 }
 
 func formatPackageList(packages []string) string {

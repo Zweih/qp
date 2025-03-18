@@ -7,6 +7,12 @@ import (
 	"yaylog/internal/pkgdata"
 )
 
+type RangeFilter struct {
+	Start   int64
+	End     int64
+	IsExact bool
+}
+
 func newBaseCondition(filterType consts.FieldType) FilterCondition {
 	return FilterCondition{
 		PhaseName: "Filtering by " + string(filterType),
@@ -51,40 +57,40 @@ func NewPackageCondition(fieldType consts.FieldType, targets []string) (FilterCo
 	return conditionFilter, nil
 }
 
-func NewDateCondition(dateFilter DateFilter) FilterCondition {
-	startDate, endDate, isExact := dateFilter.StartDate, dateFilter.EndDate, dateFilter.IsExact
+func NewDateCondition(dateFilter RangeFilter) FilterCondition {
+	start, end, isExact := dateFilter.Start, dateFilter.End, dateFilter.IsExact
 	condition := newBaseCondition(consts.FieldDate)
 
 	if isExact {
 		condition.Filter = func(pkg PackageInfo) bool {
-			return pkgdata.FilterByDate(pkg, startDate)
+			return pkgdata.FilterByDate(pkg, start)
 		}
 
 		return condition
 	}
 
-	adjustedEndDate := endDate.Add(24 * time.Hour) // ensure full date range
+	adjustedEnd := end + int64(time.Hour*24/time.Second) // ensure full date range
 	condition.Filter = func(pkg PackageInfo) bool {
-		return pkgdata.FilterByDateRange(pkg, startDate, adjustedEndDate)
+		return pkgdata.FilterByDateRange(pkg, start, adjustedEnd)
 	}
 
 	return condition
 }
 
-func NewSizeCondition(sizeFilter SizeFilter) FilterCondition {
-	startSize, endSize, isExact := sizeFilter.StartSize, sizeFilter.EndSize, sizeFilter.IsExact
+func NewSizeCondition(sizeFilter RangeFilter) FilterCondition {
+	start, end, isExact := sizeFilter.Start, sizeFilter.End, sizeFilter.IsExact
 	condition := newBaseCondition(consts.FieldSize)
 
 	if isExact {
 		condition.Filter = func(pkg PackageInfo) bool {
-			return pkgdata.FilterBySize(pkg, startSize)
+			return pkgdata.FilterBySize(pkg, start)
 		}
 
 		return condition
 	}
 
 	condition.Filter = func(pkg PackageInfo) bool {
-		return pkgdata.FilterBySizeRange(pkg, startSize, endSize)
+		return pkgdata.FilterBySizeRange(pkg, start, end)
 	}
 
 	return condition

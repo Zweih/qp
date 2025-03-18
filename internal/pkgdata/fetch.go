@@ -10,7 +10,6 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	"time"
 )
 
 const (
@@ -172,7 +171,7 @@ func applyField(pkg *PackageInfo, field string, value string) error {
 			return fmt.Errorf("invalid install date value %q: %w", value, err)
 		}
 
-		pkg.Timestamp = time.Unix(installDate, 0)
+		pkg.Timestamp = installDate
 
 	case fieldVersion:
 		pkg.Version = value

@@ -39,14 +39,16 @@ func FilterDependencies(pkg PackageInfo) bool {
 	return pkg.Reason == "dependency"
 }
 
-// filters for packages installed on specific date
-func FilterByDate(pkg PackageInfo, date time.Time) bool {
-	return pkg.Timestamp.Year() == date.Year() && pkg.Timestamp.YearDay() == date.YearDay()
+// // filters for packages installed on specific date
+func FilterByDate(pkg PackageInfo, date int64) bool {
+	pkgDate := time.Unix(pkg.Timestamp, 0)
+	targetDate := time.Unix(date, 0)
+	return pkgDate.Year() == targetDate.Year() && pkgDate.YearDay() == targetDate.YearDay()
 }
 
 // inclusive
-func FilterByDateRange(pkg PackageInfo, startDate time.Time, endDate time.Time) bool {
-	return !(pkg.Timestamp.Before(startDate) || pkg.Timestamp.After(endDate))
+func FilterByDateRange(pkg PackageInfo, start int64, end int64) bool {
+	return !(pkg.Timestamp < start || pkg.Timestamp > end)
 }
 
 func roundSizeInBytes(num int64) int64 {
@@ -60,8 +62,8 @@ func roundSizeInBytes(num int64) int64 {
 	return num / scaleFactor
 }
 
-func FilterBySize(pkg PackageInfo, size int64) bool {
-	return roundSizeInBytes(pkg.Size) == roundSizeInBytes(size)
+func FilterBySize(pkg PackageInfo, targetSize int64) bool {
+	return roundSizeInBytes(pkg.Size) == roundSizeInBytes(targetSize)
 }
 
 func FilterBySizeRange(pkg PackageInfo, startSize int64, endSize int64) bool {

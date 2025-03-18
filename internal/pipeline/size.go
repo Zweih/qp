@@ -9,19 +9,13 @@ import (
 	"yaylog/internal/consts"
 )
 
-type SizeFilter struct {
-	StartSize int64
-	EndSize   int64
-	IsExact   bool
-}
-
-func parseSizeFilter(sizeFilterInput string) (SizeFilter, error) {
+func parseSizeFilter(sizeFilterInput string) (RangeFilter, error) {
 	if sizeFilterInput == "" {
-		return SizeFilter{}, nil
+		return RangeFilter{}, nil
 	}
 
 	if sizeFilterInput == ":" {
-		return SizeFilter{}, fmt.Errorf("invalid size filter: ':' must be accompanied by a value")
+		return RangeFilter{}, fmt.Errorf("invalid size filter: ':' must be accompanied by a value")
 	}
 
 	// valid size format: "10MB", "5GB:", ":20KB", "1.5MB:2GB" (value + unit, optional range)
@@ -31,22 +25,22 @@ func parseSizeFilter(sizeFilterInput string) (SizeFilter, error) {
 	isExact := !strings.Contains(sizeFilterInput, ":")
 
 	if matches == nil {
-		return SizeFilter{}, fmt.Errorf("invalid size filter format: %q", sizeFilterInput)
+		return RangeFilter{}, fmt.Errorf("invalid size filter format: %q", sizeFilterInput)
 	}
 
-	startSize, err := parseSizeMatch(matches[1], matches[2], 0)
+	start, err := parseSizeMatch(matches[1], matches[2], 0)
 	if err != nil {
-		return SizeFilter{}, err
+		return RangeFilter{}, err
 	}
 
-	endSize, err := parseSizeMatch(matches[3], matches[4], math.MaxInt64)
+	end, err := parseSizeMatch(matches[3], matches[4], math.MaxInt64)
 	if err != nil {
-		return SizeFilter{}, err
+		return RangeFilter{}, err
 	}
 
-	return SizeFilter{
-		startSize,
-		endSize,
+	return RangeFilter{
+		start,
+		end,
 		isExact,
 	}, nil
 }
@@ -83,9 +77,9 @@ func parseSizeInBytes(valueInput string, unitInput string) (sizeInBytes int64, e
 	return sizeInBytes, nil
 }
 
-func validateSizeFilter(sizeFilter SizeFilter) error {
-	if sizeFilter.StartSize > 0 && sizeFilter.EndSize > 0 {
-		if sizeFilter.StartSize > sizeFilter.EndSize {
+func validateSizeFilter(sizeFilter RangeFilter) error {
+	if sizeFilter.Start > 0 && sizeFilter.End > 0 {
+		if sizeFilter.Start > sizeFilter.End {
 			return fmt.Errorf("Error: invalid size range. Start size cannot be greater than the end size")
 		}
 	}

@@ -1,8 +1,7 @@
 package pkgdata
 
-import "time"
-
-type BasePackageInfo struct {
+type PackageInfo struct {
+	Timestamp  int64    `json:"timestamp,omitempty"`
 	Name       string   `json:"name,omitempty"`
 	Reason     string   `json:"reason,omitempty"`  // "explicit" or "dependency"
 	Size       int64    `json:"size,omitempty"`    // package size in bytes
@@ -12,15 +11,4 @@ type BasePackageInfo struct {
 	Provides   []string `json:"provides,omitempty"`
 	Conflicts  []string `json:"conflicts,omitempty"`
 	Arch       string   `json:"arch,omitempty"`
-}
-
-// info about a single installed package
-type PackageInfo struct {
-	Timestamp time.Time
-	BasePackageInfo
-}
-
-type PackageInfoJson struct {
-	Timestamp *time.Time `json:"timestamp,omitempty"`
-	BasePackageInfo
 }

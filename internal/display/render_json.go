@@ -8,12 +8,11 @@ import (
 )
 
 func (o *OutputManager) renderJson(pkgs []pkgdata.PackageInfo, fields []consts.FieldType) {
-	filteredPackages := make([]pkgdata.PackageInfoJson, len(pkgs))
-	for i, pkg := range pkgs {
-		filteredPackages[i] = getJsonValues(pkg, fields)
+	if !isAllFields(fields) {
+		pkgs = selectJsonFields(pkgs, fields)
 	}
 
-	jsonOutput, err := json.MarshalIndent(filteredPackages, "", "  ")
+	jsonOutput, err := json.MarshalIndent(pkgs, "", "  ")
 	if err != nil {
 		o.writeLine(fmt.Sprintf("Error genereating JSON output: %v", err))
 	}
@@ -21,13 +20,42 @@ func (o *OutputManager) renderJson(pkgs []pkgdata.PackageInfo, fields []consts.F
 	o.writeLine(string(jsonOutput))
 }
 
-func getJsonValues(pkg pkgdata.PackageInfo, fields []consts.FieldType) pkgdata.PackageInfoJson {
-	filteredPackage := pkgdata.PackageInfoJson{}
+// quick check to verify if we should select fields at all
+func isAllFields(fields []consts.FieldType) bool {
+	if len(fields) != len(consts.ValidFields) {
+		return false
+	}
+
+	for _, field := range fields {
+		for _, validField := range consts.ValidFields {
+			if field != validField {
+				return false
+			}
+		}
+	}
+
+	return true
+}
+
+func selectJsonFields(
+	pkgs []pkgdata.PackageInfo,
+	fields []consts.FieldType,
+) []pkgdata.PackageInfo {
+	filteredPackages := make([]pkgdata.PackageInfo, len(pkgs))
+	for i, pkg := range pkgs {
+		filteredPackages[i] = getJsonValues(pkg, fields)
+	}
+
+	return filteredPackages
+}
+
+func getJsonValues(pkg pkgdata.PackageInfo, fields []consts.FieldType) pkgdata.PackageInfo {
+	filteredPackage := pkgdata.PackageInfo{}
 
 	for _, field := range fields {
 		switch field {
 		case consts.FieldDate:
-			filteredPackage.Timestamp = &pkg.Timestamp
+			filteredPackage.Timestamp = pkg.Timestamp
 		case consts.FieldName:
 			filteredPackage.Name = pkg.Name
 		case consts.FieldReason:

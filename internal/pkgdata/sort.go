@@ -17,7 +17,7 @@ func alphabeticalComparator(a PackageInfo, b PackageInfo) bool {
 }
 
 func dateComparator(a PackageInfo, b PackageInfo) bool {
-	return a.Timestamp.Before(b.Timestamp)
+	return a.Timestamp < b.Timestamp
 }
 
 func sizeDecComparator(a PackageInfo, b PackageInfo) bool {
