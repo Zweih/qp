@@ -8,8 +8,8 @@ import (
 )
 
 func (o *OutputManager) renderJson(pkgs []pkgdata.PackageInfo, fields []consts.FieldType) {
-	if !isAllFields(fields) {
-		pkgs = selectJsonFields(pkgs, fields)
+	if isAllFields, uniqueFields := getUniqueFields(fields); isAllFields {
+		pkgs = selectJsonFields(pkgs, uniqueFields)
 	}
 
 	jsonOutput, err := json.MarshalIndent(pkgs, "", "  ")
@@ -21,20 +21,18 @@ func (o *OutputManager) renderJson(pkgs []pkgdata.PackageInfo, fields []consts.F
 }
 
 // quick check to verify if we should select fields at all
-func isAllFields(fields []consts.FieldType) bool {
-	if len(fields) != len(consts.ValidFields) {
-		return false
-	}
-
+func getUniqueFields(fields []consts.FieldType) (bool, []consts.FieldType) {
+	fieldSet := make(map[consts.FieldType]bool, len(fields))
 	for _, field := range fields {
-		for _, validField := range consts.ValidFields {
-			if field != validField {
-				return false
-			}
-		}
+		fieldSet[field] = true
 	}
 
-	return true
+	uniqueFields := make([]consts.FieldType, 0, len(fieldSet))
+	for field := range fieldSet {
+		uniqueFields = append(uniqueFields, field)
+	}
+
+	return len(fieldSet) != len(consts.ValidFields), uniqueFields
 }
 
 func selectJsonFields(
