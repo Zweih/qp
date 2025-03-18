@@ -31,13 +31,13 @@ func mainWithConfig(configProvider config.ConfigProvider) error {
 	isInteractive := term.IsTerminal(int(os.Stdout.Fd())) && !cfg.DisableProgress
 	var wg sync.WaitGroup
 
-	pipeline := []PipelinePhase{
+	pipelinePhases := []PipelinePhase{
 		{"Calculating reverse dependencies", pkgdata.CalculateReverseDependencies, isInteractive, &wg},
 		{"Filtering", pipeline.PreprocessFiltering, isInteractive, &wg},
 		{"Sorting", pkgdata.SortPackages, isInteractive, &wg},
 	}
 
-	for _, phase := range pipeline {
+	for _, phase := range pipelinePhases {
 		packages, err = phase.Run(cfg, packages)
 		if err != nil {
 			return err
