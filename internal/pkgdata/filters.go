@@ -62,12 +62,14 @@ func roundSizeInBytes(num int64) int64 {
 	return num / scaleFactor
 }
 
+// TODO: let's pre-round the inputs outside of these functions
 func FilterBySize(pkg PackageInfo, targetSize int64) bool {
 	return roundSizeInBytes(pkg.Size) == roundSizeInBytes(targetSize)
 }
 
 func FilterBySizeRange(pkg PackageInfo, startSize int64, endSize int64) bool {
-	return pkg.Size >= startSize && pkg.Size <= endSize
+	roundedSize := roundSizeInBytes(pkg.Size)
+	return !(roundedSize < roundSizeInBytes(startSize) || roundedSize > roundSizeInBytes(endSize))
 }
 
 func FilterByStrings(pkgString string, targetStrings []string) bool {
