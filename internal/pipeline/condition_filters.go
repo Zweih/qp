@@ -2,24 +2,27 @@ package pipeline
 
 import (
 	"fmt"
-	"time"
 	"yaylog/internal/consts"
 	"yaylog/internal/pkgdata"
 )
 
-type RangeFilter struct {
+type RangeSelector struct {
 	Start   int64
 	End     int64
 	IsExact bool
 }
 
-func newBaseCondition(filterType consts.FieldType) FilterCondition {
+type ExactFilter func(pkg pkgdata.PackageInfo, target int64) bool
+
+type RangeFilter func(pkg pkgdata.PackageInfo, start int64, end int64) bool
+
+func newBaseCondition(fieldType consts.FieldType) FilterCondition {
 	return FilterCondition{
-		PhaseName: "Filtering by " + string(filterType),
+		PhaseName: "Filtering by " + string(fieldType),
 	}
 }
 
-func NewPackageCondition(fieldType consts.FieldType, targets []string) (FilterCondition, error) {
+func newPackageCondition(fieldType consts.FieldType, targets []string) (FilterCondition, error) {
 	conditionFilter := newBaseCondition(fieldType)
 	var filterFunc pkgdata.Filter
 
@@ -57,46 +60,48 @@ func NewPackageCondition(fieldType consts.FieldType, targets []string) (FilterCo
 	return conditionFilter, nil
 }
 
-func NewDateCondition(dateFilter RangeFilter) FilterCondition {
-	start, end, isExact := dateFilter.Start, dateFilter.End, dateFilter.IsExact
-	condition := newBaseCondition(consts.FieldDate)
+func newRangeCondition(
+	rangeSelector RangeSelector,
+	fieldType consts.FieldType,
+	exactFunc ExactFilter,
+	rangeFunc RangeFilter,
+) FilterCondition {
+	condition := newBaseCondition(fieldType)
 
-	if isExact {
+	if rangeSelector.IsExact {
 		condition.Filter = func(pkg PackageInfo) bool {
-			return pkgdata.FilterByDate(pkg, start)
-		}
-
-		return condition
-	}
-
-	adjustedEnd := end + int64(time.Hour*24/time.Second) // ensure full date range
-	condition.Filter = func(pkg PackageInfo) bool {
-		return pkgdata.FilterByDateRange(pkg, start, adjustedEnd)
-	}
-
-	return condition
-}
-
-func NewSizeCondition(sizeFilter RangeFilter) FilterCondition {
-	start, end, isExact := sizeFilter.Start, sizeFilter.End, sizeFilter.IsExact
-	condition := newBaseCondition(consts.FieldSize)
-
-	if isExact {
-		condition.Filter = func(pkg PackageInfo) bool {
-			return pkgdata.FilterBySize(pkg, start)
+			return exactFunc(pkg, rangeSelector.Start)
 		}
 
 		return condition
 	}
 
 	condition.Filter = func(pkg PackageInfo) bool {
-		return pkgdata.FilterBySizeRange(pkg, start, end)
+		return rangeFunc(pkg, rangeSelector.Start, rangeSelector.End)
 	}
 
 	return condition
 }
 
-func NewReasonCondition(reason string) FilterCondition {
+func newDateCondition(dateFilter RangeSelector) FilterCondition {
+	return newRangeCondition(
+		dateFilter,
+		consts.FieldDate,
+		pkgdata.FilterByDate,
+		pkgdata.FilterByDateRange,
+	)
+}
+
+func newSizeCondition(sizeFilter RangeSelector) FilterCondition {
+	return newRangeCondition(
+		sizeFilter,
+		consts.FieldSize,
+		pkgdata.FilterBySize,
+		pkgdata.FilterBySizeRange,
+	)
+}
+
+func newReasonCondition(reason string) FilterCondition {
 	condition := newBaseCondition(consts.FieldReason)
 	condition.Filter = func(pkg PackageInfo) bool {
 		return pkgdata.FilterByReason(pkg.Reason, reason)

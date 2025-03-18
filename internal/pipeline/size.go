@@ -9,13 +9,13 @@ import (
 	"yaylog/internal/consts"
 )
 
-func parseSizeFilter(sizeFilterInput string) (RangeFilter, error) {
+func parseSizeFilter(sizeFilterInput string) (RangeSelector, error) {
 	if sizeFilterInput == "" {
-		return RangeFilter{}, nil
+		return RangeSelector{}, nil
 	}
 
 	if sizeFilterInput == ":" {
-		return RangeFilter{}, fmt.Errorf("invalid size filter: ':' must be accompanied by a value")
+		return RangeSelector{}, fmt.Errorf("invalid size filter: ':' must be accompanied by a value")
 	}
 
 	// valid size format: "10MB", "5GB:", ":20KB", "1.5MB:2GB" (value + unit, optional range)
@@ -25,20 +25,20 @@ func parseSizeFilter(sizeFilterInput string) (RangeFilter, error) {
 	isExact := !strings.Contains(sizeFilterInput, ":")
 
 	if matches == nil {
-		return RangeFilter{}, fmt.Errorf("invalid size filter format: %q", sizeFilterInput)
+		return RangeSelector{}, fmt.Errorf("invalid size filter format: %q", sizeFilterInput)
 	}
 
 	start, err := parseSizeMatch(matches[1], matches[2], 0)
 	if err != nil {
-		return RangeFilter{}, err
+		return RangeSelector{}, err
 	}
 
 	end, err := parseSizeMatch(matches[3], matches[4], math.MaxInt64)
 	if err != nil {
-		return RangeFilter{}, err
+		return RangeSelector{}, err
 	}
 
-	return RangeFilter{
+	return RangeSelector{
 		start,
 		end,
 		isExact,
@@ -77,7 +77,7 @@ func parseSizeInBytes(valueInput string, unitInput string) (sizeInBytes int64, e
 	return sizeInBytes, nil
 }
 
-func validateSizeFilter(sizeFilter RangeFilter) error {
+func validateSizeFilter(sizeFilter RangeSelector) error {
 	if sizeFilter.Start > 0 && sizeFilter.End > 0 {
 		if sizeFilter.Start > sizeFilter.End {
 			return fmt.Errorf("Error: invalid size range. Start size cannot be greater than the end size")

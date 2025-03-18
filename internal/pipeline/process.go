@@ -77,7 +77,7 @@ func parsePackageFilterCondition(
 	}
 
 	targetList := strings.Split(targetListInput, ",")
-	return NewPackageCondition(fieldType, targetList)
+	return newPackageCondition(fieldType, targetList)
 }
 
 func parseReasonFilterCondition(installReason string) (FilterCondition, error) {
@@ -85,7 +85,7 @@ func parseReasonFilterCondition(installReason string) (FilterCondition, error) {
 		return FilterCondition{}, fmt.Errorf("invalid install reason filter: %s", installReason)
 	}
 
-	return NewReasonCondition(installReason), nil
+	return newReasonCondition(installReason), nil
 }
 
 func parseDateFilterCondition(value string) (FilterCondition, error) {
@@ -98,7 +98,7 @@ func parseDateFilterCondition(value string) (FilterCondition, error) {
 		return pkgdata.FilterCondition{}, err
 	}
 
-	return NewDateCondition(dateFilter), nil
+	return newDateCondition(dateFilter), nil
 }
 
 func parseSizeFilterCondition(value string) (FilterCondition, error) {
@@ -111,5 +111,5 @@ func parseSizeFilterCondition(value string) (FilterCondition, error) {
 		return FilterCondition{}, err
 	}
 
-	return NewSizeCondition(sizeFilter), nil
+	return newSizeCondition(sizeFilter), nil
 }

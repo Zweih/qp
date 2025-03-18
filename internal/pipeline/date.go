@@ -8,13 +8,13 @@ import (
 	"yaylog/internal/consts"
 )
 
-func parseDateFilter(dateFilterInput string) (RangeFilter, error) {
+func parseDateFilter(dateFilterInput string) (RangeSelector, error) {
 	if dateFilterInput == "" {
-		return RangeFilter{}, nil
+		return RangeSelector{}, nil
 	}
 
 	if dateFilterInput == ":" {
-		return RangeFilter{}, fmt.Errorf("invalid date filter: ':' must be accompanied by a date")
+		return RangeSelector{}, fmt.Errorf("invalid date filter: ':' must be accompanied by a date")
 	}
 
 	pattern := `^(\d{4}-\d{2}-\d{2})?(?::(\d{4}-\d{2}-\d{2})?)?$`
@@ -23,20 +23,22 @@ func parseDateFilter(dateFilterInput string) (RangeFilter, error) {
 	isExact := !strings.Contains(dateFilterInput, ":")
 
 	if matches == nil {
-		return RangeFilter{}, fmt.Errorf("invalid date filter format: %q", dateFilterInput)
+		return RangeSelector{}, fmt.Errorf("invalid date filter format: %q", dateFilterInput)
 	}
 
 	start, err := parseDateMatch(matches[1], 0)
 	if err != nil {
-		return RangeFilter{}, err
+		return RangeSelector{}, err
 	}
 
 	end, err := parseDateMatch(matches[2], time.Now().Unix())
 	if err != nil {
-		return RangeFilter{}, err
+		return RangeSelector{}, err
 	}
 
-	return RangeFilter{
+	end += int64(time.Hour * 24 / time.Second)
+
+	return RangeSelector{
 		start,
 		end,
 		isExact,
@@ -60,7 +62,7 @@ func parseValidDate(dateInput string) (int64, error) {
 	return parsedDate.Unix(), nil
 }
 
-func validateDateFilter(dateFilter RangeFilter) error {
+func validateDateFilter(dateFilter RangeSelector) error {
 	if dateFilter.Start > 0 && dateFilter.End > 0 {
 		if dateFilter.Start > dateFilter.End {
 			return fmt.Errorf("Error invalid date range. The start date cannot be after the end date")
