@@ -191,45 +191,52 @@ short-flag filters and long-flag filters can be combined.
 - `provides` - list of alternative package names or shared libraries provided by package (output can be long)
 - `conficts` - list of packages that conflict, or cause problems, with the package
 - `arch` - architecture the package was built for (e.g., x86_64, aarch64, any)
+- `license` - package software license
 
 ### JSON output
 the `--json` flag outputs the package data as structured JSON instead of a table. this can be useful for scripts or automation.
 
 example:
 ```bash
-yaylog -f name=sqlite --all-columns --json
+yaylog -f name=tinysparql --all-columns --json
 ```
 
-`sqlite` is one of the few packages that actually has all the fields populated.
+`tinysparql` is one of the few packages that actually has all the fields populated.
 
 output format:
 ```json
 [
   {
-    "timestamp": 174058762,
-    "name": "sqlite",
+    "timestamp": 1739294218,
+    "name": "tinysparql",
     "reason": "dependency",
-    "size": 21074944,
-    "version": "3.48.0-2",
+    "size": 4385422,
+    "version": "3.8.2-2",
     "depends": [
-      "readline",
-      "zlib",
-      "glibc"
+      "avahi",
+      "gcc-libs",
+      "glib2",
+      "glibc",
+      "icu",
+      "json-glib",
+      "libsoup3",
+      "libstemmer",
+      "libxml2",
+      "sqlite"
     ],
     "requiredBy": [
-      "docker",
-      "gnupg",
-      "libsoup3",
-      "nss",
-      "openslide",
-      "tinysparql",
-      "util-linux-libs"
+      "gtk3",
+      "gtk4"
     ],
     "provides": [
-      "sqlite3=3.48.0",
-      "libsqlite3.so=0-64"
+      "tracker3=3.8.2",
+      "libtinysparql-3.0.so=0-64"
     ],
-    "arch": "x86_64"
+    "conflicts": [
+      "tracker3<=3.7.3-2"
+    ],
+    "arch": "aarch64",
+    "license": "GPL-2.0-or-later"
   }
 ]
 ```
