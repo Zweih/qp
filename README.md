@@ -57,8 +57,8 @@ because yay is my preferred AUR helper and the name has a good flow.
 - [x] filter by package name
 - [x] package version field
 - [x] filter by date range
-- [x] concurrent file reading (2x speed boost)
-- [x] remove expac as a dependency (3x speed boost)
+- [x] concurrent file reading (200% speed boost)
+- [x] remove expac as a dependency (300% speed boost)
 - [x] package provisions
 - [x] optional full timestamp 
 - [x] add CI to release binaries
@@ -93,6 +93,7 @@ because yay is my preferred AUR helper and the name has a good flow.
 - [ ] dependency count sort
 - [ ] license filter
 - [ ] optional dependency field
+- [x] improve sorting efficiency (8% speed boost)
 
 ## installation
 
