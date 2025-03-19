@@ -10,21 +10,21 @@ import (
 
 const concurrentSortThreshold = 500
 
-type PackageComparator func(a PackageInfo, b PackageInfo) bool
+type PackageComparator func(a *PackageInfo, b *PackageInfo) bool
 
-func alphabeticalComparator(a PackageInfo, b PackageInfo) bool {
+func alphabeticalComparator(a *PackageInfo, b *PackageInfo) bool {
 	return a.Name < b.Name
 }
 
-func dateComparator(a PackageInfo, b PackageInfo) bool {
+func dateComparator(a *PackageInfo, b *PackageInfo) bool {
 	return a.Timestamp < b.Timestamp
 }
 
-func sizeDecComparator(a PackageInfo, b PackageInfo) bool {
+func sizeDecComparator(a *PackageInfo, b *PackageInfo) bool {
 	return a.Size > b.Size
 }
 
-func sizeAscComparator(a PackageInfo, b PackageInfo) bool {
+func sizeAscComparator(a *PackageInfo, b *PackageInfo) bool {
 	return a.Size < b.Size
 }
 
@@ -44,12 +44,12 @@ func getComparator(sortBy string) PackageComparator {
 }
 
 func mergedSortedChunks(
-	leftChunk []PackageInfo,
-	rightChunk []PackageInfo,
+	leftChunk []*PackageInfo,
+	rightChunk []*PackageInfo,
 	comparator PackageComparator,
-) []PackageInfo {
+) []*PackageInfo {
 	capacity := len(leftChunk) + len(rightChunk)
-	result := make([]PackageInfo, 0, capacity)
+	result := make([]*PackageInfo, 0, capacity)
 	i, j := 0, 0
 
 	for i < len(leftChunk) && j < len(rightChunk) {
@@ -70,13 +70,14 @@ func mergedSortedChunks(
 	return result
 }
 
+// pkgPointers will be sorted in place, mutating the slice order
 func sortConcurrently(
-	pkgs []PackageInfo,
+	pkgPointers []*PackageInfo,
 	comparator PackageComparator,
 	phase string,
 	reportProgress ProgressReporter,
 ) []PackageInfo {
-	total := len(pkgs)
+	total := len(pkgPointers)
 
 	if total == 0 {
 		return nil
@@ -90,18 +91,17 @@ func sortConcurrently(
 	var wg sync.WaitGroup
 
 	numChunks := (total + chunkSize - 1) / chunkSize
-	chunks := make([][]PackageInfo, 0, numChunks) // pre-allocate
+	chunks := make([][]*PackageInfo, 0, numChunks) // pre-allocate
 
 	for chunkIdx := range numChunks {
 		startIdx := chunkIdx * chunkSize
 		endIdx := min(startIdx+chunkSize, total)
 
-		chunk := make([]PackageInfo, endIdx-startIdx)
-		copy(chunk, pkgs[startIdx:endIdx]) // avoid mutating the original array
+		chunk := pkgPointers[startIdx:endIdx]
 
 		wg.Add(1)
 
-		go func(c []PackageInfo) {
+		go func(c []*PackageInfo) {
 			defer wg.Done()
 
 			sort.SliceStable(c, func(i int, j int) bool {
@@ -129,7 +129,7 @@ func sortConcurrently(
 	mergeStep := 0
 
 	for len(chunks) > 1 {
-		var newChunks [][]PackageInfo
+		var newChunks [][]*PackageInfo
 
 		for i := 0; i < len(chunks); i += 2 {
 			if i+1 < len(chunks) {
@@ -156,34 +156,32 @@ func sortConcurrently(
 	}
 
 	if len(chunks) == 1 {
-		return chunks[0]
+		return dereferencePkgPointers(chunks[0])
 	}
 
 	return nil
 }
 
+// pkgPointers will be sorted in place, mutating the slice order
 func sortNormally(
-	pkgs []PackageInfo,
+	pkgPointers []*PackageInfo,
 	comparator PackageComparator,
 	phase string,
 	reportProgress ProgressReporter,
 ) []PackageInfo {
-	sortedPkgs := make([]PackageInfo, len(pkgs))
-	copy(sortedPkgs, pkgs)
-
 	if reportProgress != nil {
 		reportProgress(0, 100, fmt.Sprintf("%s - normally", phase))
 	}
 
-	sort.SliceStable(sortedPkgs, func(i int, j int) bool {
-		return comparator(sortedPkgs[i], sortedPkgs[j])
+	sort.SliceStable(pkgPointers, func(i int, j int) bool {
+		return comparator(pkgPointers[i], pkgPointers[j])
 	})
 
 	if reportProgress != nil {
 		reportProgress(100, 100, fmt.Sprintf("%s completed", phase))
 	}
 
-	return sortedPkgs
+	return dereferencePkgPointers(pkgPointers)
 }
 
 func SortPackages(
@@ -194,10 +192,24 @@ func SortPackages(
 	comparator := getComparator(cfg.SortBy)
 	phase := "Sorting packages"
 
-	// threshold is 500 as that is where merge sorting chunk performance overtakes timsort
-	if len(pkgs) < concurrentSortThreshold {
-		return sortNormally(pkgs, comparator, phase, reportProgress), nil
+	pkgPointers := make([]*PackageInfo, len(pkgs))
+	for i := range pkgs {
+		pkgPointers[i] = &pkgs[i]
 	}
 
-	return sortConcurrently(pkgs, comparator, phase, reportProgress), nil
+	// threshold is 500 as that is where merge sorting chunk performance overtakes timsort
+	if len(pkgs) < concurrentSortThreshold {
+		return sortNormally(pkgPointers, comparator, phase, reportProgress), nil
+	}
+
+	return sortConcurrently(pkgPointers, comparator, phase, reportProgress), nil
+}
+
+func dereferencePkgPointers(pkgPointers []*PackageInfo) []PackageInfo {
+	pkgs := make([]PackageInfo, len(pkgPointers))
+	for i, pkgPointer := range pkgPointers {
+		pkgs[i] = *pkgPointer
+	}
+
+	return pkgs
 }
