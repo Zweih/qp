@@ -1,5 +1,5 @@
 .\" Man page for yaylog
-.TH yaylog 1 "March 2025" "yaylog 3.19.0" "User Commands"
+.TH yaylog 1 "March 2025" "yaylog 3.27.0" "User Commands"
 .SH NAME
 yaylog \- List and filter installed packages on Arch-based systems.
 .SH SYNOPSIS
@@ -100,6 +100,7 @@ For example, to filter all explicitly installed packages larger than 100MB:
 .EX
 yaylog -f reason=explicit -f size=100MB:
 .EE
+
 .TP
 .B \-\-sort <mode>
 Sort results by the specified mode. Available modes:
@@ -154,6 +155,9 @@ Specify a comma-separated list of columns to display. Available columns:
 .IP
 .B license
 : Package software license.
+.IP
+.B url
+: URL of the official site of the software being packaged.
 .TP
 .B \-\-all-columns
 Show all available columns.

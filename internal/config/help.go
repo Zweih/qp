@@ -59,6 +59,7 @@ func PrintHelp() {
 	fmt.Println("  conflicts    List of packages that conflict, or cause problems, with the package")
 	fmt.Println("  arch         Architecture the package was built for")
 	fmt.Println("  license      Package software license")
+	fmt.Println("  url          URL of the official site of the software being packaged")
 
 	fmt.Println("\nDeprecated Legacy Options (Use --filter Instead):")
 	fmt.Println("  -e, --explicit              (Deprecated) Show only explicitly installed packages")

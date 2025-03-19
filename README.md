@@ -54,8 +54,8 @@ because yay is my preferred AUR helper and the name has a good flow.
 - [x] asynchronous progress bar
 - [x] channel-based aggregation
 - [x] concurrent sorting
-- [x] search by text input
-- [x] package versions
+- [x] filter by package name
+- [x] package version field
 - [x] filter by date range
 - [x] concurrent file reading (2x speed boost)
 - [x] remove expac as a dependency (3x speed boost)
@@ -65,12 +65,12 @@ because yay is my preferred AUR helper and the name has a good flow.
 - [x] remove go as a dependency
 - [x] filter by range of size on disk
 - [x] user defined columns
-- [x] dependencies of each package
+- [x] dependencies of each package (dependency field)
 - [x] reverse-dependencies of each package (required-by field)
-- [ ] package descriptions
-- [ ] package URLs
-- [x] package architecture
-- [x] package conflicts
+- [ ] package descriptions field
+- [x] package URL field
+- [x] package architectur field
+- [x] package conflicts field
 - [x] conflicts filter
 - [ ] name exclusion filter
 - [ ] self-referencing column
@@ -85,10 +85,14 @@ because yay is my preferred AUR helper and the name has a good flow.
 - [x] config dependency injection for testing
 - [ ] required-by count sort
 - [x] metaflag for all filters
+- [x] license field
 - [ ] XML output
 - [ ] short-args for filters
+- [ ] license sort
 - [x] architecture filter
 - [ ] dependency count sort
+- [ ] license filter
+- [ ] optional dependency field
 
 ## installation
 
@@ -192,6 +196,7 @@ short-flag filters and long-flag filters can be combined.
 - `conficts` - list of packages that conflict, or cause problems, with the package
 - `arch` - architecture the package was built for (e.g., x86_64, aarch64, any)
 - `license` - package software license
+- `url` - the URL of the official site of the software being packaged
 
 ### JSON output
 the `--json` flag outputs the package data as structured JSON instead of a table. this can be useful for scripts or automation.
@@ -236,7 +241,8 @@ output format:
       "tracker3<=3.7.3-2"
     ],
     "arch": "aarch64",
-    "license": "GPL-2.0-or-later"
+    "license": "GPL-2.0-or-later",
+    "url": "https://tinysparql.org/"
   }
 ]
 ```
