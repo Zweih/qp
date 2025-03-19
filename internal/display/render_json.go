@@ -79,6 +79,8 @@ func getJsonValues(pkg pkgdata.PackageInfo, fields []consts.FieldType) pkgdata.P
 			filteredPackage.Arch = pkg.Arch
 		case consts.FieldLicense:
 			filteredPackage.License = pkg.License
+		case consts.FieldUrl:
+			filteredPackage.Url = pkg.Url
 		}
 	}
 

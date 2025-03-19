@@ -23,6 +23,7 @@ const (
 	fieldConflicts   = "%CONFLICTS%"
 	fieldArch        = "%ARCH%"
 	fieldLicense     = "%LICENSE%"
+	fieldUrl         = "%URL%"
 
 	pacmanDbPath = "/var/lib/pacman/local"
 )
@@ -133,7 +134,8 @@ func parseDescFile(descPath string) (PackageInfo, error) {
 			fieldProvides,
 			fieldConflicts,
 			fieldArch,
-			fieldLicense:
+			fieldLicense,
+			fieldUrl:
 			currentField = line
 		case "":
 			currentField = "" // reset if line is blank
@@ -201,6 +203,9 @@ func applyField(pkg *PackageInfo, field string, value string) error {
 
 	case fieldLicense:
 		pkg.License = value
+
+	case fieldUrl:
+		pkg.Url = value
 
 	default:
 		// ignore unknown fields

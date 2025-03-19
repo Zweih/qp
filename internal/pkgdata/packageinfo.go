@@ -12,4 +12,5 @@ type PackageInfo struct {
 	Conflicts  []string `json:"conflicts,omitempty"`
 	Arch       string   `json:"arch,omitempty"`
 	License    string   `json:"license,omitempty"`
+	Url        string   `json:"url,omitempty"`
 }

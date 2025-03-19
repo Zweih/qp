@@ -26,6 +26,7 @@ var columnHeaders = map[consts.FieldType]string{
 	consts.FieldConflicts:  "CONFLICTS",
 	consts.FieldArch:       "ARCH",
 	consts.FieldLicense:    "LICENSE",
+	consts.FieldUrl:        "URL",
 }
 
 // displays data in tab format
@@ -106,6 +107,8 @@ func getTableValue(pkg pkgdata.PackageInfo, field consts.FieldType, ctx tableCon
 		return pkg.Arch
 	case consts.FieldLicense:
 		return pkg.License
+	case consts.FieldUrl:
+		return pkg.Url
 	default:
 		return ""
 	}
@@ -113,7 +116,6 @@ func getTableValue(pkg pkgdata.PackageInfo, field consts.FieldType, ctx tableCon
 
 // use time as parameter
 func formatDate(pkg pkgdata.PackageInfo, ctx tableContext) string {
-	// return pkg.Timestamp.Format(ctx.DateFormat)
 	timestamp := time.Unix(pkg.Timestamp, 0)
 	return timestamp.Format(ctx.DateFormat)
 }

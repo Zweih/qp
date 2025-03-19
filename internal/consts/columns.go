@@ -14,6 +14,7 @@ const (
 	conflicts  = "conflicts"
 	arch       = "arch"
 	license    = "license"
+	url        = "url"
 )
 
 const (
@@ -28,6 +29,7 @@ const (
 	FieldConflicts  FieldType = conflicts
 	FieldArch       FieldType = arch
 	FieldLicense    FieldType = license
+	FieldUrl        FieldType = url
 )
 
 var FieldTypeLookup = map[string]FieldType{
@@ -51,6 +53,7 @@ var FieldTypeLookup = map[string]FieldType{
 	conflicts:  FieldConflicts,
 	arch:       FieldArch,
 	license:    FieldLicense,
+	url:        FieldUrl,
 }
 
 var (
@@ -72,5 +75,6 @@ var (
 		FieldConflicts,
 		FieldArch,
 		FieldLicense,
+		FieldUrl,
 	}
 )
