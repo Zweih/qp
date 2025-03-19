@@ -114,7 +114,11 @@ func sortConcurrently(
 
 			if reportProgress != nil {
 				currentProgress := (chunkIdx + 1) * 50 / numChunks // scale chunk sorting progress to 0%-50%
-				reportProgress(currentProgress, 100, fmt.Sprintf("%s - Sorted chunk %d/%d", phase, chunkIdx+1, numChunks))
+				reportProgress(
+					currentProgress,
+					100,
+					fmt.Sprintf("%s - Sorted chunk %d/%d", phase, chunkIdx+1, numChunks),
+				)
 			}
 		}(chunk)
 	}
@@ -207,8 +211,8 @@ func SortPackages(
 
 func dereferencePkgPointers(pkgPointers []*PackageInfo) []PackageInfo {
 	pkgs := make([]PackageInfo, len(pkgPointers))
-	for i, pkgPointer := range pkgPointers {
-		pkgs[i] = *pkgPointer
+	for i := range pkgPointers {
+		pkgs[i] = *pkgPointers[i]
 	}
 
 	return pkgs
