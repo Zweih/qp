@@ -25,6 +25,7 @@ var columnHeaders = map[consts.FieldType]string{
 	consts.FieldProvides:   "PROVIDES",
 	consts.FieldConflicts:  "CONFLICTS",
 	consts.FieldArch:       "ARCH",
+	consts.FieldLicense:    "LICENSE",
 }
 
 // displays data in tab format
@@ -103,6 +104,8 @@ func getTableValue(pkg pkgdata.PackageInfo, field consts.FieldType, ctx tableCon
 		return formatPackageList(pkg.Conflicts)
 	case consts.FieldArch:
 		return pkg.Arch
+	case consts.FieldLicense:
+		return pkg.License
 	default:
 		return ""
 	}
