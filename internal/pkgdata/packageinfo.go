@@ -14,3 +14,21 @@ type PkgInfo struct {
 	License    string   `json:"license,omitempty"`
 	Url        string   `json:"url,omitempty"`
 }
+
+func convertToPointers(pkgs []PkgInfo) []*PkgInfo {
+	pkgPtrs := make([]*PkgInfo, len(pkgs))
+	for i := range pkgs {
+		pkgPtrs[i] = &pkgs[i]
+	}
+
+	return pkgPtrs
+}
+
+func dereferencePkgPointers(pkgPtrs []*PkgInfo) []PkgInfo {
+	pkgs := make([]PkgInfo, len(pkgPtrs))
+	for i := range pkgPtrs {
+		pkgs[i] = *pkgPtrs[i]
+	}
+
+	return pkgs
+}

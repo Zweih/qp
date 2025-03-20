@@ -114,15 +114,26 @@ func applyFilterPipeline(
 	outputChan := inputChan
 	totalPhases := len(filters)
 	completedPhases := 0
+	chunkSize := 100
 
 	for filterIndex, f := range filters {
 		nextOutputChan := make(chan PkgInfo, cap(inputChan))
 
 		go func(inChan <-chan PkgInfo, outChan chan<- PkgInfo, filter Filter, phaseName string) {
+			defer close(outChan)
+
+			var chunk []PkgInfo
 			for pkg := range inChan {
-				if filter(pkg) {
-					outChan <- pkg
+				chunk = append(chunk, pkg)
+
+				if len(chunk) >= chunkSize {
+					processChunk(chunk, outChan, filter)
+					chunk = nil
 				}
+			}
+
+			if len(chunk) > 0 {
+				processChunk(chunk, outChan, filter)
 			}
 
 			if reportProgress != nil {
@@ -133,14 +144,20 @@ func applyFilterPipeline(
 					fmt.Sprintf("%s - Step %d/%d completed", phaseName, filterIndex+1, totalPhases),
 				)
 			}
-
-			close(outChan)
 		}(outputChan, nextOutputChan, f.Filter, f.PhaseName)
 
 		outputChan = nextOutputChan
 	}
 
 	return outputChan
+}
+
+func processChunk(pkgs []PkgInfo, outChan chan<- PkgInfo, filter Filter) {
+	for i := range pkgs {
+		if filter(pkgs[i]) {
+			outChan <- pkgs[i]
+		}
+	}
 }
 
 func populateInitialInputChannel(pkgs []PkgInfo) <-chan PkgInfo {

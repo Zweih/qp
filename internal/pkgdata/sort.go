@@ -195,25 +195,12 @@ func SortPackages(
 ) ([]PkgInfo, error) {
 	comparator := getComparator(cfg.SortBy)
 	phase := "Sorting packages"
-
-	pkgPointers := make([]*PkgInfo, len(pkgs))
-	for i := range pkgs {
-		pkgPointers[i] = &pkgs[i]
-	}
+	pkgPtrs := convertToPointers(pkgs)
 
 	// threshold is 500 as that is where merge sorting chunk performance overtakes timsort
 	if len(pkgs) < concurrentSortThreshold {
-		return sortNormally(pkgPointers, comparator, phase, reportProgress), nil
+		return sortNormally(pkgPtrs, comparator, phase, reportProgress), nil
 	}
 
-	return sortConcurrently(pkgPointers, comparator, phase, reportProgress), nil
-}
-
-func dereferencePkgPointers(pkgPointers []*PkgInfo) []PkgInfo {
-	pkgs := make([]PkgInfo, len(pkgPointers))
-	for i := range pkgPointers {
-		pkgs[i] = *pkgPointers[i]
-	}
-
-	return pkgs
+	return sortConcurrently(pkgPtrs, comparator, phase, reportProgress), nil
 }
