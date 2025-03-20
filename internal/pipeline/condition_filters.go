@@ -12,9 +12,9 @@ type RangeSelector struct {
 	IsExact bool
 }
 
-type ExactFilter func(pkg pkgdata.PackageInfo, target int64) bool
+type ExactFilter func(pkg pkgdata.PkgInfo, target int64) bool
 
-type RangeFilter func(pkg pkgdata.PackageInfo, start int64, end int64) bool
+type RangeFilter func(pkg pkgdata.PkgInfo, start int64, end int64) bool
 
 func newBaseCondition(fieldType consts.FieldType) FilterCondition {
 	return FilterCondition{

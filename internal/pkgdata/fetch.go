@@ -28,21 +28,21 @@ const (
 	pacmanDbPath = "/var/lib/pacman/local"
 )
 
-func FetchPackages() ([]PackageInfo, error) {
-	packagePaths, err := os.ReadDir(pacmanDbPath)
+func FetchPackages() ([]PkgInfo, error) {
+	pkgPaths, err := os.ReadDir(pacmanDbPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read pacman database: %v", err)
 	}
 
-	numPackages := len(packagePaths)
+	numPkgs := len(pkgPaths)
 
 	var wg sync.WaitGroup
-	descPaths := make(chan string, numPackages)
-	packagesChan := make(chan PackageInfo, numPackages)
-	errorsChan := make(chan error, numPackages)
+	descPaths := make(chan string, numPkgs)
+	packagesChan := make(chan PkgInfo, numPkgs)
+	errorsChan := make(chan error, numPkgs)
 
 	// fun fact: NumCPU() does account for hyperthreading
-	numWorkers := getWorkerCount(runtime.NumCPU(), numPackages)
+	numWorkers := getWorkerCount(runtime.NumCPU(), numPkgs)
 
 	for range numWorkers {
 		wg.Add(1)
@@ -60,7 +60,7 @@ func FetchPackages() ([]PackageInfo, error) {
 		}()
 	}
 
-	for _, packagePath := range packagePaths {
+	for _, packagePath := range pkgPaths {
 		if packagePath.IsDir() {
 			descPath := filepath.Join(pacmanDbPath, packagePath.Name(), "desc")
 			descPaths <- descPath
@@ -73,9 +73,9 @@ func FetchPackages() ([]PackageInfo, error) {
 	close(packagesChan)
 	close(errorsChan)
 
-	packages := make([]PackageInfo, 0, numPackages)
+	pkgs := make([]PkgInfo, 0, numPkgs)
 	for pkg := range packagesChan {
-		packages = append(packages, pkg)
+		pkgs = append(pkgs, pkg)
 	}
 
 	if len(errorsChan) > 0 {
@@ -88,7 +88,7 @@ func FetchPackages() ([]PackageInfo, error) {
 		return nil, errors.Join(collectedErrors...)
 	}
 
-	return packages, nil
+	return pkgs, nil
 }
 
 func getWorkerCount(numCPUs int, numFiles int) int {
@@ -108,15 +108,15 @@ func getWorkerCount(numCPUs int, numFiles int) int {
 	return min(numWorkers, 12) // avoid overthreading on high-core systems
 }
 
-func parseDescFile(descPath string) (PackageInfo, error) {
+func parseDescFile(descPath string) (PkgInfo, error) {
 	file, err := os.Open(descPath)
 	if err != nil {
-		return PackageInfo{}, fmt.Errorf("failed to open file: %v", err)
+		return PkgInfo{}, fmt.Errorf("failed to open file: %v", err)
 	}
 
 	defer file.Close()
 
-	var pkg PackageInfo
+	var pkg PkgInfo
 	var currentField string
 
 	scanner := bufio.NewScanner(file)
@@ -141,13 +141,13 @@ func parseDescFile(descPath string) (PackageInfo, error) {
 			currentField = "" // reset if line is blank
 		default:
 			if err := applyField(&pkg, currentField, line); err != nil {
-				return PackageInfo{}, fmt.Errorf("error reading desc file %s: %w", descPath, err)
+				return PkgInfo{}, fmt.Errorf("error reading desc file %s: %w", descPath, err)
 			}
 		}
 	}
 
 	if pkg.Name == "" {
-		return PackageInfo{}, fmt.Errorf("package name is missing in file: %s", descPath)
+		return PkgInfo{}, fmt.Errorf("package name is missing in file: %s", descPath)
 	}
 
 	if pkg.Reason == "" {
@@ -157,7 +157,7 @@ func parseDescFile(descPath string) (PackageInfo, error) {
 	return pkg, nil
 }
 
-func applyField(pkg *PackageInfo, field string, value string) error {
+func applyField(pkg *PkgInfo, field string, value string) error {
 	switch field {
 	case fieldName:
 		pkg.Name = value

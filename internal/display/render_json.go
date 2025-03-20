@@ -8,7 +8,7 @@ import (
 	"yaylog/internal/pkgdata"
 )
 
-func (o *OutputManager) renderJson(pkgs []pkgdata.PackageInfo, fields []consts.FieldType) {
+func (o *OutputManager) renderJson(pkgs []pkgdata.PkgInfo, fields []consts.FieldType) {
 	if isAllFields, uniqueFields := getUniqueFields(fields); isAllFields {
 		pkgs = selectJsonFields(pkgs, uniqueFields)
 	}
@@ -41,10 +41,10 @@ func getUniqueFields(fields []consts.FieldType) (bool, []consts.FieldType) {
 }
 
 func selectJsonFields(
-	pkgs []pkgdata.PackageInfo,
+	pkgs []pkgdata.PkgInfo,
 	fields []consts.FieldType,
-) []pkgdata.PackageInfo {
-	filteredPackages := make([]pkgdata.PackageInfo, len(pkgs))
+) []pkgdata.PkgInfo {
+	filteredPackages := make([]pkgdata.PkgInfo, len(pkgs))
 	for i, pkg := range pkgs {
 		filteredPackages[i] = getJsonValues(pkg, fields)
 	}
@@ -52,8 +52,8 @@ func selectJsonFields(
 	return filteredPackages
 }
 
-func getJsonValues(pkg pkgdata.PackageInfo, fields []consts.FieldType) pkgdata.PackageInfo {
-	filteredPackage := pkgdata.PackageInfo{}
+func getJsonValues(pkg pkgdata.PkgInfo, fields []consts.FieldType) pkgdata.PkgInfo {
+	filteredPackage := pkgdata.PkgInfo{}
 
 	for _, field := range fields {
 		switch field {

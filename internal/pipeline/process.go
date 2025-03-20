@@ -10,7 +10,7 @@ import (
 )
 
 type (
-	PackageInfo     = pkgdata.PackageInfo
+	PackageInfo     = pkgdata.PkgInfo
 	FilterCondition = pkgdata.FilterCondition
 )
 
@@ -18,16 +18,16 @@ var targetListRegex = regexp.MustCompile(`^([a-z0-9][a-z0-9._-]*[a-z0-9])(,([a-z
 
 func PreprocessFiltering(
 	cfg config.Config,
-	packages []pkgdata.PackageInfo,
+	packages []pkgdata.PkgInfo,
 	reportProgress pkgdata.ProgressReporter,
-) ([]pkgdata.PackageInfo, error) {
+) ([]pkgdata.PkgInfo, error) {
 	if len(cfg.FilterQueries) == 0 {
 		return packages, nil
 	}
 
 	filterConditions, err := queriesToConditions(cfg.FilterQueries)
 	if err != nil {
-		return []pkgdata.PackageInfo{}, err
+		return []pkgdata.PkgInfo{}, err
 	}
 
 	return pkgdata.FilterPackages(packages, filterConditions, reportProgress), nil

@@ -11,7 +11,7 @@ import (
 type (
 	ProgressReporter = pkgdata.ProgressReporter
 	ProgressMessage  = pkgdata.ProgressMessage
-	PackageInfo      = pkgdata.PackageInfo
+	PackageInfo      = pkgdata.PkgInfo
 )
 
 type Operation func(cfg config.Config, packages []PackageInfo, progressReporter ProgressReporter) ([]PackageInfo, error)

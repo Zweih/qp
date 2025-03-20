@@ -31,7 +31,7 @@ var columnHeaders = map[consts.FieldType]string{
 
 // displays data in tab format
 func (o *OutputManager) renderTable(
-	pkgs []pkgdata.PackageInfo,
+	pkgs []pkgdata.PkgInfo,
 	fields []consts.FieldType,
 	showFullTimestamp bool,
 	hasNoHeaders bool,
@@ -71,7 +71,7 @@ func renderHeaders(w *tabwriter.Writer, fields []consts.FieldType) {
 
 func renderRows(
 	w *tabwriter.Writer,
-	pkg pkgdata.PackageInfo,
+	pkg pkgdata.PkgInfo,
 	fields []consts.FieldType,
 	ctx tableContext,
 ) {
@@ -83,7 +83,7 @@ func renderRows(
 	fmt.Fprintln(w, strings.Join(row, "\t"))
 }
 
-func getTableValue(pkg pkgdata.PackageInfo, field consts.FieldType, ctx tableContext) string {
+func getTableValue(pkg pkgdata.PkgInfo, field consts.FieldType, ctx tableContext) string {
 	switch field {
 	case consts.FieldDate:
 		return formatDate(pkg, ctx)
@@ -115,7 +115,7 @@ func getTableValue(pkg pkgdata.PackageInfo, field consts.FieldType, ctx tableCon
 }
 
 // use time as parameter
-func formatDate(pkg pkgdata.PackageInfo, ctx tableContext) string {
+func formatDate(pkg pkgdata.PkgInfo, ctx tableContext) string {
 	timestamp := time.Unix(pkg.Timestamp, 0)
 	return timestamp.Format(ctx.DateFormat)
 }

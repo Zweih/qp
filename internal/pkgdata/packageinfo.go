@@ -1,6 +1,6 @@
 package pkgdata
 
-type PackageInfo struct {
+type PkgInfo struct {
 	Timestamp  int64    `json:"timestamp,omitempty"`
 	Name       string   `json:"name,omitempty"`
 	Reason     string   `json:"reason,omitempty"`  // "explicit" or "dependency"

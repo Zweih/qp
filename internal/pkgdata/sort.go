@@ -10,21 +10,21 @@ import (
 
 const concurrentSortThreshold = 500
 
-type PackageComparator func(a *PackageInfo, b *PackageInfo) bool
+type PackageComparator func(a *PkgInfo, b *PkgInfo) bool
 
-func alphabeticalComparator(a *PackageInfo, b *PackageInfo) bool {
+func alphabeticalComparator(a *PkgInfo, b *PkgInfo) bool {
 	return a.Name < b.Name
 }
 
-func dateComparator(a *PackageInfo, b *PackageInfo) bool {
+func dateComparator(a *PkgInfo, b *PkgInfo) bool {
 	return a.Timestamp < b.Timestamp
 }
 
-func sizeDecComparator(a *PackageInfo, b *PackageInfo) bool {
+func sizeDecComparator(a *PkgInfo, b *PkgInfo) bool {
 	return a.Size > b.Size
 }
 
-func sizeAscComparator(a *PackageInfo, b *PackageInfo) bool {
+func sizeAscComparator(a *PkgInfo, b *PkgInfo) bool {
 	return a.Size < b.Size
 }
 
@@ -44,12 +44,12 @@ func getComparator(sortBy string) PackageComparator {
 }
 
 func mergedSortedChunks(
-	leftChunk []*PackageInfo,
-	rightChunk []*PackageInfo,
+	leftChunk []*PkgInfo,
+	rightChunk []*PkgInfo,
 	comparator PackageComparator,
-) []*PackageInfo {
+) []*PkgInfo {
 	capacity := len(leftChunk) + len(rightChunk)
-	result := make([]*PackageInfo, 0, capacity)
+	result := make([]*PkgInfo, 0, capacity)
 	i, j := 0, 0
 
 	for i < len(leftChunk) && j < len(rightChunk) {
@@ -72,11 +72,11 @@ func mergedSortedChunks(
 
 // pkgPointers will be sorted in place, mutating the slice order
 func sortConcurrently(
-	pkgPointers []*PackageInfo,
+	pkgPointers []*PkgInfo,
 	comparator PackageComparator,
 	phase string,
 	reportProgress ProgressReporter,
-) []PackageInfo {
+) []PkgInfo {
 	total := len(pkgPointers)
 
 	if total == 0 {
@@ -91,7 +91,7 @@ func sortConcurrently(
 	var wg sync.WaitGroup
 
 	numChunks := (total + chunkSize - 1) / chunkSize
-	chunks := make([][]*PackageInfo, 0, numChunks) // pre-allocate
+	chunks := make([][]*PkgInfo, 0, numChunks) // pre-allocate
 
 	for chunkIdx := range numChunks {
 		startIdx := chunkIdx * chunkSize
@@ -101,7 +101,7 @@ func sortConcurrently(
 
 		wg.Add(1)
 
-		go func(c []*PackageInfo) {
+		go func(c []*PkgInfo) {
 			defer wg.Done()
 
 			sort.SliceStable(c, func(i int, j int) bool {
@@ -133,7 +133,7 @@ func sortConcurrently(
 	mergeStep := 0
 
 	for len(chunks) > 1 {
-		var newChunks [][]*PackageInfo
+		var newChunks [][]*PkgInfo
 
 		for i := 0; i < len(chunks); i += 2 {
 			if i+1 < len(chunks) {
@@ -168,11 +168,11 @@ func sortConcurrently(
 
 // pkgPointers will be sorted in place, mutating the slice order
 func sortNormally(
-	pkgPointers []*PackageInfo,
+	pkgPointers []*PkgInfo,
 	comparator PackageComparator,
 	phase string,
 	reportProgress ProgressReporter,
-) []PackageInfo {
+) []PkgInfo {
 	if reportProgress != nil {
 		reportProgress(0, 100, fmt.Sprintf("%s - normally", phase))
 	}
@@ -190,13 +190,13 @@ func sortNormally(
 
 func SortPackages(
 	cfg config.Config,
-	pkgs []PackageInfo,
+	pkgs []PkgInfo,
 	reportProgress ProgressReporter,
-) ([]PackageInfo, error) {
+) ([]PkgInfo, error) {
 	comparator := getComparator(cfg.SortBy)
 	phase := "Sorting packages"
 
-	pkgPointers := make([]*PackageInfo, len(pkgs))
+	pkgPointers := make([]*PkgInfo, len(pkgs))
 	for i := range pkgs {
 		pkgPointers[i] = &pkgs[i]
 	}
@@ -209,8 +209,8 @@ func SortPackages(
 	return sortConcurrently(pkgPointers, comparator, phase, reportProgress), nil
 }
 
-func dereferencePkgPointers(pkgPointers []*PackageInfo) []PackageInfo {
-	pkgs := make([]PackageInfo, len(pkgPointers))
+func dereferencePkgPointers(pkgPointers []*PkgInfo) []PkgInfo {
+	pkgs := make([]PkgInfo, len(pkgPointers))
 	for i := range pkgPointers {
 		pkgs[i] = *pkgPointers[i]
 	}
