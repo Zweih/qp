@@ -116,10 +116,10 @@ func applyFilterPipeline(
 	outputChan := inputChan
 	totalPhases := len(filterConditions)
 	completedPhases := 0
-	chunkSize := 100
+	chunkSize := 20
 
 	for filterIndex, f := range filterConditions {
-		nextOutputChan := make(chan *PkgInfo, cap(inputChan))
+		nextOutputChan := make(chan *PkgInfo, chunkSize)
 
 		go func(inChan <-chan *PkgInfo, outChan chan<- *PkgInfo, filter Filter, phaseName string) {
 			defer close(outChan)
