@@ -37,7 +37,7 @@ func FetchPackages() ([]PkgInfo, error) {
 	numPkgs := len(pkgPaths)
 
 	var wg sync.WaitGroup
-	descPaths := make(chan string, numPkgs)
+	descPathChan := make(chan string, numPkgs)
 	packagesChan := make(chan PkgInfo, numPkgs)
 	errorsChan := make(chan error, numPkgs)
 
@@ -48,7 +48,7 @@ func FetchPackages() ([]PkgInfo, error) {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			for descPath := range descPaths {
+			for descPath := range descPathChan {
 				pkg, err := parseDescFile(descPath)
 				if err != nil {
 					errorsChan <- err
@@ -63,11 +63,11 @@ func FetchPackages() ([]PkgInfo, error) {
 	for _, packagePath := range pkgPaths {
 		if packagePath.IsDir() {
 			descPath := filepath.Join(pacmanDbPath, packagePath.Name(), "desc")
-			descPaths <- descPath
+			descPathChan <- descPath
 		}
 	}
 
-	close(descPaths)
+	close(descPathChan)
 
 	wg.Wait()
 	close(packagesChan)

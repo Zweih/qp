@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-type Filter func(PkgInfo) bool
+type Filter func(*PkgInfo) bool
 
 type FilterCondition struct {
 	Filter    Filter
@@ -31,23 +31,23 @@ func FilterByReason(installReason string, targetReason string) bool {
 	return installReason == targetReason
 }
 
-func FilterExplicit(pkg PkgInfo) bool {
+func FilterExplicit(pkg *PkgInfo) bool {
 	return pkg.Reason == "explicit"
 }
 
-func FilterDependencies(pkg PkgInfo) bool {
+func FilterDependencies(pkg *PkgInfo) bool {
 	return pkg.Reason == "dependency"
 }
 
 // filters for packages installed on specific date
-func FilterByDate(pkg PkgInfo, date int64) bool {
+func FilterByDate(pkg *PkgInfo, date int64) bool {
 	pkgDate := time.Unix(pkg.Timestamp, 0)
 	targetDate := time.Unix(date, 0)
 	return pkgDate.Year() == targetDate.Year() && pkgDate.YearDay() == targetDate.YearDay()
 }
 
 // inclusive
-func FilterByDateRange(pkg PkgInfo, start int64, end int64) bool {
+func FilterByDateRange(pkg *PkgInfo, start int64, end int64) bool {
 	return !(pkg.Timestamp < start || pkg.Timestamp > end)
 }
 
@@ -63,11 +63,11 @@ func roundSizeInBytes(num int64) int64 {
 }
 
 // TODO: let's pre-round the inputs outside of these functions
-func FilterBySize(pkg PkgInfo, targetSize int64) bool {
+func FilterBySize(pkg *PkgInfo, targetSize int64) bool {
 	return roundSizeInBytes(pkg.Size) == roundSizeInBytes(targetSize)
 }
 
-func FilterBySizeRange(pkg PkgInfo, startSize int64, endSize int64) bool {
+func FilterBySizeRange(pkg *PkgInfo, startSize int64, endSize int64) bool {
 	roundedSize := roundSizeInBytes(pkg.Size)
 	return !(roundedSize < roundSizeInBytes(startSize) || roundedSize > roundSizeInBytes(endSize))
 }
@@ -84,45 +84,47 @@ func FilterByStrings(pkgString string, targetStrings []string) bool {
 
 func FilterPackages(
 	pkgs []PkgInfo,
-	filters []FilterCondition,
+	filterConditions []FilterCondition,
 	reportProgress ProgressReporter,
 ) []PkgInfo {
-	if len(filters) < 1 {
+	if len(filterConditions) < 1 {
 		return pkgs
 	}
 
-	inputChan := populateInitialInputChannel(pkgs)
-	outputChan := applyFilterPipeline(inputChan, filters, reportProgress)
+	pkgPtrs := convertToPointers(pkgs)
+
+	inputChan := populateInitialInputChannel(pkgPtrs)
+	outputChan := applyFilterPipeline(inputChan, filterConditions, reportProgress)
 	return collectFilteredResults(outputChan)
 }
 
-func collectFilteredResults(outputChan <-chan PkgInfo) []PkgInfo {
-	var filteredPackages []PkgInfo
+func collectFilteredResults(outputChan <-chan *PkgInfo) []PkgInfo {
+	var filteredPkgs []PkgInfo
 
 	for pkg := range outputChan {
-		filteredPackages = append(filteredPackages, pkg)
+		filteredPkgs = append(filteredPkgs, *pkg)
 	}
 
-	return filteredPackages
+	return filteredPkgs
 }
 
 func applyFilterPipeline(
-	inputChan <-chan PkgInfo,
-	filters []FilterCondition,
+	inputChan <-chan *PkgInfo,
+	filterConditions []FilterCondition,
 	reportProgress ProgressReporter,
-) <-chan PkgInfo {
+) <-chan *PkgInfo {
 	outputChan := inputChan
-	totalPhases := len(filters)
+	totalPhases := len(filterConditions)
 	completedPhases := 0
 	chunkSize := 100
 
-	for filterIndex, f := range filters {
-		nextOutputChan := make(chan PkgInfo, cap(inputChan))
+	for filterIndex, f := range filterConditions {
+		nextOutputChan := make(chan *PkgInfo, cap(inputChan))
 
-		go func(inChan <-chan PkgInfo, outChan chan<- PkgInfo, filter Filter, phaseName string) {
+		go func(inChan <-chan *PkgInfo, outChan chan<- *PkgInfo, filter Filter, phaseName string) {
 			defer close(outChan)
 
-			var chunk []PkgInfo
+			var chunk []*PkgInfo
 			for pkg := range inChan {
 				chunk = append(chunk, pkg)
 
@@ -152,19 +154,19 @@ func applyFilterPipeline(
 	return outputChan
 }
 
-func processChunk(pkgs []PkgInfo, outChan chan<- PkgInfo, filter Filter) {
-	for i := range pkgs {
-		if filter(pkgs[i]) {
-			outChan <- pkgs[i]
+func processChunk(pkgPtrs []*PkgInfo, outChan chan<- *PkgInfo, filter Filter) {
+	for i := range pkgPtrs {
+		if filter(pkgPtrs[i]) {
+			outChan <- pkgPtrs[i]
 		}
 	}
 }
 
-func populateInitialInputChannel(pkgs []PkgInfo) <-chan PkgInfo {
-	inputChan := make(chan PkgInfo, len(pkgs))
+func populateInitialInputChannel(pkgPtrs []*PkgInfo) <-chan *PkgInfo {
+	inputChan := make(chan *PkgInfo, len(pkgPtrs))
 
 	go func() {
-		for _, pkg := range pkgs {
+		for _, pkg := range pkgPtrs {
 			inputChan <- pkg
 		}
 

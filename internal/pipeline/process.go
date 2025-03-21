@@ -10,7 +10,7 @@ import (
 )
 
 type (
-	PackageInfo     = pkgdata.PkgInfo
+	PkgInfo         = pkgdata.PkgInfo
 	FilterCondition = pkgdata.FilterCondition
 )
 

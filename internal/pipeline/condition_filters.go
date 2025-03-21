@@ -12,9 +12,9 @@ type RangeSelector struct {
 	IsExact bool
 }
 
-type ExactFilter func(pkg pkgdata.PkgInfo, target int64) bool
+type ExactFilter func(pkg *PkgInfo, target int64) bool
 
-type RangeFilter func(pkg pkgdata.PkgInfo, start int64, end int64) bool
+type RangeFilter func(pkg *PkgInfo, start int64, end int64) bool
 
 func newBaseCondition(fieldType consts.FieldType) FilterCondition {
 	return FilterCondition{
@@ -28,27 +28,27 @@ func newPackageCondition(fieldType consts.FieldType, targets []string) (FilterCo
 
 	switch fieldType {
 	case consts.FieldName:
-		filterFunc = func(pkg PackageInfo) bool {
+		filterFunc = func(pkg *PkgInfo) bool {
 			return pkgdata.FilterByStrings(pkg.Name, targets)
 		}
 	case consts.FieldArch:
-		filterFunc = func(pkg PackageInfo) bool {
+		filterFunc = func(pkg *PkgInfo) bool {
 			return pkgdata.FilterByStrings(pkg.Arch, targets)
 		}
 	case consts.FieldRequiredBy:
-		filterFunc = func(pkg PackageInfo) bool {
+		filterFunc = func(pkg *PkgInfo) bool {
 			return pkgdata.FilterByRelation(pkg.RequiredBy, targets)
 		}
 	case consts.FieldDepends:
-		filterFunc = func(pkg PackageInfo) bool {
+		filterFunc = func(pkg *PkgInfo) bool {
 			return pkgdata.FilterByRelation(pkg.Depends, targets)
 		}
 	case consts.FieldProvides:
-		filterFunc = func(pkg PackageInfo) bool {
+		filterFunc = func(pkg *PkgInfo) bool {
 			return pkgdata.FilterByRelation(pkg.Provides, targets)
 		}
 	case consts.FieldConflicts:
-		filterFunc = func(pkg PackageInfo) bool {
+		filterFunc = func(pkg *PkgInfo) bool {
 			return pkgdata.FilterByRelation(pkg.Conflicts, targets)
 		}
 	default:
@@ -69,14 +69,14 @@ func newRangeCondition(
 	condition := newBaseCondition(fieldType)
 
 	if rangeSelector.IsExact {
-		condition.Filter = func(pkg PackageInfo) bool {
+		condition.Filter = func(pkg *PkgInfo) bool {
 			return exactFunc(pkg, rangeSelector.Start)
 		}
 
 		return condition
 	}
 
-	condition.Filter = func(pkg PackageInfo) bool {
+	condition.Filter = func(pkg *PkgInfo) bool {
 		return rangeFunc(pkg, rangeSelector.Start, rangeSelector.End)
 	}
 
@@ -103,7 +103,7 @@ func newSizeCondition(sizeFilter RangeSelector) FilterCondition {
 
 func newReasonCondition(reason string) FilterCondition {
 	condition := newBaseCondition(consts.FieldReason)
-	condition.Filter = func(pkg PackageInfo) bool {
+	condition.Filter = func(pkg *PkgInfo) bool {
 		return pkgdata.FilterByReason(pkg.Reason, reason)
 	}
 
