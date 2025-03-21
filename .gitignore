@@ -5,6 +5,7 @@
 /yaylog
 src-bundle
 
+/benchmarking/bin/
 /bin/
 /build/
 /dist/
