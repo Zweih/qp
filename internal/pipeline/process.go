@@ -18,19 +18,19 @@ var targetListRegex = regexp.MustCompile(`^([a-z0-9][a-z0-9._-]*[a-z0-9])(,([a-z
 
 func PreprocessFiltering(
 	cfg config.Config,
-	packages []pkgdata.PkgInfo,
+	pkgPrts []*pkgdata.PkgInfo,
 	reportProgress pkgdata.ProgressReporter,
-) ([]pkgdata.PkgInfo, error) {
+) ([]*pkgdata.PkgInfo, error) {
 	if len(cfg.FilterQueries) == 0 {
-		return packages, nil
+		return pkgPrts, nil
 	}
 
 	filterConditions, err := queriesToConditions(cfg.FilterQueries)
 	if err != nil {
-		return []pkgdata.PkgInfo{}, err
+		return []*pkgdata.PkgInfo{}, err
 	}
 
-	return pkgdata.FilterPackages(packages, filterConditions, reportProgress), nil
+	return pkgdata.FilterPackages(pkgPrts, filterConditions, reportProgress), nil
 }
 
 func queriesToConditions(filterQueries map[consts.FieldType]string) ([]pkgdata.FilterCondition, error) {

@@ -13,13 +13,13 @@ var packageNameRegex = regexp.MustCompile(`^([^<>=]+)`)
 // TODO: we can do this concurrently. let's get on that.
 func CalculateReverseDependencies(
 	cfg config.Config,
-	pkgs []PkgInfo,
+	pkgPtrs []*PkgInfo,
 	_ ProgressReporter, // TODO: Add progress reporting
-) ([]PkgInfo, error) {
+) ([]*PkgInfo, error) {
 	_, hasRequiredByFilter := cfg.FilterQueries[consts.FieldRequiredBy]
 
 	if !slices.Contains(cfg.Fields, consts.FieldRequiredBy) && !hasRequiredByFilter {
-		return pkgs, nil
+		return pkgPtrs, nil
 	}
 
 	packagePointerMap := make(map[string]*PkgInfo)
@@ -27,8 +27,7 @@ func CalculateReverseDependencies(
 	providesMap := make(map[string]string)
 	// key: provided library/package, value: package that provides it (provider)
 
-	for i := range pkgs {
-		pkg := &pkgs[i]
+	for _, pkg := range pkgPtrs {
 		packagePointerMap[pkg.Name] = pkg
 
 		// populate providesMap
@@ -40,7 +39,7 @@ func CalculateReverseDependencies(
 		}
 	}
 
-	for _, pkg := range pkgs {
+	for _, pkg := range pkgPtrs {
 		for _, depPackage := range pkg.Depends {
 			matches := packageNameRegex.FindStringSubmatch(depPackage)
 
@@ -66,5 +65,5 @@ func CalculateReverseDependencies(
 		}
 	}
 
-	return pkgs, nil
+	return pkgPtrs, nil
 }

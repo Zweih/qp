@@ -83,29 +83,27 @@ func FilterByStrings(pkgString string, targetStrings []string) bool {
 }
 
 func FilterPackages(
-	pkgs []PkgInfo,
+	pkgPtrs []*PkgInfo,
 	filterConditions []FilterCondition,
 	reportProgress ProgressReporter,
-) []PkgInfo {
+) []*PkgInfo {
 	if len(filterConditions) < 1 {
-		return pkgs
+		return pkgPtrs
 	}
-
-	pkgPtrs := convertToPointers(pkgs)
 
 	inputChan := populateInitialInputChannel(pkgPtrs)
 	outputChan := applyFilterPipeline(inputChan, filterConditions, reportProgress)
 	return collectFilteredResults(outputChan)
 }
 
-func collectFilteredResults(outputChan <-chan *PkgInfo) []PkgInfo {
-	var filteredPkgs []PkgInfo
+func collectFilteredResults(outputChan <-chan *PkgInfo) []*PkgInfo {
+	var filteredPkgPtrs []*PkgInfo
 
 	for pkg := range outputChan {
-		filteredPkgs = append(filteredPkgs, *pkg)
+		filteredPkgPtrs = append(filteredPkgPtrs, pkg)
 	}
 
-	return filteredPkgs
+	return filteredPkgPtrs
 }
 
 func applyFilterPipeline(

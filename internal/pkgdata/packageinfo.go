@@ -15,7 +15,7 @@ type PkgInfo struct {
 	Url        string   `json:"url,omitempty"`
 }
 
-func convertToPointers(pkgs []PkgInfo) []*PkgInfo {
+func ConvertToPointers(pkgs []PkgInfo) []*PkgInfo {
 	pkgPtrs := make([]*PkgInfo, len(pkgs))
 	for i := range pkgs {
 		pkgPtrs[i] = &pkgs[i]
@@ -24,7 +24,7 @@ func convertToPointers(pkgs []PkgInfo) []*PkgInfo {
 	return pkgPtrs
 }
 
-func dereferencePkgPointers(pkgPtrs []*PkgInfo) []PkgInfo {
+func DereferencePkgPointers(pkgPtrs []*PkgInfo) []PkgInfo {
 	pkgs := make([]PkgInfo, len(pkgPtrs))
 	for i := range pkgPtrs {
 		pkgs[i] = *pkgPtrs[i]

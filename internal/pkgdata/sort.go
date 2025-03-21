@@ -72,12 +72,12 @@ func mergedSortedChunks(
 
 // pkgPointers will be sorted in place, mutating the slice order
 func sortConcurrently(
-	pkgPointers []*PkgInfo,
+	pkgPtrs []*PkgInfo,
 	comparator PackageComparator,
 	phase string,
 	reportProgress ProgressReporter,
-) []PkgInfo {
-	total := len(pkgPointers)
+) []*PkgInfo {
+	total := len(pkgPtrs)
 
 	if total == 0 {
 		return nil
@@ -97,7 +97,7 @@ func sortConcurrently(
 		startIdx := chunkIdx * chunkSize
 		endIdx := min(startIdx+chunkSize, total)
 
-		chunk := pkgPointers[startIdx:endIdx]
+		chunk := pkgPtrs[startIdx:endIdx]
 
 		wg.Add(1)
 
@@ -160,7 +160,7 @@ func sortConcurrently(
 	}
 
 	if len(chunks) == 1 {
-		return dereferencePkgPointers(chunks[0])
+		return chunks[0]
 	}
 
 	return nil
@@ -168,37 +168,36 @@ func sortConcurrently(
 
 // pkgPointers will be sorted in place, mutating the slice order
 func sortNormally(
-	pkgPointers []*PkgInfo,
+	pkgPtrs []*PkgInfo,
 	comparator PackageComparator,
 	phase string,
 	reportProgress ProgressReporter,
-) []PkgInfo {
+) []*PkgInfo {
 	if reportProgress != nil {
 		reportProgress(0, 100, fmt.Sprintf("%s - normally", phase))
 	}
 
-	sort.SliceStable(pkgPointers, func(i int, j int) bool {
-		return comparator(pkgPointers[i], pkgPointers[j])
+	sort.SliceStable(pkgPtrs, func(i int, j int) bool {
+		return comparator(pkgPtrs[i], pkgPtrs[j])
 	})
 
 	if reportProgress != nil {
 		reportProgress(100, 100, fmt.Sprintf("%s completed", phase))
 	}
 
-	return dereferencePkgPointers(pkgPointers)
+	return pkgPtrs
 }
 
 func SortPackages(
 	cfg config.Config,
-	pkgs []PkgInfo,
+	pkgPtrs []*PkgInfo,
 	reportProgress ProgressReporter,
-) ([]PkgInfo, error) {
+) ([]*PkgInfo, error) {
 	comparator := getComparator(cfg.SortBy)
 	phase := "Sorting packages"
-	pkgPtrs := convertToPointers(pkgs)
 
 	// threshold is 500 as that is where merge sorting chunk performance overtakes timsort
-	if len(pkgs) < concurrentSortThreshold {
+	if len(pkgPtrs) < concurrentSortThreshold {
 		return sortNormally(pkgPtrs, comparator, phase, reportProgress), nil
 	}
 

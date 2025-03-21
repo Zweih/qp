@@ -11,10 +11,10 @@ import (
 type (
 	ProgressReporter = pkgdata.ProgressReporter
 	ProgressMessage  = pkgdata.ProgressMessage
-	PackageInfo      = pkgdata.PkgInfo
+	PkgInfo          = pkgdata.PkgInfo
 )
 
-type Operation func(cfg config.Config, packages []PackageInfo, progressReporter ProgressReporter) ([]PackageInfo, error)
+type Operation func(cfg config.Config, packages []*PkgInfo, progressReporter ProgressReporter) ([]*PkgInfo, error)
 
 type PipelinePhase struct {
 	Name          string
@@ -23,7 +23,7 @@ type PipelinePhase struct {
 	wg            *sync.WaitGroup
 }
 
-func (phase PipelinePhase) Run(cfg config.Config, packages []PackageInfo) ([]PackageInfo, error) {
+func (phase PipelinePhase) Run(cfg config.Config, packages []*PkgInfo) ([]*PkgInfo, error) {
 	progressChan := phase.startProgress()
 	outputPackages, err := phase.Operation(cfg, packages, phase.reportProgress(progressChan))
 	phase.stopProgress(progressChan)
