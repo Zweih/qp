@@ -26,8 +26,7 @@ func mainWithConfig(configProvider config.ConfigProvider) error {
 		return err
 	}
 
-	pkgs := fetchPackages()
-	pkgPtrs := pkgdata.ConvertToPointers(pkgs)
+	pkgPtrs := fetchPackages()
 
 	isInteractive := term.IsTerminal(int(os.Stdout.Fd())) && !cfg.DisableProgress
 	var wg sync.WaitGroup
@@ -51,19 +50,19 @@ func mainWithConfig(configProvider config.ConfigProvider) error {
 	}
 
 	pkgPtrs = trimPackagesLen(pkgPtrs, cfg)
-	pkgs = pkgdata.DereferencePkgPointers(pkgPtrs)
+	pkgs := pkgdata.DereferencePkgPointers(pkgPtrs)
 
 	renderOutput(pkgs, cfg)
 	return nil
 }
 
-func fetchPackages() []pkgdata.PkgInfo {
-	pkgs, err := pkgdata.FetchPackages()
+func fetchPackages() []*pkgdata.PkgInfo {
+	pkgPtrs, err := pkgdata.FetchPackages()
 	if err != nil {
 		out.WriteLine(fmt.Sprintf("Warning: Some packages may be missing due to corrupted package database: %v", err))
 	}
 
-	return pkgs
+	return pkgPtrs
 }
 
 func trimPackagesLen(

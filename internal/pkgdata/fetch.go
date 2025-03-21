@@ -28,7 +28,7 @@ const (
 	pacmanDbPath = "/var/lib/pacman/local"
 )
 
-func FetchPackages() ([]PkgInfo, error) {
+func FetchPackages() ([]*PkgInfo, error) {
 	pkgPaths, err := os.ReadDir(pacmanDbPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read pacman database: %v", err)
@@ -38,7 +38,7 @@ func FetchPackages() ([]PkgInfo, error) {
 
 	var wg sync.WaitGroup
 	descPathChan := make(chan string, numPkgs)
-	packagesChan := make(chan PkgInfo, numPkgs)
+	pkgPtrsChan := make(chan *PkgInfo, numPkgs)
 	errorsChan := make(chan error, numPkgs)
 
 	// fun fact: NumCPU() does account for hyperthreading
@@ -55,7 +55,7 @@ func FetchPackages() ([]PkgInfo, error) {
 					continue
 				}
 
-				packagesChan <- pkg
+				pkgPtrsChan <- pkg
 			}
 		}()
 	}
@@ -70,12 +70,12 @@ func FetchPackages() ([]PkgInfo, error) {
 	close(descPathChan)
 
 	wg.Wait()
-	close(packagesChan)
+	close(pkgPtrsChan)
 	close(errorsChan)
 
-	pkgs := make([]PkgInfo, 0, numPkgs)
-	for pkg := range packagesChan {
-		pkgs = append(pkgs, pkg)
+	pkgPtrs := make([]*PkgInfo, 0, numPkgs)
+	for pkg := range pkgPtrsChan {
+		pkgPtrs = append(pkgPtrs, pkg)
 	}
 
 	if len(errorsChan) > 0 {
@@ -88,7 +88,7 @@ func FetchPackages() ([]PkgInfo, error) {
 		return nil, errors.Join(collectedErrors...)
 	}
 
-	return pkgs, nil
+	return pkgPtrs, nil
 }
 
 func getWorkerCount(numCPUs int, numFiles int) int {
@@ -108,10 +108,10 @@ func getWorkerCount(numCPUs int, numFiles int) int {
 	return min(numWorkers, 12) // avoid overthreading on high-core systems
 }
 
-func parseDescFile(descPath string) (PkgInfo, error) {
+func parseDescFile(descPath string) (*PkgInfo, error) {
 	file, err := os.Open(descPath)
 	if err != nil {
-		return PkgInfo{}, fmt.Errorf("failed to open file: %v", err)
+		return nil, fmt.Errorf("failed to open file: %v", err)
 	}
 
 	defer file.Close()
@@ -141,20 +141,20 @@ func parseDescFile(descPath string) (PkgInfo, error) {
 			currentField = "" // reset if line is blank
 		default:
 			if err := applyField(&pkg, currentField, line); err != nil {
-				return PkgInfo{}, fmt.Errorf("error reading desc file %s: %w", descPath, err)
+				return nil, fmt.Errorf("error reading desc file %s: %w", descPath, err)
 			}
 		}
 	}
 
 	if pkg.Name == "" {
-		return PkgInfo{}, fmt.Errorf("package name is missing in file: %s", descPath)
+		return nil, fmt.Errorf("package name is missing in file: %s", descPath)
 	}
 
 	if pkg.Reason == "" {
 		pkg.Reason = "explicit"
 	}
 
-	return pkg, nil
+	return &pkg, nil
 }
 
 func applyField(pkg *PkgInfo, field string, value string) error {
