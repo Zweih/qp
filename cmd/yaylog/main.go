@@ -50,9 +50,8 @@ func mainWithConfig(configProvider config.ConfigProvider) error {
 	}
 
 	pkgPtrs = trimPackagesLen(pkgPtrs, cfg)
-	pkgs := pkgdata.DereferencePkgPointers(pkgPtrs)
 
-	renderOutput(pkgs, cfg)
+	renderOutput(pkgPtrs, cfg)
 	return nil
 }
 
@@ -77,7 +76,7 @@ func trimPackagesLen(
 	return pkgPtrs
 }
 
-func renderOutput(pkgs []pkgdata.PkgInfo, cfg config.Config) {
+func renderOutput(pkgs []*pkgdata.PkgInfo, cfg config.Config) {
 	if cfg.OutputJson {
 		out.RenderJson(pkgs, cfg.Fields)
 		return

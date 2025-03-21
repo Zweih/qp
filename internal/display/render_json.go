@@ -8,9 +8,9 @@ import (
 	"yaylog/internal/pkgdata"
 )
 
-func (o *OutputManager) renderJson(pkgs []pkgdata.PkgInfo, fields []consts.FieldType) {
+func (o *OutputManager) renderJson(pkgPtrs []*pkgdata.PkgInfo, fields []consts.FieldType) {
 	if isAllFields, uniqueFields := getUniqueFields(fields); isAllFields {
-		pkgs = selectJsonFields(pkgs, uniqueFields)
+		pkgPtrs = selectJsonFields(pkgPtrs, uniqueFields)
 	}
 
 	var buffer bytes.Buffer
@@ -18,7 +18,7 @@ func (o *OutputManager) renderJson(pkgs []pkgdata.PkgInfo, fields []consts.Field
 	encoder.SetEscapeHTML(false) // disable escaping of characters like `<`, `>`, perhaps this should be a user defined option
 	encoder.SetIndent("", "  ")
 
-	if err := encoder.Encode(pkgs); err != nil {
+	if err := encoder.Encode(pkgPtrs); err != nil {
 		o.writeLine(fmt.Sprintf("Error genereating JSON output: %v", err))
 	}
 
@@ -41,18 +41,18 @@ func getUniqueFields(fields []consts.FieldType) (bool, []consts.FieldType) {
 }
 
 func selectJsonFields(
-	pkgs []pkgdata.PkgInfo,
+	pkgPtrs []*pkgdata.PkgInfo,
 	fields []consts.FieldType,
-) []pkgdata.PkgInfo {
-	filteredPackages := make([]pkgdata.PkgInfo, len(pkgs))
-	for i, pkg := range pkgs {
-		filteredPackages[i] = getJsonValues(pkg, fields)
+) []*pkgdata.PkgInfo {
+	filteredPkgPtrs := make([]*pkgdata.PkgInfo, len(pkgPtrs))
+	for i, pkg := range pkgPtrs {
+		filteredPkgPtrs[i] = getJsonValues(pkg, fields)
 	}
 
-	return filteredPackages
+	return filteredPkgPtrs
 }
 
-func getJsonValues(pkg pkgdata.PkgInfo, fields []consts.FieldType) pkgdata.PkgInfo {
+func getJsonValues(pkg *pkgdata.PkgInfo, fields []consts.FieldType) *pkgdata.PkgInfo {
 	filteredPackage := pkgdata.PkgInfo{}
 
 	for _, field := range fields {
@@ -84,5 +84,5 @@ func getJsonValues(pkg pkgdata.PkgInfo, fields []consts.FieldType) pkgdata.PkgIn
 		}
 	}
 
-	return filteredPackage
+	return &filteredPackage
 }
