@@ -10,6 +10,15 @@ despite the name, it's not limited to `yay` and works with any package manager t
 
 ![Alt](https://repobeats.axiom.co/api/embed/7a20b73b689d45d678001c582a9d1f124dca31ba.svg "Repobeats analytics image")
 
+<details open>
+<summary><strong>download and clone statistics</strong></summary>
+<br>
+ 
+graphs are generated daily with my other project, [Repulse Analytics](https://github.com/Zweih/repulse-analytics)
+
+<img src="https://raw.githubusercontent.com/Zweih/repulse-analytics/refs/heads/repulse-traffic-graphs/total_downloads.png" alt="total downloads" width="400"/> <img src="https://raw.githubusercontent.com/Zweih/repulse-analytics/refs/heads/repulse-traffic-graphs/total_clones.png" alt="total clones" width="400"/>
+
+</details>
 
 this package is compatible with the following distributions:
  - [arch linux](https://archlinux.org)
