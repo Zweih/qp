@@ -33,11 +33,11 @@ func PreprocessFiltering(
 	return pkgdata.FilterPackages(pkgPrts, filterConditions, reportProgress), nil
 }
 
-func queriesToConditions(filterQueries map[consts.FieldType]string) ([]*pkgdata.FilterCondition, error) {
-	conditions := make([]*pkgdata.FilterCondition, 0, len(filterQueries))
+func queriesToConditions(filterQueries map[consts.FieldType]string) ([]pkgdata.FilterCondition, error) {
+	conditions := make([]pkgdata.FilterCondition, 0, len(filterQueries))
 
 	for fieldType, value := range filterQueries {
-		var condition *pkgdata.FilterCondition
+		var condition pkgdata.FilterCondition
 		var err error
 
 		switch fieldType {
@@ -59,7 +59,7 @@ func queriesToConditions(filterQueries map[consts.FieldType]string) ([]*pkgdata.
 		}
 
 		if err != nil {
-			return []*pkgdata.FilterCondition{}, err
+			return []pkgdata.FilterCondition{}, err
 		}
 
 		conditions = append(conditions, condition)
@@ -71,44 +71,44 @@ func queriesToConditions(filterQueries map[consts.FieldType]string) ([]*pkgdata.
 func parsePackageFilterCondition(
 	fieldType consts.FieldType,
 	targetListInput string,
-) (*FilterCondition, error) {
+) (FilterCondition, error) {
 	if !targetListRegex.MatchString(targetListInput) {
-		return nil, fmt.Errorf("invalid package list: %s", targetListInput)
+		return FilterCondition{}, fmt.Errorf("invalid package list: %s", targetListInput)
 	}
 
 	targetList := strings.Split(targetListInput, ",")
 	return newPackageCondition(fieldType, targetList)
 }
 
-func parseReasonFilterCondition(installReason string) (*FilterCondition, error) {
+func parseReasonFilterCondition(installReason string) (FilterCondition, error) {
 	if installReason != config.ReasonExplicit && installReason != config.ReasonDependency {
-		return nil, fmt.Errorf("invalid install reason filter: %s", installReason)
+		return FilterCondition{}, fmt.Errorf("invalid install reason filter: %s", installReason)
 	}
 
 	return newReasonCondition(installReason), nil
 }
 
-func parseDateFilterCondition(value string) (*FilterCondition, error) {
+func parseDateFilterCondition(value string) (FilterCondition, error) {
 	dateFilter, err := parseDateFilter(value)
 	if err != nil {
-		return nil, fmt.Errorf("invalid date filter: %v", err)
+		return pkgdata.FilterCondition{}, fmt.Errorf("invalid date filter: %v", err)
 	}
 
 	if err = validateDateFilter(dateFilter); err != nil {
-		return nil, err
+		return pkgdata.FilterCondition{}, err
 	}
 
 	return newDateCondition(dateFilter), nil
 }
 
-func parseSizeFilterCondition(value string) (*FilterCondition, error) {
+func parseSizeFilterCondition(value string) (FilterCondition, error) {
 	sizeFilter, err := parseSizeFilter(value)
 	if err != nil {
-		return nil, fmt.Errorf("invalid size filter: %v", err)
+		return FilterCondition{}, fmt.Errorf("invalid size filter: %v", err)
 	}
 
 	if err = validateSizeFilter(sizeFilter); err != nil {
-		return nil, err
+		return FilterCondition{}, err
 	}
 
 	return newSizeCondition(sizeFilter), nil

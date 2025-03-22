@@ -84,7 +84,7 @@ func FilterByStrings(pkgString string, targetStrings []string) bool {
 
 func FilterPackages(
 	pkgPtrs []*PkgInfo,
-	filterConditions []*FilterCondition,
+	filterConditions []FilterCondition,
 	reportProgress ProgressReporter,
 ) []*PkgInfo {
 	if len(filterConditions) < 1 {
@@ -108,7 +108,7 @@ func collectFilteredResults(outputChan <-chan *PkgInfo) []*PkgInfo {
 
 func applyFilterPipeline(
 	inputChan <-chan *PkgInfo,
-	filterConditions []*FilterCondition,
+	filterConditions []FilterCondition,
 	reportProgress ProgressReporter,
 ) <-chan *PkgInfo {
 	outputChan := inputChan
