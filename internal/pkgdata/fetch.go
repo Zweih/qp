@@ -73,11 +73,6 @@ func FetchPackages() ([]*PkgInfo, error) {
 	close(pkgPtrsChan)
 	close(errorsChan)
 
-	pkgPtrs := make([]*PkgInfo, 0, numPkgs)
-	for pkg := range pkgPtrsChan {
-		pkgPtrs = append(pkgPtrs, pkg)
-	}
-
 	if len(errorsChan) > 0 {
 		var collectedErrors []error
 
@@ -86,6 +81,11 @@ func FetchPackages() ([]*PkgInfo, error) {
 		}
 
 		return nil, errors.Join(collectedErrors...)
+	}
+
+	pkgPtrs := make([]*PkgInfo, 0, numPkgs)
+	for pkg := range pkgPtrsChan {
+		pkgPtrs = append(pkgPtrs, pkg)
 	}
 
 	return pkgPtrs, nil
