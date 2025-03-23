@@ -22,7 +22,7 @@ func newBaseCondition(fieldType consts.FieldType) FilterCondition {
 	}
 }
 
-func newPackageCondition(fieldType consts.FieldType, targets []string) (FilterCondition, error) {
+func newPackageCondition(fieldType consts.FieldType, targets []string) (*FilterCondition, error) {
 	conditionFilter := newBaseCondition(fieldType)
 	var filterFunc pkgdata.Filter
 
@@ -52,12 +52,12 @@ func newPackageCondition(fieldType consts.FieldType, targets []string) (FilterCo
 			return pkgdata.FilterByRelation(pkg.Conflicts, targets)
 		}
 	default:
-		return FilterCondition{}, fmt.Errorf("invalid field for package filter: %s", fieldType)
+		return nil, fmt.Errorf("invalid field for package filter: %s", fieldType)
 	}
 
 	conditionFilter.Filter = filterFunc
 
-	return conditionFilter, nil
+	return &conditionFilter, nil
 }
 
 func newRangeCondition(
@@ -65,7 +65,7 @@ func newRangeCondition(
 	fieldType consts.FieldType,
 	exactFunc ExactFilter,
 	rangeFunc RangeFilter,
-) FilterCondition {
+) *FilterCondition {
 	condition := newBaseCondition(fieldType)
 
 	if rangeSelector.IsExact {
@@ -73,17 +73,17 @@ func newRangeCondition(
 			return exactFunc(pkg, rangeSelector.Start)
 		}
 
-		return condition
+		return &condition
 	}
 
 	condition.Filter = func(pkg *PkgInfo) bool {
 		return rangeFunc(pkg, rangeSelector.Start, rangeSelector.End)
 	}
 
-	return condition
+	return &condition
 }
 
-func newDateCondition(dateFilter RangeSelector) FilterCondition {
+func newDateCondition(dateFilter RangeSelector) *FilterCondition {
 	return newRangeCondition(
 		dateFilter,
 		consts.FieldDate,
@@ -92,7 +92,7 @@ func newDateCondition(dateFilter RangeSelector) FilterCondition {
 	)
 }
 
-func newSizeCondition(sizeFilter RangeSelector) FilterCondition {
+func newSizeCondition(sizeFilter RangeSelector) *FilterCondition {
 	return newRangeCondition(
 		sizeFilter,
 		consts.FieldSize,
@@ -101,11 +101,11 @@ func newSizeCondition(sizeFilter RangeSelector) FilterCondition {
 	)
 }
 
-func newReasonCondition(reason string) FilterCondition {
+func newReasonCondition(reason string) *FilterCondition {
 	condition := newBaseCondition(consts.FieldReason)
 	condition.Filter = func(pkg *PkgInfo) bool {
 		return pkgdata.FilterByReason(pkg.Reason, reason)
 	}
 
-	return condition
+	return &condition
 }
