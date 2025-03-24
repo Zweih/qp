@@ -74,13 +74,6 @@ func queriesToConditions(filterQueries map[consts.FieldType]string) (
 		return conditions[i].FieldType < conditions[j].FieldType
 	})
 
-	derefedConditions := make([]FilterCondition, 0, len(conditions))
-	for _, cond := range conditions {
-		derefedConditions = append(derefedConditions, *(cond))
-	}
-
-	fmt.Println(derefedConditions)
-
 	return conditions, nil
 }
 

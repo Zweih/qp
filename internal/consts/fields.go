@@ -59,6 +59,7 @@ var FieldTypeLookup = map[string]FieldType{
 var FieldNameLookup = map[FieldType]string{
 	FieldDate:       date,
 	FieldName:       name,
+	FieldSize:       size,
 	FieldReason:     reason,
 	FieldVersion:    version,
 	FieldDepends:    depends,
