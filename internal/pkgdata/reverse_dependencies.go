@@ -17,8 +17,9 @@ func CalculateReverseDependencies(
 	_ ProgressReporter, // TODO: Add progress reporting
 ) ([]*PkgInfo, error) {
 	_, hasRequiredByFilter := cfg.FilterQueries[consts.FieldRequiredBy]
+	hasRequiredByField := slices.Contains(cfg.Fields, consts.FieldRequiredBy)
 
-	if !slices.Contains(cfg.Fields, consts.FieldRequiredBy) && !hasRequiredByFilter {
+	if !hasRequiredByField && !hasRequiredByFilter {
 		return pkgPtrs, nil
 	}
 
