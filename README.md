@@ -82,7 +82,7 @@ because yay is my preferred AUR helper and the name has a good flow.
 - [x] package conflicts field
 - [x] conflicts filter
 - [ ] name exclusion filter
-- [ ] self-referencing column
+- [ ] self-referencing field
 - [x] JSON output
 - [x] no-headers option
 - [x] provides filter
@@ -94,11 +94,13 @@ because yay is my preferred AUR helper and the name has a good flow.
 - [x] config dependency injection for testing
 - [ ] required-by count sort
 - [x] metaflag for all filters
-- [x] license field
+- [x] package license field
 - [ ] XML output
+- [x] use chunked channel-based concurrent filtering (12% speed boost) 
 - [ ] short-args for filters
 - [ ] license sort
 - [x] architecture filter
+- [x] optimize filter ordering (4% speed boost)
 - [ ] dependency count sort
 - [ ] license filter
 - [ ] optional dependency field
