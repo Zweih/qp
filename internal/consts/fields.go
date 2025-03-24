@@ -2,19 +2,20 @@ package consts
 
 type FieldType int
 
+// ordered by filter efficiency
 const (
-	FieldDate FieldType = iota
+	FieldReason FieldType = iota
+	FieldArch
+	FieldLicense
 	FieldName
-	FieldReason
+	FieldUrl
 	FieldSize
+	FieldDate
 	FieldVersion
 	FieldDepends
 	FieldRequiredBy
 	FieldProvides
 	FieldConflicts
-	FieldArch
-	FieldLicense
-	FieldUrl
 )
 
 const (
