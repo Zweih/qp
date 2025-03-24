@@ -1,6 +1,21 @@
 package consts
 
-type FieldType string
+type FieldType int
+
+const (
+	FieldDate FieldType = iota
+	FieldName
+	FieldReason
+	FieldSize
+	FieldVersion
+	FieldDepends
+	FieldRequiredBy
+	FieldProvides
+	FieldConflicts
+	FieldArch
+	FieldLicense
+	FieldUrl
+)
 
 const (
 	date       = "date"
@@ -15,21 +30,6 @@ const (
 	arch       = "arch"
 	license    = "license"
 	url        = "url"
-)
-
-const (
-	FieldDate       FieldType = date
-	FieldName       FieldType = name
-	FieldReason     FieldType = reason
-	FieldSize       FieldType = size
-	FieldVersion    FieldType = version
-	FieldDepends    FieldType = depends
-	FieldRequiredBy FieldType = requiredBy
-	FieldProvides   FieldType = provides
-	FieldConflicts  FieldType = conflicts
-	FieldArch       FieldType = arch
-	FieldLicense    FieldType = license
-	FieldUrl        FieldType = url
 )
 
 var FieldTypeLookup = map[string]FieldType{
@@ -54,6 +54,20 @@ var FieldTypeLookup = map[string]FieldType{
 	arch:       FieldArch,
 	license:    FieldLicense,
 	url:        FieldUrl,
+}
+
+var FieldNameLookup = map[FieldType]string{
+	FieldDate:       date,
+	FieldName:       name,
+	FieldReason:     reason,
+	FieldVersion:    version,
+	FieldDepends:    depends,
+	FieldRequiredBy: requiredBy,
+	FieldProvides:   provides,
+	FieldConflicts:  conflicts,
+	FieldArch:       arch,
+	FieldLicense:    license,
+	FieldUrl:        url,
 }
 
 var (

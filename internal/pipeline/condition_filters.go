@@ -18,7 +18,8 @@ type RangeFilter func(pkg *PkgInfo, start int64, end int64) bool
 
 func newBaseCondition(fieldType consts.FieldType) FilterCondition {
 	return FilterCondition{
-		PhaseName: "Filtering by " + string(fieldType),
+		PhaseName: "Filtering by " + consts.FieldNameLookup[fieldType],
+		FieldType: fieldType,
 	}
 }
 
@@ -52,7 +53,7 @@ func newPackageCondition(fieldType consts.FieldType, targets []string) (*FilterC
 			return pkgdata.FilterByRelation(pkg.Conflicts, targets)
 		}
 	default:
-		return nil, fmt.Errorf("invalid field for package filter: %s", fieldType)
+		return nil, fmt.Errorf("invalid field for package filter: %s", consts.FieldNameLookup[fieldType])
 	}
 
 	conditionFilter.Filter = filterFunc

@@ -3,6 +3,7 @@ package pipeline
 import (
 	"fmt"
 	"regexp"
+	"sort"
 	"strings"
 	"yaylog/internal/config"
 	"yaylog/internal/consts"
@@ -18,9 +19,9 @@ var targetListRegex = regexp.MustCompile(`^([a-z0-9][a-z0-9._-]*[a-z0-9])(,([a-z
 
 func PreprocessFiltering(
 	cfg config.Config,
-	pkgPrts []*pkgdata.PkgInfo,
+	pkgPrts []*PkgInfo,
 	reportProgress pkgdata.ProgressReporter,
-) ([]*pkgdata.PkgInfo, error) {
+) ([]*PkgInfo, error) {
 	if len(cfg.FilterQueries) == 0 {
 		return pkgPrts, nil
 	}
@@ -34,13 +35,13 @@ func PreprocessFiltering(
 }
 
 func queriesToConditions(filterQueries map[consts.FieldType]string) (
-	[]*pkgdata.FilterCondition,
+	[]*FilterCondition,
 	error,
 ) {
-	conditions := make([]*pkgdata.FilterCondition, 0, len(filterQueries))
+	conditions := make([]*FilterCondition, 0, len(filterQueries))
 
 	for fieldType, value := range filterQueries {
-		var condition *pkgdata.FilterCondition
+		var condition *FilterCondition
 		var err error
 
 		switch fieldType {
@@ -58,15 +59,27 @@ func queriesToConditions(filterQueries map[consts.FieldType]string) (
 		case consts.FieldReason:
 			condition, err = parseReasonFilterCondition(value)
 		default:
-			err = fmt.Errorf("unsupported filter type: %s", fieldType)
+			err = fmt.Errorf("unsupported filter type: %s", consts.FieldNameLookup[fieldType])
 		}
 
 		if err != nil {
-			return []*pkgdata.FilterCondition{}, err
+			return []*FilterCondition{}, err
 		}
 
 		conditions = append(conditions, condition)
 	}
+
+	// sort filters in order of efficiency
+	sort.Slice(conditions, func(i int, j int) bool {
+		return conditions[i].FieldType < conditions[j].FieldType
+	})
+
+	derefedConditions := make([]FilterCondition, 0, len(conditions))
+	for _, cond := range conditions {
+		derefedConditions = append(derefedConditions, *(cond))
+	}
+
+	fmt.Println(derefedConditions)
 
 	return conditions, nil
 }

@@ -5,6 +5,7 @@ import (
 	"math"
 	"strings"
 	"time"
+	"yaylog/internal/consts"
 )
 
 type Filter func(*PkgInfo) bool
@@ -12,6 +13,7 @@ type Filter func(*PkgInfo) bool
 type FilterCondition struct {
 	Filter    Filter
 	PhaseName string
+	FieldType consts.FieldType
 }
 
 func FilterByRelation(pkgNames []string, targetNames []string) bool {
