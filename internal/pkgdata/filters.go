@@ -118,13 +118,19 @@ func applyFilterPipeline(
 	completedPhases := 0
 	chunkSize := 20
 
+	// chunkPool := sync.Pool{
+	// 	New: func() any {
+	// 		return make([]*PkgInfo, 0, chunkSize)
+	// 	},
+	// }
+
 	for filterIndex, f := range filterConditions {
 		nextOutputChan := make(chan *PkgInfo, chunkSize)
 
 		go func(inChan <-chan *PkgInfo, outChan chan<- *PkgInfo, filter Filter, phaseName string) {
 			defer close(outChan)
 
-			var chunk []*PkgInfo
+			chunk := make([]*PkgInfo, 0, chunkSize)
 			for pkg := range inChan {
 				chunk = append(chunk, pkg)
 
