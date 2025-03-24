@@ -121,7 +121,8 @@ func applyFilterPipeline(
 
 	chunkPool := sync.Pool{
 		New: func() any {
-			return make([]*PkgInfo, 0, chunkSize)
+			slice := make([]*PkgInfo, 0, chunkSize)
+			return &slice
 		},
 	}
 
@@ -130,9 +131,10 @@ func applyFilterPipeline(
 
 		go func(inChan <-chan *PkgInfo, outChan chan<- *PkgInfo, filter Filter, phaseName string) {
 			defer close(outChan)
-			// chunk := make([]*PkgInfo, 0, chunkSize)
-			chunk := chunkPool.Get().([]*PkgInfo)
-			chunk = chunk[:0] // reset
+
+			chunkPtr := chunkPool.Get().(*[]*PkgInfo)
+			chunk := *chunkPtr
+			chunk = chunk[:0]
 
 			for pkg := range inChan {
 				chunk = append(chunk, pkg)
@@ -146,6 +148,9 @@ func applyFilterPipeline(
 			if len(chunk) > 0 {
 				processChunk(chunk, outChan, filter)
 			}
+
+			*chunkPtr = chunk[:0]
+			chunkPool.Put(chunkPtr)
 
 			if reportProgress != nil {
 				completedPhases++
