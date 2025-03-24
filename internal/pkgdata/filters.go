@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"strings"
+	"sync"
 	"time"
 	"yaylog/internal/consts"
 )
@@ -118,25 +119,27 @@ func applyFilterPipeline(
 	completedPhases := 0
 	chunkSize := 20
 
-	// chunkPool := sync.Pool{
-	// 	New: func() any {
-	// 		return make([]*PkgInfo, 0, chunkSize)
-	// 	},
-	// }
+	chunkPool := sync.Pool{
+		New: func() any {
+			return make([]*PkgInfo, 0, chunkSize)
+		},
+	}
 
 	for filterIndex, f := range filterConditions {
 		nextOutputChan := make(chan *PkgInfo, chunkSize)
 
 		go func(inChan <-chan *PkgInfo, outChan chan<- *PkgInfo, filter Filter, phaseName string) {
 			defer close(outChan)
+			// chunk := make([]*PkgInfo, 0, chunkSize)
+			chunk := chunkPool.Get().([]*PkgInfo)
+			chunk = chunk[:0] // reset
 
-			chunk := make([]*PkgInfo, 0, chunkSize)
 			for pkg := range inChan {
 				chunk = append(chunk, pkg)
 
 				if len(chunk) >= chunkSize {
 					processChunk(chunk, outChan, filter)
-					chunk = nil
+					chunk = chunk[:0]
 				}
 			}
 
