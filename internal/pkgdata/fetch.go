@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"strconv"
 	"strings"
@@ -27,6 +28,9 @@ const (
 
 	pacmanDbPath = "/var/lib/pacman/local"
 )
+
+// pulls package name, operator, and version out of `package-name>=2.0.1`
+var relationRegex = regexp.MustCompile(`^([^<>=\s]+)\s*(<=|>=|=|<|>)?\s*(.*)?$`)
 
 func FetchPackages() ([]*PkgInfo, error) {
 	pkgPaths, err := os.ReadDir(pacmanDbPath)
@@ -189,14 +193,13 @@ func applyField(pkg *PkgInfo, field string, value string) error {
 		pkg.Size = size
 
 	case fieldDepends:
-		// use this if we ever need to separate the package name from its dependencies re := regexp.MustCompile(`^([^<>=]+)`)
-		pkg.Depends = append(pkg.Depends, value)
+		pkg.Depends = append(pkg.Depends, parseRelation(value))
 
 	case fieldProvides:
-		pkg.Provides = append(pkg.Provides, value)
+		pkg.Provides = append(pkg.Provides, parseRelation(value))
 
 	case fieldConflicts:
-		pkg.Conflicts = append(pkg.Conflicts, value)
+		pkg.Conflicts = append(pkg.Conflicts, parseRelation(value))
 
 	case fieldArch:
 		pkg.Arch = value
@@ -212,4 +215,37 @@ func applyField(pkg *PkgInfo, field string, value string) error {
 	}
 
 	return nil
+}
+
+func parseRelation(relationInput string) Relation {
+	matches := relationRegex.FindStringSubmatch(relationInput)
+	relation := Relation{}
+
+	if len(matches) > 1 {
+		relation.Name = matches[1]
+	}
+
+	if len(matches) > 3 {
+		relation.Operator = stringToOperator(matches[2])
+		relation.Version = matches[3]
+	}
+
+	return relation
+}
+
+func stringToOperator(operatorInput string) RelationOp {
+	switch operatorInput {
+	case "=":
+		return OpEqual
+	case "<":
+		return OpLess
+	case "<=":
+		return OpLessEqual
+	case ">":
+		return OpGreater
+	case ">=":
+		return OpGreaterEqual
+	default:
+		return OpNone
+	}
 }

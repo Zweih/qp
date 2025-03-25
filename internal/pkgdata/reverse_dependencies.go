@@ -1,14 +1,10 @@
 package pkgdata
 
 import (
-	"regexp"
 	"slices"
 	"yaylog/internal/config"
 	"yaylog/internal/consts"
 )
-
-// pulls package name out of `package-name>=2.0.1`
-var packageNameRegex = regexp.MustCompile(`^([^<>=]+)`)
 
 // TODO: we can do this concurrently. let's get on that.
 func CalculateReverseDependencies(
@@ -24,7 +20,7 @@ func CalculateReverseDependencies(
 	}
 
 	packagePointerMap := make(map[string]*PkgInfo)
-	packageDependencyMap := make(map[string][]string)
+	packageDependencyMap := make(map[string][]Relation)
 	providesMap := make(map[string]string)
 	// key: provided library/package, value: package that provides it (provider)
 
@@ -33,30 +29,23 @@ func CalculateReverseDependencies(
 
 		// populate providesMap
 		for _, provided := range pkg.Provides {
-			matches := packageNameRegex.FindStringSubmatch(provided)
-			if len(matches) >= 2 {
-				providesMap[matches[1]] = pkg.Name
-			}
+			providesMap[provided.Name] = pkg.Name
 		}
 	}
 
 	for _, pkg := range pkgPtrs {
 		for _, depPackage := range pkg.Depends {
-			matches := packageNameRegex.FindStringSubmatch(depPackage)
+			depName := depPackage.Name
 
-			if len(matches) >= 2 {
-				depName := matches[1]
-
-				if provider, exists := providesMap[depName]; exists {
-					depName = provider
-				}
-
-				if depName == pkg.Name {
-					continue // skip if a package names itself as a dependency
-				}
-
-				packageDependencyMap[depName] = append(packageDependencyMap[depName], pkg.Name)
+			if providerName, exists := providesMap[depName]; exists {
+				depName = providerName
 			}
+
+			if depName == pkg.Name {
+				continue // skip if a package names itself as a dependency
+			}
+
+			packageDependencyMap[depName] = append(packageDependencyMap[depName], Relation{Name: pkg.Name})
 		}
 	}
 

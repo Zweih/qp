@@ -17,11 +17,10 @@ type FilterCondition struct {
 	FieldType consts.FieldType
 }
 
-func FilterByRelation(pkgNames []string, targetNames []string) bool {
+func FilterByRelation(relations []Relation, targetNames []string) bool {
 	for _, targetName := range targetNames {
-		for _, packageName := range pkgNames {
-			matches := packageNameRegex.FindStringSubmatch(packageName)
-			if len(matches) >= 2 && matches[1] == targetName {
+		for _, relation := range relations {
+			if relation.Name == targetName {
 				return true
 			}
 		}

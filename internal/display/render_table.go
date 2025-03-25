@@ -96,13 +96,13 @@ func getTableValue(pkg *pkgdata.PkgInfo, field consts.FieldType, ctx tableContex
 	case consts.FieldVersion:
 		return pkg.Version
 	case consts.FieldDepends:
-		return formatPackageList(pkg.Depends)
+		return formatRelations(pkg.Depends)
 	case consts.FieldRequiredBy:
-		return formatPackageList(pkg.RequiredBy)
+		return formatRelations(pkg.RequiredBy)
 	case consts.FieldProvides:
-		return formatPackageList(pkg.Provides)
+		return formatRelations(pkg.Provides)
 	case consts.FieldConflicts:
-		return formatPackageList(pkg.Conflicts)
+		return formatRelations(pkg.Conflicts)
 	case consts.FieldArch:
 		return pkg.Arch
 	case consts.FieldLicense:
@@ -120,11 +120,17 @@ func formatDate(pkg *pkgdata.PkgInfo, ctx tableContext) string {
 	return timestamp.Format(ctx.DateFormat)
 }
 
-func formatPackageList(packageList []string) string {
-	if len(packageList) == 0 {
+func formatRelations(relations []pkgdata.Relation) string {
+	if len(relations) == 0 {
 		return "-"
 	}
-	return strings.Join(packageList, ", ")
+
+	pkgNameList := make([]string, 0, len(relations))
+	for _, relation := range relations {
+		pkgNameList = append(pkgNameList, relation.Name)
+	}
+
+	return strings.Join(pkgNameList, ", ")
 }
 
 func formatSize(size int64) string {
