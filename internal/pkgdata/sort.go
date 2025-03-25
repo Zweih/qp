@@ -85,7 +85,7 @@ func sortConcurrently(
 
 	numCPUs := runtime.NumCPU()
 	baseChunkSize := total / (2 * numCPUs)
-	chunkSize := min(100, baseChunkSize)
+	chunkSize := max(100, baseChunkSize)
 
 	var mu sync.Mutex
 	var wg sync.WaitGroup
