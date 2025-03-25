@@ -99,7 +99,7 @@ func sortConcurrently(
 		go func() {
 			defer wg.Done()
 
-			sort.SliceStable(pkgPtrs[startIdx:endIdx], func(i int, j int) bool {
+			sort.Slice(pkgPtrs[startIdx:endIdx], func(i int, j int) bool {
 				return comparator(pkgPtrs[i], pkgPtrs[j])
 			})
 
@@ -121,7 +121,7 @@ func sortConcurrently(
 		reportProgress(50, 100, fmt.Sprintf("%s - Initial chunk sorting complete", phase))
 	}
 
-	sort.SliceStable(pkgPtrs, func(i int, j int) bool {
+	sort.Slice(pkgPtrs, func(i int, j int) bool {
 		return comparator(pkgPtrs[i], pkgPtrs[j])
 	})
 
@@ -143,7 +143,7 @@ func sortNormally(
 		reportProgress(0, 100, fmt.Sprintf("%s - normally", phase))
 	}
 
-	sort.SliceStable(pkgPtrs, func(i int, j int) bool {
+	sort.Slice(pkgPtrs, func(i int, j int) bool {
 		return comparator(pkgPtrs[i], pkgPtrs[j])
 	})
 
