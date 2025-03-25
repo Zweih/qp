@@ -87,21 +87,30 @@ func sortConcurrently(
 	baseChunkSize := total / (2 * numCPUs)
 	chunkSize := max(100, baseChunkSize)
 
+	var mu sync.Mutex
 	var wg sync.WaitGroup
+
 	numChunks := (total + chunkSize - 1) / chunkSize
+	chunks := make([][]*PkgInfo, 0, numChunks) // pre-allocate
 
 	for chunkIdx := range numChunks {
 		startIdx := chunkIdx * chunkSize
 		endIdx := min(startIdx+chunkSize, total)
 
+		chunk := pkgPtrs[startIdx:endIdx]
+
 		wg.Add(1)
 
-		go func() {
+		go func(c []*PkgInfo) {
 			defer wg.Done()
 
-			sort.Slice(pkgPtrs[startIdx:endIdx], func(i int, j int) bool {
-				return comparator(pkgPtrs[i], pkgPtrs[j])
+			sort.Slice(c, func(i int, j int) bool {
+				return comparator(c[i], c[j])
 			})
+
+			mu.Lock()
+			chunks = append(chunks, c)
+			mu.Unlock()
 
 			if reportProgress != nil {
 				currentProgress := (chunkIdx + 1) * 50 / numChunks // scale chunk sorting progress to 0%-50%
@@ -111,7 +120,7 @@ func sortConcurrently(
 					fmt.Sprintf("%s - Sorted chunk %d/%d", phase, chunkIdx+1, numChunks),
 				)
 			}
-		}()
+		}(chunk)
 	}
 
 	wg.Wait()
@@ -121,15 +130,40 @@ func sortConcurrently(
 		reportProgress(50, 100, fmt.Sprintf("%s - Initial chunk sorting complete", phase))
 	}
 
-	sort.Slice(pkgPtrs, func(i int, j int) bool {
-		return comparator(pkgPtrs[i], pkgPtrs[j])
-	})
+	mergeStep := 0
+
+	for len(chunks) > 1 {
+		var newChunks [][]*PkgInfo
+
+		for i := 0; i < len(chunks); i += 2 {
+			if i+1 < len(chunks) {
+				mergedChunk := mergedSortedChunks(chunks[i], chunks[i+1], comparator)
+				newChunks = append(newChunks, mergedChunk)
+
+				continue
+			}
+
+			newChunks = append(newChunks, chunks[i]) // move odd chunk forward
+		}
+
+		chunks = newChunks
+
+		if reportProgress != nil {
+			mergeStep++
+			currentProgress := 50 + (mergeStep * 50 / (numChunks - 1)) // scale to 50%-100%
+			reportProgress(currentProgress, 100, fmt.Sprintf("%s - Merging step %d", phase, mergeStep))
+		}
+	}
 
 	if reportProgress != nil {
 		reportProgress(total, total, fmt.Sprintf("%s completed", phase))
 	}
 
-	return pkgPtrs
+	if len(chunks) == 1 {
+		return chunks[0]
+	}
+
+	return nil
 }
 
 // pkgPointers will be sorted in place, mutating the slice order
