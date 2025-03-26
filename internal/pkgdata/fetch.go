@@ -1,6 +1,7 @@
 package pkgdata
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -8,7 +9,6 @@ import (
 	"path/filepath"
 	"runtime"
 	"strconv"
-	"strings"
 	"sync"
 )
 
@@ -116,57 +116,54 @@ func parseDescFile(descPath string) (*PkgInfo, error) {
 
 	defer file.Close()
 
-	// the average desc file is 103.13 lines, reading the entire file into memory is more efficient than using bufio.Scanner
-	contents, err := io.ReadAll(file)
+	data, err := io.ReadAll(file)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read file: %w", err)
 	}
 
-	lines := strings.Split(string(contents), "\n")
 	var pkg PkgInfo
 	var currentField string
+	start := 0
+	end := 0
+	length := len(data)
 
-	for i := 0; i < len(lines); i++ {
-		line := strings.TrimSpace(lines[i])
+	for end <= length {
+		if end == length || data[end] == '\n' {
+			line := bytes.TrimSpace(data[start:end])
+			if len(line) == 0 {
+				currentField = ""
+			} else {
+				switch string(line) {
+				case fieldName, fieldInstallDate, fieldSize, fieldReason,
+					fieldVersion, fieldArch, fieldLicense, fieldUrl:
+					currentField = string(line)
 
-		// TODO: perhaps we can look ahead i+1 on these instead of iterating twice
-		switch line {
-		case fieldName,
-			fieldInstallDate,
-			fieldSize,
-			fieldReason,
-			fieldVersion,
-			fieldArch,
-			fieldLicense,
-			fieldUrl:
-			currentField = line
-		case fieldProvides, fieldDepends, fieldConflicts:
-			currentField = line
-			block, nextIdx := collectBlock(lines, i+1)
-			i = nextIdx
-			relations := parseRelations(block)
+				case fieldDepends, fieldProvides, fieldConflicts:
+					currentField = string(line)
+					block, next := collectBlockBytes(data, end+1)
+					switch currentField {
+					case fieldDepends:
+						pkg.Depends = parseRelations(block)
+					case fieldProvides:
+						pkg.Provides = parseRelations(block)
+					case fieldConflicts:
+						pkg.Conflicts = parseRelations(block)
+					}
+					currentField = ""
+					end = next
+					start = next
+					continue
 
-			switch currentField {
-			case fieldDepends:
-				pkg.Depends = relations
-			case fieldProvides:
-				pkg.Provides = relations
-			case fieldConflicts:
-				pkg.Conflicts = relations
+				default:
+					if err := applyField(&pkg, currentField, string(line)); err != nil {
+						return nil, fmt.Errorf("error reading desc file %s: %w", descPath, err)
+					}
+				}
 			}
-
-			currentField = ""
-			i--
-
-		case "":
-			currentField = "" // reset if line is blank
-		default:
-			if err := applyField(&pkg, currentField, line); err != nil {
-				return nil, fmt.Errorf("error reading desc file %s: %w", descPath, err)
-			}
+			start = end + 1
 		}
+		end++
 	}
-
 	if pkg.Name == "" {
 		return nil, fmt.Errorf("package name is missing in file: %s", descPath)
 	}
@@ -178,21 +175,28 @@ func parseDescFile(descPath string) (*PkgInfo, error) {
 	return &pkg, nil
 }
 
-// mutates lines
-func collectBlock(lines []string, startIdx int) ([]string, int) {
-	endIdx := startIdx
-	for endIdx < len(lines) {
-		trimmed := strings.TrimSpace(lines[endIdx])
+func collectBlockBytes(data []byte, start int) ([]string, int) {
+	var block []string
+	i := start
 
-		if trimmed == "" {
+	for i < len(data) {
+		j := i
+
+		for j < len(data) && data[j] != '\n' {
+			j++
+		}
+
+		line := bytes.TrimSpace(data[i:j])
+
+		if len(line) == 0 {
 			break
 		}
 
-		lines[endIdx] = trimmed
-		endIdx++
+		block = append(block, string(line))
+		i = j + 1
 	}
 
-	return lines[startIdx:endIdx], endIdx
+	return block, i
 }
 
 func parseRelations(block []string) []Relation {
