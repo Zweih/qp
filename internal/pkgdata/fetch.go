@@ -1,12 +1,11 @@
 package pkgdata
 
 import (
-	"bufio"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
-	"regexp"
 	"runtime"
 	"strconv"
 	"strings"
@@ -28,9 +27,6 @@ const (
 
 	pacmanDbPath = "/var/lib/pacman/local"
 )
-
-// pulls package name, operator, and version out of `package-name>=2.0.1`
-var relationRegex = regexp.MustCompile(`^([^<>=\s]+)\s*(<=|>=|=|<|>)?\s*(.*)?$`)
 
 func FetchPackages() ([]*PkgInfo, error) {
 	pkgPaths, err := os.ReadDir(pacmanDbPath)
@@ -120,27 +116,48 @@ func parseDescFile(descPath string) (*PkgInfo, error) {
 
 	defer file.Close()
 
+	// the average desc file is 103.13 lines, reading the entire file into memory is more efficient than using bufio.Scanner
+	contents, err := io.ReadAll(file)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read file: %w", err)
+	}
+
+	lines := strings.Split(string(contents), "\n")
 	var pkg PkgInfo
 	var currentField string
 
-	scanner := bufio.NewScanner(file)
+	for i := 0; i < len(lines); i++ {
+		line := strings.TrimSpace(lines[i])
 
-	for scanner.Scan() {
-		line := strings.TrimSpace(scanner.Text())
-
+		// TODO: perhaps we can look ahead i+1 on these instead of iterating twice
 		switch line {
 		case fieldName,
 			fieldInstallDate,
 			fieldSize,
 			fieldReason,
 			fieldVersion,
-			fieldDepends,
-			fieldProvides,
-			fieldConflicts,
 			fieldArch,
 			fieldLicense,
 			fieldUrl:
 			currentField = line
+		case fieldProvides, fieldDepends, fieldConflicts:
+			currentField = line
+			block, nextIdx := collectBlock(lines, i+1)
+			i = nextIdx
+			relations := parseRelations(block)
+
+			switch currentField {
+			case fieldDepends:
+				pkg.Depends = relations
+			case fieldProvides:
+				pkg.Provides = relations
+			case fieldConflicts:
+				pkg.Conflicts = relations
+			}
+
+			currentField = ""
+			i--
+
 		case "":
 			currentField = "" // reset if line is blank
 		default:
@@ -159,6 +176,33 @@ func parseDescFile(descPath string) (*PkgInfo, error) {
 	}
 
 	return &pkg, nil
+}
+
+// mutates lines
+func collectBlock(lines []string, startIdx int) ([]string, int) {
+	endIdx := startIdx
+	for endIdx < len(lines) {
+		trimmed := strings.TrimSpace(lines[endIdx])
+
+		if trimmed == "" {
+			break
+		}
+
+		lines[endIdx] = trimmed
+		endIdx++
+	}
+
+	return lines[startIdx:endIdx], endIdx
+}
+
+func parseRelations(block []string) []Relation {
+	relations := make([]Relation, 0, len(block))
+
+	for _, line := range block {
+		relations = append(relations, parseRelation(line))
+	}
+
+	return relations
 }
 
 func applyField(pkg *PkgInfo, field string, value string) error {
@@ -192,15 +236,6 @@ func applyField(pkg *PkgInfo, field string, value string) error {
 
 		pkg.Size = size
 
-	case fieldDepends:
-		pkg.Depends = append(pkg.Depends, parseRelation(value))
-
-	case fieldProvides:
-		pkg.Provides = append(pkg.Provides, parseRelation(value))
-
-	case fieldConflicts:
-		pkg.Conflicts = append(pkg.Conflicts, parseRelation(value))
-
 	case fieldArch:
 		pkg.Arch = value
 
@@ -217,20 +252,42 @@ func applyField(pkg *PkgInfo, field string, value string) error {
 	return nil
 }
 
-func parseRelation(relationInput string) Relation {
-	matches := relationRegex.FindStringSubmatch(relationInput)
-	relation := Relation{}
+func parseRelation(input string) Relation {
+	opStart := 0
 
-	if len(matches) > 1 {
-		relation.Name = matches[1]
+	for i := range input {
+		switch input[i] {
+		case '=', '<', '>':
+			opStart = i
+			goto parseOp
+		}
 	}
 
-	if len(matches) > 3 {
-		relation.Operator = stringToOperator(matches[2])
-		relation.Version = matches[3]
+	return Relation{Name: input}
+
+parseOp:
+	name := input[:opStart]
+	opEnd := opStart + 1
+
+	if opEnd < len(input) {
+		switch input[opEnd] {
+		case '=', '<', '>':
+			opEnd++
+		}
 	}
 
-	return relation
+	operator := stringToOperator(input[opStart:opEnd])
+	var version string
+
+	if opEnd < len(input) {
+		version = input[opEnd:]
+	}
+
+	return Relation{
+		Name:     name,
+		Operator: operator,
+		Version:  version,
+	}
 }
 
 func stringToOperator(operatorInput string) RelationOp {
