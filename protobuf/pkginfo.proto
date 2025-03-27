@@ -1,0 +1,43 @@
+// go:generate protoc --go_out=. protobuf/pkginfo.proto
+
+syntax = "proto3";
+
+package pkginfo;
+
+option go_package = "internal/protobuf;protobuf";
+
+enum RelationOp {
+  NONE = 0;
+  EQUAL = 1;
+  LESS = 2;
+  LESS_EQUAL = 3;
+  GREATER = 4;
+  GREATER_EQUAL = 5;
+}
+
+message Relation {
+  string name = 1;
+  string version = 2;
+  RelationOp operator = 3;
+}
+
+message PkgInfo {
+  int64 timestamp = 1;
+  int64 size = 2;
+  string name = 3;
+  string reason = 4;
+  string version = 5;
+  string arch = 6;
+  string license = 7;
+  string url = 8;
+
+  repeated Relation depends = 9;
+  repeated Relation required_by = 10;
+  repeated Relation provides = 11;
+  repeated Relation conflicts = 12;
+}
+
+message CachedPackages {
+  int64 last_modified = 1;
+  repeated PkgInfo packages = 2;
+}
