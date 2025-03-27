@@ -57,7 +57,7 @@ because yay is my preferred AUR helper and the name has a good flow.
 - [x] additional filters
 - [ ] list possibly or confirmed stale/abandoned packages
 - [x] sort by size on disk
-- [ ] protobuf caching
+- [x] protobuf caching (127% speed boost)
 - [ ] dependency graph
 - [x] concurrent filtering
 - [x] filter by size on disk
