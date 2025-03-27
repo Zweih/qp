@@ -278,6 +278,7 @@ type CachedPkgs struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	LastModified  int64                  `protobuf:"varint,1,opt,name=last_modified,json=lastModified,proto3" json:"last_modified,omitempty"`
 	Pkgs          []*PkgInfo             `protobuf:"bytes,2,rep,name=pkgs,proto3" json:"pkgs,omitempty"`
+	Version       int32                  `protobuf:"varint,3,opt,name=version,proto3" json:"version,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -326,6 +327,13 @@ func (x *CachedPkgs) GetPkgs() []*PkgInfo {
 	return nil
 }
 
+func (x *CachedPkgs) GetVersion() int32 {
+	if x != nil {
+		return x.Version
+	}
+	return 0
+}
+
 var File_protobuf_pkginfo_proto protoreflect.FileDescriptor
 
 const file_protobuf_pkginfo_proto_rawDesc = "" +
@@ -349,11 +357,12 @@ const file_protobuf_pkginfo_proto_rawDesc = "" +
 	" \x03(\v2\x11.pkginfo.RelationR\n" +
 	"requiredBy\x12-\n" +
 	"\bprovides\x18\v \x03(\v2\x11.pkginfo.RelationR\bprovides\x12/\n" +
-	"\tconflicts\x18\f \x03(\v2\x11.pkginfo.RelationR\tconflicts\"W\n" +
+	"\tconflicts\x18\f \x03(\v2\x11.pkginfo.RelationR\tconflicts\"q\n" +
 	"\n" +
 	"CachedPkgs\x12#\n" +
 	"\rlast_modified\x18\x01 \x01(\x03R\flastModified\x12$\n" +
-	"\x04pkgs\x18\x02 \x03(\v2\x10.pkginfo.PkgInfoR\x04pkgs*[\n" +
+	"\x04pkgs\x18\x02 \x03(\v2\x10.pkginfo.PkgInfoR\x04pkgs\x12\x18\n" +
+	"\aversion\x18\x03 \x01(\x05R\aversion*[\n" +
 	"\n" +
 	"RelationOp\x12\b\n" +
 	"\x04NONE\x10\x00\x12\t\n" +

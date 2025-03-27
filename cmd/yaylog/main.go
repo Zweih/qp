@@ -42,13 +42,13 @@ func mainWithConfig(configProvider config.ConfigProvider) error {
 		{"Sorting", pkgdata.SortPackages, &wg},
 	}
 
-	for _, phase := range pipelinePhases {
+	for i, phase := range pipelinePhases {
 		pkgPtrs, err = phase.Run(cfg, pkgPtrs, pipelineCtx)
 		if err != nil {
 			return err
 		}
 
-		if len(pkgPtrs) == 0 {
+		if i > 0 && len(pkgPtrs) == 0 { // only start checking after both fetch attempts
 			out.WriteLine("No packages to display.")
 			return nil
 		}

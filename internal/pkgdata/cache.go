@@ -9,7 +9,10 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-const cachePath = "/tmp/yaylog.cache"
+const (
+	cachePath    = "/tmp/yaylog.cache"
+	cacheVersion = 1
+)
 
 func getDbModTime() (int64, error) {
 	dirInfo, err := os.Stat(PacmanDbPath)
@@ -29,6 +32,7 @@ func SaveProtoCache(pkgs []*PkgInfo) error {
 	cachedPkgs := &pb.CachedPkgs{
 		Pkgs:         pkgsToProtos(pkgs),
 		LastModified: lastModified,
+		Version:      cacheVersion,
 	}
 
 	byteData, err := proto.Marshal(cachedPkgs)
@@ -49,6 +53,10 @@ func LoadProtoCache() ([]*PkgInfo, error) {
 	err = proto.Unmarshal(byteData, &cachedPkgs)
 	if err != nil {
 		return nil, fmt.Errorf("failed to unmarshal cache: %v", err)
+	}
+
+	if cachedPkgs.Version != cacheVersion {
+		return nil, errors.New("cache version mismatch, regenerating fresh cache")
 	}
 
 	dbModTime, err := getDbModTime()

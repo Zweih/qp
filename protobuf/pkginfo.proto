@@ -40,4 +40,5 @@ message PkgInfo {
 message CachedPkgs {
   int64 last_modified = 1;
   repeated PkgInfo pkgs = 2;
+  int32 version = 3;
 }
