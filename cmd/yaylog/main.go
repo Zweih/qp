@@ -34,6 +34,7 @@ func mainWithConfig(configProvider config.ConfigProvider) error {
 	var wg sync.WaitGroup
 
 	pipelinePhases := []PipelinePhase{
+		{"Loading cache", loadCache, &wg},
 		{"Fetching packages", fetchPackages, &wg},
 		{"Calculating reverse dependencies", pkgdata.CalculateReverseDependencies, &wg},
 		{"Saving cache", saveCache, &wg},
@@ -62,22 +63,33 @@ func mainWithConfig(configProvider config.ConfigProvider) error {
 // TODO: add progress reporting
 func fetchPackages(
 	_ config.Config,
+	pkgPtrs []*pkgdata.PkgInfo,
+	_ meta.ProgressReporter,
+	pipelineCtx *meta.PipelineContext,
+) ([]*pkgdata.PkgInfo, error) {
+	if !pipelineCtx.UsedCache {
+		var err error
+		pkgPtrs, err = pkgdata.FetchPackages()
+		if err != nil {
+			out.WriteLine(fmt.Sprintf("Warning: Some packages may be missing due to corrupted package database: %v", err))
+		}
+	}
+
+	return pkgPtrs, nil
+}
+
+func loadCache(
+	_ config.Config,
 	_ []*pkgdata.PkgInfo,
 	_ meta.ProgressReporter,
 	pipelineCtx *meta.PipelineContext,
 ) ([]*pkgdata.PkgInfo, error) {
-	// TODO: break these up into separate phases
 	pkgPtrs, err := pkgdata.LoadProtoCache()
 	if err == nil {
 		pipelineCtx.UsedCache = true
-		return pkgPtrs, nil
 	}
 
-	pkgPtrs, err = pkgdata.FetchPackages()
-	if err != nil {
-		out.WriteLine(fmt.Sprintf("Warning: Some packages may be missing due to corrupted package database: %v", err))
-	}
-
+	// TODO: use ProgressReporter to report cache status
 	return pkgPtrs, nil
 }
 
@@ -86,12 +98,14 @@ func saveCache(
 	_ config.Config,
 	pkgPtrs []*pkgdata.PkgInfo,
 	_ meta.ProgressReporter,
-	_ *meta.PipelineContext,
+	pipelineCtx *meta.PipelineContext,
 ) ([]*pkgdata.PkgInfo, error) {
-	// TODO: we can probably save the file concurrently
-	err := pkgdata.SaveProtoCache(pkgPtrs)
-	if err != nil {
-		out.WriteLine(fmt.Sprintf("Error saving cache: %v", err))
+	if !pipelineCtx.UsedCache {
+		// TODO: we can probably save the file concurrently
+		err := pkgdata.SaveProtoCache(pkgPtrs)
+		if err != nil {
+			out.WriteLine(fmt.Sprintf("Error saving cache: %v", err))
+		}
 	}
 
 	return pkgPtrs, nil
