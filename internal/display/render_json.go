@@ -8,25 +8,38 @@ import (
 	"yaylog/internal/pkgdata"
 )
 
+type PkgInfoJson struct {
+	Timestamp  int64    `json:"timestamp,omitempty"`
+	Size       int64    `json:"size,omitempty"`
+	Name       string   `json:"name,omitempty"`
+	Reason     string   `json:"reason,omitempty"`
+	Version    string   `json:"version,omitempty"`
+	Arch       string   `json:"arch,omitempty"`
+	License    string   `json:"license,omitempty"`
+	Url        string   `json:"url,omitempty"`
+	Depends    []string `json:"depends,omitempty"`
+	RequiredBy []string `json:"requiredBy,omitempty"`
+	Provides   []string `json:"provides,omitempty"`
+	Conflicts  []string `json:"conflicts,omitempty"`
+}
+
 func (o *OutputManager) renderJson(pkgPtrs []*pkgdata.PkgInfo, fields []consts.FieldType) {
-	if isAllFields, uniqueFields := getUniqueFields(fields); isAllFields {
-		pkgPtrs = selectJsonFields(pkgPtrs, uniqueFields)
-	}
+	uniqueFields := getUniqueFields(fields)
+	filteredPkgPtrs := selectJsonFields(pkgPtrs, uniqueFields)
 
 	var buffer bytes.Buffer
 	encoder := json.NewEncoder(&buffer)
 	encoder.SetEscapeHTML(false) // disable escaping of characters like `<`, `>`, perhaps this should be a user defined option
 	encoder.SetIndent("", "  ")
 
-	if err := encoder.Encode(pkgPtrs); err != nil {
+	if err := encoder.Encode(filteredPkgPtrs); err != nil {
 		o.writeLine(fmt.Sprintf("Error genereating JSON output: %v", err))
 	}
 
 	o.writeLine(buffer.String())
 }
 
-// quick check to verify if we should select fields at all
-func getUniqueFields(fields []consts.FieldType) (bool, []consts.FieldType) {
+func getUniqueFields(fields []consts.FieldType) []consts.FieldType {
 	fieldSet := make(map[consts.FieldType]bool, len(fields))
 	for _, field := range fields {
 		fieldSet[field] = true
@@ -37,14 +50,14 @@ func getUniqueFields(fields []consts.FieldType) (bool, []consts.FieldType) {
 		uniqueFields = append(uniqueFields, field)
 	}
 
-	return len(fieldSet) != len(consts.ValidFields), uniqueFields
+	return uniqueFields
 }
 
 func selectJsonFields(
 	pkgPtrs []*pkgdata.PkgInfo,
 	fields []consts.FieldType,
-) []*pkgdata.PkgInfo {
-	filteredPkgPtrs := make([]*pkgdata.PkgInfo, len(pkgPtrs))
+) []*PkgInfoJson {
+	filteredPkgPtrs := make([]*PkgInfoJson, len(pkgPtrs))
 	for i, pkg := range pkgPtrs {
 		filteredPkgPtrs[i] = getJsonValues(pkg, fields)
 	}
@@ -52,8 +65,8 @@ func selectJsonFields(
 	return filteredPkgPtrs
 }
 
-func getJsonValues(pkg *pkgdata.PkgInfo, fields []consts.FieldType) *pkgdata.PkgInfo {
-	filteredPackage := pkgdata.PkgInfo{}
+func getJsonValues(pkg *pkgdata.PkgInfo, fields []consts.FieldType) *PkgInfoJson {
+	filteredPackage := PkgInfoJson{}
 
 	for _, field := range fields {
 		switch field {
@@ -68,13 +81,13 @@ func getJsonValues(pkg *pkgdata.PkgInfo, fields []consts.FieldType) *pkgdata.Pkg
 		case consts.FieldVersion:
 			filteredPackage.Version = pkg.Version
 		case consts.FieldDepends:
-			filteredPackage.Depends = pkg.Depends
+			filteredPackage.Depends = flattenRelations(pkg.Depends)
 		case consts.FieldRequiredBy:
-			filteredPackage.RequiredBy = pkg.RequiredBy
+			filteredPackage.RequiredBy = flattenRelations(pkg.RequiredBy)
 		case consts.FieldProvides:
-			filteredPackage.Provides = pkg.Provides
+			filteredPackage.Provides = flattenRelations(pkg.Provides)
 		case consts.FieldConflicts:
-			filteredPackage.Conflicts = pkg.Conflicts
+			filteredPackage.Conflicts = flattenRelations(pkg.Conflicts)
 		case consts.FieldArch:
 			filteredPackage.Arch = pkg.Arch
 		case consts.FieldLicense:
@@ -85,4 +98,36 @@ func getJsonValues(pkg *pkgdata.PkgInfo, fields []consts.FieldType) *pkgdata.Pkg
 	}
 
 	return &filteredPackage
+}
+
+func flattenRelations(relations []pkgdata.Relation) []string {
+	relationOutputs := make([]string, 0, len(relations))
+
+	for _, rel := range relations {
+		if rel.Operator == pkgdata.OpNone {
+			relationOutputs = append(relationOutputs, rel.Name)
+		} else {
+			op := relationOpToString(rel.Operator)
+			relationOutputs = append(relationOutputs, fmt.Sprintf("%s%s%s", rel.Name, op, rel.Version))
+		}
+	}
+
+	return relationOutputs
+}
+
+func relationOpToString(op pkgdata.RelationOp) string {
+	switch op {
+	case pkgdata.OpEqual:
+		return "="
+	case pkgdata.OpLess:
+		return "<"
+	case pkgdata.OpLessEqual:
+		return "<="
+	case pkgdata.OpGreater:
+		return ">"
+	case pkgdata.OpGreaterEqual:
+		return ">="
+	default:
+		return ""
+	}
 }
