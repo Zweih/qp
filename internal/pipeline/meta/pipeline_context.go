@@ -1,5 +1,6 @@
 package meta
 
 type PipelineContext struct {
-	UsedCache bool
+	UsedCache     bool
+	IsInteractive bool
 }

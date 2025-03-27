@@ -30,17 +30,15 @@ func mainWithConfig(configProvider config.ConfigProvider) error {
 	var pkgPtrs []*pkgdata.PkgInfo
 
 	isInteractive := term.IsTerminal(int(os.Stdout.Fd())) && !cfg.DisableProgress
+	pipelineCtx := &meta.PipelineContext{IsInteractive: isInteractive}
 	var wg sync.WaitGroup
 
-	pipelineCtx := &meta.PipelineContext{}
-
-	// TODO: we can pull the repeated logic of building pipelines into a function
 	pipelinePhases := []PipelinePhase{
-		{"Fetching packages", fetchPackages, isInteractive, &wg},
-		{"Calculating reverse dependencies", pkgdata.CalculateReverseDependencies, isInteractive, &wg},
-		{"Saving cache", saveCache, isInteractive, &wg},
-		{"Filtering", pipeline.PreprocessFiltering, isInteractive, &wg},
-		{"Sorting", pkgdata.SortPackages, isInteractive, &wg},
+		{"Fetching packages", fetchPackages, &wg},
+		{"Calculating reverse dependencies", pkgdata.CalculateReverseDependencies, &wg},
+		{"Saving cache", saveCache, &wg},
+		{"Filtering", pipeline.PreprocessFiltering, &wg},
+		{"Sorting", pkgdata.SortPackages, &wg},
 	}
 
 	for _, phase := range pipelinePhases {
@@ -68,6 +66,7 @@ func fetchPackages(
 	_ meta.ProgressReporter,
 	pipelineCtx *meta.PipelineContext,
 ) ([]*pkgdata.PkgInfo, error) {
+	// TODO: break these up into separate phases
 	pkgPtrs, err := pkgdata.LoadProtoCache()
 	if err == nil {
 		pipelineCtx.UsedCache = true

@@ -23,10 +23,9 @@ type Operation func(
 ) ([]*PkgInfo, error)
 
 type PipelinePhase struct {
-	Name          string
-	Operation     Operation
-	IsInteractive bool
-	wg            *sync.WaitGroup
+	Name      string
+	Operation Operation
+	wg        *sync.WaitGroup
 }
 
 func (phase PipelinePhase) Run(
@@ -34,7 +33,7 @@ func (phase PipelinePhase) Run(
 	packages []*PkgInfo,
 	pipelineCtx *meta.PipelineContext,
 ) ([]*PkgInfo, error) {
-	progressChan := phase.startProgress()
+	progressChan := phase.startProgress(pipelineCtx.IsInteractive)
 	outputPackages, err := phase.Operation(
 		cfg,
 		packages,
@@ -64,8 +63,8 @@ func (phase PipelinePhase) reportProgress(progressChan chan ProgressMessage) Pro
 	})
 }
 
-func (phase PipelinePhase) startProgress() chan ProgressMessage {
-	if !phase.IsInteractive {
+func (phase PipelinePhase) startProgress(isInteractive bool) chan ProgressMessage {
+	if !isInteractive {
 		return nil
 	}
 
