@@ -57,6 +57,7 @@ because yay is my preferred AUR helper and the name has a good flow.
 - [x] additional filters
 - [ ] list possibly or confirmed stale/abandoned packages
 - [x] sort by size on disk
+- [ ] protobuf caching
 - [ ] dependency graph
 - [x] concurrent filtering
 - [x] filter by size on disk
@@ -76,9 +77,9 @@ because yay is my preferred AUR helper and the name has a good flow.
 - [x] user defined columns
 - [x] dependencies of each package (dependency field)
 - [x] reverse-dependencies of each package (required-by field)
-- [ ] package descriptions field
+- [ ] package description field
 - [x] package URL field
-- [x] package architectur field
+- [x] package architecture field
 - [x] package conflicts field
 - [x] conflicts filter
 - [ ] name exclusion filter
@@ -93,12 +94,14 @@ because yay is my preferred AUR helper and the name has a good flow.
 - [x] list of packages for package filters
 - [x] config dependency injection for testing
 - [ ] required-by count sort
+- [x] optimize file reading (28% speed boost)
 - [x] metaflag for all filters
 - [x] package license field
 - [ ] XML output
 - [x] use chunked channel-based concurrent filtering (12% speed boost) 
 - [ ] short-args for filters
 - [ ] license sort
+- [ ] streaming pipeline
 - [x] architecture filter
 - [x] optimize filter ordering (4% speed boost)
 - [ ] dependency count sort
