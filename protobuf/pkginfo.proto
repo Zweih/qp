@@ -37,7 +37,7 @@ message PkgInfo {
   repeated Relation conflicts = 12;
 }
 
-message CachedPackages {
+message CachedPkgs {
   int64 last_modified = 1;
-  repeated PkgInfo packages = 2;
+  repeated PkgInfo pkgs = 2;
 }

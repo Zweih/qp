@@ -25,11 +25,11 @@ const (
 	fieldLicense     = "%LICENSE%"
 	fieldUrl         = "%URL%"
 
-	pacmanDbPath = "/var/lib/pacman/local"
+	PacmanDbPath = "/var/lib/pacman/local"
 )
 
 func FetchPackages() ([]*PkgInfo, error) {
-	pkgPaths, err := os.ReadDir(pacmanDbPath)
+	pkgPaths, err := os.ReadDir(PacmanDbPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read pacman database: %v", err)
 	}
@@ -62,7 +62,7 @@ func FetchPackages() ([]*PkgInfo, error) {
 
 	for _, packagePath := range pkgPaths {
 		if packagePath.IsDir() {
-			descPath := filepath.Join(pacmanDbPath, packagePath.Name(), "desc")
+			descPath := filepath.Join(PacmanDbPath, packagePath.Name(), "desc")
 			descPathChan <- descPath
 		}
 	}

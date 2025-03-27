@@ -56,9 +56,21 @@ func mainWithConfig(configProvider config.ConfigProvider) error {
 }
 
 func fetchPackages() []*pkgdata.PkgInfo {
-	pkgPtrs, err := pkgdata.FetchPackages()
+	pkgPtrs, err := pkgdata.LoadProtoCache()
+	if err != nil {
+		out.WriteLine(fmt.Sprintf("Warning: %v", err))
+	} else {
+		return pkgPtrs
+	}
+
+	pkgPtrs, err = pkgdata.FetchPackages()
 	if err != nil {
 		out.WriteLine(fmt.Sprintf("Warning: Some packages may be missing due to corrupted package database: %v", err))
+	}
+
+	err = pkgdata.SaveProtoCache(pkgPtrs)
+	if err != nil {
+		out.WriteLine(fmt.Sprintf("Error saving cache: %v", err))
 	}
 
 	return pkgPtrs
