@@ -4,6 +4,8 @@
 
 despite the name, it's not limited to `yay` and works with any package manager that uses ALPM; so it can be used with `pacman`, `yay`, `paru`, `aura`, `pamac`, and even `yaourt` if you're somehow still using it.
 
+you can find installation instructions [here](#installation).
+
 `yaylog` supports optional filters/sorting for install date, package name, install reason (explicit/dependency), size on disk, reverse dependencies, dependency requirements, and more. check [usage](#usage) for all available options.
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/yaylog.svg)](https://repology.org/project/yaylog/versions) ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/Zweih/yaylog/total?style=for-the-badge&logo=archlinux&label=Downloads%20Since%202%2F4%2F2025&color=%20%231793d0)
