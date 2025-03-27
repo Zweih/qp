@@ -26,13 +26,16 @@ func mainWithConfig(configProvider config.ConfigProvider) error {
 		return err
 	}
 
-	pkgPtrs := fetchPackages()
+	var pkgPtrs []*pkgdata.PkgInfo
 
 	isInteractive := term.IsTerminal(int(os.Stdout.Fd())) && !cfg.DisableProgress
 	var wg sync.WaitGroup
 
+	// TODO: we can pull the repeated logic of building pipelines into a function
 	pipelinePhases := []PipelinePhase{
+		{"Fetching packages", fetchPackages, isInteractive, &wg},
 		{"Calculating reverse dependencies", pkgdata.CalculateReverseDependencies, isInteractive, &wg},
+		{"Saving cache", saveCache, isInteractive, &wg},
 		{"Filtering", pipeline.PreprocessFiltering, isInteractive, &wg},
 		{"Sorting", pkgdata.SortPackages, isInteractive, &wg},
 	}
@@ -55,12 +58,15 @@ func mainWithConfig(configProvider config.ConfigProvider) error {
 	return nil
 }
 
-func fetchPackages() []*pkgdata.PkgInfo {
+// TODO: add progress reporting
+func fetchPackages(
+	_ config.Config,
+	_ []*pkgdata.PkgInfo,
+	_ pkgdata.ProgressReporter,
+) ([]*pkgdata.PkgInfo, error) {
 	pkgPtrs, err := pkgdata.LoadProtoCache()
-	if err != nil {
-		out.WriteLine(fmt.Sprintf("Warning: %v", err))
-	} else {
-		return pkgPtrs
+	if err == nil {
+		return pkgPtrs, nil
 	}
 
 	pkgPtrs, err = pkgdata.FetchPackages()
@@ -68,12 +74,22 @@ func fetchPackages() []*pkgdata.PkgInfo {
 		out.WriteLine(fmt.Sprintf("Warning: Some packages may be missing due to corrupted package database: %v", err))
 	}
 
-	err = pkgdata.SaveProtoCache(pkgPtrs)
+	return pkgPtrs, nil
+}
+
+// TODO: add progress reporting
+func saveCache(
+	_ config.Config,
+	pkgPtrs []*pkgdata.PkgInfo,
+	_ pkgdata.ProgressReporter,
+) ([]*pkgdata.PkgInfo, error) {
+	// TODO: we can probably save the file concurrently
+	err := pkgdata.SaveProtoCache(pkgPtrs)
 	if err != nil {
 		out.WriteLine(fmt.Sprintf("Error saving cache: %v", err))
 	}
 
-	return pkgPtrs
+	return pkgPtrs, nil
 }
 
 func trimPackagesLen(

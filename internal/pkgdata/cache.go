@@ -11,6 +11,15 @@ import (
 
 const cachePath = "/tmp/yaylog.cache"
 
+func getDbModTime() (int64, error) {
+	dirInfo, err := os.Stat(PacmanDbPath)
+	if err != nil {
+		return 0, fmt.Errorf("failed to read pacman DB mod time: %v", err)
+	}
+
+	return dirInfo.ModTime().Unix(), nil
+}
+
 func SaveProtoCache(pkgs []*PkgInfo) error {
 	lastModified, err := getDbModTime()
 	if err != nil {
@@ -53,15 +62,6 @@ func LoadProtoCache() ([]*PkgInfo, error) {
 
 	pkgs := protosToPkgs(cachedPkgs.Pkgs)
 	return pkgs, nil
-}
-
-func getDbModTime() (int64, error) {
-	dirInfo, err := os.Stat(PacmanDbPath)
-	if err != nil {
-		return 0, fmt.Errorf("failed to read pacman DB mod time: %v", err)
-	}
-
-	return dirInfo.ModTime().Unix(), nil
 }
 
 func relationsToProtos(rels []Relation) []*pb.Relation {
