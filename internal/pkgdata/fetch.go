@@ -116,6 +116,7 @@ func parseDescFile(descPath string) (*PkgInfo, error) {
 
 	defer file.Close()
 
+	// the average desc file is 103.13 lines, reading the entire file into memory is more efficient than using bufio.Scanner
 	data, err := io.ReadAll(file)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read file: %w", err)
@@ -129,41 +130,38 @@ func parseDescFile(descPath string) (*PkgInfo, error) {
 
 	for end <= length {
 		if end == length || data[end] == '\n' {
-			line := bytes.TrimSpace(data[start:end])
-			if len(line) == 0 {
+			line := string(bytes.TrimSpace(data[start:end]))
+
+			switch line {
+			case fieldName, fieldInstallDate, fieldSize, fieldReason,
+				fieldVersion, fieldArch, fieldLicense, fieldUrl:
+				currentField = line
+
+			case fieldDepends, fieldProvides, fieldConflicts:
+				currentField = line
+				block, next := collectBlockBytes(data, end+1)
+
+				applyMultiLineField(&pkg, currentField, block)
+				end = next
+				start = next
+
+				continue
+
+			case "":
 				currentField = ""
-			} else {
-				switch string(line) {
-				case fieldName, fieldInstallDate, fieldSize, fieldReason,
-					fieldVersion, fieldArch, fieldLicense, fieldUrl:
-					currentField = string(line)
 
-				case fieldDepends, fieldProvides, fieldConflicts:
-					currentField = string(line)
-					block, next := collectBlockBytes(data, end+1)
-					switch currentField {
-					case fieldDepends:
-						pkg.Depends = parseRelations(block)
-					case fieldProvides:
-						pkg.Provides = parseRelations(block)
-					case fieldConflicts:
-						pkg.Conflicts = parseRelations(block)
-					}
-					currentField = ""
-					end = next
-					start = next
-					continue
-
-				default:
-					if err := applyField(&pkg, currentField, string(line)); err != nil {
-						return nil, fmt.Errorf("error reading desc file %s: %w", descPath, err)
-					}
+			default:
+				if err := applySingleLineField(&pkg, currentField, line); err != nil {
+					return nil, fmt.Errorf("error reading desc file %s: %w", descPath, err)
 				}
 			}
+
 			start = end + 1
 		}
+
 		end++
 	}
+
 	if pkg.Name == "" {
 		return nil, fmt.Errorf("package name is missing in file: %s", descPath)
 	}
@@ -199,17 +197,7 @@ func collectBlockBytes(data []byte, start int) ([]string, int) {
 	return block, i
 }
 
-func parseRelations(block []string) []Relation {
-	relations := make([]Relation, 0, len(block))
-
-	for _, line := range block {
-		relations = append(relations, parseRelation(line))
-	}
-
-	return relations
-}
-
-func applyField(pkg *PkgInfo, field string, value string) error {
+func applySingleLineField(pkg *PkgInfo, field string, value string) error {
 	switch field {
 	case fieldName:
 		pkg.Name = value
@@ -254,6 +242,27 @@ func applyField(pkg *PkgInfo, field string, value string) error {
 	}
 
 	return nil
+}
+
+func applyMultiLineField(pkg *PkgInfo, field string, lines []string) {
+	switch field {
+	case fieldDepends:
+		pkg.Depends = parseRelations(lines)
+	case fieldProvides:
+		pkg.Provides = parseRelations(lines)
+	case fieldConflicts:
+		pkg.Conflicts = parseRelations(lines)
+	}
+}
+
+func parseRelations(block []string) []Relation {
+	relations := make([]Relation, 0, len(block))
+
+	for _, line := range block {
+		relations = append(relations, parseRelation(line))
+	}
+
+	return relations
 }
 
 func parseRelation(input string) Relation {
