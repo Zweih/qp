@@ -6,6 +6,7 @@ import (
 	"sort"
 	"sync"
 	"yaylog/internal/config"
+	"yaylog/internal/pipeline/meta"
 )
 
 const concurrentSortThreshold = 500
@@ -75,7 +76,7 @@ func sortConcurrently(
 	pkgPtrs []*PkgInfo,
 	comparator PackageComparator,
 	phase string,
-	reportProgress ProgressReporter,
+	reportProgress meta.ProgressReporter,
 ) []*PkgInfo {
 	total := len(pkgPtrs)
 
@@ -171,7 +172,7 @@ func sortNormally(
 	pkgPtrs []*PkgInfo,
 	comparator PackageComparator,
 	phase string,
-	reportProgress ProgressReporter,
+	reportProgress meta.ProgressReporter,
 ) []*PkgInfo {
 	if reportProgress != nil {
 		reportProgress(0, 100, fmt.Sprintf("%s - normally", phase))
@@ -191,7 +192,8 @@ func sortNormally(
 func SortPackages(
 	cfg config.Config,
 	pkgPtrs []*PkgInfo,
-	reportProgress ProgressReporter,
+	reportProgress meta.ProgressReporter,
+	_ *meta.PipelineContext,
 ) ([]*PkgInfo, error) {
 	comparator := getComparator(cfg.SortBy)
 	phase := "Sorting packages"

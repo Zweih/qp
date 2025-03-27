@@ -5,16 +5,22 @@ import (
 	"sync"
 	"yaylog/internal/config"
 	out "yaylog/internal/display"
+	"yaylog/internal/pipeline/meta"
 	"yaylog/internal/pkgdata"
 )
 
 type (
-	ProgressReporter = pkgdata.ProgressReporter
-	ProgressMessage  = pkgdata.ProgressMessage
+	ProgressReporter = meta.ProgressReporter
+	ProgressMessage  = meta.ProgressMessage
 	PkgInfo          = pkgdata.PkgInfo
 )
 
-type Operation func(cfg config.Config, packages []*PkgInfo, progressReporter ProgressReporter) ([]*PkgInfo, error)
+type Operation func(
+	cfg config.Config,
+	packages []*PkgInfo,
+	progressReporter meta.ProgressReporter,
+	pipelineCtx *meta.PipelineContext,
+) ([]*PkgInfo, error)
 
 type PipelinePhase struct {
 	Name          string
@@ -23,9 +29,18 @@ type PipelinePhase struct {
 	wg            *sync.WaitGroup
 }
 
-func (phase PipelinePhase) Run(cfg config.Config, packages []*PkgInfo) ([]*PkgInfo, error) {
+func (phase PipelinePhase) Run(
+	cfg config.Config,
+	packages []*PkgInfo,
+	pipelineCtx *meta.PipelineContext,
+) ([]*PkgInfo, error) {
 	progressChan := phase.startProgress()
-	outputPackages, err := phase.Operation(cfg, packages, phase.reportProgress(progressChan))
+	outputPackages, err := phase.Operation(
+		cfg,
+		packages,
+		phase.reportProgress(progressChan),
+		pipelineCtx,
+	)
 	phase.stopProgress(progressChan)
 
 	if err != nil {

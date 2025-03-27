@@ -1,4 +1,4 @@
-package pkgdata
+package meta
 
 type ProgressMessage struct {
 	Phase       string

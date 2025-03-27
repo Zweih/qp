@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 	"yaylog/internal/consts"
+	"yaylog/internal/pipeline/meta"
 )
 
 type Filter func(*PkgInfo) bool
@@ -87,7 +88,7 @@ func FilterByStrings(pkgString string, targetStrings []string) bool {
 func FilterPackages(
 	pkgPtrs []*PkgInfo,
 	filterConditions []*FilterCondition,
-	reportProgress ProgressReporter,
+	reportProgress meta.ProgressReporter,
 ) []*PkgInfo {
 	if len(filterConditions) < 1 {
 		return pkgPtrs
@@ -111,7 +112,7 @@ func collectFilteredResults(outputChan <-chan *PkgInfo) []*PkgInfo {
 func applyFilterPipeline(
 	inputChan <-chan *PkgInfo,
 	filterConditions []*FilterCondition,
-	reportProgress ProgressReporter,
+	reportProgress meta.ProgressReporter,
 ) <-chan *PkgInfo {
 	outputChan := inputChan
 	totalPhases := len(filterConditions)

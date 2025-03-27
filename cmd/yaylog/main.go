@@ -7,6 +7,7 @@ import (
 	"yaylog/internal/config"
 	out "yaylog/internal/display"
 	"yaylog/internal/pipeline"
+	"yaylog/internal/pipeline/meta"
 	"yaylog/internal/pkgdata"
 
 	"golang.org/x/term"
@@ -31,6 +32,8 @@ func mainWithConfig(configProvider config.ConfigProvider) error {
 	isInteractive := term.IsTerminal(int(os.Stdout.Fd())) && !cfg.DisableProgress
 	var wg sync.WaitGroup
 
+	pipelineCtx := &meta.PipelineContext{}
+
 	// TODO: we can pull the repeated logic of building pipelines into a function
 	pipelinePhases := []PipelinePhase{
 		{"Fetching packages", fetchPackages, isInteractive, &wg},
@@ -41,7 +44,7 @@ func mainWithConfig(configProvider config.ConfigProvider) error {
 	}
 
 	for _, phase := range pipelinePhases {
-		pkgPtrs, err = phase.Run(cfg, pkgPtrs)
+		pkgPtrs, err = phase.Run(cfg, pkgPtrs, pipelineCtx)
 		if err != nil {
 			return err
 		}
@@ -62,10 +65,12 @@ func mainWithConfig(configProvider config.ConfigProvider) error {
 func fetchPackages(
 	_ config.Config,
 	_ []*pkgdata.PkgInfo,
-	_ pkgdata.ProgressReporter,
+	_ meta.ProgressReporter,
+	pipelineCtx *meta.PipelineContext,
 ) ([]*pkgdata.PkgInfo, error) {
 	pkgPtrs, err := pkgdata.LoadProtoCache()
 	if err == nil {
+		pipelineCtx.UsedCache = true
 		return pkgPtrs, nil
 	}
 
@@ -81,7 +86,8 @@ func fetchPackages(
 func saveCache(
 	_ config.Config,
 	pkgPtrs []*pkgdata.PkgInfo,
-	_ pkgdata.ProgressReporter,
+	_ meta.ProgressReporter,
+	_ *meta.PipelineContext,
 ) ([]*pkgdata.PkgInfo, error) {
 	// TODO: we can probably save the file concurrently
 	err := pkgdata.SaveProtoCache(pkgPtrs)

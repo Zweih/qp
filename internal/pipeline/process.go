@@ -7,6 +7,7 @@ import (
 	"strings"
 	"yaylog/internal/config"
 	"yaylog/internal/consts"
+	"yaylog/internal/pipeline/meta"
 	"yaylog/internal/pkgdata"
 )
 
@@ -15,12 +16,14 @@ type (
 	FilterCondition = pkgdata.FilterCondition
 )
 
+// TODO: regex is overkill for package list parsing
 var targetListRegex = regexp.MustCompile(`^([a-z0-9][a-z0-9._-]*[a-z0-9])(,([a-z0-9][a-z0-9._-]*[a-z0-9]))*$`)
 
 func PreprocessFiltering(
 	cfg config.Config,
 	pkgPrts []*PkgInfo,
-	reportProgress pkgdata.ProgressReporter,
+	reportProgress meta.ProgressReporter,
+	_ *meta.PipelineContext,
 ) ([]*PkgInfo, error) {
 	if len(cfg.FilterQueries) == 0 {
 		return pkgPrts, nil
@@ -49,12 +52,8 @@ func queriesToConditions(filterQueries map[consts.FieldType]string) (
 			condition, err = parseDateFilterCondition(value)
 		case consts.FieldSize:
 			condition, err = parseSizeFilterCondition(value)
-		case consts.FieldName,
-			consts.FieldRequiredBy,
-			consts.FieldDepends,
-			consts.FieldProvides,
-			consts.FieldConflicts,
-			consts.FieldArch:
+		case consts.FieldName, consts.FieldRequiredBy, consts.FieldDepends,
+			consts.FieldProvides, consts.FieldConflicts, consts.FieldArch:
 			condition, err = parsePackageFilterCondition(fieldType, value)
 		case consts.FieldReason:
 			condition, err = parseReasonFilterCondition(value)
@@ -97,6 +96,7 @@ func parseReasonFilterCondition(installReason string) (*FilterCondition, error) 
 	return newReasonCondition(installReason), nil
 }
 
+// TODO: we can merge parseDateFilterCondition and parseSizeFilterCondition into parseRangeFilterCondition
 func parseDateFilterCondition(value string) (*FilterCondition, error) {
 	dateFilter, err := parseDateFilter(value)
 	if err != nil {
