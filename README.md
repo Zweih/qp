@@ -33,7 +33,7 @@ this package is compatible with the following distributions:
 
 ## features
 
-- list installed packages with date/timestamps, dependencies, provisions, requirements, size on disk, conflicts, architecture, and version
+- list installed packages with date/timestamps, dependencies, provisions, requirements, size on disk, conflicts, architecture, description, and version
 - filter by explicitly installed packages
 - filter by packages installed as dependencies
 - filter by packages required by specified packages
@@ -79,7 +79,7 @@ because yay is my preferred AUR helper and the name has a good flow.
 - [x] user defined columns
 - [x] dependencies of each package (dependency field)
 - [x] reverse-dependencies of each package (required-by field)
-- [ ] package description field
+- [x] package description field
 - [x] package URL field
 - [x] package architecture field
 - [x] package conflicts field
@@ -214,6 +214,7 @@ short-flag filters and long-flag filters can be combined.
 - `arch` - architecture the package was built for (e.g., x86_64, aarch64, any)
 - `license` - package software license
 - `url` - the URL of the official site of the software being packaged
+- `description` - package description
 
 ### JSON output
 the `--json` flag outputs the package data as structured JSON instead of a table. this can be useful for scripts or automation.
@@ -230,10 +231,14 @@ output format:
 [
   {
     "timestamp": 1739294218,
+    "size": 4385422,
     "name": "tinysparql",
     "reason": "dependency",
-    "size": 4385422,
     "version": "3.8.2-2",
+    "arch": "aarch64",
+    "license": "GPL-2.0-or-later",
+    "url": "https://tinysparql.org/",
+    "description": "Low-footprint RDF triple store with SPARQL 1.1 interface",
     "depends": [
       "avahi",
       "gcc-libs",
@@ -246,20 +251,13 @@ output format:
       "libxml2",
       "sqlite"
     ],
-    "requiredBy": [
-      "gtk3",
-      "gtk4"
-    ],
     "provides": [
       "tracker3=3.8.2",
       "libtinysparql-3.0.so=0-64"
     ],
     "conflicts": [
       "tracker3<=3.7.3-2"
-    ],
-    "arch": "aarch64",
-    "license": "GPL-2.0-or-later",
-    "url": "https://tinysparql.org/"
+    ]
   }
 ]
 ```
@@ -368,9 +366,9 @@ are treated as separate parameters.
    ```bash
    yaylog --columns name,version,size
    ```
-16. show package names and dependencies with `less` for readability
+16. show package names, descriptions, and dependencies with `less` for readability
    ```bash
-   yaylog --columns name,depends | less
+   yaylog --columns name,depends,description | less
    ```
 17. output package data in JSON format
    ```bash
