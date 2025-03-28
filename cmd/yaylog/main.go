@@ -71,7 +71,10 @@ func fetchPackages(
 		var err error
 		pkgPtrs, err = pkgdata.FetchPackages()
 		if err != nil {
-			out.WriteLine(fmt.Sprintf("Warning: Some packages may be missing due to corrupted package database: %v", err))
+			out.WriteLine(fmt.Sprintf(
+				"Warning: Some packages may be missing due to corrupted package database: %v",
+				err,
+			))
 		}
 	}
 
