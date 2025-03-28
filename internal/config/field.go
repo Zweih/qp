@@ -6,25 +6,25 @@ import (
 	"yaylog/internal/consts"
 )
 
-func parseColumns(
-	columnsInput string,
-	addColumnsInput string,
-	hasAllColumns bool,
+func parseFields(
+	fieldInput string,
+	addFieldInput string,
+	hasAllFields bool,
 ) ([]consts.FieldType, error) {
 	var specifiedColumnsRaw string
-	var columns []consts.FieldType
+	var fields []consts.FieldType
 
 	switch {
-	case columnsInput != "":
-		specifiedColumnsRaw = columnsInput
-	case addColumnsInput != "":
-		specifiedColumnsRaw = addColumnsInput
+	case fieldInput != "":
+		specifiedColumnsRaw = fieldInput
+	case addFieldInput != "":
+		specifiedColumnsRaw = addFieldInput
 		fallthrough
 	default:
-		if hasAllColumns {
-			columns = consts.ValidFields
+		if hasAllFields {
+			fields = consts.ValidFields
 		} else {
-			columns = consts.DefaultFields
+			fields = consts.DefaultFields
 		}
 	}
 
@@ -41,9 +41,9 @@ func parseColumns(
 				return nil, fmt.Errorf("Error: '%s' is not a valid column", column)
 			}
 
-			columns = append(columns, fieldType)
+			fields = append(fields, fieldType)
 		}
 	}
 
-	return columns, nil
+	return fields, nil
 }

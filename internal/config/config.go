@@ -51,7 +51,7 @@ func ParseFlags(args []string) (Config, error) {
 	var count int
 
 	var allPackages bool
-	var hasAllColumns bool
+	var hasAllFields bool
 	var showHelp bool
 	var outputJson bool
 	var hasNoHeaders bool
@@ -66,33 +66,48 @@ func ParseFlags(args []string) (Config, error) {
 	var nameFilter string
 	var requiredByFilter string
 	var sortBy string
-	var columnsInput string
-	var addColumnsInput string
+	var fieldInput string
+	var addFieldInput string
 
 	pflag.CommandLine.SortFlags = false // keeps the help output in the order we define below
 
-	pflag.IntVarP(&count, "number", "n", 20, "Number of packages to show")
-	pflag.BoolVarP(&allPackages, "all", "a", false, "Show all packages (ignores -n)")
+	pflag.IntVarP(&count, "limit", "l", 20, "Number of packages to show")
+	pflag.BoolVarP(&allPackages, "all", "a", false, "Show all packages (ignores -l)")
 
-	pflag.StringVar(&sortBy, "sort", "date", "Sort packages by: 'date', 'alphabetical', 'size:desc', 'size:asc'")
-	pflag.StringArrayVarP(&filterInputs, "filter", "f", []string{}, "Apply multiple filters (e.g. --filter size=2KB:3KB --filter name=vim)")
+	pflag.StringArrayVarP(&filterInputs, "where", "w", []string{}, "Apply multiple filters (e.g. --where size=2KB:3KB --w name=vim)")
+	pflag.StringVarP(&sortBy, "order", "O", "date", "Order results by a field")
 
-	pflag.BoolVarP(&hasNoHeaders, "no-headers", "", false, "Hide headers for columns (useful for scripts/automation)")
-	pflag.BoolVarP(&hasAllColumns, "all-columns", "", false, "Show all available columns/fields in the output (overrides defaults)")
-	pflag.StringVar(&columnsInput, "columns", "", "Comma-separated list of columns to display (overrides defaults)")
-	pflag.StringVar(&addColumnsInput, "add-columns", "", "Comma-separated list of columns to add to defaults")
+	pflag.BoolVarP(&hasNoHeaders, "no-headers", "", false, "Hide headers for table ouput (useful for scripts/automation)")
+	pflag.BoolVarP(&hasAllFields, "select-all", "A", false, "Display all available fields")
+	pflag.StringVarP(&fieldInput, "select", "s", "", "Select exact fields to display")
+	pflag.StringVarP(&addFieldInput, "select-add", "S", "", "Add fields to the default output")
 
 	pflag.BoolVarP(&showFullTimestamp, "full-timestamp", "", false, "Show full timestamp instead of just the date")
 	pflag.BoolVarP(&outputJson, "json", "", false, "Output results in JSON format")
 	pflag.BoolVarP(&disableProgress, "no-progress", "", false, "Force suppress progress output")
 
+	pflag.BoolVarP(&showHelp, "help", "h", false, "Display help")
+
 	// deprecated legacy flags, hidden but still functioning
+	pflag.IntVarP(&count, "number", "n", 20, "Number of packages to show")
+	pflag.StringArrayVarP(&filterInputs, "filter", "f", []string{}, "Apply multiple filters (e.g. --filter size=2KB:3KB --filter name=vim)")
+	pflag.StringVar(&sortBy, "sort", "date", "Sort packages by: 'date', 'alphabetical', 'size:desc', 'size:asc'")
+	pflag.BoolVarP(&hasAllFields, "all-columns", "", false, "Show all available columns/fields in the output (overrides defaults)")
+	pflag.StringVar(&fieldInput, "columns", "", "Comma-separated list of columns to display (overrides defaults)")
+	pflag.StringVar(&addFieldInput, "add-columns", "", "Comma-separated list of columns to add to defaults")
 	pflag.BoolVarP(&explicitOnly, "explicit", "e", false, "Show only explicitly installed packages")
 	pflag.BoolVarP(&dependenciesOnly, "dependencies", "d", false, "Show only packages installed as dependencies")
 	pflag.StringVar(&dateFilter, "date", "", "Filter packages by installation date. Supports exact dates (YYYY-MM-DD), ranges (YYYY-MM-DD:YYYY-MM-DD), and open-ended filters (:YYYY-MM-DD or YYYY-MM-DD:).")
 	pflag.StringVar(&sizeFilter, "size", "", "Filter packages by size. Supports ranges (e.g., 10MB:20GB), exact matches (e.g., 5MB), and open-ended values (e.g., :2GB or 500KB:)")
 	pflag.StringVar(&nameFilter, "name", "", "Filter packages by name (or similar name)")
 	pflag.StringVar(&requiredByFilter, "required-by", "", "Show only packages that are required by the specified package")
+
+	_ = pflag.CommandLine.MarkHidden("number")
+	_ = pflag.CommandLine.MarkHidden("filter")
+	_ = pflag.CommandLine.MarkHidden("sort")
+	_ = pflag.CommandLine.MarkHidden("all-columns")
+	_ = pflag.CommandLine.MarkHidden("columns")
+	_ = pflag.CommandLine.MarkHidden("add-columns")
 	_ = pflag.CommandLine.MarkHidden("explicit")
 	_ = pflag.CommandLine.MarkHidden("dependencies")
 	_ = pflag.CommandLine.MarkHidden("date")
@@ -100,16 +115,14 @@ func ParseFlags(args []string) (Config, error) {
 	_ = pflag.CommandLine.MarkHidden("name")
 	_ = pflag.CommandLine.MarkHidden("required-by")
 
-	pflag.BoolVarP(&showHelp, "help", "h", false, "Display help")
-
 	if err := pflag.CommandLine.Parse(args); err != nil {
 		return Config{}, fmt.Errorf("Error parsing flags: %v", err)
 	}
 
 	err := validateFlagCombinations(
-		columnsInput,
-		addColumnsInput,
-		hasAllColumns,
+		fieldInput,
+		addFieldInput,
+		hasAllFields,
 		explicitOnly,
 		dependenciesOnly,
 	)
@@ -121,7 +134,7 @@ func ParseFlags(args []string) (Config, error) {
 		count = 0
 	}
 
-	columnsParsed, err := parseColumns(columnsInput, addColumnsInput, hasAllColumns)
+	fieldsParsed, err := parseFields(fieldInput, addFieldInput, hasAllFields)
 	if err != nil {
 		return Config{}, err
 	}
@@ -150,7 +163,7 @@ func ParseFlags(args []string) (Config, error) {
 		ShowFullTimestamp: showFullTimestamp,
 		DisableProgress:   disableProgress,
 		SortBy:            sortBy,
-		Fields:            columnsParsed,
+		Fields:            fieldsParsed,
 		FilterQueries:     filterQueries,
 	}
 

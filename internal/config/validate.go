@@ -5,14 +5,14 @@ import (
 )
 
 func validateFlagCombinations(
-	columnsInput string,
-	addColumnsInput string,
-	hasAllColumns bool,
+	fieldInput string,
+	addFieldInput string,
+	hasAllFields bool,
 	explicitOnly bool,
 	dependenciesOnly bool,
 ) error {
-	if columnsInput != "" && (addColumnsInput != "" || hasAllColumns) {
-		return fmt.Errorf("Error: Cannot use --columns and --add-columns or --all-columns together. Use --columns to fully define the output columns")
+	if fieldInput != "" && (addFieldInput != "" || hasAllFields) {
+		return fmt.Errorf("Error: Cannot use --select/--select-add or --select-al together. Use --select to fully define the output fields")
 	}
 
 	if explicitOnly && dependenciesOnly {
@@ -39,7 +39,7 @@ func validateSortOption(sortBy string) error {
 	}
 
 	if !validSortOptions[sortBy] {
-		return fmt.Errorf("Error: Invalid sort option %s", sortBy)
+		return fmt.Errorf("Error: Invalid order option %s", sortBy)
 	}
 
 	return nil
