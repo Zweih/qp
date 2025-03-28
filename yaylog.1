@@ -1,13 +1,14 @@
 .\" Man page for yaylog
-.TH yaylog 1 "March 2025" "yaylog 3.27.0" "User Commands"
+.TH yaylog 1 "March 2025" "yaylog 3.39.0" "User Commands"
 .SH NAME
-yaylog \- List and filter installed packages on Arch-based systems.
+yaylog \- List and query installed packages on Arch-based systems.
 .SH SYNOPSIS
 .B yaylog
-.RI [ \-n | \-\-number <number> ] [ \-a | \-\-all ] [ \-f <field>=<value> ] [ \-e | \-\-explicit ] [ \-d | \-\-dependencies ] [ \-\-required-by <package> ] [ \-\-date <filter> ] [ \-\-size <filter> ] [ \-\-name <search-term> ] [ \-\-sort <mode> ] [ \-\-columns <list> ] [ \-\-add-columns <list> ] [ \-\-all-columns ] [ \-\-json ] [ \-\-full-timestamp ] [ \-\-no-progress ] [ \-h | \-\-help ]
+.RI [ \-n | \-\-limit <number> ] [ \-a | \-\-all ] [ \-w <field>=<value> ] [ \-s | \-\-select <list> ] [ \-S | \-\-select-add <list> ] [ \-A | \-\-select-all ] [ \-O | \-\-order <mode> ] [ \-\-json ] [ \-\-no-headers ] [ \-\-full-timestamp ] [ \-\-no-progress ] [ \-h | \-\-help ]
+
 .SH DESCRIPTION
 .B yaylog
-is a standalone CLI utility for Arch and Arch-based Linux distributions to list and filter installed packages. It works with any package manager that uses ALPM,
+is a standalone CLI utility for Arch and Arch-based Linux distributions to list and query installed packages. It works with any package manager that uses ALPM,
 including
 .B yay,
 .B paru,
@@ -15,21 +16,21 @@ including
 .B pacman,
 and others.
 
-The utility provides powerful filtering capabilities, including:
-- Installation date filtering
-- Package size filtering
-- Install reason filtering
-- Reverse dependency lookup + filtering
-- Conflict filtering
-- Dependency filtering
-- Provision filtering
-- Package name filtering
-- Architecture filtering
-- Sorting and JSON output support
+The utility provides powerful querying capabilities, including:
+- Installation date queries
+- Package size queries
+- Install reason queries
+- Reverse dependency lookups
+- Conflict queries
+- Dependency queries
+- Provision queries
+- Package name queries
+- Architecture queries
+- Sorting and JSON output
 
 .SH OPTIONS
 .TP
-.B \-n, \-\-number <number>
+.B \-l, \-\-limit <number>
 Display the specified number of recent packages (default: 20). Ignored if
 .B \-a
 or
@@ -37,72 +38,70 @@ or
 is used.
 .TP
 .B \-a, \-\-all
-Show all installed packages, ignoring the
-.B \-n
-or
-.B \-\-number
-option.
+Show all installed packages, ignoring
+.B \-l
+/
+.B \-\-limit
 .TP
-.B \-f, \-\-filter <field>=<value>
-Apply multiple filters for flexible package queries. This option can be used multiple times.
+.B \-w, \-\-where <field>=<value>
+Apply package queries. This option can be used multiple times.
+
 .PP
-Supported fields:
+Supported queries:
 .IP
 .B date=<YYYY-MM-DD>
-: Show packages installed on the specified date.
+: Packages installed on the specified date.
 .IP
 .B date=YYYY-MM-DD:
-: Show packages installed on or after the date.
+: Packages installed on or after the date.
 .IP
 .B date=:YYYY-MM-DD
-: Show packages installed up to the specified date.
+: Packages installed up to the specified date.
 .IP
 .B date=YYYY-MM-DD:YYYY-MM-DD
-: Show packages installed within a date range.
+: Packages installed within a date range.
 .IP
 .B size=10MB:
-: Show packages larger than 10MB.
+: Packages larger than 10MB.
 .IP
 .B size=:500KB
-: Show packages up to 500KB.
+: Packages up to 500KB.
 .IP
 .B size=1GB:5GB
-: Show packages between 1GB and 5GB.
+: Packages between 1GB and 5GB.
 .IP
 .B reason=explicit
-: Show only explicitly installed packages.
-.IP
-.B name=firefox
-: Filter packages by name. Use a comma-separated list for multiple packages.
+: Explicitly installed packages.
 .IP
 .B reason=dependencies
-: Show only packages installed as dependencies. Use a comma-separated list for multiple packages.
+: Packages installed as dependencies.
+.IP
+.B name=firefox
+: Match package names. Supports comma-separated list.
 .IP
 .B required-by=vlc
-: Show packages required by "vlc". Use a comma-separated list for multiple packages.
+: Packages required by "vlc".
 .IP
 .B depends=glibc
-: Show packages that depend on "glibc". Use a comma-separated list for multiple packages.
+: Packages that depend on "glibc".
 .IP
 .B provides=awk
-: Show packages that provide the "awk" program. Use a comma-separated list for multiple provisions.
+: Packages that provide "awk".
 .IP
 .B conflicts=linuxqq
-: Show packages that conflict with the "linuxqq" package. Use a comma-separated list for multiple conflicts.
+: Packages that conflict with "linuxqq".
 .IP
 .B arch=x86_64
-: Show packages that are built for the specified (or unspecfied with "any) architecture. Use a comma-separated for multiple architectures.
-
+: Packages built for specified architectures. "any" is also valid.
 
 .PP
-For example, to filter all explicitly installed packages larger than 100MB:
-.PP
+Example:
 .EX
-yaylog -f reason=explicit -f size=100MB:
+yaylog -w reason=explicit -w size=100MB:
 .EE
 
 .TP
-.B \-\-sort <mode>
+.B \-O, \-\-order <mode>
 Sort results by the specified mode. Available modes:
 .IP
 .B date
@@ -112,204 +111,105 @@ Sort results by the specified mode. Available modes:
 : Sort alphabetically by package name.
 .IP
 .B size:asc
-: Sort by package size in ascending order.
+: Sort by size ascending.
 .IP
 .B size:desc
-: Sort by package size in descending order.
+: Sort by size descending.
+
 .TP
 .B \-\-no-headers
-Omit column headers in table output. Useful for scripting.
+Omit headers in table output. Useful for scripting.
+
 .TP
-.B \-\-columns <list>
-Specify a comma-separated list of columns to display. Available columns:
-.IP
-.B date
-: Installation date.
-.IP
-.B name
-: Package name.
-.IP
-.B reason
-: Installation reason (explicit/dependency).
-.IP
-.B size
-: Package size.
-.IP
-.B version
-: Installed version.
-.IP
-.B depends
-: List of dependencies.
-.IP
-.B required-by
-: Reverse dependencies (packages that depend on this one).
-.IP
-.B provides
-: Alternative package names or shared libraries provided.
-.IP
-.B conflicts
-: List of packages that conflict, or cause problems, with the package.
-.IP
-.B arch
-: Architecture the package was built for. 
-.IP
-.B license
-: Package software license.
-.IP
-.B url
-: URL of the official site of the software being packaged.
-.IP
-.B description
-: Package description.
+.B \-s, \-\-select <list>
+Specify a comma-separated list of fields to display. Overrides default fields.
+
 .TP
-.B \-\-all-columns
-Show all available columns.
+.B \-S, \-\-select-add <list>
+Add fields to default output or to
+.B \-\-select-all
+
+.TP
+.B \-A, \-\-select-all
+Display all available fields.
+
 .TP
 .B \-\-json
-Output results in JSON format instead of a table. Overrides
+Output results in JSON format. Overrides
 .B \-\-full-timestamp
-for structured automation.
+
 .PP
 Example:
-.PP
 .EX
-yaylog -f name=sqlite --json --columns name,version,size
+yaylog -w name=sqlite --json -s name,version,size
 .EE
+
 .TP
 .B \-\-full-timestamp
-Display the full timestamp instead of just the date.
+Show full date + time instead of just the date.
+
 .TP
-.B \-\-no-progress 
-Suppress progress output.
+.B \-\-no-progress
+Suppress progress output, even in interactive mode.
+
 .TP
 .B \-h, \-\-help
-Display help information.
-
-.SH LEGACY OPTIONS (Deprecated)
-These options remain for backward compatibility but are superseded by
-.B \-\-filter (-f)
-.TP
-.B \-e, \-\-explicit
-(Deprecated) Show only explicitly installed packages.
-Equivalent to:
-.PP
-.EX
-yaylog -f reason=explicit
-.EE
-.TP
-.B \-d, \-\-dependencies
-(Deprecated) Show only packages installed as dependencies.
-Equivalent to:
-.PP
-.EX
-yaylog -f reason=dependencies
-.EE
-.TP
-.B \-\-required-by <package>
-(Deprecated) Show packages required by another package.
-Equivalent to:
-.PP
-.EX
-yaylog -f required-by=firefox
-.EE
-.TP
-.B \-\-date <filter>
-(Deprecated) Filter packages by installation date.
-Equivalent to:
-.PP
-.EX
-yaylog -f date=YYYY-MM-DD
-.EE
-.TP
-.B \-\-size <filter>
-(Deprecated) Filter packages by size.
-Equivalent to:
-.PP
-.EX
-yaylog -f size=100MB:1GB
-.EE
-.TP
-.B \-\-name <search-term>
-(Deprecated) Filter packages by name.
-Equivalent to:
-.PP
-.EX
-yaylog -f name=vim
-.EE
+Show help information.
 
 .SH EXAMPLES
 .TP
-Show the last 10 installed packages:
-.PP
+Last 10 installed packages:
 .EX
 yaylog -n 10
 .EE
 .TP
-Show all explicitly installed packages:
-.PP
+All explicitly installed packages:
 .EX
-yaylog -f reason=explicit
+yaylog -w reason=explicit
 .EE
 .TP
-Show packages between 100MB and 1GB installed before June 30, 2024:
-.PP
+Between 100MB–1GB, installed before June 30, 2024:
 .EX
-yaylog -f size=100MB:1GB -f date=:2024-06-30
+yaylog -w size=100MB:1GB -w date=:2024-06-30
 .EE
 .TP
-Show all packages required by "firefox":
-.PP
+Packages required by "firefox":
 .EX
-yaylog -f required-by=firefox
+yaylog -w required-by=firefox
 .EE
 .TP
-Output package data in JSON format:
-.PP
+JSON output:
 .EX
 yaylog --json
 .EE
 .TP
-Save all explicitly installed packages to a JSON file:
-.PP
+Save explicit packages to JSON file:
 .EX
-yaylog -f reason=explicit --json > explicit-packages.json
+yaylog -w reason=explicit --json > explicit-packages.json
 .EE
 .TP
-Show package names and sizes without headers (useful for scripting):
-.PP
+Show names and sizes without headers:
 .EX
-yaylog --no-headers --columns name,size
+yaylog --no-headers -s name,size
 .EE
 .TP
-Show all packages that have "glibc" as a dependency and are required by "ffmpeg":
-.PP
+Packages that depend on "glibc" and are required by "ffmpeg":
 .EX
-yaylog -f depends=glibc -f required-by=ffmpeg
+yaylog -w depends=glibc -w required-by=ffmpeg
 .EE
 .TP
-Inclusively show packages that require "gcc" or "pacman":
-.PP
+Packages built for "any" architecture:
 .EX
-yaylog -f required-by=base-devel,gcc
-.EE
-.TP
-Show packages that conflict with the "linuxqq" package
-.PP
-.EX
-yaylog -f conflicts=linuxqq
-.EE
-.TP
-Show packages that are built for any architecure.
-.EX
-yaylog -f arch=any
+yaylog -w arch=any
 .EE
 
 .SH AUTHOR
 Written by Fernando Nunez <me@fernandonunez.io>.
+
 .SH LICENSE
-This project is licensed under the MIT License. See the
+MIT License. See
 .B LICENSE
-file for details.
+for details.
 
 .SH BUGS
 Report bugs at:
@@ -319,3 +219,4 @@ Report bugs at:
 .SH SEE ALSO
 .BR pacman(8),
 .BR yay(8)
+

@@ -1,12 +1,12 @@
 # yaylog
 
-`yaylog` is a CLI util, written in **Go** / **Golang**, for [arch linux](https://archlinux.org) and arch-based linux distros to sort/filter installed packages.
+`yaylog` is a CLI util, written in **Go** / **Golang**, for [arch linux](https://archlinux.org) and arch-based linux distros to query installed packages.
 
 despite the name, it's not limited to `yay` and works with any package manager that uses ALPM; so it can be used with `pacman`, `yay`, `paru`, `aura`, `pamac`, and even `yaourt` if you're somehow still using it.
 
 you can find installation instructions [here](#installation).
 
-`yaylog` supports optional filters/sorting for install date, package name, install reason (explicit/dependency), size on disk, reverse dependencies, dependency requirements, and more. check [usage](#usage) for all available options.
+`yaylog` supports querying/sorting for install date, package name, install reason (explicit/dependency), size on disk, reverse dependencies, dependency requirements, and more. check [usage](#usage) for all available options.
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/yaylog.svg)](https://repology.org/project/yaylog/versions) ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/Zweih/yaylog/total?style=for-the-badge&logo=archlinux&label=Downloads%20Since%202%2F4%2F2025&color=%20%231793d0)
 
@@ -16,7 +16,7 @@ you can find installation instructions [here](#installation).
 <summary><strong>download and clone statistics</strong></summary>
 <br>
  
-graphs are generated daily with my other project, [Repulse Analytics](https://github.com/Zweih/repulse-analytics)
+graphs are generated daily with my other project, [repulse analytics](https://github.com/Zweih/repulse-analytics)
 
 <img src="https://raw.githubusercontent.com/Zweih/repulse-analytics/refs/heads/repulse-traffic-graphs/total_downloads.png" alt="total downloads" width="400"/> <img src="https://raw.githubusercontent.com/Zweih/repulse-analytics/refs/heads/repulse-traffic-graphs/total_clones.png" alt="total clones" width="400"/>
 
@@ -34,16 +34,16 @@ this package is compatible with the following distributions:
 ## features
 
 - list installed packages with date/timestamps, dependencies, provisions, requirements, size on disk, conflicts, architecture, description, and version
-- filter by explicitly installed packages
-- filter by packages installed as dependencies
-- filter by packages required by specified packages
-- filter by packages that depend upon specified packages
-- filter by packages that provide specified packages
-- filter by packages that conflict with specific packages
-- filter by a specific installation date or date range
-- filter by packages built with specified architectures
-- filter by package size or size range
-- filter by package name (substring match)
+- query by explicitly installed packages
+- query by packages installed as dependencies
+- query by packages required by specified packages
+- query by packages that depend upon specified packages
+- query by packages that provide specified packages
+- query by packages that conflict with specific packages
+- query by a specific installation date or date range
+- query by packages built with specified architectures
+- query by package size or size range
+- query by package name (substring match)
 - sort by installation date, alphabetically, or by size on disk
 - output as a table or JSON
 
@@ -56,26 +56,26 @@ because yay is my preferred AUR helper and the name has a good flow.
 ## roadmap
 
 - [x] rewrite in golang
-- [x] additional filters
+- [x] additional queries
 - [ ] list possibly or confirmed stale/abandoned packages
 - [x] sort by size on disk
 - [x] protobuf caching (127% speed boost)
 - [ ] dependency graph
-- [x] concurrent filtering
-- [x] filter by size on disk
+- [x] concurrent querying
+- [x] query by size on disk
 - [x] asynchronous progress bar
 - [x] channel-based aggregation
 - [x] concurrent sorting
-- [x] filter by package name
+- [x] query by package name
 - [x] package version field
-- [x] filter by date range
+- [x] query by date range
 - [x] concurrent file reading (200% speed boost)
 - [x] remove expac as a dependency (300% speed boost)
 - [x] package provisions
 - [x] optional full timestamp 
 - [x] add CI to release binaries
 - [x] remove go as a dependency
-- [x] filter by range of size on disk
+- [x] query by range of size on disk
 - [x] user defined columns
 - [x] dependencies of each package (dependency field)
 - [x] reverse-dependencies of each package (required-by field)
@@ -83,36 +83,36 @@ because yay is my preferred AUR helper and the name has a good flow.
 - [x] package URL field
 - [x] package architecture field
 - [x] package conflicts field
-- [x] conflicts filter
-- [ ] name exclusion filter
+- [x] conflicts query
+- [ ] name exclusion query
 - [ ] self-referencing field
 - [x] JSON output
 - [x] no-headers option
-- [x] provides filter
-- [x] depends filter
+- [x] provides query
+- [x] depends query
 - [x] all-columns option
-- [x] required-by filter
+- [x] required-by query
 - [ ] key/value output
-- [x] list of packages for package filters
+- [x] list of packages for package queries
 - [x] config dependency injection for testing
 - [ ] required-by count sort
 - [x] optimize file reading (28% speed boost)
-- [x] metaflag for all filters
+- [x] metaflag for all queries
 - [x] package license field
 - [ ] XML output
-- [x] use chunked channel-based concurrent filtering (12% speed boost) 
-- [ ] short-args for filters
+- [x] use chunked channel-based concurrent querying (12% speed boost) 
+- [ ] short-args for queries
 - [ ] license sort
 - [ ] packager field
 - [ ] streaming pipeline
-- [x] architecture filter
-- [x] optimize filter ordering (4% speed boost)
+- [x] architecture query
+- [x] optimize query order (4% speed boost)
 - [ ] dependency count sort
-- [ ] license filter
+- [ ] license query
 - [ ] optional dependency field
 - [x] improve sorting efficiency (8% speed boost)
 - [ ] package base field
-- [ ] package description filter
+- [ ] package description query
 
 ## installation
 
@@ -159,52 +159,51 @@ yaylog [options]
 ```
 
 ### options
-- `-n <number>` | `--number <number>`: number of recent packages to display (default: 20)
-- `-a` | `all`: show all installed packages (ignores `-n`)
-- `-f <field>=<value>` | `--filter <field>=<value>`: apply multiple filters for a flexible query system. can be used multiple times. example:
-  - `--filter size=10MB:1GB`    -> filter by size range
-  - `--filter date=2024-01-01:` -> filter by installation date
-  - `--filter reason=explicit`  -> filter by explicit installations
-  - `--filter name=firefox`     -> filter by package names that contain `firefox`
-  - `--filter required-by=vlc`  -> filter by packages required by `vlc`
-  - `--filter depends=glibc`    -> filter by packages that depend on `glibc`
-  - `--filter conflicts=sdl2`   -> filter by packages that conflict with `sdl2`
-  - `--filter arch=x86_64`      -> filter by packages that are built for `x86_64` CPUs
-- `--sort <mode>`: sort results by:
+- `-l <number>` | `--limit <number>`: limit the amount of recent packages to display (default: 20)
+- `-a` | `all`: show all installed packages (ignores `-l`)
+- `-w <field>=<value>` | `--where <field>=<value>`: apply multiple queries for a flexible query system. can be used multiple times. example:
+  - `--where size=10MB:1GB`    -> query by size range
+  - `--where date=2024-01-01:` -> query by installation date
+  - `--where reason=explicit`  -> query by explicit installations
+  - `--where name=firefox`     -> query by package names that contain `firefox`
+  - `--where required-by=vlc`  -> query by packages required by `vlc`
+  - `--where depends=glibc`    -> query by packages that depend on `glibc`
+  - `--where conflicts=sdl2`   -> query by packages that conflict with `sdl2`
+  - `--where arch=x86_64`      -> query by packages that are built for `x86_64` CPUs
+- `-O` | `--order <mode>`: sort results by:
   - `date` (default) - sort by installation date
   - `alphabetical` - sort alphabetically by package name
   - `size:asc` / `size:desc` - sort by package size (ascending or descending)
 - `--no-headers`: omit column headers in table output (useful for scripting)
-- `--columns <list>`: comma-separated list of columns to display (cannot use with `--all-columns` or `--add-columns`)
-- `--add-columns <list>`: comma-separated list of columns to add to defaults or `all-columns`
-- `--all-columns`: show all available columns in the output (overrides defaults)
+- `-s` | `--select <list>`: comma-separated list of fields to display (cannot use with `--select-all` or `--select-add`)
+- `-S` | `--select-add <list>`: comma-separated list of fields to add to defaults or `--select-all`
+- `-A` | `--select-all`: output all available fields (overrides defaults)
 - `--full-timestamp`: display the full timestamp (date and time) of package installations instead of just the date
 - `--json`: output results in JSON format (overrides table output and `--full-timestamp`)
 - `--no-progress`: force no progress bar outside of non-interactive environments
-- `--required-by <package-name>`: show only packages that are required by the specified package
 - `-h` | `--help`: print help info
 
-### filtering with `--filter`
-the `--filter` (short-flag: `-f`) flag allow for powerful filtering of installed packages. filters can be combined by using multiple filter flags. 
+### querying with `--where`
+the `--where` (short-flag: `-w`) flag allow for powerful querying of installed packages. queries can be combined by using multiple query flags. 
 
-all filters that take package/library/program names as arguments can also take a comma-separated list. this applies to the filters `name`, `depends`, and `required-by`. 
+all queries that take package/library/program names as arguments can also take a comma-separated list. this applies to the queries `name`, `depends`, and `required-by`. 
 
-short-flag filters and long-flag filters can be combined.
+short-flag queries and long-flag queries can be combined.
 
-#### available filters
-| filter type  | syntax | description |
+#### available queries
+| query type  | syntax | description |
 |-------------|--------|-------------|
-| **date** | `date=<value>` | filters by installation date. supports exact dates, ranges (`YYYY-MM-DD:YYYY-MM-DD`), and open-ended ranges (`YYYY-MM-DD:` or `:YYYY-MM-DD`) |
-| **required by** | `required-by=<package>` / <br> `required-by=<package-1>,<package-2>,<etc>` | filters by packages that are required by the specified packages |
-| **depends** | `depends=<package>` / <br> `depends=<package-1>,<package-2>,<etc>` | filters by packages that have the specified packages as dependencies |
-| **provides** | `provides=<package>` / <br> `provides=<package-1>,<package-2>,<etc>` | filters by package that provide the specified packages/libraries |
-| **conflicts** | `conflicts=<package>` / <br> `conflicts=<package-1,<package-2>,<etc>` | filters by packages that conflict with the specified packages |
-| **architecture** | `arch=<architecture>` / <br> `arch=<architecture-1>,<architecture-2>,<etc>` | filters by packages that are built for the specified architectures <br> **note**: "any" is a separate architecture category |
-| **name** | `name=<package>` / <br> `name=<package-1>,<package-2>,<etc>` |  filters by package name (substring match) |
-| **installation reason** | `reason=explicit` / `reason=dependencies` | filters packages by installation reason: explicitly installed or installed as a dependency |
-| **size** | `size=<value>` | filters by package size on disk. supports exact values (`10MB`), ranges (`10MB:1GB`), and open-ended ranges (`:500KB`, `1GB:`) |
+| **date** | `date=<value>` | query by installation date. supports exact dates, ranges (`YYYY-MM-DD:YYYY-MM-DD`), and open-ended ranges (`YYYY-MM-DD:` or `:YYYY-MM-DD`) |
+| **required by** | `required-by=<package>` / <br> `required-by=<package-1>,<package-2>,<etc>` | query by packages that are required by the specified packages |
+| **depends** | `depends=<package>` / <br> `depends=<package-1>,<package-2>,<etc>` | query by packages that have the specified packages as dependencies |
+| **provides** | `provides=<package>` / <br> `provides=<package-1>,<package-2>,<etc>` | query by package that provide the specified packages/libraries |
+| **conflicts** | `conflicts=<package>` / <br> `conflicts=<package-1,<package-2>,<etc>` | query by packages that conflict with the specified packages |
+| **architecture** | `arch=<architecture>` / <br> `arch=<architecture-1>,<architecture-2>,<etc>` | query by packages that are built for the specified architectures <br> **note**: "any" is a separate architecture category |
+| **name** | `name=<package>` / <br> `name=<package-1>,<package-2>,<etc>` | query by package name (substring match) |
+| **installation reason** | `reason=explicit` / `reason=dependencies` | query packages by installation reason: explicitly installed or installed as a dependency |
+| **size** | `size=<value>` | query by package size on disk. supports exact values (`10MB`), ranges (`10MB:1GB`), and open-ended ranges (`:500KB`, `1GB:`) |
 
-### available columns
+### available fields
 - `date` - installation date of the package
 - `name` - package name
 - `reason` - installation reason (explicit/dependency)
@@ -224,7 +223,7 @@ the `--json` flag outputs the package data as structured JSON instead of a table
 
 example:
 ```bash
-yaylog -f name=tinysparql --all-columns --json
+yaylog -Aw name=tinysparql --json
 ```
 
 `tinysparql` is one of the few packages that actually has all the fields populated.
@@ -267,27 +266,27 @@ output format:
 
 ### tips & tricks
 
-- when using multiple short flags, the -n flag must be last since it consumes the next argument.
+- when using multiple short flags, the -l flag must be last since it consumes the next argument.
 this follows standard unix-style flag parsing, where positional arguments (like numbers)
 are treated as separate parameters.
   
   invalid:
   ```bash
-  yaylog -ne 15  # incorrect usage 
+  yaylog -wa name=yay  # incorrect usage 
   ```
   valid:
   ```bash
-  yaylog -en 15
+  yaylog -aw name=yay  # correct usage
   ```
 
-- the `depends`, `provides`, `required-by` columns output can be lengthy, packages like `glibc` are required by thousands of packages. to improve readability, pipe the output to `less`:
+- the `depends`, `provides`, `required-by` columns output can be lengthy, packages like `glibc` are required by thousands of packages. to improve readability, pipe the output to tools like `less` or `moar` (i prefer `moar`, but `less` is a core-util):
   ```bash
-  yaylog --columns name,depends | less
+  yaylog -s name,depends | less
   ```
 - all options that take an argument can also be used in the `--<flag>=<argument>` format:
   ```bash
-  yaylog -f size=100MB:1GB -f date=:2024-06-30 --number=100
-  yaylog -f name=gtk --sort=alphabetical
+  yaylog -w size=100MB:1GB -w date=:2024-06-30 --limit=100
+  yaylog -w name=gtk -O=alphabetical
   ```
   boolean flags can also be explicitly set using `--<flag>=true` or `--<flag>=false`:
   ```bash
@@ -295,7 +294,7 @@ are treated as separate parameters.
   ```
   string arguments can also be surrounded with quotes or double-quotes:
   ```bash
-  yaylog --sort="alphabetical" -f name="vim"
+  yaylog --order="alphabetical" -w name="vim"
   ```
 
   this can be useful for scripts and automation where you might want to avoid any and all ambiguity.
@@ -311,67 +310,67 @@ are treated as separate parameters.
 
  1. show the last 10 installed packages 
    ```bash
-   yaylog -n 10
+   yaylog -l 10
    ```
  2. show all explicitly installed packages
    ```bash
-   yaylog -a -f reason=explicit
+   yaylog -aw reason=explicit
    ```
  3. show only dependencies installed on a specific date
    ```bash
-   yaylog -f reason=dependencies -f date=2025-03-01
+   yaylog -w reason=dependencies -w date=2025-03-01
    ```
  4. show all packages sorted alphabetically
    ```bash
-   yaylog -a --sort alphabetical
+   yaylog -a -O alphabetical
    ```
  5. show the 15 most recent explicitly installed packages
    ```bash
-   yaylog -f reason=explicit -n 15
+   yaylog -w reason=explicit -l 15
    ```
  6. show packages installed between july 1, 2024, and december 31, 2024
    ```bash
-   yaylog -f date=2024-07-01:2024-12-31
+   yaylog -w date=2024-07-01:2024-12-31
    ```
  7. show the 20 most recently installed packages larger than 20MB
    ```bash
-   yaylog -f size=20MB: -n 20
+   yaylog -w size=20MB: -l 20
    ```
  8. show all dependencies smaller than 500KB  
    ```bash
-   yaylog -f reason=dependencies -f size=:500KB
+   yaylog -w reason=dependencies -w size=:500KB
    ```
  9. show packages between 100MB and 1GB installed up to june 30, 2024
    ```bash
-   yaylog -f size=100MB:1GB -f date=:2024-06-30
+   yaylog -w size=100MB:1GB -w date=:2024-06-30
    ```
 10. show all packages sorted by size in descending order, installed after january 1, 2025
    ```bash
-   yaylog -a --sort size:desc -f date=2025-01-01:
+   yaylog -a --order size:desc -w date=2025-01-01:
    ```
 11. search for installed packages containing "python
    ```bash
-   yaylog -f name=python
+   yaylog -w name=python
    ```
 12. search for explicitly installed packages containing "lib" that are between 10MB and 1GB in size
    ```bash
-   yaylog -f reason=explicit -f name=lib -f size=10MB:1GB
+   yaylog -w reason=explicit -w name=lib -w size=10MB:1GB
    ```
 13. search for packages with names containing "linux" installed between january 1 and june 30, 2024
    ```bash
-   yaylog -f name=linux -f date=2024-01-01:2024-06-30
+   yaylog -w name=linux -w date=2024-01-01:2024-06-30
    ```
 14. search for packages containing "gtk" installed after january 1, 2025, and at least 5MB in size
    ```bash
-   yaylog -f name=gtk -f date=2025-01-01: -f size=5MB:
+   yaylog -w name=gtk -w date=2025-01-01: -w size=5MB:
    ```
 15. show packages with name, version, and size
    ```bash
-   yaylog --columns name,version,size
+   yaylog -s name,version,size
    ```
 16. show package names, descriptions, and dependencies with `less` for readability
    ```bash
-   yaylog --columns name,depends,description | less
+   yaylog --select name,depends,description | less
    ```
 17. output package data in JSON format
    ```bash
@@ -379,61 +378,61 @@ are treated as separate parameters.
    ```
 18. save all explicitly installed packages to a JSON file
    ```bash
-   yaylog -f reason=explicit --json > explicit-packages.json
+   yaylog -w reason=explicit --json > explicit-packages.json
    ```
 19. output all packages sorted by size (descending) in JSON
    ```bash
-   yaylog --json -a --sort size:desc
+   yaylog --json -a -O size:desc
    ```
-20. output JSON with specific columns
+20. output JSON with specific fields
    ```bash
-   yaylog --json --columns name,version,size
+   yaylog --json -s name,version,size
    ```
-21. show all available package details
+21. show all available package details for all packages
    ```bash
-   yaylog --all-columns
+   yaylog -aA
    ```
 22. output all packages with all columns/fields in JSON format
    ```bash
-   yaylog -a --all-columns --json
+   yaylog -aA --json
    ```
 23. show package names and sizes without headers for scripting
    ```bash
-   yaylog --no-headers --columns name,size
+   yaylog --no-headers -s name,size
    ```
 24. show all packages required by `firefox`
    ```bash
-   yaylog -a -f required-by=firefox
+   yaylog -a -w required-by=firefox
    ```
 25. show all packages required by `gtk3` that are at least 50MB in size
    ```bash
-   yaylog -a -f required-by=gtk3 -f size=50MB:
+   yaylog -a -w required-by=gtk3 -w size=50MB:
    ```
 26. show packages required by `vlc` and installed after january 1, 2024 
    ```bash
-   yaylog -f required-by=vlc -f date=2024-01-01:
+   yaylog -w required-by=vlc -w date=2024-01-01:
    ```
 27. show all packages that have `glibc` as a dependency and are required by `ffmpeg`
    ```bash
-   yaylog -a -f depends=glibc -f required-by=ffmpeg
+   yaylog -a -w depends=glibc -w required-by=ffmpeg
    ```
 28. inclusively show packages that require `gcc` or `pacman`:
    ```bash
-   yaylog -f required-by=base-devel,gcc
+   yaylog -w required-by=base-devel,gcc
    ```
 29. show packages that provide `awk`:
    ```bash
-   yaylog -f provides=awk
+   yaylog -w provides=awk
    ```
 30. inclusively show packages that provide `rustc` or `python3`:
    ```bash
-   yaylog -f provides=rustc,python3
+   yaylog -w provides=rustc,python3
    ```
 31. show packages that conflict with `linuxqq`:
    ```bash
-   yaylog -f conflicts=linuxqq
+   yaylog -w conflicts=linuxqq
    ```
 32. show packages that are built for the `aarch64` CPU architecture or any architecture (non-CPU-specific):
    ```bash
-   yaylog -f arch=aarch64,any
+   yaylog -w arch=aarch64,any
    ```
