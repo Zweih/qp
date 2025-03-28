@@ -1,12 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"sync"
 	"yaylog/internal/config"
 	out "yaylog/internal/display"
-	"yaylog/internal/pipeline/filtering"
 	"yaylog/internal/pipeline/meta"
 	phasekit "yaylog/internal/pipeline/phase"
 	"yaylog/internal/pkgdata"
@@ -33,12 +31,12 @@ func mainWithConfig(configProvider config.ConfigProvider) error {
 	var wg sync.WaitGroup
 
 	pipelinePhases := []phasekit.PipelinePhase{
-		phasekit.New("Loading cache", loadCache, &wg),
-		phasekit.New("Fetching packages", fetchPackages, &wg),
-		phasekit.New("Calculating reverse dependencies", pkgdata.ReverseDependencies, &wg),
-		phasekit.New("Saving cache", saveCache, &wg),
-		phasekit.New("Filtering", filtering.PreprocessFiltering, &wg),
-		phasekit.New("Sorting", pkgdata.SortPackages, &wg),
+		phasekit.New("Loading cache", phasekit.LoadCacheStep, &wg),
+		phasekit.New("Fetching packages", phasekit.FetchStep, &wg),
+		phasekit.New("Calculating reverse dependencies", phasekit.ReverseDepStep, &wg),
+		phasekit.New("Saving cache", phasekit.SaveCacheStep, &wg),
+		phasekit.New("Filtering", phasekit.FilterStep, &wg),
+		phasekit.New("Sorting", phasekit.SortStep, &wg),
 	}
 
 	var pkgPtrs []*pkgdata.PkgInfo
@@ -55,63 +53,9 @@ func mainWithConfig(configProvider config.ConfigProvider) error {
 	}
 
 	pkgPtrs = trimPackagesLen(pkgPtrs, cfg)
-
 	renderOutput(pkgPtrs, cfg)
+
 	return nil
-}
-
-// TODO: add progress reporting
-func fetchPackages(
-	_ config.Config,
-	pkgPtrs []*pkgdata.PkgInfo,
-	_ meta.ProgressReporter,
-	pipelineCtx *meta.PipelineContext,
-) ([]*pkgdata.PkgInfo, error) {
-	if !pipelineCtx.UsedCache {
-		var err error
-		pkgPtrs, err = pkgdata.FetchPackages()
-		if err != nil {
-			out.WriteLine(fmt.Sprintf(
-				"Warning: Some packages may be missing due to corrupted package database: %v",
-				err,
-			))
-		}
-	}
-
-	return pkgPtrs, nil
-}
-
-func loadCache(
-	_ config.Config,
-	_ []*pkgdata.PkgInfo,
-	_ meta.ProgressReporter,
-	pipelineCtx *meta.PipelineContext,
-) ([]*pkgdata.PkgInfo, error) {
-	pkgPtrs, err := pkgdata.LoadProtoCache()
-	if err == nil {
-		pipelineCtx.UsedCache = true
-	}
-
-	// TODO: use ProgressReporter to report cache status
-	return pkgPtrs, nil
-}
-
-// TODO: add progress reporting
-func saveCache(
-	_ config.Config,
-	pkgPtrs []*pkgdata.PkgInfo,
-	_ meta.ProgressReporter,
-	pipelineCtx *meta.PipelineContext,
-) ([]*pkgdata.PkgInfo, error) {
-	if !pipelineCtx.UsedCache {
-		// TODO: we can probably save the file concurrently
-		err := pkgdata.SaveProtoCache(pkgPtrs)
-		if err != nil {
-			out.WriteLine(fmt.Sprintf("Error saving cache: %v", err))
-		}
-	}
-
-	return pkgPtrs, nil
 }
 
 func trimPackagesLen(

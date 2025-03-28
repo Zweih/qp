@@ -15,7 +15,7 @@ type (
 	PkgInfo          = pkgdata.PkgInfo
 )
 
-type Operation func(
+type Step func(
 	cfg config.Config,
 	packages []*PkgInfo,
 	progressReporter meta.ProgressReporter,
@@ -23,15 +23,15 @@ type Operation func(
 ) ([]*PkgInfo, error)
 
 type PipelinePhase struct {
-	name      string
-	operation Operation
-	wg        *sync.WaitGroup
+	name string
+	step Step
+	wg   *sync.WaitGroup
 }
 
-func New(name string, operation Operation, wg *sync.WaitGroup) PipelinePhase {
+func New(name string, step Step, wg *sync.WaitGroup) PipelinePhase {
 	return PipelinePhase{
 		name,
-		operation,
+		step,
 		wg,
 	}
 }
@@ -42,7 +42,7 @@ func (phase PipelinePhase) Run(
 	pipelineCtx *meta.PipelineContext,
 ) ([]*PkgInfo, error) {
 	progressChan := phase.startProgress(pipelineCtx.IsInteractive)
-	outputPackages, err := phase.operation(
+	outputPackages, err := phase.step(
 		cfg,
 		packages,
 		phase.reportProgress(progressChan),

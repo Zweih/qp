@@ -7,7 +7,6 @@ import (
 	"strings"
 	"yaylog/internal/config"
 	"yaylog/internal/consts"
-	"yaylog/internal/pipeline/meta"
 	"yaylog/internal/pkgdata"
 )
 
@@ -19,25 +18,7 @@ type (
 // TODO: regex is overkill for package list parsing
 var targetListRegex = regexp.MustCompile(`^([a-z0-9][a-z0-9._-]*[a-z0-9])(,([a-z0-9][a-z0-9._-]*[a-z0-9]))*$`)
 
-func PreprocessFiltering(
-	cfg config.Config,
-	pkgPrts []*PkgInfo,
-	reportProgress meta.ProgressReporter,
-	_ *meta.PipelineContext,
-) ([]*PkgInfo, error) {
-	if len(cfg.FilterQueries) == 0 {
-		return pkgPrts, nil
-	}
-
-	filterConditions, err := queriesToConditions(cfg.FilterQueries)
-	if err != nil {
-		return []*pkgdata.PkgInfo{}, err
-	}
-
-	return pkgdata.FilterPackages(pkgPrts, filterConditions, reportProgress), nil
-}
-
-func queriesToConditions(filterQueries map[consts.FieldType]string) (
+func QueriesToConditions(filterQueries map[consts.FieldType]string) (
 	[]*FilterCondition,
 	error,
 ) {

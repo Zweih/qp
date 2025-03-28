@@ -1,30 +1,14 @@
 package pkgdata
 
 import (
-	"slices"
-	"yaylog/internal/config"
-	"yaylog/internal/consts"
 	"yaylog/internal/pipeline/meta"
 )
 
 // TODO: we can do this concurrently. let's get on that.
-func ReverseDependencies(
-	cfg config.Config,
+func CalculateReverseDependencies(
 	pkgPtrs []*PkgInfo,
 	_ meta.ProgressReporter, // TODO: Add progress reporting
-	pipelineCtx *meta.PipelineContext,
 ) ([]*PkgInfo, error) {
-	if pipelineCtx.UsedCache {
-		return pkgPtrs, nil
-	}
-
-	_, hasRequiredByFilter := cfg.FilterQueries[consts.FieldRequiredBy]
-	hasRequiredByField := slices.Contains(cfg.Fields, consts.FieldRequiredBy)
-
-	if !hasRequiredByField && !hasRequiredByFilter {
-		return pkgPtrs, nil
-	}
-
 	packagePointerMap := make(map[string]*PkgInfo)
 	packageDependencyMap := make(map[string][]Relation)
 	providesMap := make(map[string]string)

@@ -5,11 +5,10 @@ import (
 	"runtime"
 	"sort"
 	"sync"
-	"yaylog/internal/config"
 	"yaylog/internal/pipeline/meta"
 )
 
-const concurrentSortThreshold = 500
+const ConcurrentSortThreshold = 500
 
 type PackageComparator func(a *PkgInfo, b *PkgInfo) bool
 
@@ -29,7 +28,7 @@ func sizeAscComparator(a *PkgInfo, b *PkgInfo) bool {
 	return a.Size < b.Size
 }
 
-func getComparator(sortBy string) PackageComparator {
+func GetComparator(sortBy string) PackageComparator {
 	switch sortBy {
 	case "alphabetical":
 		return alphabeticalComparator
@@ -72,7 +71,7 @@ func mergedSortedChunks(
 }
 
 // pkgPointers will be sorted in place, mutating the slice order
-func sortConcurrently(
+func SortConcurrently(
 	pkgPtrs []*PkgInfo,
 	comparator PackageComparator,
 	phase string,
@@ -168,7 +167,7 @@ func sortConcurrently(
 }
 
 // pkgPointers will be sorted in place, mutating the slice order
-func sortNormally(
+func SortNormally(
 	pkgPtrs []*PkgInfo,
 	comparator PackageComparator,
 	phase string,
@@ -187,21 +186,4 @@ func sortNormally(
 	}
 
 	return pkgPtrs
-}
-
-func SortPackages(
-	cfg config.Config,
-	pkgPtrs []*PkgInfo,
-	reportProgress meta.ProgressReporter,
-	_ *meta.PipelineContext,
-) ([]*PkgInfo, error) {
-	comparator := getComparator(cfg.SortBy)
-	phase := "Sorting packages"
-
-	// threshold is 500 as that is where merge sorting chunk performance overtakes timsort
-	if len(pkgPtrs) < concurrentSortThreshold {
-		return sortNormally(pkgPtrs, comparator, phase, reportProgress), nil
-	}
-
-	return sortConcurrently(pkgPtrs, comparator, phase, reportProgress), nil
 }
