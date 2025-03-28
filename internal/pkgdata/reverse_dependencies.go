@@ -8,7 +8,7 @@ import (
 )
 
 // TODO: we can do this concurrently. let's get on that.
-func CalculateReverseDependencies(
+func ReverseDependencies(
 	cfg config.Config,
 	pkgPtrs []*PkgInfo,
 	_ meta.ProgressReporter, // TODO: Add progress reporting

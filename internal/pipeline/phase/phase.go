@@ -1,4 +1,4 @@
-package main
+package phase
 
 import (
 	"fmt"
@@ -23,9 +23,17 @@ type Operation func(
 ) ([]*PkgInfo, error)
 
 type PipelinePhase struct {
-	Name      string
-	Operation Operation
+	name      string
+	operation Operation
 	wg        *sync.WaitGroup
+}
+
+func New(name string, operation Operation, wg *sync.WaitGroup) PipelinePhase {
+	return PipelinePhase{
+		name,
+		operation,
+		wg,
+	}
 }
 
 func (phase PipelinePhase) Run(
@@ -34,7 +42,7 @@ func (phase PipelinePhase) Run(
 	pipelineCtx *meta.PipelineContext,
 ) ([]*PkgInfo, error) {
 	progressChan := phase.startProgress(pipelineCtx.IsInteractive)
-	outputPackages, err := phase.Operation(
+	outputPackages, err := phase.operation(
 		cfg,
 		packages,
 		phase.reportProgress(progressChan),
@@ -58,7 +66,7 @@ func (phase PipelinePhase) reportProgress(progressChan chan ProgressMessage) Pro
 		progressChan <- ProgressMessage{
 			Phase:       phaseName,
 			Progress:    (current * 100) / total,
-			Description: fmt.Sprintf(("%s is in progress..."), phase.Name),
+			Description: fmt.Sprintf(("%s is in progress..."), phase.name),
 		}
 	})
 }

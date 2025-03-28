@@ -6,8 +6,9 @@ import (
 	"sync"
 	"yaylog/internal/config"
 	out "yaylog/internal/display"
-	"yaylog/internal/pipeline"
+	"yaylog/internal/pipeline/filtering"
 	"yaylog/internal/pipeline/meta"
+	phasekit "yaylog/internal/pipeline/phase"
 	"yaylog/internal/pkgdata"
 
 	"golang.org/x/term"
@@ -27,28 +28,27 @@ func mainWithConfig(configProvider config.ConfigProvider) error {
 		return err
 	}
 
-	var pkgPtrs []*pkgdata.PkgInfo
-
 	isInteractive := term.IsTerminal(int(os.Stdout.Fd())) && !cfg.DisableProgress
 	pipelineCtx := &meta.PipelineContext{IsInteractive: isInteractive}
 	var wg sync.WaitGroup
 
-	pipelinePhases := []PipelinePhase{
-		{"Loading cache", loadCache, &wg},
-		{"Fetching packages", fetchPackages, &wg},
-		{"Calculating reverse dependencies", pkgdata.CalculateReverseDependencies, &wg},
-		{"Saving cache", saveCache, &wg},
-		{"Filtering", pipeline.PreprocessFiltering, &wg},
-		{"Sorting", pkgdata.SortPackages, &wg},
+	pipelinePhases := []phasekit.PipelinePhase{
+		phasekit.New("Loading cache", loadCache, &wg),
+		phasekit.New("Fetching packages", fetchPackages, &wg),
+		phasekit.New("Calculating reverse dependencies", pkgdata.ReverseDependencies, &wg),
+		phasekit.New("Saving cache", saveCache, &wg),
+		phasekit.New("Filtering", filtering.PreprocessFiltering, &wg),
+		phasekit.New("Sorting", pkgdata.SortPackages, &wg),
 	}
 
+	var pkgPtrs []*pkgdata.PkgInfo
 	for i, phase := range pipelinePhases {
 		pkgPtrs, err = phase.Run(cfg, pkgPtrs, pipelineCtx)
 		if err != nil {
 			return err
 		}
 
-		if i > 0 && len(pkgPtrs) == 0 { // only start checking after both fetch attempts
+		if i > 0 && len(pkgPtrs) == 0 { // only start checking once both fetche
 			out.WriteLine("No packages to display.")
 			return nil
 		}
