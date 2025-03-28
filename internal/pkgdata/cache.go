@@ -11,7 +11,7 @@ import (
 
 const (
 	cachePath    = "/tmp/yaylog.cache"
-	cacheVersion = 1
+	cacheVersion = 2 // bump when updating structure of PkgInfo/Relation/pkginfo.proto
 )
 
 func getDbModTime() (int64, error) {
@@ -89,18 +89,19 @@ func pkgsToProtos(pkgs []*PkgInfo) []*pb.PkgInfo {
 	pbPkgs := make([]*pb.PkgInfo, len(pkgs))
 	for i, pkg := range pkgs {
 		pbPkgs[i] = &pb.PkgInfo{
-			Timestamp:  pkg.Timestamp,
-			Size:       pkg.Size,
-			Name:       pkg.Name,
-			Reason:     pkg.Reason,
-			Version:    pkg.Version,
-			Arch:       pkg.Arch,
-			License:    pkg.License,
-			Url:        pkg.Url,
-			Depends:    relationsToProtos(pkg.Depends),
-			RequiredBy: relationsToProtos(pkg.RequiredBy),
-			Provides:   relationsToProtos(pkg.Provides),
-			Conflicts:  relationsToProtos(pkg.Conflicts),
+			Timestamp:   pkg.Timestamp,
+			Size:        pkg.Size,
+			Name:        pkg.Name,
+			Reason:      pkg.Reason,
+			Version:     pkg.Version,
+			Arch:        pkg.Arch,
+			License:     pkg.License,
+			Url:         pkg.Url,
+			Description: pkg.Description,
+			Depends:     relationsToProtos(pkg.Depends),
+			RequiredBy:  relationsToProtos(pkg.RequiredBy),
+			Provides:    relationsToProtos(pkg.Provides),
+			Conflicts:   relationsToProtos(pkg.Conflicts),
 		}
 	}
 
@@ -124,18 +125,19 @@ func protosToPkgs(pbPkgs []*pb.PkgInfo) []*PkgInfo {
 	pkgs := make([]*PkgInfo, len(pbPkgs))
 	for i, pbPkg := range pbPkgs {
 		pkgs[i] = &PkgInfo{
-			Timestamp:  pbPkg.Timestamp,
-			Size:       pbPkg.Size,
-			Name:       pbPkg.Name,
-			Reason:     pbPkg.Reason,
-			Version:    pbPkg.Version,
-			Arch:       pbPkg.Arch,
-			License:    pbPkg.License,
-			Url:        pbPkg.Url,
-			Depends:    protosToRelations(pbPkg.Depends),
-			RequiredBy: protosToRelations(pbPkg.RequiredBy),
-			Provides:   protosToRelations(pbPkg.Provides),
-			Conflicts:  protosToRelations(pbPkg.Conflicts),
+			Timestamp:   pbPkg.Timestamp,
+			Size:        pbPkg.Size,
+			Name:        pbPkg.Name,
+			Reason:      pbPkg.Reason,
+			Version:     pbPkg.Version,
+			Arch:        pbPkg.Arch,
+			License:     pbPkg.License,
+			Url:         pbPkg.Url,
+			Description: pbPkg.Description,
+			Depends:     protosToRelations(pbPkg.Depends),
+			RequiredBy:  protosToRelations(pbPkg.RequiredBy),
+			Provides:    protosToRelations(pbPkg.Provides),
+			Conflicts:   protosToRelations(pbPkg.Conflicts),
 		}
 	}
 

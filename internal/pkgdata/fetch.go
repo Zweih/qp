@@ -24,6 +24,7 @@ const (
 	fieldArch        = "%ARCH%"
 	fieldLicense     = "%LICENSE%"
 	fieldUrl         = "%URL%"
+	fieldDescription = "%DESC%"
 
 	PacmanDbPath = "/var/lib/pacman/local"
 )
@@ -134,7 +135,7 @@ func parseDescFile(descPath string) (*PkgInfo, error) {
 
 			switch line {
 			case fieldName, fieldInstallDate, fieldSize, fieldReason,
-				fieldVersion, fieldArch, fieldLicense, fieldUrl:
+				fieldVersion, fieldArch, fieldLicense, fieldUrl, fieldDescription:
 				currentField = line
 
 			case fieldDepends, fieldProvides, fieldConflicts:
@@ -236,6 +237,9 @@ func applySingleLineField(pkg *PkgInfo, field string, value string) error {
 
 	case fieldUrl:
 		pkg.Url = value
+
+	case fieldDescription:
+		pkg.Description = value
 
 	default:
 		// ignore unknown fields

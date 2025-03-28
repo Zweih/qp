@@ -9,18 +9,19 @@ import (
 )
 
 type PkgInfoJson struct {
-	Timestamp  int64    `json:"timestamp,omitempty"`
-	Size       int64    `json:"size,omitempty"`
-	Name       string   `json:"name,omitempty"`
-	Reason     string   `json:"reason,omitempty"`
-	Version    string   `json:"version,omitempty"`
-	Arch       string   `json:"arch,omitempty"`
-	License    string   `json:"license,omitempty"`
-	Url        string   `json:"url,omitempty"`
-	Depends    []string `json:"depends,omitempty"`
-	RequiredBy []string `json:"requiredBy,omitempty"`
-	Provides   []string `json:"provides,omitempty"`
-	Conflicts  []string `json:"conflicts,omitempty"`
+	Timestamp   int64    `json:"timestamp,omitempty"`
+	Size        int64    `json:"size,omitempty"`
+	Name        string   `json:"name,omitempty"`
+	Reason      string   `json:"reason,omitempty"`
+	Version     string   `json:"version,omitempty"`
+	Arch        string   `json:"arch,omitempty"`
+	License     string   `json:"license,omitempty"`
+	Url         string   `json:"url,omitempty"`
+	Description string   `json:"description,omitempty"`
+	Depends     []string `json:"depends,omitempty"`
+	RequiredBy  []string `json:"requiredBy,omitempty"`
+	Provides    []string `json:"provides,omitempty"`
+	Conflicts   []string `json:"conflicts,omitempty"`
 }
 
 func (o *OutputManager) renderJson(pkgPtrs []*pkgdata.PkgInfo, fields []consts.FieldType) {
@@ -80,6 +81,14 @@ func getJsonValues(pkg *pkgdata.PkgInfo, fields []consts.FieldType) *PkgInfoJson
 			filteredPackage.Size = pkg.Size // return in bytes for json
 		case consts.FieldVersion:
 			filteredPackage.Version = pkg.Version
+		case consts.FieldArch:
+			filteredPackage.Arch = pkg.Arch
+		case consts.FieldLicense:
+			filteredPackage.License = pkg.License
+		case consts.FieldUrl:
+			filteredPackage.Url = pkg.Url
+		case consts.FieldDescription:
+			filteredPackage.Description = pkg.Description
 		case consts.FieldDepends:
 			filteredPackage.Depends = flattenRelations(pkg.Depends)
 		case consts.FieldRequiredBy:
@@ -88,12 +97,6 @@ func getJsonValues(pkg *pkgdata.PkgInfo, fields []consts.FieldType) *PkgInfoJson
 			filteredPackage.Provides = flattenRelations(pkg.Provides)
 		case consts.FieldConflicts:
 			filteredPackage.Conflicts = flattenRelations(pkg.Conflicts)
-		case consts.FieldArch:
-			filteredPackage.Arch = pkg.Arch
-		case consts.FieldLicense:
-			filteredPackage.License = pkg.License
-		case consts.FieldUrl:
-			filteredPackage.Url = pkg.Url
 		}
 	}
 

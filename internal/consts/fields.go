@@ -8,6 +8,7 @@ const (
 	FieldArch
 	FieldLicense
 	FieldName
+	FieldDescription
 	FieldUrl
 	FieldSize
 	FieldDate
@@ -19,18 +20,19 @@ const (
 )
 
 const (
-	date       = "date"
-	name       = "name"
-	reason     = "reason"
-	size       = "size"
-	version    = "version"
-	depends    = "depends"
-	requiredBy = "required-by"
-	provides   = "provides"
-	conflicts  = "conflicts"
-	arch       = "arch"
-	license    = "license"
-	url        = "url"
+	date        = "date"
+	name        = "name"
+	reason      = "reason"
+	size        = "size"
+	version     = "version"
+	description = "description"
+	depends     = "depends"
+	requiredBy  = "required-by"
+	provides    = "provides"
+	conflicts   = "conflicts"
+	arch        = "arch"
+	license     = "license"
+	url         = "url"
 )
 
 var FieldTypeLookup = map[string]FieldType{
@@ -43,18 +45,19 @@ var FieldTypeLookup = map[string]FieldType{
 	"R": FieldRequiredBy,
 	"p": FieldProvides,
 
-	date:       FieldDate,
-	name:       FieldName,
-	reason:     FieldReason,
-	size:       FieldSize,
-	version:    FieldVersion,
-	depends:    FieldDepends,
-	requiredBy: FieldRequiredBy,
-	provides:   FieldProvides,
-	conflicts:  FieldConflicts,
-	arch:       FieldArch,
-	license:    FieldLicense,
-	url:        FieldUrl,
+	date:        FieldDate,
+	name:        FieldName,
+	reason:      FieldReason,
+	arch:        FieldArch,
+	license:     FieldLicense,
+	url:         FieldUrl,
+	description: FieldDescription,
+	size:        FieldSize,
+	version:     FieldVersion,
+	depends:     FieldDepends,
+	requiredBy:  FieldRequiredBy,
+	provides:    FieldProvides,
+	conflicts:   FieldConflicts,
 }
 
 var FieldNameLookup = map[FieldType]string{
@@ -92,5 +95,6 @@ var (
 		FieldArch,
 		FieldLicense,
 		FieldUrl,
+		FieldDescription,
 	}
 )

@@ -15,18 +15,19 @@ type tableContext struct {
 }
 
 var columnHeaders = map[consts.FieldType]string{
-	consts.FieldDate:       "DATE",
-	consts.FieldName:       "NAME",
-	consts.FieldReason:     "REASON",
-	consts.FieldSize:       "SIZE",
-	consts.FieldVersion:    "VERSION",
-	consts.FieldDepends:    "DEPENDS",
-	consts.FieldRequiredBy: "REQUIRED BY",
-	consts.FieldProvides:   "PROVIDES",
-	consts.FieldConflicts:  "CONFLICTS",
-	consts.FieldArch:       "ARCH",
-	consts.FieldLicense:    "LICENSE",
-	consts.FieldUrl:        "URL",
+	consts.FieldDate:        "DATE",
+	consts.FieldName:        "NAME",
+	consts.FieldReason:      "REASON",
+	consts.FieldSize:        "SIZE",
+	consts.FieldVersion:     "VERSION",
+	consts.FieldDepends:     "DEPENDS",
+	consts.FieldRequiredBy:  "REQUIRED BY",
+	consts.FieldProvides:    "PROVIDES",
+	consts.FieldConflicts:   "CONFLICTS",
+	consts.FieldArch:        "ARCH",
+	consts.FieldLicense:     "LICENSE",
+	consts.FieldUrl:         "URL",
+	consts.FieldDescription: "DESCRIPTION",
 }
 
 // displays data in tab format
@@ -109,6 +110,8 @@ func getTableValue(pkg *pkgdata.PkgInfo, field consts.FieldType, ctx tableContex
 		return pkg.License
 	case consts.FieldUrl:
 		return pkg.Url
+	case consts.FieldDescription:
+		return pkg.Description
 	default:
 		return ""
 	}

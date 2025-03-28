@@ -9,12 +9,11 @@
 package protobuf
 
 import (
+	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
+	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
-
-	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
-	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
 
 const (
@@ -152,6 +151,7 @@ type PkgInfo struct {
 	Arch          string                 `protobuf:"bytes,6,opt,name=arch,proto3" json:"arch,omitempty"`
 	License       string                 `protobuf:"bytes,7,opt,name=license,proto3" json:"license,omitempty"`
 	Url           string                 `protobuf:"bytes,8,opt,name=url,proto3" json:"url,omitempty"`
+	Description   string                 `protobuf:"bytes,13,opt,name=description,proto3" json:"description,omitempty"`
 	Depends       []*Relation            `protobuf:"bytes,9,rep,name=depends,proto3" json:"depends,omitempty"`
 	RequiredBy    []*Relation            `protobuf:"bytes,10,rep,name=required_by,json=requiredBy,proto3" json:"required_by,omitempty"`
 	Provides      []*Relation            `protobuf:"bytes,11,rep,name=provides,proto3" json:"provides,omitempty"`
@@ -242,6 +242,13 @@ func (x *PkgInfo) GetLicense() string {
 func (x *PkgInfo) GetUrl() string {
 	if x != nil {
 		return x.Url
+	}
+	return ""
+}
+
+func (x *PkgInfo) GetDescription() string {
+	if x != nil {
+		return x.Description
 	}
 	return ""
 }
@@ -342,7 +349,7 @@ const file_protobuf_pkginfo_proto_rawDesc = "" +
 	"\bRelation\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x18\n" +
 	"\aversion\x18\x02 \x01(\tR\aversion\x12/\n" +
-	"\boperator\x18\x03 \x01(\x0e2\x13.pkginfo.RelationOpR\boperator\"\x82\x03\n" +
+	"\boperator\x18\x03 \x01(\x0e2\x13.pkginfo.RelationOpR\boperator\"\xa4\x03\n" +
 	"\aPkgInfo\x12\x1c\n" +
 	"\ttimestamp\x18\x01 \x01(\x03R\ttimestamp\x12\x12\n" +
 	"\x04size\x18\x02 \x01(\x03R\x04size\x12\x12\n" +
@@ -351,7 +358,8 @@ const file_protobuf_pkginfo_proto_rawDesc = "" +
 	"\aversion\x18\x05 \x01(\tR\aversion\x12\x12\n" +
 	"\x04arch\x18\x06 \x01(\tR\x04arch\x12\x18\n" +
 	"\alicense\x18\a \x01(\tR\alicense\x12\x10\n" +
-	"\x03url\x18\b \x01(\tR\x03url\x12+\n" +
+	"\x03url\x18\b \x01(\tR\x03url\x12 \n" +
+	"\vdescription\x18\r \x01(\tR\vdescription\x12+\n" +
 	"\adepends\x18\t \x03(\v2\x11.pkginfo.RelationR\adepends\x122\n" +
 	"\vrequired_by\x18\n" +
 	" \x03(\v2\x11.pkginfo.RelationR\n" +
@@ -385,16 +393,14 @@ func file_protobuf_pkginfo_proto_rawDescGZIP() []byte {
 	return file_protobuf_pkginfo_proto_rawDescData
 }
 
-var (
-	file_protobuf_pkginfo_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-	file_protobuf_pkginfo_proto_msgTypes  = make([]protoimpl.MessageInfo, 3)
-	file_protobuf_pkginfo_proto_goTypes   = []any{
-		(RelationOp)(0),    // 0: pkginfo.RelationOp
-		(*Relation)(nil),   // 1: pkginfo.Relation
-		(*PkgInfo)(nil),    // 2: pkginfo.PkgInfo
-		(*CachedPkgs)(nil), // 3: pkginfo.CachedPkgs
-	}
-)
+var file_protobuf_pkginfo_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_protobuf_pkginfo_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_protobuf_pkginfo_proto_goTypes = []any{
+	(RelationOp)(0),    // 0: pkginfo.RelationOp
+	(*Relation)(nil),   // 1: pkginfo.Relation
+	(*PkgInfo)(nil),    // 2: pkginfo.PkgInfo
+	(*CachedPkgs)(nil), // 3: pkginfo.CachedPkgs
+}
 var file_protobuf_pkginfo_proto_depIdxs = []int32{
 	0, // 0: pkginfo.Relation.operator:type_name -> pkginfo.RelationOp
 	1, // 1: pkginfo.PkgInfo.depends:type_name -> pkginfo.Relation

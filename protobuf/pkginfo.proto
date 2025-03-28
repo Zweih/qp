@@ -30,6 +30,7 @@ message PkgInfo {
   string arch = 6;
   string license = 7;
   string url = 8;
+  string description = 13;
 
   repeated Relation depends = 9;
   repeated Relation required_by = 10;
