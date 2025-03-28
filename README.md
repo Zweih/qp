@@ -103,6 +103,7 @@ because yay is my preferred AUR helper and the name has a good flow.
 - [x] use chunked channel-based concurrent filtering (12% speed boost) 
 - [ ] short-args for filters
 - [ ] license sort
+- [ ] packager field
 - [ ] streaming pipeline
 - [x] architecture filter
 - [x] optimize filter ordering (4% speed boost)
@@ -110,6 +111,8 @@ because yay is my preferred AUR helper and the name has a good flow.
 - [ ] license filter
 - [ ] optional dependency field
 - [x] improve sorting efficiency (8% speed boost)
+- [ ] package base field
+- [ ] package description filter
 
 ## installation
 
