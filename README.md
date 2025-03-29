@@ -109,7 +109,7 @@ because yay is my preferred AUR helper and the name has a good flow.
 - [x] architecture query
 - [x] optimize query order (4% speed boost)
 - [ ] dependency count sort
-- [ ] license query
+- [x] license query
 - [ ] optional dependency field
 - [x] improve sorting efficiency (8% speed boost)
 - [ ] package base field

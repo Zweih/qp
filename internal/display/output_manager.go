@@ -76,8 +76,6 @@ func (o *OutputManager) writeLine(msg string) {
 }
 
 func (o *OutputManager) printProgress(phase string, progress int, description string) {
-	o.progressActive = true
-
 	msg := o.formatProgessMsg(phase, progress, description)
 	o.clearPrevMsg(len(msg))
 
@@ -86,10 +84,7 @@ func (o *OutputManager) printProgress(phase string, progress int, description st
 }
 
 func (o *OutputManager) clearProgress() {
-	if o.progressActive {
-		o.clearPrevMsg(0)
-		o.progressActive = false
-	}
+	o.clearPrevMsg(0)
 }
 
 func (o *OutputManager) formatProgessMsg(phase string, progress int, description string) string {
