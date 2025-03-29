@@ -326,7 +326,7 @@ are treated as separate parameters.
    ```
  4. show all packages sorted alphabetically by name
    ```bash
-   yaylog -a -O name
+   yaylog -aO name
    ```
  5. search for packages that contain a GPL license
    ```bash
