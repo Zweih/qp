@@ -44,7 +44,7 @@ this package is compatible with the following distributions:
 - query by packages built with specified architectures
 - query by package size or size range
 - query by package name (substring match)
-- sort by installation date, alphabetically, or by size on disk
+- sort by installation date, package name, license, or by size on disk
 - output as a table or JSON
 
 ## why is it called yaylog if it works with other AUR helpers?
@@ -102,7 +102,7 @@ because yay is my preferred AUR helper and the name has a good flow.
 - [ ] XML output
 - [x] use chunked channel-based concurrent querying (12% speed boost) 
 - [ ] short-args for queries
-- [ ] license sort
+- [x] license sort
 - [ ] packager field
 - [ ] streaming pipeline
 - [x] architecture query
@@ -170,10 +170,11 @@ yaylog [options]
   - `--where depends=glibc`    -> query by packages that depend on `glibc`
   - `--where conflicts=sdl2`   -> query by packages that conflict with `sdl2`
   - `--where arch=x86_64`      -> query by packages that are built for `x86_64` CPUs
-- `-O` | `--order <mode>`: sort results by:
-  - `date` (default) - sort by installation date
-  - `alphabetical` - sort alphabetically by package name
-  - `size:asc` / `size:desc` - sort by package size (ascending or descending)
+- `-O` | `--order <mode>:<direction>`: sort results ascending or descending (default sort is `date:asc`):
+  - `date`    -> sort by installation date
+  - `name`    -> sort alphabetically by package name
+  - `size`    -> sort by package size
+  - `license` -> sort alphabetically by license
 - `--no-headers`: omit column headers in table output (useful for scripting)
 - `-s` | `--select <list>`: comma-separated list of fields to display (cannot use with `--select-all` or `--select-add`)
 - `-S` | `--select-add <list>`: comma-separated list of fields to add to defaults or `--select-all`
@@ -318,11 +319,11 @@ are treated as separate parameters.
    ```
  3. show only dependencies installed on a specific date
    ```bash
-   yaylog -w reason=dependencies -w date=2025-03-01
+   yaylog -w reason=dependency -w date=2025-03-01
    ```
- 4. show all packages sorted alphabetically
+ 4. show all packages sorted alphabetically by name
    ```bash
-   yaylog -a -O alphabetical
+   yaylog -a -O name
    ```
  5. show the 15 most recent explicitly installed packages
    ```bash
@@ -332,17 +333,17 @@ are treated as separate parameters.
    ```bash
    yaylog -w date=2024-07-01:2024-12-31
    ```
- 7. show the 20 most recently installed packages larger than 20MB
+ 7. sort all packages by their license, displaying name and license
+   ```
+   yaylog -aO license -s name,license
+   ```
+ 8. show the 20 most recently installed packages larger than 20MB
    ```bash
    yaylog -w size=20MB: -l 20
    ```
- 8. show all dependencies smaller than 500KB  
+ 9. show packages between 100MB and 1GB installed up to february 27, 2025
    ```bash
-   yaylog -w reason=dependencies -w size=:500KB
-   ```
- 9. show packages between 100MB and 1GB installed up to june 30, 2024
-   ```bash
-   yaylog -w size=100MB:1GB -w date=:2024-06-30
+   yaylog -w size=100MB:1GB -w date=:2025-02-27
    ```
 10. show all packages sorted by size in descending order, installed after january 1, 2025
    ```bash
@@ -356,9 +357,9 @@ are treated as separate parameters.
    ```bash
    yaylog -w reason=explicit -w name=lib -w size=10MB:1GB
    ```
-13. search for packages with names containing "linux" installed between january 1 and june 30, 2024
+13. search for packages with names containing "linux" installed between january 1 and march 30, 2025
    ```bash
-   yaylog -w name=linux -w date=2024-01-01:2024-06-30
+   yaylog -w name=linux -w date=2025-01-01:2025-03-30
    ```
 14. search for packages containing "gtk" installed after january 1, 2025, and at least 5MB in size
    ```bash
@@ -408,9 +409,9 @@ are treated as separate parameters.
    ```bash
    yaylog -a -w required-by=gtk3 -w size=50MB:
    ```
-26. show packages required by `vlc` and installed after january 1, 2024 
+26. show packages required by `vlc` and installed after january 1, 2025 
    ```bash
-   yaylog -w required-by=vlc -w date=2024-01-01:
+   yaylog -w required-by=vlc -w date=2025-01-01:
    ```
 27. show all packages that have `glibc` as a dependency and are required by `ffmpeg`
    ```bash
@@ -435,4 +436,8 @@ are treated as separate parameters.
 32. show packages that are built for the `aarch64` CPU architecture or any architecture (non-CPU-specific):
    ```bash
    yaylog -w arch=aarch64,any
+   ```
+33. show all dependencies smaller than 500KB  
+   ```bash
+   yaylog -w reason=dependencies -w size=:500KB
    ```

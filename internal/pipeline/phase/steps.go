@@ -78,7 +78,7 @@ func SaveCacheStep(
 		// TODO: we can probably save the file concurrently
 		err := pkgdata.SaveProtoCache(pkgPtrs)
 		if err != nil {
-			out.WriteLine(fmt.Sprintf("Error saving cache: %v", err))
+			out.WriteLine(fmt.Sprintf("Warning: Error saving cache: %v", err))
 		}
 	}
 
@@ -109,7 +109,7 @@ func SortStep(
 	reportProgress ProgressReporter,
 	_ *meta.PipelineContext,
 ) ([]*PkgInfo, error) {
-	comparator := pkgdata.GetComparator(cfg.SortBy)
+	comparator := pkgdata.GetComparator(cfg.SortOption.Field, cfg.SortOption.Asc)
 	phase := "Sorting packages"
 
 	// threshold is 500 as that is where merge sorting chunk performance overtakes timsort

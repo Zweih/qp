@@ -9,13 +9,15 @@ import (
 	phasekit "yaylog/internal/pipeline/phase"
 	"yaylog/internal/pkgdata"
 
+	"github.com/spf13/pflag"
 	"golang.org/x/term"
 )
 
 func main() {
 	err := mainWithConfig(&config.CliConfigProvider{})
 	if err != nil {
-		out.WriteLine(err.Error())
+		out.WriteLine(err.Error() + "\n")
+		pflag.PrintDefaults()
 		os.Exit(1)
 	}
 }

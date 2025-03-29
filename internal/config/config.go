@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"strings"
 	"yaylog/internal/consts"
 
 	"github.com/spf13/pflag"
@@ -22,9 +23,14 @@ type Config struct {
 	HasNoHeaders      bool
 	ShowFullTimestamp bool
 	DisableProgress   bool
-	SortBy            string
+	SortOption        SortOption
 	Fields            []consts.FieldType
 	FilterQueries     map[consts.FieldType]string
+}
+
+type SortOption struct {
+	Field consts.FieldType
+	Asc   bool
 }
 
 type ConfigProvider interface {
@@ -36,6 +42,7 @@ type CliConfigProvider struct{}
 func (c *CliConfigProvider) GetConfig() (Config, error) {
 	cfg, err := ParseFlags(os.Args[1:])
 	if err != nil {
+		pflag.PrintDefaults()
 		return Config{}, err
 	}
 
@@ -65,7 +72,7 @@ func ParseFlags(args []string) (Config, error) {
 	var sizeFilter string
 	var nameFilter string
 	var requiredByFilter string
-	var sortBy string
+	var sortInput string
 	var fieldInput string
 	var addFieldInput string
 
@@ -75,7 +82,7 @@ func ParseFlags(args []string) (Config, error) {
 	pflag.BoolVarP(&allPackages, "all", "a", false, "Show all packages (ignores -l)")
 
 	pflag.StringArrayVarP(&filterInputs, "where", "w", []string{}, "Apply multiple filters (e.g. --where size=2KB:3KB --w name=vim)")
-	pflag.StringVarP(&sortBy, "order", "O", "date", "Order results by a field")
+	pflag.StringVarP(&sortInput, "order", "O", "date", "Order results by a field")
 
 	pflag.BoolVarP(&hasNoHeaders, "no-headers", "", false, "Hide headers for table ouput (useful for scripts/automation)")
 	pflag.BoolVarP(&hasAllFields, "select-all", "A", false, "Display all available fields")
@@ -91,7 +98,7 @@ func ParseFlags(args []string) (Config, error) {
 	// deprecated legacy flags, hidden but still functioning
 	pflag.IntVarP(&count, "number", "n", 20, "Number of packages to show")
 	pflag.StringArrayVarP(&filterInputs, "filter", "f", []string{}, "Apply multiple filters (e.g. --filter size=2KB:3KB --filter name=vim)")
-	pflag.StringVar(&sortBy, "sort", "date", "Sort packages by: 'date', 'alphabetical', 'size:desc', 'size:asc'")
+	pflag.StringVar(&sortInput, "sort", "date", "Sort packages by: 'date', 'alphabetical', 'size:desc', 'size:asc'")
 	pflag.BoolVarP(&hasAllFields, "all-columns", "", false, "Show all available columns/fields in the output (overrides defaults)")
 	pflag.StringVar(&fieldInput, "columns", "", "Comma-separated list of columns to display (overrides defaults)")
 	pflag.StringVar(&addFieldInput, "add-columns", "", "Comma-separated list of columns to add to defaults")
@@ -139,6 +146,11 @@ func ParseFlags(args []string) (Config, error) {
 		return Config{}, err
 	}
 
+	sortOption, err := parseSortOption(sortInput)
+	if err != nil {
+		return Config{}, err
+	}
+
 	filterQueries, err := parseFilterQueries(filterInputs)
 	if err != nil {
 		return Config{}, err
@@ -162,16 +174,38 @@ func ParseFlags(args []string) (Config, error) {
 		HasNoHeaders:      hasNoHeaders,
 		ShowFullTimestamp: showFullTimestamp,
 		DisableProgress:   disableProgress,
-		SortBy:            sortBy,
+		SortOption:        sortOption,
 		Fields:            fieldsParsed,
 		FilterQueries:     filterQueries,
 	}
 
-	if err := validateConfig(cfg); err != nil {
-		return Config{}, err
+	return cfg, nil
+}
+
+func parseSortOption(sortInput string) (SortOption, error) {
+	parts := strings.Split(sortInput, ":")
+	fieldKey := strings.ToLower(parts[0])
+	fieldType, exists := consts.FieldTypeLookup[fieldKey]
+	if !exists {
+		return SortOption{}, fmt.Errorf("invalid sort field: %s", fieldKey)
 	}
 
-	return cfg, nil
+	asc := true
+	if len(parts) > 1 {
+		switch parts[1] {
+		case "desc":
+			asc = false
+		case "asc":
+			asc = true
+		default:
+			return SortOption{}, fmt.Errorf("invalid sort direction: %s", parts[1])
+		}
+	}
+
+	return SortOption{
+		Field: fieldType,
+		Asc:   asc,
+	}, nil
 }
 
 func parseFilterQueries(filterInputs []string) (map[consts.FieldType]string, error) {

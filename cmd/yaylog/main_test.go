@@ -21,7 +21,7 @@ func (m *MockConfigProvider) GetConfig() (config.Config, error) {
 func TestMainWithConfig(t *testing.T) {
 	mockCfg := config.Config{
 		Count:      5,
-		SortBy:     "size:desc",
+		SortOption: config.SortOption{Field: consts.FieldSize, Asc: false},
 		OutputJson: true,
 		Fields:     []consts.FieldType{consts.FieldName, consts.FieldSize},
 	}

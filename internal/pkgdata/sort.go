@@ -4,40 +4,48 @@ import (
 	"fmt"
 	"runtime"
 	"sort"
+	"strings"
 	"sync"
+	"yaylog/internal/consts"
 	"yaylog/internal/pipeline/meta"
 )
 
 const ConcurrentSortThreshold = 500
 
-type PackageComparator func(a *PkgInfo, b *PkgInfo) bool
+type PkgComparator func(a *PkgInfo, b *PkgInfo) bool
 
-func alphabeticalComparator(a *PkgInfo, b *PkgInfo) bool {
-	return a.Name < b.Name
+type ordered interface {
+	~int64 | ~string
 }
 
-func dateComparator(a *PkgInfo, b *PkgInfo) bool {
-	return a.Timestamp < b.Timestamp
+func makeComparator[T ordered](
+	getValue func(*PkgInfo) T,
+	asc bool,
+) PkgComparator {
+	if asc {
+		return func(a, b *PkgInfo) bool { return getValue(a) < getValue(b) }
+	}
+
+	return func(a, b *PkgInfo) bool { return getValue(a) > getValue(b) }
 }
 
-func sizeDecComparator(a *PkgInfo, b *PkgInfo) bool {
-	return a.Size > b.Size
-}
+func GetComparator(field consts.FieldType, asc bool) PkgComparator {
+	switch field {
+	case consts.FieldDate:
+		return makeComparator(func(p *PkgInfo) int64 { return p.Timestamp }, asc)
 
-func sizeAscComparator(a *PkgInfo, b *PkgInfo) bool {
-	return a.Size < b.Size
-}
+	case consts.FieldSize:
+		return makeComparator(func(p *PkgInfo) int64 { return p.Size }, asc)
 
-func GetComparator(sortBy string) PackageComparator {
-	switch sortBy {
-	case "alphabetical":
-		return alphabeticalComparator
-	case "date":
-		return dateComparator
-	case "size:desc":
-		return sizeDecComparator
-	case "size:asc":
-		return sizeAscComparator
+	case consts.FieldName:
+		return makeComparator(func(p *PkgInfo) string { return strings.ToLower(p.Name) }, asc)
+
+	case consts.FieldVersion:
+		return makeComparator(func(p *PkgInfo) string { return strings.ToLower(p.Version) }, asc)
+
+	case consts.FieldLicense:
+		return makeComparator(func(p *PkgInfo) string { return strings.ToLower(p.License) }, asc)
+
 	default:
 		return nil
 	}
@@ -46,7 +54,7 @@ func GetComparator(sortBy string) PackageComparator {
 func mergedSortedChunks(
 	leftChunk []*PkgInfo,
 	rightChunk []*PkgInfo,
-	comparator PackageComparator,
+	comparator PkgComparator,
 ) []*PkgInfo {
 	capacity := len(leftChunk) + len(rightChunk)
 	result := make([]*PkgInfo, 0, capacity)
@@ -73,7 +81,7 @@ func mergedSortedChunks(
 // pkgPointers will be sorted in place, mutating the slice order
 func SortConcurrently(
 	pkgPtrs []*PkgInfo,
-	comparator PackageComparator,
+	comparator PkgComparator,
 	phase string,
 	reportProgress meta.ProgressReporter,
 ) []*PkgInfo {
@@ -169,7 +177,7 @@ func SortConcurrently(
 // pkgPointers will be sorted in place, mutating the slice order
 func SortNormally(
 	pkgPtrs []*PkgInfo,
-	comparator PackageComparator,
+	comparator PkgComparator,
 	phase string,
 	reportProgress meta.ProgressReporter,
 ) []*PkgInfo {

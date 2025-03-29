@@ -21,26 +21,3 @@ func validateFlagCombinations(
 
 	return nil
 }
-
-func validateConfig(cfg Config) error {
-	if err := validateSortOption(cfg.SortBy); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func validateSortOption(sortBy string) error {
-	validSortOptions := map[string]bool{
-		"date":         true,
-		"alphabetical": true,
-		"size:desc":    true,
-		"size:asc":     true,
-	}
-
-	if !validSortOptions[sortBy] {
-		return fmt.Errorf("Error: Invalid order option %s", sortBy)
-	}
-
-	return nil
-}

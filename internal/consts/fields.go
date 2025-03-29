@@ -45,6 +45,8 @@ var FieldTypeLookup = map[string]FieldType{
 	"R": FieldRequiredBy,
 	"p": FieldProvides,
 
+	"alphabetical": FieldName, // legacy flag, to be deprecated
+
 	date:        FieldDate,
 	name:        FieldName,
 	reason:      FieldReason,
