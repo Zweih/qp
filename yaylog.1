@@ -1,5 +1,5 @@
 .\" Man page for yaylog
-.TH yaylog 1 "March 2025" "yaylog 3.40.0" "User Commands"
+.TH yaylog 1 "March 2025" "yaylog 3.41.0" "User Commands"
 .SH NAME
 yaylog \- List and query installed packages on Arch-based systems.
 .SH SYNOPSIS
@@ -20,7 +20,8 @@ The utility provides powerful querying capabilities, including:
 - Installation date queries
 - Package size queries
 - Install reason queries
-- Reverse dependency lookups
+- License queries
+- Reverse dependency queries (requirements)
 - Conflict queries
 - Dependency queries
 - Provision queries
@@ -48,6 +49,9 @@ Apply package queries. This option can be used multiple times.
 
 .PP
 Supported queries:
+.IP
+.B license=<license-name>
+: Packages that contain the specified license. Supports comma-separated list.
 .IP
 .B date=<YYYY-MM-DD>
 : Packages installed on the specified date.

@@ -2,6 +2,7 @@ package filtering
 
 import (
 	"fmt"
+	"strings"
 	"yaylog/internal/consts"
 	"yaylog/internal/pkgdata"
 )
@@ -27,6 +28,10 @@ func newPackageCondition(fieldType consts.FieldType, targets []string) (*FilterC
 	conditionFilter := newBaseCondition(fieldType)
 	var filterFunc pkgdata.Filter
 
+	for i, target := range targets {
+		targets[i] = strings.ToLower(target)
+	}
+
 	switch fieldType {
 	case consts.FieldName:
 		filterFunc = func(pkg *PkgInfo) bool {
@@ -35,6 +40,10 @@ func newPackageCondition(fieldType consts.FieldType, targets []string) (*FilterC
 	case consts.FieldArch:
 		filterFunc = func(pkg *PkgInfo) bool {
 			return pkgdata.FilterByStrings(pkg.Arch, targets)
+		}
+	case consts.FieldLicense:
+		filterFunc = func(pkg *PkgInfo) bool {
+			return pkgdata.FilterByStrings(pkg.License, targets)
 		}
 	case consts.FieldRequiredBy:
 		filterFunc = func(pkg *PkgInfo) bool {

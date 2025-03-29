@@ -2,7 +2,6 @@ package filtering
 
 import (
 	"fmt"
-	"regexp"
 	"sort"
 	"strings"
 	"yaylog/internal/config"
@@ -14,9 +13,6 @@ type (
 	PkgInfo         = pkgdata.PkgInfo
 	FilterCondition = pkgdata.FilterCondition
 )
-
-// TODO: regex is overkill for package list parsing
-var targetListRegex = regexp.MustCompile(`^([a-z0-9][a-z0-9._-]*[a-z0-9])(,([a-z0-9][a-z0-9._-]*[a-z0-9]))*$`)
 
 func QueriesToConditions(filterQueries map[consts.FieldType]string) (
 	[]*FilterCondition,
@@ -34,7 +30,7 @@ func QueriesToConditions(filterQueries map[consts.FieldType]string) (
 		case consts.FieldSize:
 			condition, err = parseSizeFilterCondition(value)
 		case consts.FieldName, consts.FieldRequiredBy, consts.FieldDepends,
-			consts.FieldProvides, consts.FieldConflicts, consts.FieldArch:
+			consts.FieldProvides, consts.FieldConflicts, consts.FieldArch, consts.FieldLicense:
 			condition, err = parsePackageFilterCondition(fieldType, value)
 		case consts.FieldReason:
 			condition, err = parseReasonFilterCondition(value)
@@ -61,10 +57,6 @@ func parsePackageFilterCondition(
 	fieldType consts.FieldType,
 	targetListInput string,
 ) (*FilterCondition, error) {
-	if !targetListRegex.MatchString(targetListInput) {
-		return nil, fmt.Errorf("invalid package list: %s", targetListInput)
-	}
-
 	targetList := strings.Split(targetListInput, ",")
 	return newPackageCondition(fieldType, targetList)
 }

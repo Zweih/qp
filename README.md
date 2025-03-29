@@ -33,17 +33,18 @@ this package is compatible with the following distributions:
 
 ## features
 
-- list installed packages with date/timestamps, dependencies, provisions, requirements, size on disk, conflicts, architecture, description, and version
+- list installed packages with date/timestamps, dependencies, provisions, requirements, size on disk, conflicts, architecture, license, description, and version
 - query by explicitly installed packages
 - query by packages installed as dependencies
 - query by packages required by specified packages
 - query by packages that depend upon specified packages
 - query by packages that provide specified packages
 - query by packages that conflict with specific packages
+- query by packages that contain specific licenses
 - query by a specific installation date or date range
 - query by packages built with specified architectures
 - query by package size or size range
-- query by package name (substring match)
+- query by package names
 - sort by installation date, package name, license, or by size on disk
 - output as a table or JSON
 
@@ -170,14 +171,15 @@ yaylog [options]
   - `--where depends=glibc`    -> query by packages that depend on `glibc`
   - `--where conflicts=sdl2`   -> query by packages that conflict with `sdl2`
   - `--where arch=x86_64`      -> query by packages that are built for `x86_64` CPUs
-- `-O` | `--order <field>:<direction>`: sort results ascending or descending (default sort is `date:asc`):
+  - `--where license=GPL`      -> query by package licenses that contain `GPL`
+- `-O <field>:<direction>` | `--order <field>:<direction>`: sort results ascending or descending (default sort is `date:asc`):
   - `date`    -> sort by installation date
   - `name`    -> sort alphabetically by package name
   - `size`    -> sort by package size on disk
   - `license` -> sort alphabetically by package license
 - `--no-headers`: omit column headers in table output (useful for scripting)
-- `-s` | `--select <list>`: comma-separated list of fields to display (cannot use with `--select-all` or `--select-add`)
-- `-S` | `--select-add <list>`: comma-separated list of fields to add to defaults or `--select-all`
+- `-s <list>` | `--select <list>`: comma-separated list of fields to display (cannot use with `--select-all` or `--select-add`)
+- `-S <list>` | `--select-add <list>`: comma-separated list of fields to add to defaults or `--select-all`
 - `-A` | `--select-all`: output all available fields (overrides defaults)
 - `--full-timestamp`: display the full timestamp (date and time) of package installations instead of just the date
 - `--json`: output results in JSON format (overrides table output and `--full-timestamp`)
@@ -185,7 +187,7 @@ yaylog [options]
 - `-h` | `--help`: print help info
 
 ### querying with `--where`
-the `--where` (short-flag: `-w`) flag allow for powerful querying of installed packages. queries can be combined by using multiple query flags. 
+the `--where` (short-flag: `-w`) flag allows for powerful querying of installed packages. queries can be combined by using multiple query flags. 
 
 all queries that take package/library/program names as arguments can also take a comma-separated list. this applies to the queries `name`, `depends`, and `required-by`. 
 
@@ -194,6 +196,7 @@ short-flag queries and long-flag queries can be combined.
 #### available queries
 | query type  | syntax | description |
 |-------------|--------|-------------|
+| **license** | `license=<license>` / <br> `license=<license-1>,<license-2>,<etc` | query by license name (substring match) |
 | **date** | `date=<value>` | query by installation date. supports exact dates, ranges (`YYYY-MM-DD:YYYY-MM-DD`), and open-ended ranges (`YYYY-MM-DD:` or `:YYYY-MM-DD`) |
 | **required by** | `required-by=<package>` / <br> `required-by=<package-1>,<package-2>,<etc>` | query by packages that are required by the specified packages |
 | **depends** | `depends=<package>` / <br> `depends=<package-1>,<package-2>,<etc>` | query by packages that have the specified packages as dependencies |
@@ -325,16 +328,16 @@ are treated as separate parameters.
    ```bash
    yaylog -a -O name
    ```
- 5. show the 15 most recent explicitly installed packages
+ 5. search for packages that contain a GPL license
    ```bash
-   yaylog -w reason=explicit -l 15
+   yaylog -w license=GPL
    ```
- 6. show packages installed between july 1, 2024, and december 31, 2024
+ 6. show packages installed between january 1, 2025, and january 5, 2025
    ```bash
-   yaylog -w date=2024-07-01:2024-12-31
+   yaylog -w date=2025-01-01:2025-01-05
    ```
  7. sort all packages by their license, displaying name and license
-   ```
+   ```bash
    yaylog -aO license -s name,license
    ```
  8. show the 20 most recently installed packages larger than 20MB
@@ -440,4 +443,8 @@ are treated as separate parameters.
 33. show all dependencies smaller than 500KB  
    ```bash
    yaylog -w reason=dependencies -w size=:500KB
+   ```
+34. show the 15 most recent explicitly installed packages
+   ```bash
+   yaylog -w reason=explicit -l 15
    ```
