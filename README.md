@@ -330,7 +330,7 @@ are treated as separate parameters.
    ```
  5. search for packages that contain a GPL license
    ```bash
-   yaylog -w license=GPL
+   yaylog -w license=gpl
    ```
  6. show packages installed between january 1, 2025, and january 5, 2025
    ```bash
