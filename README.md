@@ -117,9 +117,9 @@ because yay is my preferred AUR helper and the name has a good flow.
 ## installation
 
 ### from AUR (**recommended**)
-install using [AUR helper](https://wiki.archlinux.org/title/AUR_helpers) like `yay`:
+install using [AUR helper](https://wiki.archlinux.org/title/AUR_helpers) like `yay`, `paru`, `aura`, etc.:
 ```bash
-yay -S yaylog
+yay -Sy yaylog
 ```
 
 if you prefer to install a pre-compiled binary* using the AUR, use the `yaylog-bin` package instead.
