@@ -289,8 +289,8 @@ are treated as separate parameters.
   ```
 - all options that take an argument can also be used in the `--<flag>=<argument>` format:
   ```bash
-  yaylog -w size=100MB:1GB -w date=:2024-06-30 --limit=100
-  yaylog -w name=gtk -O=alphabetical
+  yaylog --select-add=name --limit=100
+  yaylog -s=date,name,version -O=name
   ```
   boolean flags can also be explicitly set using `--<flag>=true` or `--<flag>=false`:
   ```bash
