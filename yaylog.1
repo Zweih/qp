@@ -1,10 +1,10 @@
 .\" Man page for yaylog
-.TH yaylog 1 "March 2025" "yaylog 3.39.0" "User Commands"
+.TH yaylog 1 "March 2025" "yaylog 3.40.0" "User Commands"
 .SH NAME
 yaylog \- List and query installed packages on Arch-based systems.
 .SH SYNOPSIS
 .B yaylog
-.RI [ \-n | \-\-limit <number> ] [ \-a | \-\-all ] [ \-w <field>=<value> ] [ \-s | \-\-select <list> ] [ \-S | \-\-select-add <list> ] [ \-A | \-\-select-all ] [ \-O | \-\-order <mode> ] [ \-\-json ] [ \-\-no-headers ] [ \-\-full-timestamp ] [ \-\-no-progress ] [ \-h | \-\-help ]
+.RI [ \-l | \-\-limit <number> ] [ \-a | \-\-all ] [ \-w <field>=<value> ] [ \-s | \-\-select <list> ] [ \-S | \-\-select-add <list> ] [ \-A | \-\-select-all ] [ \-O | \-\-order <field>:<direction> ] [ \-\-json ] [ \-\-no-headers ] [ \-\-full-timestamp ] [ \-\-no-progress ] [ \-h | \-\-help ]
 
 .SH DESCRIPTION
 .B yaylog
@@ -101,20 +101,21 @@ yaylog -w reason=explicit -w size=100MB:
 .EE
 
 .TP
-.B \-O, \-\-order <mode>
-Sort results by the specified mode. Available modes:
+.B \-O, \-\-order <field>:<direction>
+Sort results by the specified field, ascending or descending directions (asc/desc).
+Available fields for sorting.
 .IP
 .B date
 (default): Sort by installation date.
 .IP
-.B alphabetical
+.B name
 : Sort alphabetically by package name.
 .IP
-.B size:asc
-: Sort by size ascending.
+.B size
+: Sort by size on disk
 .IP
-.B size:desc
-: Sort by size descending.
+.B license
+: Sort alphabetically by package license.
 
 .TP
 .B \-\-no-headers
@@ -160,7 +161,7 @@ Show help information.
 .TP
 Last 10 installed packages:
 .EX
-yaylog -n 10
+yaylog -l 10
 .EE
 .TP
 All explicitly installed packages:

@@ -170,11 +170,11 @@ yaylog [options]
   - `--where depends=glibc`    -> query by packages that depend on `glibc`
   - `--where conflicts=sdl2`   -> query by packages that conflict with `sdl2`
   - `--where arch=x86_64`      -> query by packages that are built for `x86_64` CPUs
-- `-O` | `--order <mode>:<direction>`: sort results ascending or descending (default sort is `date:asc`):
+- `-O` | `--order <field>:<direction>`: sort results ascending or descending (default sort is `date:asc`):
   - `date`    -> sort by installation date
   - `name`    -> sort alphabetically by package name
-  - `size`    -> sort by package size
-  - `license` -> sort alphabetically by license
+  - `size`    -> sort by package size on disk
+  - `license` -> sort alphabetically by package license
 - `--no-headers`: omit column headers in table output (useful for scripting)
 - `-s` | `--select <list>`: comma-separated list of fields to display (cannot use with `--select-all` or `--select-add`)
 - `-S` | `--select-add <list>`: comma-separated list of fields to add to defaults or `--select-all`
@@ -213,7 +213,7 @@ short-flag queries and long-flag queries can be combined.
 - `depends` - list of dependencies (output can be long)
 - `required-by` - list of packages required by the package and are dependent (output can be long) 
 - `provides` - list of alternative package names or shared libraries provided by package (output can be long)
-- `conficts` - list of packages that conflict, or cause problems, with the package
+- `conflicts` - list of packages that conflict, or cause problems, with the package
 - `arch` - architecture the package was built for (e.g., x86_64, aarch64, any)
 - `license` - package software license
 - `url` - the URL of the official site of the software being packaged
