@@ -298,7 +298,7 @@ are treated as separate parameters.
   ```
   string arguments can also be surrounded with quotes or double-quotes:
   ```bash
-  yaylog --order="alphabetical" -w name="vim"
+  yaylog --order="name" -w name="vim"
   ```
 
   this can be useful for scripts and automation where you might want to avoid any and all ambiguity.
