@@ -42,7 +42,6 @@ type CliConfigProvider struct{}
 func (c *CliConfigProvider) GetConfig() (Config, error) {
 	cfg, err := ParseFlags(os.Args[1:])
 	if err != nil {
-		pflag.PrintDefaults()
 		return Config{}, err
 	}
 
@@ -82,7 +81,7 @@ func ParseFlags(args []string) (Config, error) {
 	pflag.BoolVarP(&allPackages, "all", "a", false, "Show all packages (ignores -l)")
 
 	pflag.StringArrayVarP(&filterInputs, "where", "w", []string{}, "Apply multiple filters (e.g. --where size=2KB:3KB --w name=vim)")
-	pflag.StringVarP(&sortInput, "order", "O", "date", "Order results by a field")
+	pflag.StringVarP(&sortInput, "order", "O", "date", "Order results by field")
 
 	pflag.BoolVarP(&hasNoHeaders, "no-headers", "", false, "Hide headers for table ouput (useful for scripts/automation)")
 	pflag.BoolVarP(&hasAllFields, "select-all", "A", false, "Display all available fields")
