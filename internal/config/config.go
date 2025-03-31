@@ -80,7 +80,7 @@ func ParseFlags(args []string) (Config, error) {
 	pflag.IntVarP(&count, "limit", "l", 20, "Number of packages to show")
 	pflag.BoolVarP(&allPackages, "all", "a", false, "Show all packages (ignores -l)")
 
-	pflag.StringArrayVarP(&filterInputs, "where", "w", []string{}, "Apply multiple filters (e.g. --where size=2KB:3KB --w name=vim)")
+	pflag.StringArrayVarP(&filterInputs, "where", "w", []string{}, "Apply multiple filters (e.g. --where size=2KB:3KB -wname=vim)")
 	pflag.StringVarP(&sortInput, "order", "O", "date", "Order results by field")
 
 	pflag.BoolVarP(&hasNoHeaders, "no-headers", "", false, "Hide headers for table ouput (useful for scripts/automation)")
