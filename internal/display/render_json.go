@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"yaylog/internal/consts"
-	"yaylog/internal/pkgdata"
+	"qp/internal/consts"
+	"qp/internal/pkgdata"
 )
 
 type PkgInfoJson struct {

@@ -2,11 +2,11 @@ package filtering
 
 import (
 	"fmt"
+	"qp/internal/config"
+	"qp/internal/consts"
+	"qp/internal/pkgdata"
 	"sort"
 	"strings"
-	"yaylog/internal/config"
-	"yaylog/internal/consts"
-	"yaylog/internal/pkgdata"
 )
 
 type (

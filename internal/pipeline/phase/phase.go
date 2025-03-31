@@ -2,11 +2,11 @@ package phase
 
 import (
 	"fmt"
+	"qp/internal/config"
+	out "qp/internal/display"
+	"qp/internal/pipeline/meta"
+	"qp/internal/pkgdata"
 	"sync"
-	"yaylog/internal/config"
-	out "yaylog/internal/display"
-	"yaylog/internal/pipeline/meta"
-	"yaylog/internal/pkgdata"
 )
 
 type (

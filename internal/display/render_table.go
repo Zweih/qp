@@ -3,11 +3,11 @@ package display
 import (
 	"bytes"
 	"fmt"
+	"qp/internal/consts"
+	"qp/internal/pkgdata"
 	"strings"
 	"text/tabwriter"
 	"time"
-	"yaylog/internal/consts"
-	"yaylog/internal/pkgdata"
 )
 
 type tableContext struct {

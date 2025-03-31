@@ -2,12 +2,12 @@ package main
 
 import (
 	"os"
+	"qp/internal/config"
+	out "qp/internal/display"
+	"qp/internal/pipeline/meta"
+	phasekit "qp/internal/pipeline/phase"
+	"qp/internal/pkgdata"
 	"sync"
-	"yaylog/internal/config"
-	out "yaylog/internal/display"
-	"yaylog/internal/pipeline/meta"
-	phasekit "yaylog/internal/pipeline/phase"
-	"yaylog/internal/pkgdata"
 
 	"github.com/spf13/pflag"
 	"golang.org/x/term"

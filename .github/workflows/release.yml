@@ -1,4 +1,4 @@
-name: Build and Release yaylog
+name: Build and Release qp
 
 on:
   push:
@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   build:
-    name: Build yaylog for ${{ matrix.arch }}
+    name: Build qp for ${{ matrix.arch }}
     runs-on: ubuntu-latest  # ubuntu includes cross-compilation toolchains
 
     strategy:
@@ -35,7 +35,7 @@ jobs:
         with:
           go-version: 1.23.2 # version from go.mod
 
-      - name: Build yaylog binary
+      - name: Build qp binary
         run: |
           export GOOS=linux GOARCH=${{ matrix.goarch }}
           
@@ -43,16 +43,16 @@ jobs:
             export GOARM=${{ matrix.goarm }}
           fi
           
-          go build -v -o yaylog-${{ matrix.arch }} ./cmd/yaylog
+          go build -v -o qp-${{ matrix.arch }} ./cmd/qp
 
       - name: Upload built binary
         uses: actions/upload-artifact@v4
         with:
-          name: yaylog-${{ matrix.arch }}
-          path: yaylog-${{ matrix.arch }}
+          name: qp-${{ matrix.arch }}
+          path: qp-${{ matrix.arch }}
 
   release:
-    name: Release yaylog
+    name: Release qp
     needs: build
     runs-on: ubuntu-latest
 
@@ -73,24 +73,24 @@ jobs:
 
       - name: Package binaries with manpage
         run: |
-          cp yaylog.1 ./release/
+          cp qp.1 ./release/
 
-          for binary in ./release/yaylog-*; do
+          for binary in ./release/qp-*; do
             arch=$(basename "$binary" | cut -d'-' -f2)
           
-            tar -czvf ./release/yaylog-${{ github.ref_name }}-${arch}.tar.gz -C ./release "$(basename "$binary")" yaylog.1
+            tar -czvf ./release/qp-${{ github.ref_name }}-${arch}.tar.gz -C ./release "$(basename "$binary")" qp.1
           done
 
       - name: Create source tarball
         run: |
-          git archive --format=tar.gz --prefix=yaylog-${{ github.ref_name }}/ -o ./release/yaylog-${{ github.ref_name }}.tar.gz HEAD
+          git archive --format=tar.gz --prefix=qp-${{ github.ref_name }}/ -o ./release/qp-${{ github.ref_name }}.tar.gz HEAD
 
       - name: Generate SHA256 checksums
         run: |
           cd ./release
-          sha256sum yaylog-*.tar.gz > SHA256SUMS.txt
+          sha256sum qp-*.tar.gz > SHA256SUMS.txt
 
-      - name: Update yaylog-bin and yaylog-src PKGBUILDs with version and checksums  
+      - name: Update qp-bin and qp-src PKGBUILDs with version and checksums  
         run: |
           git fetch origin packaging
           git checkout packaging
@@ -98,29 +98,29 @@ jobs:
           VERSION="${GITHUB_REF#refs/tags/v}"
           CHECKSUMS_FILE=./release/SHA256SUMS.txt
 
-          for pkg in yaylog-bin yaylog-src; do
+          for pkg in qp-bin qp-src; do
             sed -i "s/^pkgver=.*/pkgver=${VERSION}/" $pkg/PKGBUILD
             sed -i "s/^pkgrel=.*/pkgrel=1/" $pkg/PKGBUILD
           done
 
-          for pkg in yaylog-bin yaylog-src; do
+          for pkg in qp-bin qp-src; do
             chmod +x update_checksums.sh
             ./update_checksums.sh $pkg/PKGBUILD $CHECKSUMS_FILE 
           done
 
-      - name: Generate pkgver for yaylog-git
+      - name: Generate pkgver for qp-git
         run: |
-          cd yaylog-git
-          rm -rf src pkg yaylog
+          cd qp-git
+          rm -rf src pkg qp
 
           makepkg --nodeps --nobuild --noconfirm
-          echo "Updated yaylog-git/pkgver to $(grep '^pkgver=' PKGBUILD | cut -d'=' -f2)"
+          echo "Updated qp-git/pkgver to $(grep '^pkgver=' PKGBUILD | cut -d'=' -f2)"
 
-          rm -rf src pkg yaylog          
+          rm -rf src pkg qp          
 
-      - name: Generate .SRCINFO for yaylog-bin, yaylog-src, and yaylog-git
+      - name: Generate .SRCINFO for qp-bin, qp-src, and qp-git
         run: |
-          for pkg in yaylog-bin yaylog-src yaylog-git; do
+          for pkg in qp-bin qp-src qp-git; do
             (cd $pkg && makepkg --printsrcinfo --noconfirm > .SRCINFO)
           done
 
@@ -129,7 +129,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-          for pkg in yaylog-bin yaylog-src yaylog-git; do
+          for pkg in qp-bin qp-src qp-git; do
             git add $pkg/PKGBUILD $pkg/.SRCINFO
           done
           
@@ -140,7 +140,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            ./release/yaylog-*.tar.gz
+            ./release/qp-*.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

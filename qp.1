@@ -1,13 +1,13 @@
-.\" Man page for yaylog
-.TH yaylog 1 "March 2025" "yaylog 3.41.0" "User Commands"
+.\" Man page for qp
+.TH qp 1 "April 2025" "qp 4.0.0" "User Commands"
 .SH NAME
-yaylog \- List and query installed packages on Arch-based systems.
+qp \- List and query installed packages on Arch-based systems.
 .SH SYNOPSIS
-.B yaylog
+.B qp
 .RI [ \-l | \-\-limit <number> ] [ \-a | \-\-all ] [ \-w <field>=<value> ] [ \-s | \-\-select <list> ] [ \-S | \-\-select-add <list> ] [ \-A | \-\-select-all ] [ \-O | \-\-order <field>:<direction> ] [ \-\-json ] [ \-\-no-headers ] [ \-\-full-timestamp ] [ \-\-no-progress ] [ \-h | \-\-help ]
 
 .SH DESCRIPTION
-.B yaylog
+.B qp
 is a standalone CLI utility for Arch and Arch-based Linux distributions to list and query installed packages. It works with any package manager that uses ALPM,
 including
 .B yay,
@@ -101,7 +101,7 @@ Supported queries:
 .PP
 Example:
 .EX
-yaylog -w reason=explicit -w size=100MB:
+qp -w reason=explicit -w size=100MB:
 .EE
 
 .TP
@@ -146,7 +146,7 @@ Output results in JSON format. Overrides
 .PP
 Example:
 .EX
-yaylog -w name=sqlite --json -s name,version,size
+qp -w name=sqlite --json -s name,version,size
 .EE
 
 .TP
@@ -165,47 +165,47 @@ Show help information.
 .TP
 Last 10 installed packages:
 .EX
-yaylog -l 10
+qp -l 10
 .EE
 .TP
 All explicitly installed packages:
 .EX
-yaylog -w reason=explicit
+qp -w reason=explicit
 .EE
 .TP
 Between 100MB–1GB, installed before June 30, 2024:
 .EX
-yaylog -w size=100MB:1GB -w date=:2024-06-30
+qp -w size=100MB:1GB -w date=:2024-06-30
 .EE
 .TP
 Packages required by "firefox":
 .EX
-yaylog -w required-by=firefox
+qp -w required-by=firefox
 .EE
 .TP
 JSON output:
 .EX
-yaylog --json
+qp --json
 .EE
 .TP
 Save explicit packages to JSON file:
 .EX
-yaylog -w reason=explicit --json > explicit-packages.json
+qp -w reason=explicit --json > explicit-packages.json
 .EE
 .TP
 Show names and sizes without headers:
 .EX
-yaylog --no-headers -s name,size
+qp --no-headers -s name,size
 .EE
 .TP
 Packages that depend on "glibc" and are required by "ffmpeg":
 .EX
-yaylog -w depends=glibc -w required-by=ffmpeg
+qp -w depends=glibc -w required-by=ffmpeg
 .EE
 .TP
 Packages built for "any" architecture:
 .EX
-yaylog -w arch=any
+qp -w arch=any
 .EE
 
 .SH AUTHOR
@@ -218,7 +218,7 @@ for details.
 
 .SH BUGS
 Report bugs at:
-.UR https://github.com/Zweih/yaylog
+.UR https://github.com/Zweih/qp
 .UE
 
 .SH SEE ALSO

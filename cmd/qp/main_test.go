@@ -3,10 +3,10 @@ package main
 import (
 	"bytes"
 	"os"
+	"qp/internal/config"
+	"qp/internal/consts"
 	"strings"
 	"testing"
-	"yaylog/internal/config"
-	"yaylog/internal/consts"
 )
 
 type MockConfigProvider struct {

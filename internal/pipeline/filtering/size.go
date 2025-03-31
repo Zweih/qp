@@ -3,10 +3,10 @@ package filtering
 import (
 	"fmt"
 	"math"
+	"qp/internal/consts"
 	"regexp"
 	"strconv"
 	"strings"
-	"yaylog/internal/consts"
 )
 
 func parseSizeFilter(sizeFilterInput string) (RangeSelector, error) {

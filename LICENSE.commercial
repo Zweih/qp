@@ -1,0 +1,71 @@
+Commercial and AI/ML Use License for qp
+=======================================
+
+SPDX-License-Identifier: LicenseRef-Commercial-AI-Use
+
+This software is dual-licensed. You may choose to use it under the terms of:
+
+1. The GNU General Public License v3.0 only (GPL-3.0), or
+2. This Commercial and AI/ML Use License.
+
+If you use this software under the GPL, you must comply with all of its terms and conditions, including releasing any derivative works under the same license. See the LICENSE file for the full GPL-3.0 terms.
+
+This Commercial and AI/ML Use License applies to use cases that are not compatible with the GPL. It grants permission to use the software under the terms below.
+
+Definitions
+-----------
+
+"Software" refers to the qp project and all associated source code, documentation, and binaries developed and distributed by the original author.
+
+"You" refers to any individual, organization, or entity that seeks to use this Software under the terms of this Commercial License.
+
+Permitted Uses
+--------------
+
+Under this license, you are granted the right to use, modify, and integrate the Software into your own products or services, including in closed-source or proprietary environments, **provided you have obtained prior written permission** from the author.
+
+Prohibited Uses Without Prior Permission
+----------------------------------------
+
+Unless explicitly licensed by the author under a separate agreement, the following uses of the Software are prohibited under this license:
+
+1. Using the Software, in whole or in part, to train, fine-tune, or improve machine learning models, large language models (LLMs), or other artificial intelligence systems.
+
+2. Including the Software in any dataset, corpus, or training material used for AI/ML model development.
+
+3. Embedding or incorporating the Software into inference pipelines, embeddings, indexers, or any automated system that processes the Software for ML-related tasks.
+
+4. Distributing the Software as part of a proprietary product or Software-as-a-Service (SaaS) offering without also complying with the terms of the GPL or obtaining a separate commercial license.
+
+5. Using the Software in a manner that violates any local, state, or international law or regulation.
+
+Attribution
+-----------
+
+If this Software is used in a commercial product or deployment, appropriate credit must be given to the original project and author, unless otherwise agreed in writing.
+
+No Warranty
+-----------
+
+This Software is provided "as is" without warranty of any kind, express or implied. The author shall not be liable for any damages arising from the use of the Software.
+
+Obtaining a Commercial License
+------------------------------
+
+If you wish to use this Software in a manner that is not permitted by the GPL or falls under the prohibited use cases listed above, you must obtain a commercial license.
+
+To request a commercial license, contact the author at:
+
+    me@fernandonunez.io
+
+Specify your intended use case, organization name, and the type of license you are requesting (e.g., proprietary distribution, LLM usage, internal commercial tooling, etc.).
+
+Copyright
+---------
+
+Copyright (c) 2025 Fernando Nunez
+
+All rights reserved.
+
+Version: 1.0  
+Last updated: 2025-03-31

@@ -3,11 +3,11 @@ package pkgdata
 import (
 	"fmt"
 	"math"
+	"qp/internal/consts"
+	"qp/internal/pipeline/meta"
 	"strings"
 	"sync"
 	"time"
-	"yaylog/internal/consts"
-	"yaylog/internal/pipeline/meta"
 )
 
 type Filter func(*PkgInfo) bool
