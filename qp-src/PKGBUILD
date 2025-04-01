@@ -7,7 +7,6 @@ arch=("any")
 url="https://github.com/Zweih/qp"
 license=("GPL3")
 makedepends=("go>=1.24.1")
-provides=("qp")
 conflicts=("qp-bin" "qp-git")
 replaces=("yaylog")
 source=("${url}/releases/download/v${pkgver}/qp-v${pkgver}.tar.gz")

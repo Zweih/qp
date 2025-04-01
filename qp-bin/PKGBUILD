@@ -1,14 +1,14 @@
 # Maintainer: Fernando Nunez <me@fernandonunez.io>
 pkgname=qp-bin
 pkgver=4.0.0
-pkgrel=1
+pkgrel=2
 pkgdesc="qp - Query Packages. A CLI utility for querying installed packages, written in Go."
 arch=('x86_64' 'aarch64' 'armv7h')
 url="https://github.com/Zweih/qp"
 license=("GPL3")
 provides=("qp")
 conflicts=("qp" "qp-git")
-replaces=("yaylog")
+replaces=("yaylog-bin")
 
 release_url="${url}/releases/download/v${pkgver}/qp-v${pkgver}"
 ext=".tar.gz"
