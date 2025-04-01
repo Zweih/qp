@@ -11,7 +11,7 @@ provides=("qp")
 conflicts=("qp-bin" "qp-git")
 replaces=("yaylog")
 source=("${url}/releases/download/v${pkgver}/qp-v${pkgver}.tar.gz")
-sha256sums=('f4f42ffdc35121b88d650a11ea1fd29d525ab47427a037154aeeaada6da78949')
+sha256sums=('062f2315b42f6872a07ca5de1bb4970eb825f4e86d3c232c8a7490ae622fe7e9')
 
 build() {
   cd "$srcdir/$pkgname-v$pkgver"

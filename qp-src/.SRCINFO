@@ -5,12 +5,12 @@ pkgbase = qp
 	url = https://github.com/Zweih/qp
 	arch = any
 	license = GPL3
-	makedepends = go
+	makedepends = go>=1.24.1
 	provides = qp
 	conflicts = qp-bin
 	conflicts = qp-git
 	replaces = yaylog
 	source = https://github.com/Zweih/qp/releases/download/v4.0.0/qp-v4.0.0.tar.gz
-	sha256sums = f4f42ffdc35121b88d650a11ea1fd29d525ab47427a037154aeeaada6da78949
+	sha256sums = 062f2315b42f6872a07ca5de1bb4970eb825f4e86d3c232c8a7490ae622fe7e9
 
 pkgname = qp
