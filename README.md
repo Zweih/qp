@@ -51,9 +51,6 @@ this package is compatible with the following distributions:
 - sort by installation date, package name, license, or by size on disk
 - output as a table or JSON
 
-## why is it called qp if it works with other AUR helpers?
-because yay is my preferred AUR helper and the name has a good flow.
-
 ## is it good?
 [yes.](https://news.ycombinator.com/item?id=3067434)
 
