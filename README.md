@@ -6,7 +6,11 @@ you can find installation instructions [here](#installation).
 
 `qp` supports querying/sorting for install date, package name, install reason (explicit/dependency), size on disk, reverse dependencies, dependency requirements, and more. check [usage](#usage) for all available options.
 
-[![Packaging status](https://repology.org/badge/vertical-allrepos/qp.svg)](https://repology.org/project/qp/versions) ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/Zweih/qp/total?style=for-the-badge&logo=archlinux&label=Downloads%20Since%202%2F4%2F2025&color=%20%231793d0)
+![AUR status - qp](https://img.shields.io/aur/version/qp?style=flat-square&label=AUR%20-%20qp&link=https%3A%2F%2Faur.archlinux.org%2Fpackages%2Fqp)
+![AUR status - qp-bin](https://img.shields.io/aur/version/qp-bin?style=flat-square&label=AUR%20-%20qp-bin&link=https%3A%2F%2Faur.archlinux.org%2Fpackages%2Fqp-bin)
+![AUR status - qp-git](https://img.shields.io/aur/version/qp-git?style=flat-square&label=AUR%20-%20qp-git&link=https%3A%2F%2Faur.archlinux.org%2Fpackages%2Fqp-git)
+
+![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/Zweih/qp/total?style=for-the-badge&logo=archlinux&label=Downloads%20Since%202%2F4%2F2025&color=%23007ec6)
 
 ![Alt](https://repobeats.axiom.co/api/embed/7a20b73b689d45d678001c582a9d1f124dca31ba.svg "Repobeats analytics image")
 
@@ -450,5 +454,5 @@ are treated as separate parameters.
 # license
 this project is licensed under GPL-3.0-only.
 
-for use cases not compatible with the GPL — such as proprietary redistribution or integration into ML/LLM systems — a separate commercial license is available. see LICENSE.commercial for details.
+for use cases not compatible with the GPL, such as proprietary redistribution or integration into ML/LLM systems, a separate commercial license is available. see LICENSE.commercial for details.
  
