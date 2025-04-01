@@ -8,7 +8,7 @@ url="https://github.com/Zweih/qp"
 license=("GPL3")
 provides=("qp")
 conflicts=("qp" "qp-git")
-replaces=("yaylog-bin")
+replaces=('yaylog' 'yaylog-bin' 'yaylog-git')
 
 release_url="${url}/releases/download/v${pkgver}/qp-v${pkgver}"
 ext=".tar.gz"

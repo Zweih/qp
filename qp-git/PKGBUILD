@@ -9,7 +9,7 @@ license=("GPL3")
 makedepends=("go>=1.24.1" "git")
 provides=("qp")
 conflicts=("qp" "qp-bin")
-replaces=("yaylog-git")
+replaces=('yaylog' 'yaylog-bin' 'yaylog-git')
 source=("qp::git+https://github.com/Zweih/qp.git")
 sha256sums=('SKIP')
 
