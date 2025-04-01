@@ -48,7 +48,7 @@ func mainWithConfig(configProvider config.ConfigProvider) error {
 			return err
 		}
 
-		if i > 0 && len(pkgPtrs) == 0 { // only start checking once both fetche
+		if i > 0 && len(pkgPtrs) == 0 { // only start checking once loading/fetching has completed
 			out.WriteLine("No packages to display.")
 			return nil
 		}

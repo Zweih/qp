@@ -45,6 +45,10 @@ func newPackageCondition(fieldType consts.FieldType, targets []string) (*FilterC
 		filterFunc = func(pkg *PkgInfo) bool {
 			return pkgdata.FilterByStrings(pkg.License, targets)
 		}
+	case consts.FieldDescription:
+		filterFunc = func(pkg *PkgInfo) bool {
+			return pkgdata.FilterByStrings(pkg.Description, targets)
+		}
 	case consts.FieldRequiredBy:
 		filterFunc = func(pkg *PkgInfo) bool {
 			return pkgdata.FilterByRelation(pkg.RequiredBy, targets)

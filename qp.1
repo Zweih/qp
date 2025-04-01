@@ -1,5 +1,5 @@
 .\" Man page for qp
-.TH qp 1 "April 2025" "qp 4.0.0" "User Commands"
+.TH qp 1 "April 2025" "qp 4.1.0" "User Commands"
 .SH NAME
 qp \- List and query installed packages on Arch-based systems.
 .SH SYNOPSIS
@@ -27,6 +27,7 @@ The utility provides powerful querying capabilities, including:
 - Provision queries
 - Package name queries
 - Architecture queries
+- Description queries
 - Sorting and JSON output
 
 .SH OPTIONS
@@ -97,6 +98,9 @@ Supported queries:
 .IP
 .B arch=x86_64
 : Packages built for specified architectures. "any" is also valid.
+.IP
+.B description="linux kernel"
+: Packages that contain "linux kernel" in their description.
 
 .PP
 Example:
@@ -212,7 +216,7 @@ qp -w arch=any
 Written by Fernando Nunez <me@fernandonunez.io>.
 
 .SH LICENSE
-MIT License. See
+GPLv3-only License. See
 .B LICENSE
 for details.
 
