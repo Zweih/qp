@@ -1,0 +1,21 @@
+pkgbase = qp-bin
+	pkgdesc = qp - Query Packages. A CLI utility for querying installed packages, written in Go.
+	pkgver = 4.0.0
+	pkgrel = 1
+	url = https://github.com/Zweih/qp
+	arch = x86_64
+	arch = aarch64
+	arch = armv7h
+	license = GPL3
+	provides = qp
+	conflicts = qp
+	conflicts = qp-git
+	replaces = yaylog
+	source_x86_64 = https://github.com/Zweih/qp/releases/download/v4.0.0/qp-v4.0.0-x86_64.tar.gz
+	sha256sums_x86_64 = e69e954719a4d3dd69000bb6a307e9b4de7734f978057f0fb33ffd57626f896a
+	source_aarch64 = https://github.com/Zweih/qp/releases/download/v4.0.0/qp-v4.0.0-aarch64.tar.gz
+	sha256sums_aarch64 = 8af6a836b480c10257702ee20ded8e62ef518a4c05056bba41b6faded38dae0d
+	source_armv7h = https://github.com/Zweih/qp/releases/download/v4.0.0/qp-v4.0.0-armv7h.tar.gz
+	sha256sums_armv7h = 4553d97dcc1f45c3c0e5356ca7cb64ca8e720f41789d44afd2b3a282fc79796c
+
+pkgname = qp-bin

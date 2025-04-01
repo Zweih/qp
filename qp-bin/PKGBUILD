@@ -1,0 +1,29 @@
+# Maintainer: Fernando Nunez <me@fernandonunez.io>
+pkgname=qp-bin
+pkgver=4.0.0
+pkgrel=1
+pkgdesc="qp - Query Packages. A CLI utility for querying installed packages, written in Go."
+arch=('x86_64' 'aarch64' 'armv7h')
+url="https://github.com/Zweih/qp"
+license=("GPL3")
+provides=("qp")
+conflicts=("qp" "qp-git")
+replaces=("yaylog")
+
+release_url="${url}/releases/download/v${pkgver}/qp-v${pkgver}"
+ext=".tar.gz"
+
+source_x86_64+=("${release_url}-x86_64${ext}")
+source_aarch64+=("${release_url}-aarch64${ext}")
+source_armv7h+=("${release_url}-armv7h${ext}")
+
+sha256sums_x86_64=('e69e954719a4d3dd69000bb6a307e9b4de7734f978057f0fb33ffd57626f896a')
+sha256sums_aarch64=('8af6a836b480c10257702ee20ded8e62ef518a4c05056bba41b6faded38dae0d')
+sha256sums_armv7h=('4553d97dcc1f45c3c0e5356ca7cb64ca8e720f41789d44afd2b3a282fc79796c')
+
+package() {
+  tar -xzf "$srcdir/qp-v${pkgver}-${CARCH}${ext}" -C "$srcdir"
+
+  install -Dm755 "${srcdir}/qp-${CARCH}" "$pkgdir/usr/bin/qp"
+  install -Dm644 "${srcdir}/qp.1" "$pkgdir/usr/share/man/man1/qp.1"
+}

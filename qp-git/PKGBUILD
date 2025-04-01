@@ -1,32 +1,33 @@
 # Maintainer: Fernando Nunez <me@fernandonunez.io>
-pkgname=yaylog-git
-pkgver=3.41.0.r0.g3e2bbd2
+pkgname=qp-git
+pkgver=4.0.0.r0.g539dd1f
 pkgrel=1
-pkgdesc="A CLI utility to list installed packages with filtering and sorting, written in Go."
+pkgdesc="qp - Query Packages. A CLI utility for querying installed packages, written in Go."
 arch=("any")
-url="https://github.com/Zweih/yaylog"
-license=("MIT")
+url="https://github.com/Zweih/qp"
+license=("GPL3")
 makedepends=("go" "git")
-provides=("yaylog")
-conflicts=("yaylog" "yaylog-bin")
-source=("git+https://github.com/Zweih/yaylog.git")
+provides=("qp")
+conflicts=("qp" "qp-bin")
+replaces=("yaylog-git")
+source=("qp::git+https://github.com/Zweih/qp.git")
 sha256sums=('SKIP')
 
-_binaryname="yaylog"
+_binaryname="qp"
 
 pkgver() {
-  cd "$srcdir/yaylog"
+  cd "$srcdir/qp"
   git describe --long --tags | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g'
 }
 
 build() {
-  cd "$srcdir/yaylog"
+  cd "$srcdir/qp"
   export CGO_ENABLED=0
   go build -trimpath -o ${_binaryname} ./cmd/${_binaryname}
 }
 
 package() {
-  cd "$srcdir/yaylog"
+  cd "$srcdir/qp"
   install -Dm755 "${_binaryname}" "$pkgdir/usr/bin/${_binaryname}"
   install -Dm644 "${_binaryname}.1" "$pkgdir/usr/share/man/man1/${_binaryname}.1"
 }

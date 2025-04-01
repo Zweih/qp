@@ -3,7 +3,7 @@
 PKGBUILD_FILE=${1:-PKGBUILD}
 SHA_FILE=${2:-SHA256SUMS.txt}
 
-PKG_NAME="yaylog"
+PKG_NAME="qp"
 EXT="tar.gz"
 
 [[ ! -f "$SHA_FILE" ]] && {
