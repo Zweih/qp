@@ -1,7 +1,7 @@
 package pkgdata
 
 import (
-	"yaylog/internal/pipeline/meta"
+	"qp/internal/pipeline/meta"
 )
 
 // TODO: we can do this concurrently. let's get on that.

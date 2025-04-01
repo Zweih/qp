@@ -2,8 +2,8 @@ package config
 
 import (
 	"fmt"
+	"qp/internal/consts"
 	"strings"
-	"yaylog/internal/consts"
 )
 
 func parseFields(

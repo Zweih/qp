@@ -3,10 +3,10 @@ package display
 import (
 	"fmt"
 	"os"
+	"qp/internal/consts"
+	"qp/internal/pkgdata"
 	"strings"
 	"sync"
-	"yaylog/internal/consts"
-	"yaylog/internal/pkgdata"
 
 	"golang.org/x/term"
 )

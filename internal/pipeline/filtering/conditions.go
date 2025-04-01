@@ -2,9 +2,9 @@ package filtering
 
 import (
 	"fmt"
+	"qp/internal/consts"
+	"qp/internal/pkgdata"
 	"strings"
-	"yaylog/internal/consts"
-	"yaylog/internal/pkgdata"
 )
 
 type RangeSelector struct {

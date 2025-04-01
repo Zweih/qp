@@ -2,12 +2,12 @@ package pkgdata
 
 import (
 	"fmt"
+	"qp/internal/consts"
+	"qp/internal/pipeline/meta"
 	"runtime"
 	"sort"
 	"strings"
 	"sync"
-	"yaylog/internal/consts"
-	"yaylog/internal/pipeline/meta"
 )
 
 const ConcurrentSortThreshold = 500

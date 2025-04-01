@@ -1,14 +1,12 @@
-# yaylog
+# qp - query packages
 
-`yaylog` is a CLI util, written in **Go** / **Golang**, for [arch linux](https://archlinux.org) and arch-based linux distros to query installed packages.
-
-despite the name, it's not limited to `yay` and works with any package manager that uses ALPM; so it can be used with `pacman`, `yay`, `paru`, `aura`, `pamac`, and even `yaourt` if you're somehow still using it.
+`qp` is a CLI util, written in **Go** / **Golang**, for [arch linux](https://archlinux.org) and arch-based linux distros to query installed packages.
 
 you can find installation instructions [here](#installation).
 
-`yaylog` supports querying/sorting for install date, package name, install reason (explicit/dependency), size on disk, reverse dependencies, dependency requirements, and more. check [usage](#usage) for all available options.
+`qp` supports querying/sorting for install date, package name, install reason (explicit/dependency), size on disk, reverse dependencies, dependency requirements, and more. check [usage](#usage) for all available options.
 
-[![Packaging status](https://repology.org/badge/vertical-allrepos/yaylog.svg)](https://repology.org/project/yaylog/versions) ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/Zweih/yaylog/total?style=for-the-badge&logo=archlinux&label=Downloads%20Since%202%2F4%2F2025&color=%20%231793d0)
+[![Packaging status](https://repology.org/badge/vertical-allrepos/qp.svg)](https://repology.org/project/qp/versions) ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/Zweih/qp/total?style=for-the-badge&logo=archlinux&label=Downloads%20Since%202%2F4%2F2025&color=%20%231793d0)
 
 ![Alt](https://repobeats.axiom.co/api/embed/7a20b73b689d45d678001c582a9d1f124dca31ba.svg "Repobeats analytics image")
 
@@ -48,7 +46,7 @@ this package is compatible with the following distributions:
 - sort by installation date, package name, license, or by size on disk
 - output as a table or JSON
 
-## why is it called yaylog if it works with other AUR helpers?
+## why is it called qp if it works with other AUR helpers?
 because yay is my preferred AUR helper and the name has a good flow.
 
 ## is it good?
@@ -120,14 +118,14 @@ because yay is my preferred AUR helper and the name has a good flow.
 ### from AUR (**recommended**)
 install using [AUR helper](https://wiki.archlinux.org/title/AUR_helpers) like `yay`, `paru`, `aura`, etc.:
 ```bash
-yay -Sy yaylog
+yay -Sy qp
 ```
 
-if you prefer to install a pre-compiled binary* using the AUR, use the `yaylog-bin` package instead.
+if you prefer to install a pre-compiled binary* using the AUR, use the `qp-bin` package instead.
 
 ***note**: binaries are automatically, securely, and transparently compiled with github CI when a version release is created. you can audit the binary creation by checking the relevant github action for each release version.
 
-for the latest (unstable) version from git w/ the AUR, use `yaylog-git`*.  
+for the latest (unstable) version from git w/ the AUR, use `qp-git`*.  
 
 ***note**: this is not recommended for most users 
 
@@ -137,26 +135,26 @@ for the latest (unstable) version from git w/ the AUR, use `yaylog-git`*.
 
 1. clone the repo:
    ```bash
-   git clone https://github.com/zweih/yaylog.git
-   cd yaylog
+   git clone https://github.com/zweih/qp.git
+   cd qp
    ```
 2. build the binary:
    ```bash
-   go build -o yaylog ./cmd/yaylog
+   go build -o qp ./cmd/qp
    ```
 3. copy the binary to your system's `$PATH`:
    ```bash
-   sudo install -m755 yaylog /usr/bin/yaylog
+   sudo install -m755 qp /usr/bin/qp
    ```
 4. copy the manpage:
    ```bash
-   sudo install -m644 yaylog.1 /usr/share/man/man1/yaylog.1
+   sudo install -m644 qp.1 /usr/share/man/man1/qp.1
    ```
 
 ## usage
 
 ```bash
-yaylog [options]
+qp [options]
 ```
 
 ### options
@@ -227,7 +225,7 @@ the `--json` flag outputs the package data as structured JSON instead of a table
 
 example:
 ```bash
-yaylog -Aw name=tinysparql --json
+qp -Aw name=tinysparql --json
 ```
 
 `tinysparql` is one of the few packages that actually has all the fields populated.
@@ -276,29 +274,29 @@ are treated as separate parameters.
   
   invalid:
   ```bash
-  yaylog -wa name=yay  # incorrect usage 
+  qp -wa name=yay  # incorrect usage 
   ```
   valid:
   ```bash
-  yaylog -aw name=yay  # correct usage
+  qp -aw name=yay  # correct usage
   ```
 
 - the `depends`, `provides`, `required-by` columns output can be lengthy, packages like `glibc` are required by thousands of packages. to improve readability, pipe the output to tools like `less` or `moar` (i prefer `moar`, but `less` is a core-util):
   ```bash
-  yaylog -s name,depends | less
+  qp -s name,depends | less
   ```
 - all options that take an argument can also be used in the `--<flag>=<argument>` format:
   ```bash
-  yaylog --select-add=name --limit=100
-  yaylog -s=date,name,version -O=name
+  qp --select-add=name --limit=100
+  qp -s=date,name,version -O=name
   ```
   boolean flags can also be explicitly set using `--<flag>=true` or `--<flag>=false`:
   ```bash
-  yaylog --no-headers=true --no-progress=true
+  qp --no-headers=true --no-progress=true
   ```
   string arguments can also be surrounded with quotes or double-quotes:
   ```bash
-  yaylog --order="name" -w name="vim"
+  qp --order="name" -w name="vim"
   ```
 
   this can be useful for scripts and automation where you might want to avoid any and all ambiguity.
@@ -307,144 +305,150 @@ are treated as separate parameters.
 
 - the `--no-headers` flag is useful when processing output in scripts. It removes the header row, making it easier to parse package lists with tools like `awk`, `sed`, or `cut`:
   ```bash
-  yaylog --no-headers --columns name,size | awk '{print $1, $2}'
+  qp --no-headers --columns name,size | awk '{print $1, $2}'
   ```
 
 ### examples
 
  1. show the last 10 installed packages 
    ```bash
-   yaylog -l 10
+   qp -l 10
    ```
  2. show all explicitly installed packages
    ```bash
-   yaylog -aw reason=explicit
+   qp -aw reason=explicit
    ```
  3. show only dependencies installed on a specific date
    ```bash
-   yaylog -w reason=dependency -w date=2025-03-01
+   qp -w reason=dependency -w date=2025-03-01
    ```
  4. show all packages sorted alphabetically by name
    ```bash
-   yaylog -aO name
+   qp -aO name
    ```
  5. search for packages that contain a GPL license
    ```bash
-   yaylog -w license=gpl
+   qp -w license=gpl
    ```
  6. show packages installed between january 1, 2025, and january 5, 2025
    ```bash
-   yaylog -w date=2025-01-01:2025-01-05
+   qp -w date=2025-01-01:2025-01-05
    ```
  7. sort all packages by their license, displaying name and license
    ```bash
-   yaylog -aO license -s name,license
+   qp -aO license -s name,license
    ```
  8. show the 20 most recently installed packages larger than 20MB
    ```bash
-   yaylog -w size=20MB: -l 20
+   qp -w size=20MB: -l 20
    ```
  9. show packages between 100MB and 1GB installed up to february 27, 2025
    ```bash
-   yaylog -w size=100MB:1GB -w date=:2025-02-27
+   qp -w size=100MB:1GB -w date=:2025-02-27
    ```
 10. show all packages sorted by size in descending order, installed after january 1, 2025
    ```bash
-   yaylog -a --order size:desc -w date=2025-01-01:
+   qp -a --order size:desc -w date=2025-01-01:
    ```
 11. search for installed packages containing "python
    ```bash
-   yaylog -w name=python
+   qp -w name=python
    ```
 12. search for explicitly installed packages containing "lib" that are between 10MB and 1GB in size
    ```bash
-   yaylog -w reason=explicit -w name=lib -w size=10MB:1GB
+   qp -w reason=explicit -w name=lib -w size=10MB:1GB
    ```
 13. search for packages with names containing "linux" installed between january 1 and march 30, 2025
    ```bash
-   yaylog -w name=linux -w date=2025-01-01:2025-03-30
+   qp -w name=linux -w date=2025-01-01:2025-03-30
    ```
 14. search for packages containing "gtk" installed after january 1, 2025, and at least 5MB in size
    ```bash
-   yaylog -w name=gtk -w date=2025-01-01: -w size=5MB:
+   qp -w name=gtk -w date=2025-01-01: -w size=5MB:
    ```
 15. show packages with name, version, and size
    ```bash
-   yaylog -s name,version,size
+   qp -s name,version,size
    ```
 16. show package names, descriptions, and dependencies with `less` for readability
    ```bash
-   yaylog --select name,depends,description | less
+   qp --select name,depends,description | less
    ```
 17. output package data in JSON format
    ```bash
-   yaylog --json
+   qp --json
    ```
 18. save all explicitly installed packages to a JSON file
    ```bash
-   yaylog -w reason=explicit --json > explicit-packages.json
+   qp -w reason=explicit --json > explicit-packages.json
    ```
 19. output all packages sorted by size (descending) in JSON
    ```bash
-   yaylog --json -a -O size:desc
+   qp --json -a -O size:desc
    ```
 20. output JSON with specific fields
    ```bash
-   yaylog --json -s name,version,size
+   qp --json -s name,version,size
    ```
 21. show all available package details for all packages
    ```bash
-   yaylog -aA
+   qp -aA
    ```
 22. output all packages with all columns/fields in JSON format
    ```bash
-   yaylog -aA --json
+   qp -aA --json
    ```
 23. show package names and sizes without headers for scripting
    ```bash
-   yaylog --no-headers -s name,size
+   qp --no-headers -s name,size
    ```
 24. show all packages required by `firefox`
    ```bash
-   yaylog -a -w required-by=firefox
+   qp -a -w required-by=firefox
    ```
 25. show all packages required by `gtk3` that are at least 50MB in size
    ```bash
-   yaylog -a -w required-by=gtk3 -w size=50MB:
+   qp -a -w required-by=gtk3 -w size=50MB:
    ```
 26. show packages required by `vlc` and installed after january 1, 2025 
    ```bash
-   yaylog -w required-by=vlc -w date=2025-01-01:
+   qp -w required-by=vlc -w date=2025-01-01:
    ```
 27. show all packages that have `glibc` as a dependency and are required by `ffmpeg`
    ```bash
-   yaylog -a -w depends=glibc -w required-by=ffmpeg
+   qp -a -w depends=glibc -w required-by=ffmpeg
    ```
 28. inclusively show packages that require `gcc` or `pacman`:
    ```bash
-   yaylog -w required-by=base-devel,gcc
+   qp -w required-by=base-devel,gcc
    ```
 29. show packages that provide `awk`:
    ```bash
-   yaylog -w provides=awk
+   qp -w provides=awk
    ```
 30. inclusively show packages that provide `rustc` or `python3`:
    ```bash
-   yaylog -w provides=rustc,python3
+   qp -w provides=rustc,python3
    ```
 31. show packages that conflict with `linuxqq`:
    ```bash
-   yaylog -w conflicts=linuxqq
+   qp -w conflicts=linuxqq
    ```
 32. show packages that are built for the `aarch64` CPU architecture or any architecture (non-CPU-specific):
    ```bash
-   yaylog -w arch=aarch64,any
+   qp -w arch=aarch64,any
    ```
 33. show all dependencies smaller than 500KB  
    ```bash
-   yaylog -w reason=dependencies -w size=:500KB
+   qp -w reason=dependencies -w size=:500KB
    ```
 34. show the 15 most recent explicitly installed packages
    ```bash
-   yaylog -w reason=explicit -l 15
+   qp -w reason=explicit -l 15
    ```
+
+# license
+this project is licensed under GPL-3.0-only.
+
+for use cases not compatible with the GPL — such as proprietary redistribution or integration into ML/LLM systems — a separate commercial license is available. see LICENSE.commercial for details.
+ 

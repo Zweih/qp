@@ -7,7 +7,7 @@ import (
 )
 
 func PrintHelp() {
-	fmt.Println("Usage: yaylog [options]")
+	fmt.Println("Usage: qp [options]")
 
 	fmt.Println("\nOptions:")
 	pflag.PrintDefaults()
@@ -63,16 +63,16 @@ func PrintHelp() {
 	fmt.Println("  url          URL of the official site of the software being packaged")
 
 	fmt.Println("\nExamples:")
-	fmt.Println("  yaylog -l 10                      # Show the last 10 installed packages")
-	fmt.Println("  yaylog -a -w reason=explicit      # Show all explicitly installed packages")
-	fmt.Println("  yaylog -w reason=dependencies     # Show only dependencies")
-	fmt.Println("  yaylog -w date=2024-12-25         # Show packages installed on a specific date")
-	fmt.Println("  yaylog -w size=100MB:1GB          # Show packages between 100MB and 1GB")
-	fmt.Println("  yaylog -w required-by=vlc         # Show packages required by VLC")
-	fmt.Println("  yaylog --json                     # Output package data in JSON format")
-	fmt.Println("  yaylog -w name=sqlite --json      # Output details for SQLite in JSON")
-	fmt.Println("  yaylog --no-headers -s name,size  # Show package names and sizes without headers")
+	fmt.Println("  qp -l 10                      # Show the last 10 installed packages")
+	fmt.Println("  qp -a -w reason=explicit      # Show all explicitly installed packages")
+	fmt.Println("  qp -w reason=dependencies     # Show only dependencies")
+	fmt.Println("  qp -w date=2024-12-25         # Show packages installed on a specific date")
+	fmt.Println("  qp -w size=100MB:1GB          # Show packages between 100MB and 1GB")
+	fmt.Println("  qp -w required-by=vlc         # Show packages required by VLC")
+	fmt.Println("  qp --json                     # Output package data in JSON format")
+	fmt.Println("  qp -w name=sqlite --json      # Output details for SQLite in JSON")
+	fmt.Println("  qp --no-headers -s name,size  # Show package names and sizes without headers")
 
-	fmt.Println("\nFor more details, see the manpage: man yaylog")
+	fmt.Println("\nFor more details, see the manpage: man qp")
 	fmt.Println("Or check the README on the GitHub repo.")
 }

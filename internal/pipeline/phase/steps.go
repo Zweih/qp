@@ -2,13 +2,13 @@ package phase
 
 import (
 	"fmt"
+	"qp/internal/config"
+	"qp/internal/consts"
+	out "qp/internal/display"
+	"qp/internal/pipeline/filtering"
+	"qp/internal/pipeline/meta"
+	"qp/internal/pkgdata"
 	"slices"
-	"yaylog/internal/config"
-	"yaylog/internal/consts"
-	out "yaylog/internal/display"
-	"yaylog/internal/pipeline/filtering"
-	"yaylog/internal/pipeline/meta"
-	"yaylog/internal/pkgdata"
 )
 
 func LoadCacheStep(

@@ -4,13 +4,13 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	pb "yaylog/internal/protobuf"
+	pb "qp/internal/protobuf"
 
 	"google.golang.org/protobuf/proto"
 )
 
 const (
-	cachePath    = "/tmp/yaylog.cache"
+	cachePath    = "/tmp/qp.cache"
 	cacheVersion = 2 // bump when updating structure of PkgInfo/Relation/pkginfo.proto
 )
 

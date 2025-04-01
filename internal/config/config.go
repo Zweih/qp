@@ -3,9 +3,9 @@ package config
 import (
 	"fmt"
 	"os"
+	"qp/internal/consts"
 	"regexp"
 	"strings"
-	"yaylog/internal/consts"
 
 	"github.com/spf13/pflag"
 )
