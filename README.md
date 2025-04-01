@@ -4,7 +4,7 @@
 
 you can find installation instructions [here](#installation).
 
-`qp` supports querying/sorting for install date, package name, install reason (explicit/dependency), size on disk, reverse dependencies, dependency requirements, and more. check [usage](#usage) for all available options.
+`qp` supports querying/sorting for install date, package name, install reason (explicit/dependency), size on disk, reverse dependencies, dependency requirements, description, and more. check [usage](#usage) for all available options.
 
 ![AUR status - qp](https://img.shields.io/aur/version/qp?style=flat-square&label=AUR%20-%20qp&link=https%3A%2F%2Faur.archlinux.org%2Fpackages%2Fqp)
 ![AUR status - qp-bin](https://img.shields.io/aur/version/qp-bin?style=flat-square&label=AUR%20-%20qp-bin&link=https%3A%2F%2Faur.archlinux.org%2Fpackages%2Fqp-bin)
@@ -47,6 +47,7 @@ this package is compatible with the following distributions:
 - query by packages built with specified architectures
 - query by package size or size range
 - query by package names
+- query by package description
 - sort by installation date, package name, license, or by size on disk
 - output as a table or JSON
 
@@ -115,7 +116,7 @@ because yay is my preferred AUR helper and the name has a good flow.
 - [ ] optional dependency field
 - [x] improve sorting efficiency (8% speed boost)
 - [ ] package base field
-- [ ] package description query
+- [x] package description query
 
 ## installation
 
@@ -174,6 +175,7 @@ qp [options]
   - `--where conflicts=sdl2`   -> query by packages that conflict with `sdl2`
   - `--where arch=x86_64`      -> query by packages that are built for `x86_64` CPUs
   - `--where license=GPL`      -> query by package licenses that contain `GPL`
+  - `--where description="linux kernel"` -> query by package descriptions that contain "linux kernel" 
 - `-O <field>:<direction>` | `--order <field>:<direction>`: sort results ascending or descending (default sort is `date:asc`):
   - `date`    -> sort by installation date
   - `name`    -> sort alphabetically by package name
@@ -208,6 +210,7 @@ short-flag queries and long-flag queries can be combined.
 | **name** | `name=<package>` / <br> `name=<package-1>,<package-2>,<etc>` | query by package name (substring match) |
 | **installation reason** | `reason=explicit` / `reason=dependencies` | query packages by installation reason: explicitly installed or installed as a dependency |
 | **size** | `size=<value>` | query by package size on disk. supports exact values (`10MB`), ranges (`10MB:1GB`), and open-ended ranges (`:500KB`, `1GB:`) |
+| **description** | `description=<string>` / <br> `description=<string-1>,<string-2>,<etc>` | query by package description (substring match) |
 
 ### available fields
 - `date` - installation date of the package
@@ -450,9 +453,13 @@ are treated as separate parameters.
    ```bash
    qp -w reason=explicit -l 15
    ```
+35. show packages that contain "clang" in their description:
+   ```bash
+   qp -w description=clang
+   ```
 
-# license
+## license
 this project is licensed under GPL-3.0-only.
 
-for use cases not compatible with the GPL, such as proprietary redistribution or integration into ML/LLM systems, a separate commercial license is available. see LICENSE.commercial for details.
+for use cases not compatible with the GPL, such as proprietary redistribution or integration/ingestion into ML/LLM systems, a separate commercial license is available. see LICENSE.commercial for details.
  
