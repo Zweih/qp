@@ -6,9 +6,9 @@ you can find installation instructions [here](#installation).
 
 `qp` supports querying/sorting for install date, package name, install reason (explicit/dependency), size on disk, reverse dependencies, dependency requirements, description, and more. check [usage](#usage) for all available options.
 
-![AUR status - qp](https://img.shields.io/aur/version/qp?style=flat-square&label=AUR%20-%20qp&link=https%3A%2F%2Faur.archlinux.org%2Fpackages%2Fqp)
-![AUR status - qp-bin](https://img.shields.io/aur/version/qp-bin?style=flat-square&label=AUR%20-%20qp-bin&link=https%3A%2F%2Faur.archlinux.org%2Fpackages%2Fqp-bin)
-![AUR status - qp-git](https://img.shields.io/aur/version/qp-git?style=flat-square&label=AUR%20-%20qp-git&link=https%3A%2F%2Faur.archlinux.org%2Fpackages%2Fqp-git)
+[![AUR status - qp](https://img.shields.io/aur/version/qp?style=flat-square&label=AUR%20-%20qp&link=https%3A%2F%2Faur.archlinux.org%2Fpackages%2Fqp)](https://aur.archlinux.org/packages/qp)
+[![AUR status - qp-bin](https://img.shields.io/aur/version/qp-bin?style=flat-square&label=AUR%20-%20qp-bin&link=https%3A%2F%2Faur.archlinux.org%2Fpackages%2Fqp-bin)](https://aur.archlinux.org/packages/qp-bin)
+[![AUR status - qp-git](https://img.shields.io/aur/version/qp-git?style=flat-square&label=AUR%20-%20qp-git&link=https%3A%2F%2Faur.archlinux.org%2Fpackages%2Fqp-git)](https://aur.archlinux.org/packages/qp-git)
 
 ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/Zweih/qp/total?style=for-the-badge&logo=archlinux&label=Downloads%20Since%202%2F4%2F2025&color=%23007ec6)
 
