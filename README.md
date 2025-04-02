@@ -35,7 +35,7 @@ this package is compatible with the following distributions:
 
 ## features
 
-- list installed packages with date/timestamps, dependencies, provisions, requirements, size on disk, conflicts, architecture, license, description, and version
+- list installed packages with date/timestamps, dependencies, provisions, requirements, size on disk, conflicts, architecture, license, description, package, and version
 - query by explicitly installed packages
 - query by packages installed as dependencies
 - query by packages required by specified packages
@@ -109,11 +109,13 @@ this package is compatible with the following distributions:
 - [x] architecture query
 - [x] optimize query order (4% speed boost)
 - [ ] dependency count sort
+- [ ] replaces field
 - [x] license query
 - [ ] optional dependency field
 - [x] improve sorting efficiency (8% speed boost)
-- [ ] package base field
+- [x] package base field
 - [x] package description query
+- [ ] package base query
 
 ## installation
 
@@ -223,6 +225,7 @@ short-flag queries and long-flag queries can be combined.
 - `license` - package software license
 - `url` - the URL of the official site of the software being packaged
 - `description` - package description
+- `pkgbase` - for normal packages, this is the same as the package name. for split-packages, this name is what is used to refer to the group of packages. for more info, see the [documentation for package splitting](https://man.archlinux.org/man/PKGBUILD.5#PACKAGE_SPLITTING) 
 
 ### JSON output
 the `--json` flag outputs the package data as structured JSON instead of a table. this can be useful for scripts or automation.
@@ -238,15 +241,16 @@ output format:
 ```json
 [
   {
-    "timestamp": 1739294218,
-    "size": 4385422,
+    "timestamp": 1743448252,
+    "size": 4446373,
     "name": "tinysparql",
     "reason": "dependency",
-    "version": "3.8.2-2",
+    "version": "3.9.1-1",
     "arch": "aarch64",
     "license": "GPL-2.0-or-later",
     "url": "https://tinysparql.org/",
     "description": "Low-footprint RDF triple store with SPARQL 1.1 interface",
+    "pkgbase": "tinysparql",
     "depends": [
       "avahi",
       "gcc-libs",
@@ -259,8 +263,12 @@ output format:
       "libxml2",
       "sqlite"
     ],
+    "requiredBy": [
+      "gtk3",
+      "gtk4"
+    ],
     "provides": [
-      "tracker3=3.8.2",
+      "tracker3=3.9.1",
       "libtinysparql-3.0.so=0-64"
     ],
     "conflicts": [
