@@ -174,7 +174,7 @@ qp [options]
   - `--where conflicts=sdl2`   -> query by packages that conflict with `sdl2`
   - `--where arch=x86_64`      -> query by packages that are built for `x86_64` CPUs
   - `--where license=GPL`      -> query by package licenses that contain `GPL`
-  - `--where description="linux kernel"` -> query by package descriptions that contain "linux kernel" 
+  - `--where description="linux kernel"` -> query by package descriptions that contain "linux kernel"
 - `-O <field>:<direction>` | `--order <field>:<direction>`: sort results ascending or descending (default sort is `date:asc`):
   - `date`    -> sort by installation date
   - `name`    -> sort alphabetically by package name
@@ -225,7 +225,7 @@ short-flag queries and long-flag queries can be combined.
 - `license` - package software license
 - `url` - the URL of the official site of the software being packaged
 - `description` - package description
-- `pkgbase` - for normal packages, this is the same as the package name. for split-packages, this name is what is used to refer to the group of packages. for more info, see the [documentation for package splitting](https://man.archlinux.org/man/PKGBUILD.5#PACKAGE_SPLITTING) 
+- `pkgbase` - name of the base package used to group split packages; for non-split packages, it is the same as the package name. 
 
 ### JSON output
 the `--json` flag outputs the package data as structured JSON instead of a table. this can be useful for scripts or automation.

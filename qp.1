@@ -1,5 +1,5 @@
 .\" Man page for qp
-.TH qp 1 "April 2025" "qp 4.1.0" "User Commands"
+.TH qp 1 "April 2025" "qp 4.2.0" "User Commands"
 .SH NAME
 qp \- List and query installed packages on Arch-based systems.
 .SH SYNOPSIS
@@ -8,13 +8,7 @@ qp \- List and query installed packages on Arch-based systems.
 
 .SH DESCRIPTION
 .B qp
-is a standalone CLI utility for Arch and Arch-based Linux distributions to list and query installed packages. It works with any package manager that uses ALPM,
-including
-.B yay,
-.B paru,
-.B pamac,
-.B pacman,
-and others.
+is a standalone CLI utility for Arch and Arch-based Linux distributions to list and query installed packages. It works with any package manager that uses ALPM, like pacman and others.
 
 The utility provides powerful querying capabilities, including:
 - Installation date queries
@@ -28,6 +22,7 @@ The utility provides powerful querying capabilities, including:
 - Package name queries
 - Architecture queries
 - Description queries
+- Package base queries
 - Sorting and JSON output
 
 .SH OPTIONS
@@ -227,5 +222,4 @@ Report bugs at:
 
 .SH SEE ALSO
 .BR pacman(8),
-.BR yay(8)
 
