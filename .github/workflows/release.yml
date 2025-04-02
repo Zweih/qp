@@ -43,7 +43,7 @@ jobs:
             export GOARM=${{ matrix.goarm }}
           fi
           
-          go build -ldflags="-s -w" -v -o qp-${{ matrix.arch }} ./cmd/qp
+          go build -v -o qp-${{ matrix.arch }} ./cmd/qp
 
       - name: Upload built binary
         uses: actions/upload-artifact@v4
@@ -57,10 +57,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Install makepkg for .SRCINFO generation
+      - name: Install dependencies .SRCINFO and NEWS generation
         run: |
           sudo apt update
-          sudo apt install -y pacman fakeroot makepkg
+          sudo apt install -y pacman fakeroot makepkg gh
 
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -71,19 +71,47 @@ jobs:
           path: ./release
           merge-multiple: true
 
-      - name: Package binaries with manpage
+      - name: Generate NEWS file
+        run: |
+          touch ./release/NEWS
+          touch ./release/CURRRENT_NEWS
+
+          # release notes for the release currently being cut
+          previous_tag=$(git describe --abbrev=0 --tags "${GITHUB_REF#refs/tags/}^")
+          gh release notes "$previous_tag" --generate > ./release/NEWS_CURRENT
+
+          echo "# qp Release Notes" > ./release/NEWS
+          echo "" >> ./release/NEWS
+
+          echo "## ${GITHUB_REF#refs/tags/}" >> ./release/NEWS
+          cat ./release/NEWS_CURRENT >> ./release/NEWS
+
+          gh release list --limit 100 | \
+          cut -f1 | \
+          grep -E '^v[0-9]+\.' | \
+          sort -Vr | \
+          awk -v min="v4.1.0" '{ if (system("dpkg --compare-versions " $1 " ge " min) == 0) print $1 }' | \
+          while read tag; do
+            echo "" >> ./release/NEWS
+            echo "## $tag" >> ./release/NEWS
+            gh release view "$tag" --json body --template '{{.body}}' >> ./release/NEWS
+          done
+
+      - name: Package binaries with manpage and NEWS
         run: |
           cp qp.1 ./release/
 
           for binary in ./release/qp-*; do
             arch=$(basename "$binary" | cut -d'-' -f2)
           
-            tar -czvf ./release/qp-${{ github.ref_name }}-${arch}.tar.gz -C ./release "$(basename "$binary")" qp.1
+            tar -czvf ./release/qp-${{ github.ref_name }}-${arch}.tar.gz -C ./release "$(basename "$binary")" qp.1 NEWS
           done
 
-      - name: Create source tarball
+      - name: Package source tarball with NEWS
         run: |
-          git archive --format=tar.gz --prefix=qp-${{ github.ref_name }}/ -o ./release/qp-${{ github.ref_name }}.tar.gz HEAD
+          git archive --format=tar --prefix=qp-${{ github.ref_name }}/ -o ./release/qp-${{ github.ref_name }}.tar HEAD
+          tar --append --file=./release/qp-${{ github.ref_name }}.tar -C ./release NEWS
+          gzip ./release/qp-${{ github.ref_name }}.tar
 
       - name: Generate SHA256 checksums
         run: |
@@ -94,7 +122,7 @@ jobs:
         run: |
           git fetch origin packaging
           git checkout packaging
-          
+
           VERSION="${GITHUB_REF#refs/tags/v}"
           CHECKSUMS_FILE=./release/SHA256SUMS.txt
 
@@ -124,10 +152,13 @@ jobs:
             (cd $pkg && makepkg --printsrcinfo --noconfirm > .SRCINFO)
           done
 
-      - name: Commit updated PKGBUILDs and .SRCINFOs to packaging branch
+      - name: Commit updated PKGBUILDs, .SRCINFOs, and NEWS to packaging branch
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          cp ./release/NEWS .
+          git add NEWS
 
           for pkg in qp-bin qp-src qp-git; do
             git add $pkg/PKGBUILD $pkg/.SRCINFO
@@ -143,4 +174,7 @@ jobs:
             ./release/qp-*.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+      - name: Update release description with release notes
+        run: |
+          release_notes=$(cat ./release/NEWS_CURRENT)
+          gh release edit "${GITHUB_REF#refs/tags/}" --body "$release_notes"
