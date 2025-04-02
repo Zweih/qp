@@ -12,10 +12,9 @@ import (
 )
 
 type OutputManager struct {
-	mu             sync.Mutex
-	progressActive bool
-	lastMsgLength  int
-	terminalWidth  int
+	mu            sync.Mutex
+	lastMsgLength int
+	terminalWidth int
 }
 
 var manager = newOutputManager()

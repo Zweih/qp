@@ -11,7 +11,7 @@ import (
 
 const (
 	cachePath    = "/tmp/qp.cache"
-	cacheVersion = 2 // bump when updating structure of PkgInfo/Relation/pkginfo.proto
+	cacheVersion = 3 // bump when updating structure of PkgInfo/Relation/pkginfo.proto
 )
 
 func getDbModTime() (int64, error) {
@@ -98,6 +98,7 @@ func pkgsToProtos(pkgs []*PkgInfo) []*pb.PkgInfo {
 			License:     pkg.License,
 			Url:         pkg.Url,
 			Description: pkg.Description,
+			PkgBase:     pkg.PkgBase,
 			Depends:     relationsToProtos(pkg.Depends),
 			RequiredBy:  relationsToProtos(pkg.RequiredBy),
 			Provides:    relationsToProtos(pkg.Provides),
@@ -134,6 +135,7 @@ func protosToPkgs(pbPkgs []*pb.PkgInfo) []*PkgInfo {
 			License:     pbPkg.License,
 			Url:         pbPkg.Url,
 			Description: pbPkg.Description,
+			PkgBase:     pbPkg.PkgBase,
 			Depends:     protosToRelations(pbPkg.Depends),
 			RequiredBy:  protosToRelations(pbPkg.RequiredBy),
 			Provides:    protosToRelations(pbPkg.Provides),
