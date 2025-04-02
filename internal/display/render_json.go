@@ -18,6 +18,7 @@ type PkgInfoJson struct {
 	License     string   `json:"license,omitempty"`
 	Url         string   `json:"url,omitempty"`
 	Description string   `json:"description,omitempty"`
+	PkgBase     string   `json:"pkgbase,omitempty"`
 	Depends     []string `json:"depends,omitempty"`
 	RequiredBy  []string `json:"requiredBy,omitempty"`
 	Provides    []string `json:"provides,omitempty"`

@@ -27,6 +27,7 @@ type PkgInfo struct {
 	License     string
 	Url         string
 	Description string
+	PkgBase     string
 	Depends     []Relation
 	RequiredBy  []Relation
 	Provides    []Relation
