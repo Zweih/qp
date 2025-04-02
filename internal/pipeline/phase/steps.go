@@ -17,7 +17,7 @@ func LoadCacheStep(
 	_ ProgressReporter,
 	pipelineCtx *meta.PipelineContext,
 ) ([]*PkgInfo, error) {
-	pkgPtrs, err := pkgdata.LoadProtoCache()
+	pkgPtrs, err := pkgdata.LoadProtoCache(pipelineCtx.CachePath)
 	if err == nil {
 		pipelineCtx.UsedCache = true
 	}
@@ -76,7 +76,7 @@ func SaveCacheStep(
 ) ([]*PkgInfo, error) {
 	if !pipelineCtx.UsedCache {
 		// TODO: we can probably save the file concurrently
-		err := pkgdata.SaveProtoCache(pkgPtrs)
+		err := pkgdata.SaveProtoCache(pkgPtrs, pipelineCtx.CachePath)
 		if err != nil {
 			out.WriteLine(fmt.Sprintf("Warning: Error saving cache: %v", err))
 		}

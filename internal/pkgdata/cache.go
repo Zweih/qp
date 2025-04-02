@@ -4,15 +4,33 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	pb "qp/internal/protobuf"
 
 	"google.golang.org/protobuf/proto"
 )
 
 const (
-	cachePath    = "/tmp/qp.cache"
-	cacheVersion = 2 // bump when updating structure of PkgInfo/Relation/pkginfo.proto
+	cacheVersion    = 3 // bump when updating structure of PkgInfo/Relation/pkginfo.proto
+	xdgCacheHomeEnv = "XDG_CACHE_HOME"
+	homeEnv         = "HOME"
+	cacheDirName    = "query-packages"
+	packageManager  = "pacman"
 )
+
+func GetCachePath() (string, error) {
+	cacheDir := os.Getenv(xdgCacheHomeEnv)
+	if cacheDir == "" {
+		cacheDir = filepath.Join(os.Getenv(homeEnv), ".cache")
+	}
+
+	cachePath := cacheDir + "/" + cacheDirName
+	if err := os.MkdirAll(cachePath, 0755); err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("%s/qp-%s.cache", cachePath, packageManager), nil
+}
 
 func getDbModTime() (int64, error) {
 	dirInfo, err := os.Stat(PacmanDbPath)
@@ -23,7 +41,11 @@ func getDbModTime() (int64, error) {
 	return dirInfo.ModTime().Unix(), nil
 }
 
-func SaveProtoCache(pkgs []*PkgInfo) error {
+func SaveProtoCache(pkgs []*PkgInfo, cachePath string) error {
+	if cachePath == "" {
+		return errors.New("invalid cache path, skipping cache save")
+	}
+
 	lastModified, err := getDbModTime()
 	if err != nil {
 		return err
@@ -43,7 +65,11 @@ func SaveProtoCache(pkgs []*PkgInfo) error {
 	return os.WriteFile(cachePath, byteData, 0644)
 }
 
-func LoadProtoCache() ([]*PkgInfo, error) {
+func LoadProtoCache(cachePath string) ([]*PkgInfo, error) {
+	if cachePath == "" {
+		return nil, errors.New("invalid cache path, skipping cache load")
+	}
+
 	byteData, err := os.ReadFile(cachePath)
 	if err != nil {
 		return nil, err
@@ -98,6 +124,7 @@ func pkgsToProtos(pkgs []*PkgInfo) []*pb.PkgInfo {
 			License:     pkg.License,
 			Url:         pkg.Url,
 			Description: pkg.Description,
+			PkgBase:     pkg.PkgBase,
 			Depends:     relationsToProtos(pkg.Depends),
 			RequiredBy:  relationsToProtos(pkg.RequiredBy),
 			Provides:    relationsToProtos(pkg.Provides),
@@ -134,6 +161,7 @@ func protosToPkgs(pbPkgs []*pb.PkgInfo) []*PkgInfo {
 			License:     pbPkg.License,
 			Url:         pbPkg.Url,
 			Description: pbPkg.Description,
+			PkgBase:     pbPkg.PkgBase,
 			Depends:     protosToRelations(pbPkg.Depends),
 			RequiredBy:  protosToRelations(pbPkg.RequiredBy),
 			Provides:    protosToRelations(pbPkg.Provides),
