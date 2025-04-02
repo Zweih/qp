@@ -33,12 +33,41 @@ func mainWithConfig(configProvider config.ConfigProvider) error {
 	var wg sync.WaitGroup
 
 	pipelinePhases := []phasekit.PipelinePhase{
-		phasekit.New("Loading cache", phasekit.LoadCacheStep, &wg),
-		phasekit.New("Fetching packages", phasekit.FetchStep, &wg),
-		phasekit.New("Calculating reverse dependencies", phasekit.ReverseDepStep, &wg),
-		phasekit.New("Saving cache", phasekit.SaveCacheStep, &wg),
-		phasekit.New("Filtering", phasekit.FilterStep, &wg),
-		phasekit.New("Sorting", phasekit.SortStep, &wg),
+		phasekit.New(
+			"Loading cache",
+			phasekit.LoadCacheStep,
+			phasekit.ShouldAlwaysRun,
+			&wg,
+		),
+		phasekit.New(
+			"Fetching packages",
+			phasekit.FetchStep,
+			phasekit.ShouldRunFetch,
+			&wg,
+		),
+		phasekit.New(
+			"Calculating reverse dependencies",
+			phasekit.ReverseDepStep,
+			phasekit.ShouldRunReverseDeps,
+			&wg,
+		),
+		phasekit.New(
+			"Saving cache",
+			phasekit.SaveCacheStep,
+			phasekit.ShouldRunSaveCache,
+			&wg),
+		phasekit.New(
+			"Filtering",
+			phasekit.FilterStep,
+			phasekit.ShouldRunFiltering,
+			&wg,
+		),
+		phasekit.New(
+			"Sorting",
+			phasekit.SortStep,
+			phasekit.ShouldAlwaysRun,
+			&wg,
+		),
 	}
 
 	var pkgPtrs []*pkgdata.PkgInfo

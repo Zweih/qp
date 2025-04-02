@@ -3,12 +3,10 @@ package phase
 import (
 	"fmt"
 	"qp/internal/config"
-	"qp/internal/consts"
 	out "qp/internal/display"
 	"qp/internal/pipeline/filtering"
 	"qp/internal/pipeline/meta"
 	"qp/internal/pkgdata"
-	"slices"
 )
 
 func LoadCacheStep(
@@ -29,41 +27,27 @@ func LoadCacheStep(
 // TODO: add progress reporting
 func FetchStep(
 	_ config.Config,
-	pkgPtrs []*PkgInfo,
+	_ []*PkgInfo,
 	_ ProgressReporter,
-	pipelineCtx *meta.PipelineContext,
+	_ *meta.PipelineContext,
 ) ([]*PkgInfo, error) {
-	if !pipelineCtx.UsedCache {
-		var err error
-		pkgPtrs, err = pkgdata.FetchPackages()
-		if err != nil {
-			out.WriteLine(fmt.Sprintf(
-				"Warning: Some packages may be missing due to corrupted package database: %v",
-				err,
-			))
-		}
+	pkgPtrs, err := pkgdata.FetchPackages()
+	if err != nil {
+		out.WriteLine(fmt.Sprintf(
+			"Warning: Some packages may be missing due to corrupted package database: %v",
+			err,
+		))
 	}
 
 	return pkgPtrs, nil
 }
 
 func ReverseDepStep(
-	cfg config.Config,
+	_ config.Config,
 	pkgPtrs []*pkgdata.PkgInfo,
 	reportProgress ProgressReporter,
-	pipelineCtx *meta.PipelineContext,
+	_ *meta.PipelineContext,
 ) ([]*PkgInfo, error) {
-	if pipelineCtx.UsedCache {
-		return pkgPtrs, nil
-	}
-
-	_, hasRequiredByFilter := cfg.FilterQueries[consts.FieldRequiredBy]
-	hasRequiredByField := slices.Contains(cfg.Fields, consts.FieldRequiredBy)
-
-	if !hasRequiredByField && !hasRequiredByFilter {
-		return pkgPtrs, nil
-	}
-
 	return pkgdata.CalculateReverseDependencies(pkgPtrs, reportProgress)
 }
 
@@ -72,14 +56,12 @@ func SaveCacheStep(
 	_ config.Config,
 	pkgPtrs []*PkgInfo,
 	_ ProgressReporter,
-	pipelineCtx *meta.PipelineContext,
+	_ *meta.PipelineContext,
 ) ([]*PkgInfo, error) {
-	if !pipelineCtx.UsedCache {
-		// TODO: we can probably save the file concurrently
-		err := pkgdata.SaveProtoCache(pkgPtrs)
-		if err != nil {
-			out.WriteLine(fmt.Sprintf("Warning: Error saving cache: %v", err))
-		}
+	// TODO: we can probably save the file concurrently
+	err := pkgdata.SaveProtoCache(pkgPtrs)
+	if err != nil {
+		out.WriteLine(fmt.Sprintf("Warning: Error saving cache: %v", err))
 	}
 
 	return pkgPtrs, nil
@@ -91,10 +73,6 @@ func FilterStep(
 	reportProgress ProgressReporter,
 	_ *meta.PipelineContext,
 ) ([]*PkgInfo, error) {
-	if len(cfg.FilterQueries) == 0 {
-		return pkgPtrs, nil
-	}
-
 	filterConditions, err := filtering.QueriesToConditions(cfg.FilterQueries)
 	if err != nil {
 		return []*pkgdata.PkgInfo{}, err

@@ -15,12 +15,19 @@ type (
 	PkgInfo          = pkgdata.PkgInfo
 )
 
-type Step func(
+type StepFunc func(
 	cfg config.Config,
 	packages []*PkgInfo,
 	progressReporter meta.ProgressReporter,
 	pipelineCtx *meta.PipelineContext,
 ) ([]*PkgInfo, error)
+
+type ShouldRun func(cfg config.Config, pipelineCtx *meta.PipelineContext) bool
+
+type Step struct {
+	run       StepFunc
+	shouldRun ShouldRun
+}
 
 type PipelinePhase struct {
 	name string
@@ -28,10 +35,13 @@ type PipelinePhase struct {
 	wg   *sync.WaitGroup
 }
 
-func New(name string, step Step, wg *sync.WaitGroup) PipelinePhase {
+func New(name string, step StepFunc, shouldRun ShouldRun, wg *sync.WaitGroup) PipelinePhase {
 	return PipelinePhase{
 		name,
-		step,
+		Step{
+			step,
+			shouldRun,
+		},
 		wg,
 	}
 }
@@ -41,8 +51,12 @@ func (phase PipelinePhase) Run(
 	packages []*PkgInfo,
 	pipelineCtx *meta.PipelineContext,
 ) ([]*PkgInfo, error) {
+	if !phase.step.shouldRun(cfg, pipelineCtx) {
+		return packages, nil
+	}
+
 	progressChan := phase.startProgress(pipelineCtx.IsInteractive)
-	outputPackages, err := phase.step(
+	outputPackages, err := phase.step.run(
 		cfg,
 		packages,
 		phase.reportProgress(progressChan),
