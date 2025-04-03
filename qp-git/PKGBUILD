@@ -10,7 +10,10 @@ makedepends=("go>=1.24.1" "git")
 provides=("qp")
 conflicts=("qp" "qp-bin")
 replaces=('yaylog' 'yaylog-bin' 'yaylog-git')
-source=("qp::git+https://github.com/Zweih/qp.git")
+source=(
+  "qp::git+https://github.com/Zweih/qp.git"
+  "news::git+https://github.com/Zweih/qp.git#branch=packaging"
+)
 sha256sums=('SKIP')
 
 _binaryname="qp"
@@ -30,4 +33,5 @@ package() {
   cd "$srcdir/qp"
   install -Dm755 "${_binaryname}" "$pkgdir/usr/bin/${_binaryname}"
   install -Dm644 "${_binaryname}.1" "$pkgdir/usr/share/man/man1/${_binaryname}.1"
+  install -Dm644 "$srcdir/news/NEWS" "$pkgdir/usr/share/doc/${pkgname}/NEWS"
 }
