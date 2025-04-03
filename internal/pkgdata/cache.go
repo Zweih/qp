@@ -14,22 +14,24 @@ const (
 	cacheVersion    = 3 // bump when updating structure of PkgInfo/Relation/pkginfo.proto
 	xdgCacheHomeEnv = "XDG_CACHE_HOME"
 	homeEnv         = "HOME"
-	cacheDirName    = "query-packages"
+	qpCacheDir      = "query-packages"
 	packageManager  = "pacman"
 )
 
 func GetCachePath() (string, error) {
-	cacheDir := os.Getenv(xdgCacheHomeEnv)
-	if cacheDir == "" {
-		cacheDir = filepath.Join(os.Getenv(homeEnv), ".cache")
+	userCacheDir := os.Getenv(xdgCacheHomeEnv)
+	if userCacheDir == "" {
+		userCacheDir = filepath.Join(os.Getenv(homeEnv), ".cache")
 	}
 
-	cachePath := cacheDir + "/" + cacheDirName
+	cachePath := filepath.Join(userCacheDir, qpCacheDir)
 	if err := os.MkdirAll(cachePath, 0755); err != nil {
 		return "", err
 	}
 
-	return fmt.Sprintf("%s/qp-%s.cache", cachePath, packageManager), nil
+	cacheFileName := "qp-" + packageManager + ".cache"
+
+	return filepath.Join(cachePath, cacheFileName), nil
 }
 
 func getDbModTime() (int64, error) {
