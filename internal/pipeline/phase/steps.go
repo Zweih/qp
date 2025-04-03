@@ -3,12 +3,10 @@ package phase
 import (
 	"fmt"
 	"qp/internal/config"
-	"qp/internal/consts"
 	out "qp/internal/display"
 	"qp/internal/pipeline/filtering"
 	"qp/internal/pipeline/meta"
 	"qp/internal/pkgdata"
-	"slices"
 )
 
 func LoadCacheStep(
@@ -48,19 +46,12 @@ func FetchStep(
 }
 
 func ReverseDepStep(
-	cfg config.Config,
+	_ config.Config,
 	pkgPtrs []*pkgdata.PkgInfo,
 	reportProgress ProgressReporter,
 	pipelineCtx *meta.PipelineContext,
 ) ([]*PkgInfo, error) {
 	if pipelineCtx.UsedCache {
-		return pkgPtrs, nil
-	}
-
-	_, hasRequiredByFilter := cfg.FilterQueries[consts.FieldRequiredBy]
-	hasRequiredByField := slices.Contains(cfg.Fields, consts.FieldRequiredBy)
-
-	if !hasRequiredByField && !hasRequiredByFilter {
 		return pkgPtrs, nil
 	}
 

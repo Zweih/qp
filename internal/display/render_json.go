@@ -90,6 +90,8 @@ func getJsonValues(pkg *pkgdata.PkgInfo, fields []consts.FieldType) *PkgInfoJson
 			filteredPackage.Url = pkg.Url
 		case consts.FieldDescription:
 			filteredPackage.Description = pkg.Description
+		case consts.FieldPkgBase:
+			filteredPackage.PkgBase = pkg.PkgBase
 		case consts.FieldDepends:
 			filteredPackage.Depends = flattenRelations(pkg.Depends)
 		case consts.FieldRequiredBy:

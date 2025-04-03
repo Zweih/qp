@@ -62,6 +62,8 @@ func PrintHelp() {
 	fmt.Println("  arch         Architecture the package was built for")
 	fmt.Println("  license      Package software license")
 	fmt.Println("  url          URL of the official site of the software being packaged")
+	fmt.Println("  description  Package description")
+	fmt.Println("  pkgbase      Name of the base package used to group split packages; for non-split packages, it is the same as the package name.")
 
 	fmt.Println("\nExamples:")
 	fmt.Println("  qp -l 10                      # Show the last 10 installed packages")
