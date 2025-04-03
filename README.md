@@ -6,11 +6,11 @@ you can find installation instructions [here](#installation).
 
 `qp` supports querying/sorting for install date, package name, install reason (explicit/dependency), size on disk, reverse dependencies, dependency requirements, description, and more. check [usage](#usage) for all available options.
 
-[![AUR status - qp](https://img.shields.io/aur/version/qp?style=flat-square&label=AUR%20-%20qp&link=https%3A%2F%2Faur.archlinux.org%2Fpackages%2Fqp)](https://aur.archlinux.org/packages/qp)
-[![AUR status - qp-bin](https://img.shields.io/aur/version/qp-bin?style=flat-square&label=AUR%20-%20qp-bin&link=https%3A%2F%2Faur.archlinux.org%2Fpackages%2Fqp-bin)](https://aur.archlinux.org/packages/qp-bin)
-[![AUR status - qp-git](https://img.shields.io/aur/version/qp-git?style=flat-square&label=AUR%20-%20qp-git&link=https%3A%2F%2Faur.archlinux.org%2Fpackages%2Fqp-git)](https://aur.archlinux.org/packages/qp-git)
+![qp logo | query packages logo](https://github.com/user-attachments/assets/9e3c04b6-b467-4340-a03d-fb627eac567d)
 
-![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/Zweih/qp/total?style=for-the-badge&logo=archlinux&label=Downloads%20Since%202%2F4%2F2025&color=%23007ec6)
+[![AUR version - qp](https://img.shields.io/aur/version/qp?style=flat-square&logo=arch-linux&logoColor=1793d1&label=qp&color=1793d1)](https://aur.archlinux.org/packages/qp)
+[![AUR version - qp-bin](https://img.shields.io/aur/version/qp-bin?style=flat-square&logo=arch-linux&logoColor=1793d1&label=qp-bin&color=1793d1)](https://aur.archlinux.org/packages/qp-bin)
+[![AUR version - qp-git](https://img.shields.io/aur/version/qp-git?style=flat-square&logo=arch-linux&logoColor=1793d1&label=qp-git&color=1793d1)](https://aur.archlinux.org/packages/qp-git)
 
 ![Alt](https://repobeats.axiom.co/api/embed/7a20b73b689d45d678001c582a9d1f124dca31ba.svg "Repobeats analytics image")
 
@@ -35,7 +35,7 @@ this package is compatible with the following distributions:
 
 ## features
 
-- list installed packages with date/timestamps, dependencies, provisions, requirements, size on disk, conflicts, architecture, license, description, package, and version
+- list installed packages with date/timestamps, dependencies, provisions, requirements, size on disk, conflicts, architecture, license, description, package base, and version
 - query by explicitly installed packages
 - query by packages installed as dependencies
 - query by packages required by specified packages
@@ -131,8 +131,9 @@ if you prefer to install a pre-compiled binary* using the AUR, use the `qp-bin` 
 
 for the latest (unstable) version from git w/ the AUR, use `qp-git`*.  
 
-***note**: this is not recommended for most users 
+***note**: this is not recommended for most users
 
+the cache is located at `$HOME/.cache/query-packages/` or wherever you have XDG_HOME_CACHE set to.
 
 ### building from source + manual installation
 **note**: this packages is specific to arch-based linux distributions
