@@ -101,6 +101,10 @@ this package is compatible with the following distributions:
 - [x] metaflag for all queries
 - [x] package license field
 - [ ] XML output
+- [ ] package base query
+- [ ] package description sort
+- [ ] required-by sort
+- [ ] package base sort
 - [x] use chunked channel-based concurrent querying (12% speed boost) 
 - [ ] short-args for queries
 - [x] license sort
