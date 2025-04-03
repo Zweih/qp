@@ -100,7 +100,11 @@ func SortStep(
 	reportProgress ProgressReporter,
 	_ *meta.PipelineContext,
 ) ([]*PkgInfo, error) {
-	comparator := pkgdata.GetComparator(cfg.SortOption.Field, cfg.SortOption.Asc)
+	comparator, err := pkgdata.GetComparator(cfg.SortOption.Field, cfg.SortOption.Asc)
+	if err != nil {
+		return []*pkgdata.PkgInfo{}, err
+	}
+
 	phase := "Sorting packages"
 
 	// threshold is 500 as that is where merge sorting chunk performance overtakes timsort

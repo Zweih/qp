@@ -17,7 +17,7 @@ import (
 func main() {
 	err := mainWithConfig(&config.CliConfigProvider{})
 	if err != nil {
-		out.WriteLine(err.Error() + "\n")
+		out.WriteLine(fmt.Sprintf("ERROR: %v\n", err.Error()))
 		pflag.PrintDefaults()
 		os.Exit(1)
 	}
