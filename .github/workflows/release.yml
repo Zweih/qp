@@ -57,7 +57,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Install dependencies .SRCINFO and NEWS generation
+      - name: Install dependencies for .SRCINFO and NEWS generation
         run: |
           sudo apt update
           sudo apt install -y pacman fakeroot makepkg gh
@@ -115,9 +115,11 @@ jobs:
 
       - name: Package source tarball with NEWS
         run: |
-          git archive --format=tar --prefix=qp-${{ github.ref_name }}/ -o ./release/qp-${{ github.ref_name }}.tar HEAD
-          tar --append --file=./release/qp-${{ github.ref_name }}.tar -C ./release NEWS
-          gzip ./release/qp-${{ github.ref_name }}.tar
+          mkdir -p ./release/temp-qp/qp-${{ github.ref_name }}
+          git archive --format=tar HEAD | tar -x -C ./release/temp-qp/qp-${{ github.ref_name }}
+          cp ./release/NEWS ./release/temp-qp/qp-${{ github.ref_name }}/
+
+          tar -czf ./release/qp-${{ github.ref_name }}.tar.gz -C ./release/temp-qp qp-${{ github.ref_name }}
 
       - name: Generate SHA256 checksums
         run: |
