@@ -14,7 +14,7 @@ source=(
   "qp::git+https://github.com/Zweih/qp.git"
   "news::git+https://github.com/Zweih/qp.git#branch=packaging"
 )
-sha256sums=('SKIP')
+sha256sums=('SKIP', 'SKIP')
 
 _binaryname="qp"
 
