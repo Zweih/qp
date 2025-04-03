@@ -43,7 +43,7 @@ jobs:
             export GOARM=${{ matrix.goarm }}
           fi
           
-          go build -ldflags="-s -w" -v -o qp-${{ matrix.arch }} ./cmd/qp
+          go build -trimpath -ldflags="-s -w" -v -o qp-${{ matrix.arch }} ./cmd/qp
 
       - name: Upload built binary
         uses: actions/upload-artifact@v4
