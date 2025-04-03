@@ -1,0 +1,17 @@
+# qp Release Notes
+
+## v4.1.3
+### What's Changed
+* Documentation: Update AUR links by @Zweih in https://github.com/Zweih/qp/pull/147
+* Feature: Strip symbols from binaries by @Zweih in https://github.com/Zweih/qp/pull/148
+* Feature: Add news to releases by @Zweih in https://github.com/Zweih/qp/pull/149
+* Fix: qp-git validation by @Zweih in https://github.com/Zweih/qp/pull/150
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v4.1.0...v4.1.3
+
+## v4.1.0
+### What's Changed
+* Feature: Add description query by @Zweih in https://github.com/Zweih/qp/pull/146
+
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v4.0.0...v4.1.0
