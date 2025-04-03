@@ -71,20 +71,18 @@ jobs:
           path: ./release
           merge-multiple: true
 
+      - name: Create Draft Release
+        run: |
+          gh release create "${GITHUB_REF#refs/tags/}" \
+            --draft \
+            --generate-notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+
       - name: Generate NEWS file
         run: |
           touch ./release/NEWS
-          touch ./release/CURRRENT_NEWS
-
-          # release notes for the release currently being cut
-          previous_tag=$(git describe --abbrev=0 --tags "${GITHUB_REF#refs/tags/}^")
-          gh release notes "$previous_tag" --generate > ./release/NEWS_CURRENT
-
           echo "# qp Release Notes" > ./release/NEWS
-          echo "" >> ./release/NEWS
-
-          echo "## ${GITHUB_REF#refs/tags/}" >> ./release/NEWS
-          cat ./release/NEWS_CURRENT >> ./release/NEWS
 
           gh release list --limit 100 | \
           cut -f1 | \
@@ -94,8 +92,16 @@ jobs:
           while read tag; do
             echo "" >> ./release/NEWS
             echo "## $tag" >> ./release/NEWS
-            gh release view "$tag" --json body --template '{{.body}}' >> ./release/NEWS
+            # demote all headings in generated notes to make NEWS readable
+            gh release view "$tag" --json body --template '{{.body}}' | sed 's/^#/##/' >> ./release/NEWS
+            echo "" >> ./release/NEWS
           done
+
+          # allow for only one blank between each section
+          awk 'BEGIN{blank=0} /^$/ {blank++; if (blank == 1) print ""; next} {blank=0; print}' ./release/NEWS > ./release/NEWS.cleaned
+          mv ./release/NEWS.cleaned ./release/NEWS
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: Package binaries with manpage and NEWS
         run: |
@@ -166,15 +172,10 @@ jobs:
           
           git commit -m "Update packaging for release ${{ github.ref_name }}"
           git push origin packaging
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            ./release/qp-*.tar.gz
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Update release description with release notes
+      - name: Publish Release
         run: |
-          release_notes=$(cat ./release/NEWS_CURRENT)
-          gh release edit "${GITHUB_REF#refs/tags/}" --body "$release_notes"
+          gh release upload "${GITHUB_REF#refs/tags/}" ./release/qp-*.tar.gz --clobber
+          gh release edit "${GITHUB_REF#refs/tags/}" --draft=false
+        env:
+          GH_TOKEN: ${{ github.token }}
+
