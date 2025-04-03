@@ -12,6 +12,8 @@ you can find installation instructions [here](#installation).
 [![AUR version - qp-bin](https://img.shields.io/aur/version/qp-bin?style=flat-square&logo=arch-linux&logoColor=1793d1&label=qp-bin&color=1793d1)](https://aur.archlinux.org/packages/qp-bin)
 [![AUR version - qp-git](https://img.shields.io/aur/version/qp-git?style=flat-square&logo=arch-linux&logoColor=1793d1&label=qp-git&color=1793d1)](https://aur.archlinux.org/packages/qp-git)
 
+![GitHub Downloads](https://img.shields.io/github/downloads/Zweih/qp/total?style=for-the-badge&logo=github&label=Downloads%20Since%202%2F4%2F2025&color=1793d1)
+
 ![Alt](https://repobeats.axiom.co/api/embed/7a20b73b689d45d678001c582a9d1f124dca31ba.svg "Repobeats analytics image")
 
 <details open>
@@ -104,7 +106,8 @@ this package is compatible with the following distributions:
 - [ ] package base query
 - [ ] package description sort
 - [ ] required-by sort
-- [ ] package base sort
+- [x] package base field
+- [x] package base sort
 - [x] use chunked channel-based concurrent querying (12% speed boost) 
 - [ ] short-args for queries
 - [x] license sort
@@ -117,7 +120,6 @@ this package is compatible with the following distributions:
 - [x] license query
 - [ ] optional dependency field
 - [x] improve sorting efficiency (8% speed boost)
-- [x] package base field
 - [x] package description query
 - [ ] package base query
 
@@ -185,6 +187,7 @@ qp [options]
   - `name`    -> sort alphabetically by package name
   - `size`    -> sort by package size on disk
   - `license` -> sort alphabetically by package license
+  - `pkgbase` -> sort alphabetically by base package
 - `--no-headers`: omit column headers in table output (useful for scripting)
 - `-s <list>` | `--select <list>`: comma-separated list of fields to display (cannot use with `--select-all` or `--select-add`)
 - `-S <list>` | `--select-add <list>`: comma-separated list of fields to add to defaults or `--select-all`
@@ -298,7 +301,7 @@ are treated as separate parameters.
   qp -aw name=yay  # correct usage
   ```
 
-- the `depends`, `provides`, `required-by` columns output can be lengthy, packages like `glibc` are required by thousands of packages. to improve readability, pipe the output to tools like `less` or `moar` (i prefer `moar`, but `less` is a core-util):
+- the `depends`, `provides`, `required-by` columns output can be lengthy, packages like `glibc` are required by thousands of packages. to improve readability, pipe the output to tools like `moar` or `less` (i prefer `moar`, but `less` is usually pre-installed):
   ```bash
   qp -s name,depends | less
   ```
@@ -466,6 +469,10 @@ are treated as separate parameters.
 35. show packages that contain "clang" in their description:
    ```bash
    qp -w description=clang
+   ```
+36. sort packages by their package base while showing their names and package bases, in reverse alphabetical order:
+   ```bash
+   qp -O pkgbase:desc -s name,pkgbase
    ```
 
 ## license
