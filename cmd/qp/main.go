@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"qp/internal/config"
 	out "qp/internal/display"
@@ -28,9 +29,10 @@ func mainWithConfig(configProvider config.ConfigProvider) error {
 		return err
 	}
 
+	var wg sync.WaitGroup
 	isInteractive := term.IsTerminal(int(os.Stdout.Fd())) && !cfg.DisableProgress
 	pipelineCtx := &meta.PipelineContext{IsInteractive: isInteractive}
-	var wg sync.WaitGroup
+	setupCache(pipelineCtx)
 
 	pipelinePhases := []phasekit.PipelinePhase{
 		phasekit.New("Loading cache", phasekit.LoadCacheStep, &wg),
@@ -58,6 +60,16 @@ func mainWithConfig(configProvider config.ConfigProvider) error {
 	renderOutput(pkgPtrs, cfg)
 
 	return nil
+}
+
+// mutates
+func setupCache(pipelineCtx *meta.PipelineContext) {
+	cachePath, err := pkgdata.GetCachePath()
+	if err != nil {
+		out.WriteLine(fmt.Sprintf("Warning: cache setup failed %v", err))
+	}
+
+	pipelineCtx.CachePath = cachePath
 }
 
 func trimPackagesLen(

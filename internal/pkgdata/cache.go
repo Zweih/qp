@@ -4,15 +4,35 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	pb "qp/internal/protobuf"
 
 	"google.golang.org/protobuf/proto"
 )
 
 const (
-	cachePath    = "/tmp/qp.cache"
-	cacheVersion = 3 // bump when updating structure of PkgInfo/Relation/pkginfo.proto
+	cacheVersion    = 3 // bump when updating structure of PkgInfo/Relation/pkginfo.proto
+	xdgCacheHomeEnv = "XDG_CACHE_HOME"
+	homeEnv         = "HOME"
+	qpCacheDir      = "query-packages"
+	packageManager  = "pacman"
 )
+
+func GetCachePath() (string, error) {
+	userCacheDir := os.Getenv(xdgCacheHomeEnv)
+	if userCacheDir == "" {
+		userCacheDir = filepath.Join(os.Getenv(homeEnv), ".cache")
+	}
+
+	cachePath := filepath.Join(userCacheDir, qpCacheDir)
+	if err := os.MkdirAll(cachePath, 0755); err != nil {
+		return "", err
+	}
+
+	cacheFileName := "qp-" + packageManager + ".cache"
+
+	return filepath.Join(cachePath, cacheFileName), nil
+}
 
 func getDbModTime() (int64, error) {
 	dirInfo, err := os.Stat(PacmanDbPath)
@@ -23,7 +43,11 @@ func getDbModTime() (int64, error) {
 	return dirInfo.ModTime().Unix(), nil
 }
 
-func SaveProtoCache(pkgs []*PkgInfo) error {
+func SaveProtoCache(pkgs []*PkgInfo, cachePath string) error {
+	if cachePath == "" {
+		return errors.New("invalid cache path, skipping cache save")
+	}
+
 	lastModified, err := getDbModTime()
 	if err != nil {
 		return err
@@ -43,7 +67,11 @@ func SaveProtoCache(pkgs []*PkgInfo) error {
 	return os.WriteFile(cachePath, byteData, 0644)
 }
 
-func LoadProtoCache() ([]*PkgInfo, error) {
+func LoadProtoCache(cachePath string) ([]*PkgInfo, error) {
+	if cachePath == "" {
+		return nil, errors.New("invalid cache path, skipping cache load")
+	}
+
 	byteData, err := os.ReadFile(cachePath)
 	if err != nil {
 		return nil, err
