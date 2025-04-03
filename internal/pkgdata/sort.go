@@ -1,6 +1,7 @@
 package pkgdata
 
 import (
+	"errors"
 	"fmt"
 	"qp/internal/consts"
 	"qp/internal/pipeline/meta"
@@ -29,25 +30,25 @@ func makeComparator[T ordered](
 	return func(a, b *PkgInfo) bool { return getValue(a) > getValue(b) }
 }
 
-func GetComparator(field consts.FieldType, asc bool) PkgComparator {
+func GetComparator(field consts.FieldType, asc bool) (PkgComparator, error) {
 	switch field {
 	case consts.FieldDate:
-		return makeComparator(func(p *PkgInfo) int64 { return p.Timestamp }, asc)
+		return makeComparator(func(p *PkgInfo) int64 { return p.Timestamp }, asc), nil
 
 	case consts.FieldSize:
-		return makeComparator(func(p *PkgInfo) int64 { return p.Size }, asc)
+		return makeComparator(func(p *PkgInfo) int64 { return p.Size }, asc), nil
 
 	case consts.FieldName:
-		return makeComparator(func(p *PkgInfo) string { return strings.ToLower(p.Name) }, asc)
-
-	case consts.FieldVersion:
-		return makeComparator(func(p *PkgInfo) string { return strings.ToLower(p.Version) }, asc)
+		return makeComparator(func(p *PkgInfo) string { return strings.ToLower(p.Name) }, asc), nil
 
 	case consts.FieldLicense:
-		return makeComparator(func(p *PkgInfo) string { return strings.ToLower(p.License) }, asc)
+		return makeComparator(func(p *PkgInfo) string { return strings.ToLower(p.License) }, asc), nil
+
+	case consts.FieldPkgBase:
+		return makeComparator(func(p *PkgInfo) string { return strings.ToLower(p.PkgBase) }, asc), nil
 
 	default:
-		return nil
+		return nil, errors.New("invalid sort field")
 	}
 }
 
