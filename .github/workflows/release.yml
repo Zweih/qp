@@ -145,9 +145,8 @@ jobs:
       - name: Generate pkgver for qp-git
         run: |
           cd qp-git
-          rm -rf src pkg qp
-
-          makepkg --nodeps --nobuild --noconfirm
+         
+          makepkg --nobuild --nodeps --clean --cleanbuild --noconfirm
           echo "Updated qp-git/pkgver to $(grep '^pkgver=' PKGBUILD | cut -d'=' -f2)"
 
           rm -rf src pkg qp          
