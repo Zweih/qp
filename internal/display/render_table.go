@@ -28,6 +28,7 @@ var columnHeaders = map[consts.FieldType]string{
 	consts.FieldLicense:     "LICENSE",
 	consts.FieldUrl:         "URL",
 	consts.FieldDescription: "DESCRIPTION",
+	consts.FieldPkgBase:     "PKGBASE",
 }
 
 // displays data in tab format
@@ -112,6 +113,8 @@ func getTableValue(pkg *pkgdata.PkgInfo, field consts.FieldType, ctx tableContex
 		return pkg.Url
 	case consts.FieldDescription:
 		return pkg.Description
+	case consts.FieldPkgBase:
+		return pkg.PkgBase
 	default:
 		return ""
 	}

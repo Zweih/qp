@@ -8,6 +8,7 @@ const (
 	FieldArch
 	FieldLicense
 	FieldName
+	FieldPkgBase
 	FieldDescription
 	FieldUrl
 	FieldSize
@@ -26,6 +27,7 @@ const (
 	size        = "size"
 	version     = "version"
 	description = "description"
+	pkgBase     = "pkgbase"
 	depends     = "depends"
 	requiredBy  = "required-by"
 	provides    = "provides"
@@ -54,6 +56,7 @@ var FieldTypeLookup = map[string]FieldType{
 	license:     FieldLicense,
 	url:         FieldUrl,
 	description: FieldDescription,
+	pkgBase:     FieldPkgBase,
 	size:        FieldSize,
 	version:     FieldVersion,
 	depends:     FieldDepends,
@@ -63,18 +66,20 @@ var FieldTypeLookup = map[string]FieldType{
 }
 
 var FieldNameLookup = map[FieldType]string{
-	FieldDate:       date,
-	FieldName:       name,
-	FieldSize:       size,
-	FieldReason:     reason,
-	FieldVersion:    version,
-	FieldDepends:    depends,
-	FieldRequiredBy: requiredBy,
-	FieldProvides:   provides,
-	FieldConflicts:  conflicts,
-	FieldArch:       arch,
-	FieldLicense:    license,
-	FieldUrl:        url,
+	FieldDate:        date,
+	FieldName:        name,
+	FieldSize:        size,
+	FieldReason:      reason,
+	FieldVersion:     version,
+	FieldDepends:     depends,
+	FieldRequiredBy:  requiredBy,
+	FieldProvides:    provides,
+	FieldConflicts:   conflicts,
+	FieldArch:        arch,
+	FieldLicense:     license,
+	FieldUrl:         url,
+	FieldDescription: description,
+	FieldPkgBase:     pkgBase,
 }
 
 var (
@@ -98,5 +103,6 @@ var (
 		FieldLicense,
 		FieldUrl,
 		FieldDescription,
+		FieldPkgBase,
 	}
 )
