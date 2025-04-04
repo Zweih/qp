@@ -1,5 +1,11 @@
 # qp Release Notes
 
+## v4.3.0
+### What's Changed
+* Feature: Change cache location and improve caching by @Zweih in https://github.com/Zweih/qp/pull/155
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v4.2.1...v4.3.0
+
 ## v4.2.1
 ### What's Changed
 * Feature: Improve binary debugging by @Zweih in https://github.com/Zweih/qp/pull/154
