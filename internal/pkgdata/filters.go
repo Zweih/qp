@@ -34,12 +34,24 @@ func FilterByReason(installReason string, targetReason string) bool {
 	return installReason == targetReason
 }
 
-func FilterExplicit(pkg *PkgInfo) bool {
-	return pkg.Reason == "explicit"
+func FilterByDepth(relations []Relation, targetDepth int64) bool {
+	for _, relation := range relations {
+		if int64(relation.Depth) == targetDepth {
+			return true
+		}
+	}
+
+	return false
 }
 
-func FilterDependencies(pkg *PkgInfo) bool {
-	return pkg.Reason == "dependency"
+func FilterByDepthRange(relations []Relation, start int64, end int64) bool {
+	for _, relation := range relations {
+		if int64(relation.Depth) >= start && int64(relation.Depth) <= end {
+			return true
+		}
+	}
+
+	return false
 }
 
 // filters for packages installed on specific date

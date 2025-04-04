@@ -86,3 +86,52 @@ func validateSizeFilter(sizeFilter RangeSelector) error {
 
 	return nil
 }
+
+func parseIntRangeFilter(input string) (RangeSelector, error) {
+	if input == "" {
+		return RangeSelector{}, nil
+	}
+
+	if input == ":" {
+		return RangeSelector{}, fmt.Errorf("invalid range filter: ':' must be accompanied by a value")
+	}
+
+	pattern := `^(?:(\d+))?(?::(?:(\d+))?)?$`
+	re := regexp.MustCompile(pattern)
+	matches := re.FindStringSubmatch(input)
+
+	if matches == nil {
+		return RangeSelector{}, fmt.Errorf("invalid range filter format: %q", input)
+	}
+
+	isExact := !strings.Contains(input, ":")
+
+	start, err := parseIntMatch(matches[1], 0)
+	if err != nil {
+		return RangeSelector{}, err
+	}
+
+	end, err := parseIntMatch(matches[2], math.MaxInt64)
+	if err != nil {
+		return RangeSelector{}, err
+	}
+
+	return RangeSelector{
+		Start:   start,
+		End:     end,
+		IsExact: isExact,
+	}, nil
+}
+
+func parseIntMatch(value string, defaultValue int64) (int64, error) {
+	if value == "" {
+		return defaultValue, nil
+	}
+
+	parsed, err := strconv.ParseInt(value, 10, 64)
+	if err != nil {
+		return 0, fmt.Errorf("invalid integer value: %q", value)
+	}
+
+	return parsed, nil
+}

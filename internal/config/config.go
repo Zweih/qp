@@ -25,7 +25,7 @@ type Config struct {
 	DisableProgress   bool
 	SortOption        SortOption
 	Fields            []consts.FieldType
-	FilterQueries     map[consts.FieldType]string
+	FilterQueries     map[consts.FilterKey]string
 }
 
 type SortOption struct {
@@ -207,63 +207,119 @@ func parseSortOption(sortInput string) (SortOption, error) {
 	}, nil
 }
 
-func parseFilterQueries(filterInputs []string) (map[consts.FieldType]string, error) {
-	filterQueries := make(map[consts.FieldType]string)
+func parseFilterQueries(filterInputs []string) (map[consts.FilterKey]string, error) {
+	filterQueries := make(map[consts.FilterKey]string)
 	filterRegex := regexp.MustCompile(`^([a-zA-Z0-9_-]+)=(.+)$`)
 
 	for _, input := range filterInputs {
 		matches := filterRegex.FindStringSubmatch(input)
 		if matches == nil {
-			return nil, fmt.Errorf("Invalid filter format: %q. Must be in form field=value", input)
+			return nil, fmt.Errorf("invalid filter format: %q. Must be in form field=value", input)
 		}
 
 		field, value := matches[1], matches[2]
-		fieldType, exists := consts.FieldTypeLookup[field]
-		if !exists {
-			return nil, fmt.Errorf("Unknown filter field: %s", field)
-		}
 
-		if fieldType == consts.FieldReason && value != ReasonExplicit && value != ReasonDependency {
-			return nil, fmt.Errorf("Invalid reason filter value: %s. Allowed values are 'explicit' or 'dependency'", value)
+		err := injectFilterQuery(field, value, filterQueries)
+		if err != nil {
+			return nil, err
 		}
-
-		filterQueries[fieldType] = value
 	}
 
 	return filterQueries, nil
 }
 
+// mutates filterQueries
+func injectFilterQuery(
+	field string,
+	value string,
+	filterQueries map[consts.FilterKey]string,
+) error {
+	fieldType, exists := consts.FieldTypeLookup[field]
+	if !exists {
+		return fmt.Errorf("unknown filter field: %s", field)
+	}
+
+	if fieldType == consts.FieldReason && value != ReasonExplicit && value != ReasonDependency {
+		return fmt.Errorf("invalid reason filter value: %s. Allowed values are 'explicit' or 'dependency'", value)
+	}
+
+	subfield := consts.SubfieldNone
+
+	switch fieldType {
+	case consts.FieldRequiredBy:
+		// FilterKey{FieldRequiredBy, SubfieldName}: "<package-name">
+		// FilterKey{FieldRequiredBy, SubfieldDepth}: "1"
+		subfield = consts.SubfieldName
+		depthKey := consts.FilterKey{Field: consts.FieldRequiredBy, Subfield: consts.SubfieldDepth}
+
+		if _, exists := filterQueries[depthKey]; !exists {
+			filterQueries[depthKey] = "1"
+		}
+	}
+
+	filterKey := consts.FilterKey{Field: fieldType, Subfield: subfield}
+	filterQueries[filterKey] = value
+
+	return nil
+}
+
+// mutates filterQueries
 func convertLegacyFilters(
-	filterQueries map[consts.FieldType]string,
+	filterQueries map[consts.FilterKey]string,
 	dateFilter string,
 	nameFilter string,
 	sizeFilter string,
 	requiredByFilter string,
 	explicitOnly bool,
 	dependenciesOnly bool,
-) map[consts.FieldType]string {
+) map[consts.FilterKey]string {
 	if dateFilter != "" {
-		filterQueries[consts.FieldDate] = dateFilter
+		filterQueries[consts.FilterKey{
+			Field:    consts.FieldDate,
+			Subfield: consts.SubfieldNone,
+		}] = dateFilter
 	}
 
 	if nameFilter != "" {
-		filterQueries[consts.FieldName] = nameFilter
+		filterQueries[consts.FilterKey{
+			Field:    consts.FieldName,
+			Subfield: consts.SubfieldNone,
+		}] = nameFilter
 	}
 
 	if sizeFilter != "" {
-		filterQueries[consts.FieldSize] = sizeFilter
+		filterQueries[consts.FilterKey{
+			Field:    consts.FieldSize,
+			Subfield: consts.SubfieldNone,
+		}] = sizeFilter
 	}
 
 	if requiredByFilter != "" {
-		filterQueries[consts.FieldRequiredBy] = requiredByFilter
+		// implied required-by.name=<value>
+		filterQueries[consts.FilterKey{
+			Field:    consts.FieldRequiredBy,
+			Subfield: consts.SubfieldName,
+		}] = requiredByFilter
+
+		// implied required-by.depth=1
+		filterQueries[consts.FilterKey{
+			Field:    consts.FieldRequiredBy,
+			Subfield: consts.SubfieldDepth,
+		}] = "1"
 	}
 
 	if explicitOnly {
-		filterQueries[consts.FieldReason] = ReasonExplicit
+		filterQueries[consts.FilterKey{
+			Field:    consts.FieldReason,
+			Subfield: consts.SubfieldNone,
+		}] = ReasonExplicit
 	}
 
 	if dependenciesOnly {
-		filterQueries[consts.FieldReason] = ReasonDependency
+		filterQueries[consts.FilterKey{
+			Field:    consts.FieldReason,
+			Subfield: consts.SubfieldNone,
+		}] = ReasonDependency
 	}
 
 	return filterQueries

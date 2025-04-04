@@ -17,15 +17,19 @@ type ExactFilter func(pkg *PkgInfo, target int64) bool
 
 type RangeFilter func(pkg *PkgInfo, start int64, end int64) bool
 
-func newBaseCondition(fieldType consts.FieldType) FilterCondition {
+type filterableRangeType interface {
+	~int64 | ~[]pkgdata.Relation
+}
+
+func newCondition(fieldType consts.FieldType) FilterCondition {
 	return FilterCondition{
 		PhaseName: "Filtering by " + consts.FieldNameLookup[fieldType],
 		FieldType: fieldType,
 	}
 }
 
-func newPackageCondition(fieldType consts.FieldType, targets []string) (*FilterCondition, error) {
-	conditionFilter := newBaseCondition(fieldType)
+func newStringCondition(fieldType consts.FieldType, targets []string) (*FilterCondition, error) {
+	conditionFilter := newCondition(fieldType)
 	var filterFunc pkgdata.Filter
 
 	for i, target := range targets {
@@ -80,7 +84,7 @@ func newRangeCondition(
 	exactFunc ExactFilter,
 	rangeFunc RangeFilter,
 ) *FilterCondition {
-	condition := newBaseCondition(fieldType)
+	condition := newCondition(fieldType)
 
 	if rangeSelector.IsExact {
 		condition.Filter = func(pkg *PkgInfo) bool {
@@ -110,13 +114,26 @@ func newSizeCondition(sizeFilter RangeSelector) *FilterCondition {
 	return newRangeCondition(
 		sizeFilter,
 		consts.FieldSize,
-		pkgdata.FilterBySize,
+		pkgdata.FilterBySize, // TODO: maybe these two should be in maps that have the Field as a key
 		pkgdata.FilterBySizeRange,
 	)
 }
 
+func newDepthCondition(fieldType consts.FieldType, depthFilter RangeSelector) *FilterCondition {
+	return newRangeCondition(
+		depthFilter,
+		fieldType,
+		func(pkg *PkgInfo, target int64) bool {
+			return pkgdata.FilterByDepth(pkg.RequiredBy, target)
+		},
+		func(pkg *PkgInfo, start, end int64) bool {
+			return pkgdata.FilterByDepthRange(pkg.RequiredBy, start, end)
+		},
+	)
+}
+
 func newReasonCondition(reason string) *FilterCondition {
-	condition := newBaseCondition(consts.FieldReason)
+	condition := newCondition(consts.FieldReason)
 	condition.Filter = func(pkg *PkgInfo) bool {
 		return pkgdata.FilterByReason(pkg.Reason, reason)
 	}

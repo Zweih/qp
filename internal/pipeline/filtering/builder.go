@@ -14,28 +14,23 @@ type (
 	FilterCondition = pkgdata.FilterCondition
 )
 
-func QueriesToConditions(filterQueries map[consts.FieldType]string) (
+func QueriesToConditions(filterQueries map[consts.FilterKey]string) (
 	[]*FilterCondition,
 	error,
 ) {
 	conditions := make([]*FilterCondition, 0, len(filterQueries))
 
-	for fieldType, value := range filterQueries {
+	for filterKey, value := range filterQueries {
 		var condition *FilterCondition
 		var err error
 
-		switch fieldType {
-		case consts.FieldDate:
-			condition, err = parseDateFilterCondition(value)
-		case consts.FieldSize:
-			condition, err = parseSizeFilterCondition(value)
-		case consts.FieldName, consts.FieldRequiredBy, consts.FieldDepends, consts.FieldProvides,
-			consts.FieldConflicts, consts.FieldArch, consts.FieldLicense, consts.FieldDescription:
-			condition, err = parsePackageFilterCondition(fieldType, value)
-		case consts.FieldReason:
-			condition, err = parseReasonFilterCondition(value)
-		default:
-			err = fmt.Errorf("unsupported filter type: %s", consts.FieldNameLookup[fieldType])
+		switch filterKey.Subfield {
+		case consts.SubfieldNone:
+			condition, err = parseBaseCondition(filterKey.Field, value)
+		case consts.SubfieldName:
+			condition, err = parseStringFilterCondition(filterKey.Field, value)
+		case consts.SubfieldDepth:
+			condition, err = parseDepthFilterCondition(filterKey.Field, value)
 		}
 
 		if err != nil {
@@ -53,12 +48,38 @@ func QueriesToConditions(filterQueries map[consts.FieldType]string) (
 	return conditions, nil
 }
 
-func parsePackageFilterCondition(
+func parseDepthFilterCondition(fieldType consts.FieldType, value string) (*FilterCondition, error) {
+	depthFilter, err := parseIntRangeFilter(value) // TODO: make a generic int range filter
+	if err != nil {
+		return nil, fmt.Errorf("invalid depth filter: %v", err)
+	}
+
+	return newDepthCondition(fieldType, depthFilter), nil
+}
+
+func parseBaseCondition(fieldType consts.FieldType, value string) (*FilterCondition, error) {
+	switch fieldType {
+	case consts.FieldDate:
+		return parseDateFilterCondition(value)
+	case consts.FieldSize:
+		return parseSizeFilterCondition(value)
+	case consts.FieldReason:
+		return parseReasonFilterCondition(value)
+	case consts.FieldName, consts.FieldRequiredBy, consts.FieldDepends,
+		consts.FieldProvides, consts.FieldConflicts, consts.FieldArch,
+		consts.FieldLicense, consts.FieldDescription:
+		return parseStringFilterCondition(fieldType, value)
+	default:
+		return nil, fmt.Errorf("unsupported base filter: %s", consts.FieldNameLookup[fieldType])
+	}
+}
+
+func parseStringFilterCondition(
 	fieldType consts.FieldType,
 	targetListInput string,
 ) (*FilterCondition, error) {
 	targetList := strings.Split(targetListInput, ",")
-	return newPackageCondition(fieldType, targetList)
+	return newStringCondition(fieldType, targetList)
 }
 
 func parseReasonFilterCondition(installReason string) (*FilterCondition, error) {

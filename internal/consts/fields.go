@@ -1,6 +1,14 @@
 package consts
 
-type FieldType int
+type (
+	FieldType    int
+	SubfieldType int32
+)
+
+type FilterKey struct {
+	Field    FieldType
+	Subfield SubfieldType
+}
 
 // ordered by filter efficiency
 const (
@@ -21,6 +29,12 @@ const (
 )
 
 const (
+	SubfieldNone SubfieldType = iota
+	SubfieldName
+	SubfieldDepth
+)
+
+const (
 	date        = "date"
 	name        = "name"
 	reason      = "reason"
@@ -35,6 +49,7 @@ const (
 	arch        = "arch"
 	license     = "license"
 	url         = "url"
+	depth       = "depth"
 )
 
 var FieldTypeLookup = map[string]FieldType{
@@ -65,6 +80,11 @@ var FieldTypeLookup = map[string]FieldType{
 	conflicts:   FieldConflicts,
 }
 
+var SubfieldTypeLookup = map[string]SubfieldType{
+	name:  SubfieldName,
+	depth: SubfieldDepth,
+}
+
 var FieldNameLookup = map[FieldType]string{
 	FieldDate:        date,
 	FieldName:        name,
@@ -80,6 +100,11 @@ var FieldNameLookup = map[FieldType]string{
 	FieldUrl:         url,
 	FieldDescription: description,
 	FieldPkgBase:     pkgBase,
+}
+
+var SubfieldNameLookup = map[SubfieldType]string{
+	SubfieldName:  name,
+	SubfieldDepth: depth,
 }
 
 var (
