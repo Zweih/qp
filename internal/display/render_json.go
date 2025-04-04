@@ -95,7 +95,9 @@ func getJsonValues(pkg *pkgdata.PkgInfo, fields []consts.FieldType) *PkgInfoJson
 		case consts.FieldDepends:
 			filteredPackage.Depends = flattenRelations(pkg.Depends)
 		case consts.FieldRequiredBy:
-			filteredPackage.RequiredBy = flattenRelations(pkg.RequiredBy)
+			filteredPackage.RequiredBy = flattenRelations(
+				getRelationsByDepth(pkg.RequiredBy, 1),
+			)
 		case consts.FieldProvides:
 			filteredPackage.Provides = flattenRelations(pkg.Provides)
 		case consts.FieldConflicts:
@@ -104,36 +106,4 @@ func getJsonValues(pkg *pkgdata.PkgInfo, fields []consts.FieldType) *PkgInfoJson
 	}
 
 	return &filteredPackage
-}
-
-func flattenRelations(relations []pkgdata.Relation) []string {
-	relationOutputs := make([]string, 0, len(relations))
-
-	for _, rel := range relations {
-		if rel.Operator == pkgdata.OpNone {
-			relationOutputs = append(relationOutputs, rel.Name)
-		} else {
-			op := relationOpToString(rel.Operator)
-			relationOutputs = append(relationOutputs, fmt.Sprintf("%s%s%s", rel.Name, op, rel.Version))
-		}
-	}
-
-	return relationOutputs
-}
-
-func relationOpToString(op pkgdata.RelationOp) string {
-	switch op {
-	case pkgdata.OpEqual:
-		return "="
-	case pkgdata.OpLess:
-		return "<"
-	case pkgdata.OpLessEqual:
-		return "<="
-	case pkgdata.OpGreater:
-		return ">"
-	case pkgdata.OpGreaterEqual:
-		return ">="
-	default:
-		return ""
-	}
 }
