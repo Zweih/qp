@@ -2,6 +2,10 @@ package pkgdata
 
 type RelationOp int
 
+type ExtractableType interface {
+	~int64 | ~string | ~[]Relation
+}
+
 const (
 	OpNone RelationOp = iota
 	OpEqual
@@ -15,6 +19,7 @@ type Relation struct {
 	Name     string
 	Version  string
 	Operator RelationOp
+	Depth    int32
 }
 
 type PkgInfo struct {

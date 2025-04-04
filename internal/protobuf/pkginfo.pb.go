@@ -9,12 +9,11 @@
 package protobuf
 
 import (
+	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
+	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
-
-	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
-	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
 
 const (
@@ -87,6 +86,7 @@ type Relation struct {
 	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Version       string                 `protobuf:"bytes,2,opt,name=version,proto3" json:"version,omitempty"`
 	Operator      RelationOp             `protobuf:"varint,3,opt,name=operator,proto3,enum=pkginfo.RelationOp" json:"operator,omitempty"`
+	Depth         int32                  `protobuf:"varint,4,opt,name=depth,proto3" json:"depth,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -140,6 +140,13 @@ func (x *Relation) GetOperator() RelationOp {
 		return x.Operator
 	}
 	return RelationOp_NONE
+}
+
+func (x *Relation) GetDepth() int32 {
+	if x != nil {
+		return x.Depth
+	}
+	return 0
 }
 
 type PkgInfo struct {
@@ -354,11 +361,12 @@ var File_protobuf_pkginfo_proto protoreflect.FileDescriptor
 
 const file_protobuf_pkginfo_proto_rawDesc = "" +
 	"\n" +
-	"\x16protobuf/pkginfo.proto\x12\apkginfo\"i\n" +
+	"\x16protobuf/pkginfo.proto\x12\apkginfo\"\x7f\n" +
 	"\bRelation\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x18\n" +
 	"\aversion\x18\x02 \x01(\tR\aversion\x12/\n" +
-	"\boperator\x18\x03 \x01(\x0e2\x13.pkginfo.RelationOpR\boperator\"\xbf\x03\n" +
+	"\boperator\x18\x03 \x01(\x0e2\x13.pkginfo.RelationOpR\boperator\x12\x14\n" +
+	"\x05depth\x18\x04 \x01(\x05R\x05depth\"\xbf\x03\n" +
 	"\aPkgInfo\x12\x1c\n" +
 	"\ttimestamp\x18\x01 \x01(\x03R\ttimestamp\x12\x12\n" +
 	"\x04size\x18\x02 \x01(\x03R\x04size\x12\x12\n" +
@@ -403,16 +411,14 @@ func file_protobuf_pkginfo_proto_rawDescGZIP() []byte {
 	return file_protobuf_pkginfo_proto_rawDescData
 }
 
-var (
-	file_protobuf_pkginfo_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-	file_protobuf_pkginfo_proto_msgTypes  = make([]protoimpl.MessageInfo, 3)
-	file_protobuf_pkginfo_proto_goTypes   = []any{
-		(RelationOp)(0),    // 0: pkginfo.RelationOp
-		(*Relation)(nil),   // 1: pkginfo.Relation
-		(*PkgInfo)(nil),    // 2: pkginfo.PkgInfo
-		(*CachedPkgs)(nil), // 3: pkginfo.CachedPkgs
-	}
-)
+var file_protobuf_pkginfo_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_protobuf_pkginfo_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_protobuf_pkginfo_proto_goTypes = []any{
+	(RelationOp)(0),    // 0: pkginfo.RelationOp
+	(*Relation)(nil),   // 1: pkginfo.Relation
+	(*PkgInfo)(nil),    // 2: pkginfo.PkgInfo
+	(*CachedPkgs)(nil), // 3: pkginfo.CachedPkgs
+}
 var file_protobuf_pkginfo_proto_depIdxs = []int32{
 	0, // 0: pkginfo.Relation.operator:type_name -> pkginfo.RelationOp
 	1, // 1: pkginfo.PkgInfo.depends:type_name -> pkginfo.Relation
