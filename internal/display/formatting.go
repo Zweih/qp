@@ -48,21 +48,6 @@ func relationOpToString(op pkgdata.RelationOp) string {
 	}
 }
 
-func getRelationsByDepth(
-	relations []pkgdata.Relation,
-	targetDepth int32,
-) []pkgdata.Relation {
-	var result []pkgdata.Relation
-
-	for _, relation := range relations {
-		if relation.Depth == targetDepth {
-			result = append(result, relation)
-		}
-	}
-
-	return result
-}
-
 func formatDate(pkg *pkgdata.PkgInfo, ctx tableContext) string {
 	timestamp := time.Unix(pkg.Timestamp, 0)
 	return timestamp.Format(ctx.DateFormat)

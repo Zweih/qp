@@ -99,7 +99,7 @@ func getTableValue(pkg *pkgdata.PkgInfo, field consts.FieldType, ctx tableContex
 	case consts.FieldDepends:
 		return formatRelations(pkg.Depends)
 	case consts.FieldRequiredBy:
-		return formatRelations(getRelationsByDepth(pkg.RequiredBy, 1))
+		return formatRelations(pkgdata.GetRelationsByDepth(pkg.RequiredBy, 1))
 	case consts.FieldProvides:
 		return formatRelations(pkg.Provides)
 	case consts.FieldConflicts:
