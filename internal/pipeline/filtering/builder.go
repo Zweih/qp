@@ -6,6 +6,7 @@ import (
 	"qp/internal/consts"
 	"qp/internal/pkgdata"
 	"sort"
+	"strconv"
 	"strings"
 )
 
@@ -14,23 +15,35 @@ type (
 	FilterCondition = pkgdata.FilterCondition
 )
 
-func QueriesToConditions(filterQueries map[consts.FilterKey]string) (
+func QueriesToConditions(queries config.FieldQueries) (
 	[]*FilterCondition,
 	error,
 ) {
-	conditions := make([]*FilterCondition, 0, len(filterQueries))
+	conditions := make([]*FilterCondition, 0, len(queries))
 
-	for filterKey, value := range filterQueries {
+	for field, subfields := range queries {
 		var condition *FilterCondition
 		var err error
 
-		switch filterKey.Subfield {
-		case consts.SubfieldNone:
-			condition, err = parseBaseCondition(filterKey.Field, value)
-		case consts.SubfieldName:
-			condition, err = parseStringFilterCondition(filterKey.Field, value)
-		case consts.SubfieldDepth:
-			condition, err = parseDepthFilterCondition(filterKey.Field, value)
+		switch field {
+		case consts.FieldDate:
+			condition, err = parseDateCondition(subfields)
+
+		case consts.FieldSize:
+			condition, err = parseSizeCondition(subfields)
+
+		case consts.FieldName, consts.FieldArch, consts.FieldLicense:
+			condition, err = parseStringCondition(field, subfields)
+
+		case consts.FieldRequiredBy, consts.FieldDepends,
+			consts.FieldProvides, consts.FieldConflicts:
+			condition, err = parseRelationCondition(field, subfields)
+
+		case consts.FieldReason:
+			condition, err = parseReasonCondition(subfields)
+
+		default:
+			err = fmt.Errorf("unsupported filter type: %s", consts.FieldNameLookup[field])
 		}
 
 		if err != nil {
@@ -48,41 +61,48 @@ func QueriesToConditions(filterQueries map[consts.FilterKey]string) (
 	return conditions, nil
 }
 
-func parseDepthFilterCondition(fieldType consts.FieldType, value string) (*FilterCondition, error) {
-	depthFilter, err := parseIntRangeFilter(value) // TODO: make a generic int range filter
-	if err != nil {
-		return nil, fmt.Errorf("invalid depth filter: %v", err)
-	}
-
-	return newDepthCondition(fieldType, depthFilter), nil
-}
-
-func parseBaseCondition(fieldType consts.FieldType, value string) (*FilterCondition, error) {
-	switch fieldType {
-	case consts.FieldDate:
-		return parseDateFilterCondition(value)
-	case consts.FieldSize:
-		return parseSizeFilterCondition(value)
-	case consts.FieldReason:
-		return parseReasonFilterCondition(value)
-	case consts.FieldName, consts.FieldRequiredBy, consts.FieldDepends,
-		consts.FieldProvides, consts.FieldConflicts, consts.FieldArch,
-		consts.FieldLicense, consts.FieldDescription:
-		return parseStringFilterCondition(fieldType, value)
-	default:
-		return nil, fmt.Errorf("unsupported base filter: %s", consts.FieldNameLookup[fieldType])
-	}
-}
-
-func parseStringFilterCondition(
-	fieldType consts.FieldType,
-	targetListInput string,
+func parseRelationCondition(
+	field consts.FieldType,
+	subfields config.SubfieldQueries,
 ) (*FilterCondition, error) {
-	targetList := strings.Split(targetListInput, ",")
-	return newStringCondition(fieldType, targetList)
+	targetString, hasTarget := subfields[consts.SubfieldTarget]
+	if !hasTarget {
+		return nil, fmt.Errorf("relation query %s requires target subfield", consts.FieldNameLookup[field])
+	}
+
+	targetNames := strings.Split(targetString, ",")
+	depthString, hasDepth := subfields[consts.SubfieldDepth]
+	var depth int64 = 1
+	var err error
+
+	if hasDepth {
+		depth, err = strconv.ParseInt(depthString, 10, 32)
+		if err != nil {
+			return nil, fmt.Errorf("invalid depth value: %s", depthString)
+		}
+	}
+
+	return newRelationCondition(field, targetNames, int32(depth))
 }
 
-func parseReasonFilterCondition(installReason string) (*FilterCondition, error) {
+func parseStringCondition(
+	field consts.FieldType,
+	subfields config.SubfieldQueries,
+) (*FilterCondition, error) {
+	targetString, exists := subfields[consts.SubfieldTarget]
+	if !exists {
+		return nil, fmt.Errorf("missing target subfield for field: %s", consts.FieldNameLookup[field])
+	}
+
+	targets := strings.Split(targetString, ",")
+	return newStringCondition(field, targets)
+}
+
+func parseReasonCondition(subfields config.SubfieldQueries) (*FilterCondition, error) {
+	installReason, exists := subfields[consts.SubfieldTarget]
+	if !exists {
+		return nil, fmt.Errorf("missing target subfield for field: reason")
+	}
 	if installReason != config.ReasonExplicit && installReason != config.ReasonDependency {
 		return nil, fmt.Errorf("invalid install reason filter: %s", installReason)
 	}
@@ -91,21 +111,13 @@ func parseReasonFilterCondition(installReason string) (*FilterCondition, error) 
 }
 
 // TODO: we can merge parseDateFilterCondition and parseSizeFilterCondition into parseRangeFilterCondition
-func parseDateFilterCondition(value string) (*FilterCondition, error) {
-	dateFilter, err := parseDateFilter(value)
-	if err != nil {
-		return nil, fmt.Errorf("invalid date filter: %v", err)
+func parseSizeCondition(subfields config.SubfieldQueries) (*FilterCondition, error) {
+	targetString, exists := subfields[consts.SubfieldTarget]
+	if !exists {
+		return nil, fmt.Errorf("missing target subfield for field: date")
 	}
 
-	if err = validateDateFilter(dateFilter); err != nil {
-		return nil, err
-	}
-
-	return newDateCondition(dateFilter), nil
-}
-
-func parseSizeFilterCondition(value string) (*FilterCondition, error) {
-	sizeFilter, err := parseSizeFilter(value)
+	sizeFilter, err := parseSizeFilter(targetString)
 	if err != nil {
 		return nil, fmt.Errorf("invalid size filter: %v", err)
 	}
@@ -115,4 +127,22 @@ func parseSizeFilterCondition(value string) (*FilterCondition, error) {
 	}
 
 	return newSizeCondition(sizeFilter), nil
+}
+
+func parseDateCondition(subfields config.SubfieldQueries) (*FilterCondition, error) {
+	targetString, exists := subfields[consts.SubfieldTarget]
+	if !exists {
+		return nil, fmt.Errorf("missing target subfield for field: date")
+	}
+
+	dateFilter, err := parseDateFilter(targetString)
+	if err != nil {
+		return nil, fmt.Errorf("invalid date filter: %v", err)
+	}
+
+	if err = validateDateFilter(dateFilter); err != nil {
+		return nil, err
+	}
+
+	return newDateCondition(dateFilter), nil
 }

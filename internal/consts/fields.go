@@ -5,11 +5,6 @@ type (
 	SubfieldType int32
 )
 
-type FilterKey struct {
-	Field    FieldType
-	Subfield SubfieldType
-}
-
 // ordered by filter efficiency
 const (
 	FieldReason FieldType = iota
@@ -29,9 +24,8 @@ const (
 )
 
 const (
-	SubfieldNone SubfieldType = iota
-	SubfieldName
-	SubfieldDepth
+	SubfieldDepth SubfieldType = iota
+	SubfieldTarget
 )
 
 const (
@@ -49,6 +43,7 @@ const (
 	arch        = "arch"
 	license     = "license"
 	url         = "url"
+	target      = "target"
 	depth       = "depth"
 )
 
@@ -81,8 +76,9 @@ var FieldTypeLookup = map[string]FieldType{
 }
 
 var SubfieldTypeLookup = map[string]SubfieldType{
-	name:  SubfieldName,
-	depth: SubfieldDepth,
+	"":     SubfieldTarget,
+	target: SubfieldTarget,
+	depth:  SubfieldDepth,
 }
 
 var FieldNameLookup = map[FieldType]string{
@@ -103,8 +99,8 @@ var FieldNameLookup = map[FieldType]string{
 }
 
 var SubfieldNameLookup = map[SubfieldType]string{
-	SubfieldName:  name,
-	SubfieldDepth: depth,
+	SubfieldTarget: target,
+	SubfieldDepth:  depth,
 }
 
 var (

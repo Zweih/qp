@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"qp/internal/consts"
-	"regexp"
 	"strings"
 
 	"github.com/spf13/pflag"
@@ -25,8 +24,13 @@ type Config struct {
 	DisableProgress   bool
 	SortOption        SortOption
 	Fields            []consts.FieldType
-	FilterQueries     map[consts.FilterKey]string
+	FieldQueries      FieldQueries
 }
+
+type (
+	FieldQueries    map[consts.FieldType]SubfieldQueries
+	SubfieldQueries map[consts.SubfieldType]string
+)
 
 type SortOption struct {
 	Field consts.FieldType
@@ -150,13 +154,13 @@ func ParseFlags(args []string) (Config, error) {
 		return Config{}, err
 	}
 
-	filterQueries, err := parseFilterQueries(filterInputs)
+	fieldQueries, err := parseQueries(filterInputs)
 	if err != nil {
 		return Config{}, err
 	}
 
-	filterQueries = convertLegacyFilters(
-		filterQueries,
+	fieldQueries = convertLegacyQueries(
+		fieldQueries,
 		dateFilter,
 		nameFilter,
 		sizeFilter,
@@ -175,7 +179,7 @@ func ParseFlags(args []string) (Config, error) {
 		DisableProgress:   disableProgress,
 		SortOption:        sortOption,
 		Fields:            fieldsParsed,
-		FilterQueries:     filterQueries,
+		FieldQueries:      fieldQueries,
 	}
 
 	return cfg, nil
@@ -207,120 +211,113 @@ func parseSortOption(sortInput string) (SortOption, error) {
 	}, nil
 }
 
-func parseFilterQueries(filterInputs []string) (map[consts.FilterKey]string, error) {
-	filterQueries := make(map[consts.FilterKey]string)
-	filterRegex := regexp.MustCompile(`^([a-zA-Z0-9_-]+)=(.+)$`)
+func parseQueries(queryInputs []string) (FieldQueries, error) {
+	queries := make(FieldQueries)
 
-	for _, input := range filterInputs {
-		matches := filterRegex.FindStringSubmatch(input)
-		if matches == nil {
-			return nil, fmt.Errorf("invalid filter format: %q. Must be in form field=value", input)
-		}
-
-		field, value := matches[1], matches[2]
-
-		err := injectFilterQuery(field, value, filterQueries)
+	for _, queryInput := range queryInputs {
+		fieldPart, value, err := parseQueryInput(queryInput)
 		if err != nil {
 			return nil, err
 		}
-	}
 
-	return filterQueries, nil
-}
-
-// mutates filterQueries
-func injectFilterQuery(
-	field string,
-	value string,
-	filterQueries map[consts.FilterKey]string,
-) error {
-	fieldType, exists := consts.FieldTypeLookup[field]
-	if !exists {
-		return fmt.Errorf("unknown filter field: %s", field)
-	}
-
-	if fieldType == consts.FieldReason && value != ReasonExplicit && value != ReasonDependency {
-		return fmt.Errorf("invalid reason filter value: %s. Allowed values are 'explicit' or 'dependency'", value)
-	}
-
-	subfield := consts.SubfieldNone
-
-	switch fieldType {
-	case consts.FieldRequiredBy:
-		// FilterKey{FieldRequiredBy, SubfieldName}: "<package-name">
-		// FilterKey{FieldRequiredBy, SubfieldDepth}: "1"
-		subfield = consts.SubfieldName
-		depthKey := consts.FilterKey{Field: consts.FieldRequiredBy, Subfield: consts.SubfieldDepth}
-
-		if _, exists := filterQueries[depthKey]; !exists {
-			filterQueries[depthKey] = "1"
+		field, subfield, err := parseFieldPart(fieldPart)
+		if err != nil {
+			return nil, err
 		}
+
+		addQuery(queries, field, subfield, value)
 	}
 
-	filterKey := consts.FilterKey{Field: fieldType, Subfield: subfield}
-	filterQueries[filterKey] = value
-
-	return nil
+	return queries, nil
 }
 
-// mutates filterQueries
-func convertLegacyFilters(
-	filterQueries map[consts.FilterKey]string,
+func parseQueryInput(input string) (string, string, error) {
+	queryParts := strings.SplitN(input, "=", 2)
+	if len(queryParts) != 2 {
+		return "",
+			"",
+			fmt.Errorf("invalid query format: %s. Must be in form fireld.subfield=value", input)
+	}
+
+	return queryParts[0], queryParts[1], nil
+}
+
+func parseFieldPart(fieldPart string) (consts.FieldType, consts.SubfieldType, error) {
+	fieldParts := strings.SplitN(fieldPart, ".", 2)
+	fieldName := fieldParts[0]
+	field, exists := consts.FieldTypeLookup[fieldName]
+	if !exists {
+		return 0, 0, fmt.Errorf("unknown query field: %s", fieldName)
+	}
+
+	subfieldName := ""
+	if len(fieldParts) == 2 {
+		subfieldName = fieldParts[1]
+	}
+
+	subfield, exists := consts.SubfieldTypeLookup[subfieldName]
+	if !exists {
+		return 0, 0, fmt.Errorf("unknown query subfield: %s", subfieldName)
+	}
+
+	return field, subfield, nil
+}
+
+func addQuery(
+	queries FieldQueries,
+	field consts.FieldType,
+	subfield consts.SubfieldType,
+	value string,
+) {
+	subfields, exists := queries[field]
+	if !exists {
+		subfields = make(SubfieldQueries)
+	}
+
+	subfields[subfield] = value
+	queries[field] = subfields
+}
+
+func addLegacyQuery(
+	queries FieldQueries,
+	field consts.FieldType,
+	subfield consts.SubfieldType,
+	value string,
+) {
+	if value == "" {
+		return
+	}
+
+	subfields := queries[field]
+	if subfields == nil {
+		subfields = make(SubfieldQueries)
+	}
+
+	subfields[subfield] = value
+	queries[field] = subfields
+}
+
+func convertLegacyQueries(
+	queries FieldQueries,
 	dateFilter string,
 	nameFilter string,
 	sizeFilter string,
 	requiredByFilter string,
 	explicitOnly bool,
 	dependenciesOnly bool,
-) map[consts.FilterKey]string {
-	if dateFilter != "" {
-		filterQueries[consts.FilterKey{
-			Field:    consts.FieldDate,
-			Subfield: consts.SubfieldNone,
-		}] = dateFilter
-	}
-
-	if nameFilter != "" {
-		filterQueries[consts.FilterKey{
-			Field:    consts.FieldName,
-			Subfield: consts.SubfieldNone,
-		}] = nameFilter
-	}
-
-	if sizeFilter != "" {
-		filterQueries[consts.FilterKey{
-			Field:    consts.FieldSize,
-			Subfield: consts.SubfieldNone,
-		}] = sizeFilter
-	}
-
-	if requiredByFilter != "" {
-		// implied required-by.name=<value>
-		filterQueries[consts.FilterKey{
-			Field:    consts.FieldRequiredBy,
-			Subfield: consts.SubfieldName,
-		}] = requiredByFilter
-
-		// implied required-by.depth=1
-		filterQueries[consts.FilterKey{
-			Field:    consts.FieldRequiredBy,
-			Subfield: consts.SubfieldDepth,
-		}] = "1"
-	}
+) FieldQueries {
+	addLegacyQuery(queries, consts.FieldDate, consts.SubfieldTarget, dateFilter)
+	addLegacyQuery(queries, consts.FieldName, consts.SubfieldTarget, nameFilter)
+	addLegacyQuery(queries, consts.FieldSize, consts.SubfieldTarget, sizeFilter)
+	addLegacyQuery(queries, consts.FieldRequiredBy, consts.SubfieldTarget, requiredByFilter)
 
 	if explicitOnly {
-		filterQueries[consts.FilterKey{
-			Field:    consts.FieldReason,
-			Subfield: consts.SubfieldNone,
-		}] = ReasonExplicit
+		addLegacyQuery(queries, consts.FieldReason, consts.SubfieldTarget, ReasonExplicit)
 	}
 
 	if dependenciesOnly {
-		filterQueries[consts.FilterKey{
-			Field:    consts.FieldReason,
-			Subfield: consts.SubfieldNone,
-		}] = ReasonDependency
+		addLegacyQuery(queries, consts.FieldReason, consts.SubfieldTarget, ReasonDependency)
 	}
 
-	return filterQueries
+	return queries
 }
