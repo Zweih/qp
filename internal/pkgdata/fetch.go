@@ -26,6 +26,7 @@ const (
 	fieldUrl         = "%URL%"
 	fieldDescription = "%DESC%"
 	fieldPkgBase     = "%BASE%"
+	fieldReplaces    = "%REPLACES%"
 
 	PacmanDbPath = "/var/lib/pacman/local"
 )
@@ -139,7 +140,7 @@ func parseDescFile(descPath string) (*PkgInfo, error) {
 				fieldArch, fieldLicense, fieldUrl, fieldDescription, fieldPkgBase:
 				currentField = line
 
-			case fieldDepends, fieldProvides, fieldConflicts:
+			case fieldDepends, fieldProvides, fieldConflicts, fieldReplaces:
 				currentField = line
 				block, next := collectBlockBytes(data, end+1)
 
@@ -253,13 +254,17 @@ func applySingleLineField(pkg *PkgInfo, field string, value string) error {
 }
 
 func applyMultiLineField(pkg *PkgInfo, field string, lines []string) {
+	relations := parseRelations(lines)
+
 	switch field {
 	case fieldDepends:
-		pkg.Depends = parseRelations(lines)
+		pkg.Depends = relations
 	case fieldProvides:
-		pkg.Provides = parseRelations(lines)
+		pkg.Provides = relations
 	case fieldConflicts:
-		pkg.Conflicts = parseRelations(lines)
+		pkg.Conflicts = relations
+	case fieldReplaces:
+		pkg.Replaces = relations
 	}
 }
 

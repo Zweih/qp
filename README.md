@@ -6,7 +6,7 @@ you can find installation instructions [here](#installation).
 
 `qp` supports querying/sorting for install date, package name, install reason (explicit/dependency), size on disk, reverse dependencies, dependency requirements, description, and more. check [usage](#usage) for all available options.
 
-![qp logo | query packages logo](https://github.com/user-attachments/assets/9e3c04b6-b467-4340-a03d-fb627eac567d)
+![qp logo | query packages logo](https://gistcdn.githack.com/Zweih/9009d5c74eab8a5515a8a64a0495df32/raw/ef8a8ac3655fd3dee24494a3403867919d806b63/qp-logo_clean.svg)
 
 [![AUR version - qp](https://img.shields.io/aur/version/qp?style=flat-square&logo=arch-linux&logoColor=1793d1&label=qp&color=1793d1)](https://aur.archlinux.org/packages/qp)
 [![AUR version - qp-bin](https://img.shields.io/aur/version/qp-bin?style=flat-square&logo=arch-linux&logoColor=1793d1&label=qp-bin&color=1793d1)](https://aur.archlinux.org/packages/qp-bin)
@@ -79,7 +79,7 @@ this package is compatible with the following distributions:
 - [x] add CI to release binaries
 - [x] remove go as a dependency
 - [x] query by range of size on disk
-- [x] user defined columns
+- [x] user defined field selection
 - [x] dependencies of each package (dependency field)
 - [x] reverse-dependencies of each package (required-by field)
 - [x] package description field
@@ -93,7 +93,7 @@ this package is compatible with the following distributions:
 - [x] no-headers option
 - [x] provides query
 - [x] depends query
-- [x] all-columns option
+- [x] all-fields option
 - [x] required-by query
 - [ ] key/value output
 - [x] list of packages for package queries
@@ -171,7 +171,7 @@ qp [options]
 ### options
 - `-l <number>` | `--limit <number>`: limit the amount of recent packages to display (default: 20)
 - `-a` | `all`: show all installed packages (ignores `-l`)
-- `-w <field>=<value>` | `--where <field>=<value>`: apply multiple queries for a flexible query system. can be used multiple times. example:
+- `-w <field>=<value>` | `--where <field>=<value>`: apply multiple queries for a flexible query system. they can be used multiple times command. examples:
   - `--where size=10MB:1GB`    -> query by size range
   - `--where date=2024-01-01:` -> query by installation date
   - `--where reason=explicit`  -> query by explicit installations
@@ -207,7 +207,7 @@ short-flag queries and long-flag queries can be combined.
 #### available queries
 | query type  | syntax | description |
 |-------------|--------|-------------|
-| **license** | `license=<license>` / <br> `license=<license-1>,<license-2>,<etc` | query by license name (substring match) |
+| **license** | `license=<license>` / <br> `license=<license-1>,<license-2>,<etc>` | query by license name (substring match) |
 | **date** | `date=<value>` | query by installation date. supports exact dates, ranges (`YYYY-MM-DD:YYYY-MM-DD`), and open-ended ranges (`YYYY-MM-DD:` or `:YYYY-MM-DD`) |
 | **required by** | `required-by=<package>` / <br> `required-by=<package-1>,<package-2>,<etc>` | query by packages that are required by the specified packages |
 | **depends** | `depends=<package>` / <br> `depends=<package-1>,<package-2>,<etc>` | query by packages that have the specified packages as dependencies |
@@ -219,7 +219,7 @@ short-flag queries and long-flag queries can be combined.
 | **size** | `size=<value>` | query by package size on disk. supports exact values (`10MB`), ranges (`10MB:1GB`), and open-ended ranges (`:500KB`, `1GB:`) |
 | **description** | `description=<string>` / <br> `description=<string-1>,<string-2>,<etc>` | query by package description (substring match) |
 
-### available fields
+### available fields for selection
 - `date` - installation date of the package
 - `name` - package name
 - `reason` - installation reason (explicit/dependency)
@@ -229,6 +229,7 @@ short-flag queries and long-flag queries can be combined.
 - `required-by` - list of packages required by the package and are dependent (output can be long) 
 - `provides` - list of alternative package names or shared libraries provided by package (output can be long)
 - `conflicts` - list of packages that conflict, or cause problems, with the package
+- `replaces` - list of packages that are replaced by the package
 - `arch` - architecture the package was built for (e.g., x86_64, aarch64, any)
 - `license` - package software license
 - `url` - the URL of the official site of the software being packaged
@@ -281,6 +282,9 @@ output format:
     ],
     "conflicts": [
       "tracker3<=3.7.3-2"
+    ],
+    "replaces": [
+      "tracker3<=3.7.3-2"
     ]
   }
 ]
@@ -288,8 +292,8 @@ output format:
 
 ### tips & tricks
 
-- when using multiple short flags, the -l flag must be last since it consumes the next argument.
-this follows standard unix-style flag parsing, where positional arguments (like numbers)
+- when using multiple short flags at once (e.g. `-aw` or `-Al`), the flags like `-w`, `-l`, and `-s` must be last as they consume the next argument.
+this follows standard unix-style flag parsing, where positional arguments (like numbers and strings)
 are treated as separate parameters.
   
   invalid:
@@ -301,7 +305,7 @@ are treated as separate parameters.
   qp -aw name=yay  # correct usage
   ```
 
-- the `depends`, `provides`, `required-by` columns output can be lengthy, packages like `glibc` are required by thousands of packages. to improve readability, pipe the output to tools like `moar` or `less` (i prefer `moar`, but `less` is usually pre-installed):
+- the `depends`, `provides`, and `required-by` table columns can be lengthy. packages like `glibc` are required by thousands of packages. to improve readability, pipe the output to tools like `moar` or `less` (i prefer `moar`, but `less` is usually pre-installed):
   ```bash
   qp -s name,depends | less
   ```
@@ -325,7 +329,7 @@ are treated as separate parameters.
 
 - the `--no-headers` flag is useful when processing output in scripts. It removes the header row, making it easier to parse package lists with tools like `awk`, `sed`, or `cut`:
   ```bash
-  qp --no-headers --columns name,size | awk '{print $1, $2}'
+  qp --no-headers --select name,size | awk '{print $1, $2}'
   ```
 
 ### examples
@@ -414,7 +418,7 @@ are treated as separate parameters.
    ```bash
    qp -aA
    ```
-22. output all packages with all columns/fields in JSON format
+22. output all packages with all fields in JSON format
    ```bash
    qp -aA --json
    ```

@@ -10,7 +10,7 @@ func CalculateReverseDependencies(
 	_ meta.ProgressReporter, // TODO: Add progress reporting
 ) ([]*PkgInfo, error) {
 	packagePointerMap := make(map[string]*PkgInfo)
-	packageDependencyMap := make(map[string][]Relation)
+	reverseDependencyTree := make(map[string][]Relation)
 	providesMap := make(map[string]string)
 	// key: provided library/package, value: package that provides it (provider)
 
@@ -36,8 +36,8 @@ func CalculateReverseDependencies(
 				continue // skip if a package names itself as a dependency
 			}
 
-			packageDependencyMap[depName] = append(
-				packageDependencyMap[depName],
+			reverseDependencyTree[depName] = append(
+				reverseDependencyTree[depName],
 				Relation{
 					Name:     pkg.Name,
 					Version:  depPackage.Version,
@@ -47,10 +47,10 @@ func CalculateReverseDependencies(
 		}
 	}
 
-	for name := range packageDependencyMap {
+	for name := range reverseDependencyTree {
 		if pkg, exists := packagePointerMap[name]; exists {
 			visited := map[string]int32{name: 0}
-			fullDependencyTree := walkReverseDeps(name, packageDependencyMap, visited)
+			fullDependencyTree := walkReverseDeps(name, reverseDependencyTree, visited)
 			pkg.RequiredBy = dedupToLowestDepth(fullDependencyTree)
 		}
 	}
