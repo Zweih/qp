@@ -185,6 +185,7 @@ func ParseFlags(args []string) (Config, error) {
 	return cfg, nil
 }
 
+// TODO: pull parsing logic out of this file
 func parseSortOption(sortInput string) (SortOption, error) {
 	parts := strings.Split(sortInput, ":")
 	fieldKey := strings.ToLower(parts[0])
@@ -211,6 +212,7 @@ func parseSortOption(sortInput string) (SortOption, error) {
 	}, nil
 }
 
+// TODO: pull parsing logic out of this file
 func parseQueries(queryInputs []string) (FieldQueries, error) {
 	queries := make(FieldQueries)
 
