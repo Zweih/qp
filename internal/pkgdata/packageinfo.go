@@ -2,10 +2,6 @@ package pkgdata
 
 type RelationOp int
 
-type ExtractableType interface {
-	~int64 | ~string | ~[]Relation
-}
-
 const (
 	OpNone RelationOp = iota
 	OpEqual
