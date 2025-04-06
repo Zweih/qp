@@ -7,7 +7,6 @@ import (
 	"qp/internal/pkgdata"
 	"strings"
 	"text/tabwriter"
-	"time"
 )
 
 type tableContext struct {
@@ -100,7 +99,7 @@ func getTableValue(pkg *pkgdata.PkgInfo, field consts.FieldType, ctx tableContex
 	case consts.FieldDepends:
 		return formatRelations(pkg.Depends)
 	case consts.FieldRequiredBy:
-		return formatRelations(pkg.RequiredBy)
+		return formatRelations(pkgdata.GetRelationsByDepth(pkg.RequiredBy, 1))
 	case consts.FieldProvides:
 		return formatRelations(pkg.Provides)
 	case consts.FieldConflicts:
@@ -117,37 +116,5 @@ func getTableValue(pkg *pkgdata.PkgInfo, field consts.FieldType, ctx tableContex
 		return pkg.PkgBase
 	default:
 		return ""
-	}
-}
-
-// use time as parameter
-func formatDate(pkg *pkgdata.PkgInfo, ctx tableContext) string {
-	timestamp := time.Unix(pkg.Timestamp, 0)
-	return timestamp.Format(ctx.DateFormat)
-}
-
-func formatRelations(relations []pkgdata.Relation) string {
-	if len(relations) == 0 {
-		return "-"
-	}
-
-	pkgNameList := make([]string, 0, len(relations))
-	for _, relation := range relations {
-		pkgNameList = append(pkgNameList, relation.Name)
-	}
-
-	return strings.Join(pkgNameList, ", ")
-}
-
-func formatSize(size int64) string {
-	switch {
-	case size >= consts.GB:
-		return fmt.Sprintf("%.2f GB", float64(size)/(consts.GB))
-	case size >= consts.MB:
-		return fmt.Sprintf("%.2f MB", float64(size)/(consts.MB))
-	case size >= consts.KB:
-		return fmt.Sprintf("%.2f KB", float64(size)/(consts.KB))
-	default:
-		return fmt.Sprintf("%d B", size)
 	}
 }

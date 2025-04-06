@@ -19,6 +19,7 @@ message Relation {
   string name = 1;
   string version = 2;
   RelationOp operator = 3;
+  int32 depth = 4;
 }
 
 message PkgInfo {

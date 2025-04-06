@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	cacheVersion    = 3 // bump when updating structure of PkgInfo/Relation/pkginfo.proto
+	cacheVersion    = 4 // bump when updating structure of PkgInfo/Relation/pkginfo.proto
 	xdgCacheHomeEnv = "XDG_CACHE_HOME"
 	homeEnv         = "HOME"
 	qpCacheDir      = "query-packages"
@@ -107,6 +107,7 @@ func relationsToProtos(rels []Relation) []*pb.Relation {
 			Name:     rel.Name,
 			Version:  rel.Version,
 			Operator: pb.RelationOp(rel.Operator),
+			Depth:    rel.Depth,
 		}
 	}
 
@@ -144,6 +145,7 @@ func protosToRelations(pbRels []*pb.Relation) []Relation {
 			Name:     pbRel.Name,
 			Version:  pbRel.Version,
 			Operator: RelationOp(pbRel.Operator),
+			Depth:    pbRel.Depth,
 		}
 	}
 

@@ -15,6 +15,7 @@ type Relation struct {
 	Name     string
 	Version  string
 	Operator RelationOp
+	Depth    int32
 }
 
 type PkgInfo struct {

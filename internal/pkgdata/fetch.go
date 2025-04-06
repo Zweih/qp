@@ -275,6 +275,7 @@ func parseRelations(block []string) []Relation {
 
 func parseRelation(input string) Relation {
 	opStart := 0
+	var depth int32 = 1
 
 	for i := range input {
 		switch input[i] {
@@ -284,7 +285,7 @@ func parseRelation(input string) Relation {
 		}
 	}
 
-	return Relation{Name: input}
+	return Relation{Name: input, Depth: depth}
 
 parseOp:
 	name := input[:opStart]
@@ -308,6 +309,7 @@ parseOp:
 		Name:     name,
 		Operator: operator,
 		Version:  version,
+		Depth:    depth,
 	}
 }
 

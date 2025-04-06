@@ -82,11 +82,11 @@ func FilterStep(
 	reportProgress ProgressReporter,
 	_ *meta.PipelineContext,
 ) ([]*PkgInfo, error) {
-	if len(cfg.FilterQueries) == 0 {
+	if len(cfg.FieldQueries) == 0 {
 		return pkgPtrs, nil
 	}
 
-	filterConditions, err := filtering.QueriesToConditions(cfg.FilterQueries)
+	filterConditions, err := filtering.QueriesToConditions(cfg.FieldQueries)
 	if err != nil {
 		return []*pkgdata.PkgInfo{}, err
 	}
