@@ -1,5 +1,11 @@
 # qp Release Notes
 
+## v4.5.0
+### What's Changed
+* Feature: Comprehensive dependency resolution by @Zweih in https://github.com/Zweih/qp/pull/158
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v4.4.0...v4.5.0
+
 ## v4.4.0
 ### What's Changed
 * Feature: Add pkgbase sort by @Zweih in https://github.com/Zweih/qp/pull/157
