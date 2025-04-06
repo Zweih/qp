@@ -144,7 +144,7 @@ func ParseFlags(args []string) (Config, error) {
 		count = 0
 	}
 
-	fieldsParsed, err := parseFields(fieldInput, addFieldInput, hasAllFields)
+	fieldsParsed, err := parseSelection(fieldInput, addFieldInput, hasAllFields)
 	if err != nil {
 		return Config{}, err
 	}

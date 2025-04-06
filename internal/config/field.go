@@ -6,19 +6,19 @@ import (
 	"strings"
 )
 
-func parseFields(
+func parseSelection(
 	fieldInput string,
 	addFieldInput string,
 	hasAllFields bool,
 ) ([]consts.FieldType, error) {
-	var specifiedColumnsRaw string
+	var selectFieldsRaw string
 	var fields []consts.FieldType
 
 	switch {
 	case fieldInput != "":
-		specifiedColumnsRaw = fieldInput
+		selectFieldsRaw = fieldInput
 	case addFieldInput != "":
-		specifiedColumnsRaw = addFieldInput
+		selectFieldsRaw = addFieldInput
 		fallthrough
 	default:
 		if hasAllFields {
@@ -28,20 +28,17 @@ func parseFields(
 		}
 	}
 
-	if specifiedColumnsRaw != "" {
-		specifiedColumns := strings.Split(
-			strings.ToLower(strings.TrimSpace(specifiedColumnsRaw)),
-			",",
-		)
+	if selectFieldsRaw != "" {
+		cleanSelectFields := strings.ToLower(strings.TrimSpace(selectFieldsRaw))
 
-		for _, column := range specifiedColumns {
-			fieldType, exists := consts.FieldTypeLookup[strings.TrimSpace(column)]
+		for selectField := range strings.SplitSeq(cleanSelectFields, ",") {
+			field, exists := consts.FieldTypeLookup[strings.TrimSpace(selectField)]
 
 			if !exists {
-				return nil, fmt.Errorf("Error: '%s' is not a valid column", column)
+				return nil, fmt.Errorf("Error: '%s' is not a valid field for selection", selectField)
 			}
 
-			fields = append(fields, fieldType)
+			fields = append(fields, field)
 		}
 	}
 
