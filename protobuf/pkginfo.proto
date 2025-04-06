@@ -38,6 +38,7 @@ message PkgInfo {
   repeated Relation required_by = 10;
   repeated Relation provides = 11;
   repeated Relation conflicts = 12;
+  repeated Relation replaces = 15;
 }
 
 message CachedPkgs {

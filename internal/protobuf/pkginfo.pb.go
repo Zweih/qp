@@ -165,6 +165,7 @@ type PkgInfo struct {
 	RequiredBy    []*Relation            `protobuf:"bytes,10,rep,name=required_by,json=requiredBy,proto3" json:"required_by,omitempty"`
 	Provides      []*Relation            `protobuf:"bytes,11,rep,name=provides,proto3" json:"provides,omitempty"`
 	Conflicts     []*Relation            `protobuf:"bytes,12,rep,name=conflicts,proto3" json:"conflicts,omitempty"`
+	Replaces      []*Relation            `protobuf:"bytes,15,rep,name=replaces,proto3" json:"replaces,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -297,6 +298,13 @@ func (x *PkgInfo) GetConflicts() []*Relation {
 	return nil
 }
 
+func (x *PkgInfo) GetReplaces() []*Relation {
+	if x != nil {
+		return x.Replaces
+	}
+	return nil
+}
+
 type CachedPkgs struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	LastModified  int64                  `protobuf:"varint,1,opt,name=last_modified,json=lastModified,proto3" json:"last_modified,omitempty"`
@@ -366,7 +374,7 @@ const file_protobuf_pkginfo_proto_rawDesc = "" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x18\n" +
 	"\aversion\x18\x02 \x01(\tR\aversion\x12/\n" +
 	"\boperator\x18\x03 \x01(\x0e2\x13.pkginfo.RelationOpR\boperator\x12\x14\n" +
-	"\x05depth\x18\x04 \x01(\x05R\x05depth\"\xbf\x03\n" +
+	"\x05depth\x18\x04 \x01(\x05R\x05depth\"\xee\x03\n" +
 	"\aPkgInfo\x12\x1c\n" +
 	"\ttimestamp\x18\x01 \x01(\x03R\ttimestamp\x12\x12\n" +
 	"\x04size\x18\x02 \x01(\x03R\x04size\x12\x12\n" +
@@ -383,7 +391,8 @@ const file_protobuf_pkginfo_proto_rawDesc = "" +
 	" \x03(\v2\x11.pkginfo.RelationR\n" +
 	"requiredBy\x12-\n" +
 	"\bprovides\x18\v \x03(\v2\x11.pkginfo.RelationR\bprovides\x12/\n" +
-	"\tconflicts\x18\f \x03(\v2\x11.pkginfo.RelationR\tconflicts\"q\n" +
+	"\tconflicts\x18\f \x03(\v2\x11.pkginfo.RelationR\tconflicts\x12-\n" +
+	"\breplaces\x18\x0f \x03(\v2\x11.pkginfo.RelationR\breplaces\"q\n" +
 	"\n" +
 	"CachedPkgs\x12#\n" +
 	"\rlast_modified\x18\x01 \x01(\x03R\flastModified\x12$\n" +
@@ -425,12 +434,13 @@ var file_protobuf_pkginfo_proto_depIdxs = []int32{
 	1, // 2: pkginfo.PkgInfo.required_by:type_name -> pkginfo.Relation
 	1, // 3: pkginfo.PkgInfo.provides:type_name -> pkginfo.Relation
 	1, // 4: pkginfo.PkgInfo.conflicts:type_name -> pkginfo.Relation
-	2, // 5: pkginfo.CachedPkgs.pkgs:type_name -> pkginfo.PkgInfo
-	6, // [6:6] is the sub-list for method output_type
-	6, // [6:6] is the sub-list for method input_type
-	6, // [6:6] is the sub-list for extension type_name
-	6, // [6:6] is the sub-list for extension extendee
-	0, // [0:6] is the sub-list for field type_name
+	1, // 5: pkginfo.PkgInfo.replaces:type_name -> pkginfo.Relation
+	2, // 6: pkginfo.CachedPkgs.pkgs:type_name -> pkginfo.PkgInfo
+	7, // [7:7] is the sub-list for method output_type
+	7, // [7:7] is the sub-list for method input_type
+	7, // [7:7] is the sub-list for extension type_name
+	7, // [7:7] is the sub-list for extension extendee
+	0, // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_protobuf_pkginfo_proto_init() }

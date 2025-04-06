@@ -33,4 +33,5 @@ type PkgInfo struct {
 	RequiredBy  []Relation
 	Provides    []Relation
 	Conflicts   []Relation
+	Replaces    []Relation
 }

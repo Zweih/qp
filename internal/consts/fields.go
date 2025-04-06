@@ -21,6 +21,7 @@ const (
 	FieldRequiredBy
 	FieldProvides
 	FieldConflicts
+	FieldReplaces
 )
 
 const (
@@ -40,6 +41,7 @@ const (
 	requiredBy  = "required-by"
 	provides    = "provides"
 	conflicts   = "conflicts"
+	replaces    = "replaces"
 	arch        = "arch"
 	license     = "license"
 	url         = "url"
@@ -73,6 +75,7 @@ var FieldTypeLookup = map[string]FieldType{
 	requiredBy:  FieldRequiredBy,
 	provides:    FieldProvides,
 	conflicts:   FieldConflicts,
+	replaces:    FieldReplaces,
 }
 
 var SubfieldTypeLookup = map[string]SubfieldType{
@@ -91,6 +94,7 @@ var FieldNameLookup = map[FieldType]string{
 	FieldRequiredBy:  requiredBy,
 	FieldProvides:    provides,
 	FieldConflicts:   conflicts,
+	FieldReplaces:    replaces,
 	FieldArch:        arch,
 	FieldLicense:     license,
 	FieldUrl:         url,
@@ -120,6 +124,7 @@ var (
 		FieldRequiredBy,
 		FieldProvides,
 		FieldConflicts,
+		FieldReplaces,
 		FieldArch,
 		FieldLicense,
 		FieldUrl,
