@@ -4,7 +4,7 @@
 qp \- List and query installed packages on Arch-based systems.
 .SH SYNOPSIS
 .B qp
-.RI [ \-l | \-\-limit <number> ] [ \-a | \-\-all ] [ \-w <field>=<value> ] [ \-s | \-\-select <list> ] [ \-S | \-\-select-add <list> ] [ \-A | \-\-select-all ] [ \-O | \-\-order <field>:<direction> ] [ \-\-json ] [ \-\-no-headers ] [ \-\-full-timestamp ] [ \-\-no-progress ] [ \-h | \-\-help ]
+.RI [ \-l | \-\-limit <number> ] [ \-a | \-\-all ] [ \-w <field>=<value> ] [ \-s | \-\-select <list> ] [ \-S | \-\-select-add <list> ] [ \-A | \-\-select-all ] [ \-O | \-\-order <field>:<direction> ] [ \-\-json ] [ \-\-no-headers ] [ \-\-full-timestamp ] [ \-\-no-progress ] [ \-\-no-cache ] [ \-h | \-\-help ]
 
 .SH DESCRIPTION
 .B qp
@@ -155,6 +155,10 @@ Show full date + time instead of just the date.
 .TP
 .B \-\-no-progress
 Suppress progress output, even in interactive mode.
+
+.TP
+.B \-\-no-cache
+Disable cache loading/saving and force fresh package data loading
 
 .TP
 .B \-h, \-\-help

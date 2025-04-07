@@ -122,6 +122,7 @@ this package is compatible with the following distributions:
 - [x] improve sorting efficiency (8% speed boost)
 - [x] package description query
 - [ ] package base query
+- [x] no-cache option
 
 ## installation
 
@@ -195,6 +196,7 @@ qp [options]
 - `--full-timestamp`: display the full timestamp (date and time) of package installations instead of just the date
 - `--json`: output results in JSON format (overrides table output and `--full-timestamp`)
 - `--no-progress`: force no progress bar outside of non-interactive environments
+- `--no-cache`: disable cache loading/saving and force fresh package data loading
 - `-h` | `--help`: print help info
 
 ### querying with `--where`
