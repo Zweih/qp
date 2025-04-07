@@ -127,7 +127,7 @@ this package is compatible with the following distributions:
 ## installation
 
 ### from AUR (**recommended**)
-install using [AUR helper](https://wiki.archlinux.org/title/AUR_helpers) like `yay`, `paru`, `aura`, etc.:
+install using an [AUR helper](https://wiki.archlinux.org/title/AUR_helpers) like `yay`, `paru`, `aura`, etc.:
 ```bash
 yay -Sy qp
 ```
