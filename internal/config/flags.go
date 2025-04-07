@@ -15,17 +15,20 @@ func ParseFlags(args []string) (Config, error) {
 	var hasNoHeaders bool
 	var showFullTimestamp bool
 	var disableProgress bool
-	var explicitOnly bool
-	var dependenciesOnly bool
+	var noCache bool
 
 	var filterInputs []string
+	var sortInput string
+	var fieldInput string
+	var addFieldInput string
+
+	// legacy hidden flags
+	var explicitOnly bool
+	var dependenciesOnly bool
 	var dateFilter string
 	var sizeFilter string
 	var nameFilter string
 	var requiredByFilter string
-	var sortInput string
-	var fieldInput string
-	var addFieldInput string
 
 	pflag.CommandLine.SortFlags = false
 
@@ -42,6 +45,7 @@ func ParseFlags(args []string) (Config, error) {
 	pflag.BoolVar(&showFullTimestamp, "full-timestamp", false, "Show full timestamp instead of just the date")
 	pflag.BoolVar(&outputJson, "json", false, "Output results in JSON format")
 	pflag.BoolVar(&disableProgress, "no-progress", false, "Force suppress progress output")
+	pflag.BoolVar(&noCache, "no-cache", false, "Disable cache loading/saving and force fresh package data loading")
 
 	pflag.BoolVarP(&showHelp, "help", "h", false, "Display help")
 
@@ -105,6 +109,7 @@ func ParseFlags(args []string) (Config, error) {
 		OutputJson:        outputJson,
 		HasNoHeaders:      hasNoHeaders,
 		ShowFullTimestamp: showFullTimestamp,
+		NoCache:           noCache,
 		DisableProgress:   disableProgress,
 		SortOption:        sortOption,
 		Fields:            fieldsParsed,
