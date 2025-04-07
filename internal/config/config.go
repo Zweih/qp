@@ -17,6 +17,7 @@ type Config struct {
 	HasNoHeaders      bool
 	ShowFullTimestamp bool
 	DisableProgress   bool
+	NoCache           bool
 	SortOption        SortOption
 	Fields            []consts.FieldType
 	FieldQueries      FieldQueries

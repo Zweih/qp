@@ -10,11 +10,15 @@ import (
 )
 
 func LoadCacheStep(
-	_ config.Config,
+	cfg config.Config,
 	_ []*PkgInfo,
 	_ ProgressReporter,
 	pipelineCtx *meta.PipelineContext,
 ) ([]*PkgInfo, error) {
+	if cfg.NoCache {
+		return nil, nil
+	}
+
 	pkgPtrs, err := pkgdata.LoadProtoCache(pipelineCtx.CachePath)
 	if err == nil {
 		pipelineCtx.UsedCache = true
@@ -60,12 +64,12 @@ func ReverseDepStep(
 
 // TODO: add progress reporting
 func SaveCacheStep(
-	_ config.Config,
+	cfg config.Config,
 	pkgPtrs []*PkgInfo,
 	_ ProgressReporter,
 	pipelineCtx *meta.PipelineContext,
 ) ([]*PkgInfo, error) {
-	if !pipelineCtx.UsedCache {
+	if !cfg.NoCache && !pipelineCtx.UsedCache {
 		// TODO: we can probably save the file concurrently
 		err := pkgdata.SaveProtoCache(pkgPtrs, pipelineCtx.CachePath)
 		if err != nil {
