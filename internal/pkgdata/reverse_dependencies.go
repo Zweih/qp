@@ -5,12 +5,13 @@ import (
 )
 
 // TODO: we can do this concurrently. let's get on that.
-func CalculateReverseDependencies(
+func ResolveDependencyTree(
 	pkgPtrs []*PkgInfo,
 	_ meta.ProgressReporter, // TODO: Add progress reporting
 ) ([]*PkgInfo, error) {
 	packagePointerMap := make(map[string]*PkgInfo)
 	reverseDependencyTree := make(map[string][]Relation)
+	forwardDependencyTree := make(map[string][]Relation)
 	providesMap := make(map[string][]string)
 	// key: provided library/package, value: package that provides it (provider)
 
@@ -41,7 +42,18 @@ func CalculateReverseDependencies(
 						Version:  depPackage.Version,
 						Operator: depPackage.Operator,
 						Depth:    1,
-					})
+					},
+				)
+
+				forwardDependencyTree[pkg.Name] = append(
+					forwardDependencyTree[pkg.Name],
+					Relation{
+						Name:     targetName,
+						Version:  depPackage.Version,
+						Operator: depPackage.Operator,
+						Depth:    1,
+					},
+				)
 			}
 		}
 	}
