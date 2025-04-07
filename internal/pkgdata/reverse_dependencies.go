@@ -11,7 +11,7 @@ func CalculateReverseDependencies(
 ) ([]*PkgInfo, error) {
 	packagePointerMap := make(map[string]*PkgInfo)
 	reverseDependencyTree := make(map[string][]Relation)
-	providesMap := make(map[string]string)
+	providesMap := make(map[string][]string)
 	// key: provided library/package, value: package that provides it (provider)
 
 	for _, pkg := range pkgPtrs {
@@ -19,31 +19,30 @@ func CalculateReverseDependencies(
 
 		// populate providesMap
 		for _, provided := range pkg.Provides {
-			// TODO: this assumes only one provider exists to satisfy a dependency, but that's not always true. this should be an array of names, not just one name
-			providesMap[provided.Name] = pkg.Name
+			providesMap[provided.Name] = append(providesMap[provided.Name], pkg.Name)
 		}
 	}
 
 	for _, pkg := range pkgPtrs {
 		for _, depPackage := range pkg.Depends {
 			depName := depPackage.Name
+			targetNames := resolveProvisions(depName, providesMap)
 
-			if providerName, exists := providesMap[depName]; exists {
-				depName = providerName
+			for _, targetName := range targetNames {
+
+				if targetName == pkg.Name {
+					continue // skip if a package names itself as a dependency
+				}
+
+				reverseDependencyTree[targetName] = append(
+					reverseDependencyTree[targetName],
+					Relation{
+						Name:     pkg.Name, // dependent package name + constraint declared
+						Version:  depPackage.Version,
+						Operator: depPackage.Operator,
+						Depth:    1,
+					})
 			}
-
-			if depName == pkg.Name {
-				continue // skip if a package names itself as a dependency
-			}
-
-			reverseDependencyTree[depName] = append(
-				reverseDependencyTree[depName],
-				Relation{
-					Name:     pkg.Name,
-					Version:  depPackage.Version,
-					Operator: depPackage.Operator,
-					Depth:    1,
-				})
 		}
 	}
 
@@ -56,6 +55,14 @@ func CalculateReverseDependencies(
 	}
 
 	return pkgPtrs, nil
+}
+
+func resolveProvisions(depName string, providesMap map[string][]string) []string {
+	if providerNames, exists := providesMap[depName]; exists {
+		return providerNames
+	}
+
+	return []string{depName}
 }
 
 // TODO: we can memoize this. we can also paralellize as well.
