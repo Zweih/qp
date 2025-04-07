@@ -4,7 +4,7 @@
 
 you can find installation instructions [here](#installation).
 
-`qp` supports querying/sorting for install date, package name, install reason (explicit/dependency), size on disk, reverse dependencies, dependency requirements, description, and more. check [usage](#usage) for all available options.
+`qp` supports querying/sorting for install date, package name, install reason (explicit/dependency), size on disk, reverse dependencies, dependency requirements, description, replacements, conflicts, provision, and more. check [usage](#usage) for all available options.
 
 ![qp logo | query packages logo](https://gistcdn.githack.com/Zweih/9009d5c74eab8a5515a8a64a0495df32/raw/ef8a8ac3655fd3dee24494a3403867919d806b63/qp-logo_clean.svg)
 
@@ -14,7 +14,7 @@ you can find installation instructions [here](#installation).
 
 ![GitHub Downloads](https://img.shields.io/github/downloads/Zweih/qp/total?style=for-the-badge&logo=github&label=Downloads%20Since%202%2F4%2F2025&color=1793d1)
 
-![Alt](https://repobeats.axiom.co/api/embed/7a20b73b689d45d678001c582a9d1f124dca31ba.svg "Repobeats analytics image")
+![Alt](https://repobeats.axiom.co/api/embed/504d7ad06523d97d04d9fa0c5f694922ec779b96.svg "Repobeats analytics image")
 
 <details open>
 <summary><strong>download and clone statistics</strong></summary>
@@ -37,7 +37,7 @@ this package is compatible with the following distributions:
 
 ## features
 
-- list installed packages with date/timestamps, dependencies, provisions, requirements, size on disk, conflicts, architecture, license, description, package base, and version
+- list installed packages with date/timestamps, dependencies, provisions, requirements, size on disk, conflicts, replacements, architecture, license, description, package base, and version
 - query by explicitly installed packages
 - query by packages installed as dependencies
 - query by packages required by specified packages
@@ -116,7 +116,7 @@ this package is compatible with the following distributions:
 - [x] architecture query
 - [x] optimize query order (4% speed boost)
 - [ ] dependency count sort
-- [ ] replaces field
+- [x] replaces field
 - [x] license query
 - [ ] optional dependency field
 - [x] improve sorting efficiency (8% speed boost)

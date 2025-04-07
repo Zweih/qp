@@ -35,11 +35,12 @@ func PrintHelp() {
 	fmt.Println("    description=x86_64        Query packages by description (substring match)")
 
 	fmt.Println("\nSorting Options:")
-	fmt.Println("  -O, --order <type> Apply sorting to package output.")
-	fmt.Println("  --order date                 Sort packages by installation date (default)")
-	fmt.Println("  --order alphabetical         Sort packages alphabetically")
-	fmt.Println("  --order size:desc            Sort packages by size in descending order")
-	fmt.Println("  --order size:asc             Sort packages by size in ascending order")
+	fmt.Println("  -O, --order <type>:<direction> Apply sorting to package output")
+	fmt.Println("                                 Default sort is date:asc")
+	fmt.Println("  --order date                   Sort packages by installation date")
+	fmt.Println("  --order name                   Sort packages alphabetically by package name")
+	fmt.Println("  --order size                   Sort packages by size in descending order")
+	fmt.Println("  --order license                Sort packages alphabetically by package license")
 
 	fmt.Println("\nOutput Options:")
 	fmt.Println("  --json                      Output results in JSON format")
