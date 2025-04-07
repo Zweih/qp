@@ -1,5 +1,12 @@
 # qp Release Notes
 
+## v4.6.1
+### What's Changed
+* Feature: Add replaces field by @Zweih in https://github.com/Zweih/qp/pull/161
+* Documentation: Update replaces by @Zweih in https://github.com/Zweih/qp/pull/162
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v4.5.0...v4.6.1
+
 ## v4.5.0
 ### What's Changed
 * Feature: Comprehensive dependency resolution by @Zweih in https://github.com/Zweih/qp/pull/158
