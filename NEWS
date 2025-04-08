@@ -1,5 +1,11 @@
 # qp Release Notes
 
+## v4.7.0
+### What's Changed
+* Feature: Change table column order by @Zweih in https://github.com/Zweih/qp/pull/164
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v4.6.2...v4.7.0
+
 ## v4.6.2
 ### What's Changed
 * Refactor: Split config package by @Zweih in https://github.com/Zweih/qp/pull/163
