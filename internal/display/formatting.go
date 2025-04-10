@@ -17,15 +17,17 @@ func formatRelations(relations []pkgdata.Relation) string {
 }
 
 func flattenRelations(relations []pkgdata.Relation) []string {
-	relationOutputs := make([]string, 0, len(relations))
+	relationsAtDepth := pkgdata.GetRelationsByDepth(relations, 1)
+	relationOutputs := make([]string, 0, len(relationsAtDepth))
 
-	for _, rel := range relations {
-		if rel.Operator == pkgdata.OpNone {
-			relationOutputs = append(relationOutputs, rel.Name)
-		} else {
-			op := relationOpToString(rel.Operator)
-			relationOutputs = append(relationOutputs, fmt.Sprintf("%s%s%s", rel.Name, op, rel.Version))
+	for _, rel := range relationsAtDepth {
+		var virtualFormat string
+		if rel.ProviderName != "" {
+			virtualFormat = fmt.Sprintf(" (provided by %s)", rel.ProviderName)
 		}
+
+		op := relationOpToString(rel.Operator)
+		relationOutputs = append(relationOutputs, fmt.Sprintf("%s%s%s%s", rel.Name, op, rel.Version, virtualFormat))
 	}
 
 	return relationOutputs

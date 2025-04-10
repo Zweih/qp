@@ -27,65 +27,94 @@ func ResolveDependencyTree(
 	for _, pkg := range pkgPtrs {
 		for _, depPackage := range pkg.Depends {
 			depName := depPackage.Name
-			targetNames := resolveProvisions(depName, providesMap)
+			if depName == pkg.Name {
+				continue // prevent checking self-referencing packages
+			}
 
-			for _, targetName := range targetNames {
+			targets := resolveProvisions(depName, depPackage.Version, depPackage.Operator, providesMap)
 
-				if targetName == pkg.Name {
-					continue // skip if a package names itself as a dependency
+			for _, target := range targets {
+				if target.Name == pkg.Name {
+					continue
 				}
 
-				reverseDependencyTree[targetName] = append(
-					reverseDependencyTree[targetName],
-					Relation{
-						Name:     pkg.Name, // dependent package name + constraint declared
-						Version:  depPackage.Version,
-						Operator: depPackage.Operator,
-						Depth:    1,
-					},
-				)
+				addToDependencyTree(pkg.Name, forwardDependencyTree, target)
 
-				forwardDependencyTree[pkg.Name] = append(
-					forwardDependencyTree[pkg.Name],
-					Relation{
-						Name:     targetName,
-						Version:  depPackage.Version,
-						Operator: depPackage.Operator,
-						Depth:    1,
-					},
-				)
+				reverseKey := target.ProviderName
+				if reverseKey == "" {
+					reverseKey = target.Name
+				}
+
+				reverseRelation := Relation{
+					Name:     pkg.Name,
+					Version:  depPackage.Version,
+					Operator: depPackage.Operator,
+					Depth:    1,
+				}
+
+				addToDependencyTree(reverseKey, reverseDependencyTree, reverseRelation)
 			}
 		}
 	}
 
-	for name := range reverseDependencyTree {
-		if pkg, exists := packagePointerMap[name]; exists {
-			visited := map[string]int32{name: 0}
-			fullDependencyTree := walkReverseDeps(name, reverseDependencyTree, visited)
-			pkg.RequiredBy = dedupToLowestDepth(fullDependencyTree)
-		}
+	for _, pkg := range pkgPtrs {
+		name := pkg.Name
+		visitedReverse := map[string]int32{name: 0}
+		visitedForward := map[string]int32{name: 0}
+
+		fullReverseDepGraph := walkDependencyGraph(name, reverseDependencyTree, visitedReverse, "")
+		fullForwardDepGraph := walkDependencyGraph(name, forwardDependencyTree, visitedForward, "")
+
+		pkg.RequiredBy = dedupToLowestDepth(fullReverseDepGraph)
+		pkg.Depends = dedupToLowestDepth(fullForwardDepGraph)
 	}
 
 	return pkgPtrs, nil
 }
 
-func resolveProvisions(depName string, providesMap map[string][]string) []string {
+func addToDependencyTree(
+	from string,
+	tree map[string][]Relation,
+	relation Relation,
+) {
+	tree[from] = append(tree[from], relation)
+}
+
+func resolveProvisions(
+	depName string,
+	version string,
+	operator RelationOp,
+	providesMap map[string][]string,
+) []Relation {
 	if providerNames, exists := providesMap[depName]; exists {
-		return providerNames
+		provisions := make([]Relation, 0, len(providerNames))
+
+		for _, providerName := range providerNames {
+			provisions = append(provisions, Relation{
+				Name:         depName,
+				Version:      version,
+				Operator:     operator,
+				ProviderName: providerName,
+				Depth:        1,
+			})
+		}
+
+		return provisions
 	}
 
-	return []string{depName}
+	return []Relation{{Name: depName, Version: version, Operator: operator}}
 }
 
 // TODO: we can memoize this. we can also paralellize as well.
-func walkReverseDeps(
+func walkDependencyGraph(
 	name string,
-	reverseMap map[string][]Relation,
+	dependencyTree map[string][]Relation,
 	visited map[string]int32,
+	parentVirtualName string,
 ) []Relation {
 	var results []Relation
 
-	for _, relation := range reverseMap[name] {
+	for _, relation := range dependencyTree[name] {
 		newDepth := visited[name] + 1
 		prevDepth, seen := visited[relation.Name]
 		if seen && prevDepth <= newDepth {
@@ -96,9 +125,14 @@ func walkReverseDeps(
 
 		relationCopy := relation
 		relationCopy.Depth = newDepth
+
+		if relationCopy.ProviderName == "" && parentVirtualName != "" {
+			relationCopy.ProviderName = parentVirtualName
+		}
+
 		results = append(results, relationCopy)
 
-		subTree := walkReverseDeps(relation.Name, reverseMap, visited)
+		subTree := walkDependencyGraph(relation.Name, dependencyTree, visited, relationCopy.ProviderName)
 		results = append(results, subTree...)
 	}
 
@@ -109,6 +143,7 @@ func dedupToLowestDepth(relations []Relation) []Relation {
 	seen := map[string]Relation{}
 	for _, relation := range relations {
 		existingRelation, ok := seen[relation.Name]
+
 		if !ok || relation.Depth < existingRelation.Depth {
 			seen[relation.Name] = relation
 		}
