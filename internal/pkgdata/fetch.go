@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strconv"
+	"strings"
 	"sync"
 )
 
@@ -28,6 +29,9 @@ const (
 	fieldPkgBase     = "%BASE%"
 	fieldReplaces    = "%REPLACES%"
 	fieldBuildDate   = "%BUILDDATE%"
+	fieldXData       = "%XDATA%"
+
+	subfieldPkgType = "pkgtype"
 
 	PacmanDbPath = "/var/lib/pacman/local"
 )
@@ -141,7 +145,7 @@ func parseDescFile(descPath string) (*PkgInfo, error) {
 				fieldArch, fieldLicense, fieldUrl, fieldDescription, fieldPkgBase, fieldBuildDate:
 				currentField = line
 
-			case fieldDepends, fieldProvides, fieldConflicts, fieldReplaces:
+			case fieldDepends, fieldProvides, fieldConflicts, fieldReplaces, fieldXData:
 				currentField = line
 				block, next := collectBlockBytes(data, end+1)
 
@@ -262,8 +266,36 @@ func applySingleLineField(pkg *PkgInfo, field string, value string) error {
 	return nil
 }
 
-func applyMultiLineField(pkg *PkgInfo, field string, lines []string) {
-	relations := parseRelations(lines)
+func applyMultiLineField(pkg *PkgInfo, field string, block []string) {
+	switch field {
+	case fieldDepends, fieldProvides, fieldConflicts, fieldReplaces:
+		applyRelations(pkg, field, block)
+	case fieldXData:
+		applyXData(pkg, block)
+	}
+}
+
+func applyXData(pkg *PkgInfo, block []string) {
+	for _, line := range block {
+		parts := strings.SplitN(line, "=", 2)
+
+		if len(parts) == 2 {
+			subfield, value := parts[0], parts[1]
+
+			switch subfield {
+			case subfieldPkgType:
+				pkg.PkgType = stringToPkgType(value)
+			}
+		}
+	}
+}
+
+func applyRelations(pkg *PkgInfo, field string, block []string) {
+	relations := make([]Relation, 0, len(block))
+
+	for _, line := range block {
+		relations = append(relations, parseRelation(line))
+	}
 
 	switch field {
 	case fieldDepends:
@@ -275,16 +307,6 @@ func applyMultiLineField(pkg *PkgInfo, field string, lines []string) {
 	case fieldReplaces:
 		pkg.Replaces = relations
 	}
-}
-
-func parseRelations(block []string) []Relation {
-	relations := make([]Relation, 0, len(block))
-
-	for _, line := range block {
-		relations = append(relations, parseRelation(line))
-	}
-
-	return relations
 }
 
 func parseRelation(input string) Relation {
@@ -324,6 +346,21 @@ parseOp:
 		Operator: operator,
 		Version:  version,
 		Depth:    depth,
+	}
+}
+
+func stringToPkgType(pkgTypeInput string) PkgType {
+	switch pkgTypeInput {
+	case "pkg":
+		return PkgTypePkg
+	case "split":
+		return PkgTypeSplit
+	case "src":
+		return PkgTypeSrc
+	case "debug":
+		return PkgTypeDebug
+	default:
+		return PkgTypeUnknown
 	}
 }
 

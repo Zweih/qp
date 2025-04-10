@@ -4,7 +4,7 @@
 
 you can find installation instructions [here](#installation).
 
-`qp` supports querying/sorting for install date, package name, install reason (explicit/dependency), size on disk, reverse dependencies, dependency requirements, description, replacements, conflicts, provision, and more. check [usage](#usage) for all available options.
+`qp` supports querying/sorting for install date, package name, install reason (explicit/dependency), size on disk, reverse dependencies, dependency requirements, description, replacements, conflicts, provisions, build date, package type and more. check [usage](#usage) for all available options.
 
 ![qp logo | query packages logo](https://gistcdn.githack.com/Zweih/9009d5c74eab8a5515a8a64a0495df32/raw/ef8a8ac3655fd3dee24494a3403867919d806b63/qp-logo_clean.svg)
 
@@ -37,7 +37,7 @@ this package is compatible with the following distributions:
 
 ## features
 
-- list installed packages with date/timestamps, dependencies, provisions, requirements, size on disk, conflicts, replacements, architecture, license, description, build date, package base, and version
+- list installed packages with install date/timestamps, dependencies, provisions, requirements, size on disk, conflicts, replacements, architecture, license, description, build date, package base, package type, and version
 - query by explicitly installed packages
 - query by packages installed as dependencies
 - query by packages required by specified packages
@@ -96,8 +96,10 @@ this package is compatible with the following distributions:
 | ✓ | license query | – | optional dependency field |
 | ✓ | improve sorting efficiency (8% speed boost) | ✓ | package description query |
 | ✓ | dependency depth resolution | ✓ | no-cache option |
-| ✓ | build-date field | - | rebuild-cache option |
-
+| ✓ | build-date field | - | regen-cache option |
+| ✓ | pkgtype field | - | build-date filter |
+| - | build-date sort | - | pkgtype sort |
+| - | pkgtype filter | - | groups field |
 
 ## installation
 
@@ -167,7 +169,7 @@ qp [options]
 - `--no-headers`: omit column headers in table output (useful for scripting)
 - `-s <list>` | `--select <list>`: comma-separated list of fields to display (cannot use with `--select-all` or `--select-add`)
 - `-S <list>` | `--select-add <list>`: comma-separated list of fields to add to defaults or `--select-all`
-- `-A` | `--select-all`: output all available fields (overrides defaults)
+- `-A` | `--select-all`: output all available fields (overrides defaults) 
 - `--full-timestamp`: display the full timestamp (date and time) of package install/build instead of just the date
 - `--json`: output results in JSON format (overrides table output and `--full-timestamp`)
 - `--no-progress`: force no progress bar outside of non-interactive environments
@@ -203,16 +205,18 @@ short-flag queries and long-flag queries can be combined.
 - `reason` - installation reason (explicit/dependency)
 - `size` - package size on disk
 - `version` - installed package version
+- `pkgtype` - package type (standard, split, debug, source, unknown*)
+         ***note**: older packages may show "unknown" pkgtype if built before pacman introduced XDATA
+- `arch` - architecture the package was built for (e.g., x86_64, aarch64, any)
+- `license` - package software license
+- `pkgbase` - name of the base package used to group split packages; for non-split packages, it is the same as the package name. 
+- `description` - package description
+- `url` - the URL of the official site of the software being packaged
+- `conflicts` - list of packages that conflict, or cause problems, with the package
+- `replaces` - list of packages that are replaced by the package
 - `depends` - list of dependencies (output can be long)
 - `required-by` - list of packages required by the package and are dependent (output can be long) 
 - `provides` - list of alternative package names or shared libraries provided by package (output can be long)
-- `conflicts` - list of packages that conflict, or cause problems, with the package
-- `replaces` - list of packages that are replaced by the package
-- `arch` - architecture the package was built for (e.g., x86_64, aarch64, any)
-- `license` - package software license
-- `url` - the URL of the official site of the software being packaged
-- `description` - package description
-- `pkgbase` - name of the base package used to group split packages; for non-split packages, it is the same as the package name. 
 
 ### JSON output
 the `--json` flag outputs the package data as structured JSON instead of a table. this can be useful for scripts or automation.
@@ -228,16 +232,24 @@ output format:
 ```json
 [
   {
-    "timestamp": 1743448252,
+    "installTimestamp": 1743448252,
+    "buildTimestamp": 1742778264,
     "size": 4446373,
     "name": "tinysparql",
     "reason": "dependency",
     "version": "3.9.1-1",
+    "pkgtype": "split",
     "arch": "aarch64",
     "license": "GPL-2.0-or-later",
-    "url": "https://tinysparql.org/",
-    "description": "Low-footprint RDF triple store with SPARQL 1.1 interface",
     "pkgbase": "tinysparql",
+    "description": "Low-footprint RDF triple store with SPARQL 1.1 interface",
+    "url": "https://tinysparql.org/",
+    "conflicts": [
+      "tracker3<=3.7.3-2"
+    ],
+    "replaces": [
+      "tracker3<=3.7.3-2"
+    ],
     "depends": [
       "avahi",
       "gcc-libs",
@@ -255,14 +267,8 @@ output format:
       "gtk4"
     ],
     "provides": [
-      "tracker3=3.9.1",
-      "libtinysparql-3.0.so=0-64"
-    ],
-    "conflicts": [
-      "tracker3<=3.7.3-2"
-    ],
-    "replaces": [
-      "tracker3<=3.7.3-2"
+      "libtinysparql-3.0.so=0-64",
+      "tracker3=3.9.1"
     ]
   }
 ]

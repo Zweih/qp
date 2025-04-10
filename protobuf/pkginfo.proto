@@ -23,11 +23,20 @@ message Relation {
   string providerName = 5;
 }
 
+enum PkgType {
+  UNKNOWN = 0;
+  PKG = 1;
+  SPLIT = 2;
+  SRC = 3;
+  DEBUG = 4;
+}
+
 message PkgInfo {
   reserved 1;
   int64 install_timestamp = 17;
   int64 build_timestamp = 16;
   int64 size = 2;
+  PkgType pkg_type = 18;
   string name = 3;
   string reason = 4;
   string version = 5;

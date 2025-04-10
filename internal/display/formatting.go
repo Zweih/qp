@@ -55,6 +55,21 @@ func relationOpToString(op pkgdata.RelationOp) string {
 	}
 }
 
+func pkgTypeToString(pkgType pkgdata.PkgType) string {
+	switch pkgType {
+	case pkgdata.PkgTypePkg:
+		return "pkg"
+	case pkgdata.PkgTypeSplit:
+		return "split"
+	case pkgdata.PkgTypeSrc:
+		return "src"
+	case pkgdata.PkgTypeDebug:
+		return "debug"
+	default:
+		return "unknown"
+	}
+}
+
 func formatDate(timestamp int64, ctx tableContext) string {
 	unixTimestamp := time.Unix(timestamp, 0)
 	return unixTimestamp.Format(ctx.DateFormat)
