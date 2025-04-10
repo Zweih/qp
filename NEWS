@@ -1,5 +1,11 @@
 # qp Release Notes
 
+## v4.11.0
+### What's Changed
+* Feature: Sort relations output alphabetically by default by @Zweih in https://github.com/Zweih/qp/pull/169
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v4.10.0...v4.11.0
+
 ## v4.10.0
 ### What's Changed
 * Feature: Comprehensive forward dependency resolution by @Zweih in https://github.com/Zweih/qp/pull/168
