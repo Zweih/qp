@@ -74,7 +74,7 @@ func setupCache(pipelineCtx *meta.PipelineContext) {
 
 func trimPackagesLen(
 	pkgPtrs []*pkgdata.PkgInfo,
-	cfg config.Config,
+	cfg *config.Config,
 ) []*pkgdata.PkgInfo {
 	if cfg.Count > 0 && !cfg.AllPackages && len(pkgPtrs) > cfg.Count {
 		cutoffIdx := len(pkgPtrs) - cfg.Count
@@ -84,11 +84,15 @@ func trimPackagesLen(
 	return pkgPtrs
 }
 
-func renderOutput(pkgs []*pkgdata.PkgInfo, cfg config.Config) {
+func renderOutput(pkgs []*pkgdata.PkgInfo, cfg *config.Config) {
 	if cfg.OutputJson {
 		out.RenderJson(pkgs, cfg.Fields)
 		return
 	}
 
 	out.RenderTable(pkgs, cfg.Fields, cfg.ShowFullTimestamp, cfg.HasNoHeaders)
+}
+
+func isInteractive(disableProgress bool) bool {
+	return term.IsTerminal(int(os.Stdout.Fd())) && !disableProgress
 }

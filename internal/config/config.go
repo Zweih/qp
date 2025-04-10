@@ -34,7 +34,7 @@ type SortOption struct {
 }
 
 type ConfigProvider interface {
-	GetConfig() (Config, error)
+	GetConfig() (*Config, error)
 }
 
 type CliConfigProvider struct{}

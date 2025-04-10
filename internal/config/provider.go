@@ -4,10 +4,10 @@ import (
 	"os"
 )
 
-func (c *CliConfigProvider) GetConfig() (Config, error) {
+func (c *CliConfigProvider) GetConfig() (*Config, error) {
 	cfg, err := ParseFlags(os.Args[1:])
 	if err != nil {
-		return Config{}, err
+		return &Config{}, err
 	}
 
 	if cfg.ShowHelp {
@@ -15,5 +15,5 @@ func (c *CliConfigProvider) GetConfig() (Config, error) {
 		os.Exit(0)
 	}
 
-	return cfg, nil
+	return &cfg, nil
 }

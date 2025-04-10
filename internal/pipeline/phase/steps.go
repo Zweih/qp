@@ -10,7 +10,7 @@ import (
 )
 
 func LoadCacheStep(
-	cfg config.Config,
+	cfg *config.Config,
 	_ []*PkgInfo,
 	_ ProgressReporter,
 	pipelineCtx *meta.PipelineContext,
@@ -30,7 +30,7 @@ func LoadCacheStep(
 
 // TODO: add progress reporting
 func FetchStep(
-	_ config.Config,
+	_ *config.Config,
 	pkgPtrs []*PkgInfo,
 	_ ProgressReporter,
 	pipelineCtx *meta.PipelineContext,
@@ -50,7 +50,7 @@ func FetchStep(
 }
 
 func ResolveDepTreeStep(
-	_ config.Config,
+	_ *config.Config,
 	pkgPtrs []*pkgdata.PkgInfo,
 	reportProgress ProgressReporter,
 	pipelineCtx *meta.PipelineContext,
@@ -64,7 +64,7 @@ func ResolveDepTreeStep(
 
 // TODO: add progress reporting
 func SaveCacheStep(
-	cfg config.Config,
+	cfg *config.Config,
 	pkgPtrs []*PkgInfo,
 	_ ProgressReporter,
 	pipelineCtx *meta.PipelineContext,
@@ -81,7 +81,7 @@ func SaveCacheStep(
 }
 
 func FilterStep(
-	cfg config.Config,
+	cfg *config.Config,
 	pkgPtrs []*PkgInfo,
 	reportProgress ProgressReporter,
 	_ *meta.PipelineContext,
@@ -99,7 +99,7 @@ func FilterStep(
 }
 
 func SortStep(
-	cfg config.Config,
+	cfg *config.Config,
 	pkgPtrs []*PkgInfo,
 	reportProgress ProgressReporter,
 	_ *meta.PipelineContext,
