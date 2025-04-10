@@ -37,7 +37,7 @@ this package is compatible with the following distributions:
 
 ## features
 
-- list installed packages with date/timestamps, dependencies, provisions, requirements, size on disk, conflicts, replacements, architecture, license, description, package base, and version
+- list installed packages with date/timestamps, dependencies, provisions, requirements, size on disk, conflicts, replacements, architecture, license, description, build date, package base, and version
 - query by explicitly installed packages
 - query by packages installed as dependencies
 - query by packages required by specified packages
@@ -58,71 +58,46 @@ this package is compatible with the following distributions:
 
 ## roadmap
 
-- [x] rewrite in golang
-- [x] additional queries
-- [ ] list possibly or confirmed stale/abandoned packages
-- [x] sort by size on disk
-- [x] protobuf caching (127% speed boost)
-- [ ] dependency graph
-- [x] concurrent querying
-- [x] query by size on disk
-- [x] asynchronous progress bar
-- [x] channel-based aggregation
-- [x] concurrent sorting
-- [x] query by package name
-- [x] package version field
-- [x] query by date range
-- [x] concurrent file reading (200% speed boost)
-- [x] remove expac as a dependency (300% speed boost)
-- [x] package provisions
-- [x] optional full timestamp 
-- [x] add CI to release binaries
-- [x] remove go as a dependency
-- [x] query by range of size on disk
-- [x] user defined field selection
-- [x] dependencies of each package (dependency field)
-- [x] reverse-dependencies of each package (required-by field)
-- [x] package description field
-- [x] package URL field
-- [x] package architecture field
-- [x] package conflicts field
-- [x] conflicts query
-- [ ] name exclusion query
-- [ ] self-referencing field
-- [x] JSON output
-- [x] no-headers option
-- [x] provides query
-- [x] depends query
-- [x] all-fields option
-- [x] required-by query
-- [ ] key/value output
-- [x] list of packages for package queries
-- [x] config dependency injection for testing
-- [ ] required-by count sort
-- [x] optimize file reading (28% speed boost)
-- [x] metaflag for all queries
-- [x] package license field
-- [ ] XML output
-- [ ] package base query
-- [ ] package description sort
-- [ ] required-by sort
-- [x] package base field
-- [x] package base sort
-- [x] use chunked channel-based concurrent querying (12% speed boost) 
-- [ ] short-args for queries
-- [x] license sort
-- [ ] packager field
-- [ ] streaming pipeline
-- [x] architecture query
-- [x] optimize query order (4% speed boost)
-- [ ] dependency count sort
-- [x] replaces field
-- [x] license query
-- [ ] optional dependency field
-- [x] improve sorting efficiency (8% speed boost)
-- [x] package description query
-- [ ] package base query
-- [x] no-cache option
+| Status | Feature | Status | Feature |
+|--------|---------|--------|---------|
+| ✓ | rewrite in golang | ✓ | remove expac as a dependency (300% speed boost) |
+| ✓ | additional queries | ✓ | package provisions |
+| – | list possibly or confirmed stale/abandoned packages | ✓ | optional full timestamp |
+| ✓ | sort by size on disk | ✓ | add CI to release binaries |
+| ✓ | protobuf caching (127% speed boost) | ✓ | remove Go as a dependency |
+| – | dependency graph | ✓ | query by range of size on disk |
+| ✓ | concurrent querying | ✓ | user defined field selection |
+| ✓ | query by size on disk | ✓ | dependencies of each package (dependency field) |
+| ✓ | asynchronous progress bar | ✓ | reverse-dependencies of each package (required-by field) |
+| ✓ | channel-based aggregation | ✓ | package description field |
+| ✓ | concurrent sorting | ✓ | package URL field |
+| ✓ | query by package name | ✓ | package architecture field |
+| ✓ | package version field | ✓ | package conflicts field |
+| ✓ | query by date range | ✓ | conflicts query |
+| ✓ | concurrent file reading (200% speed boost) | – | name exclusion query |
+| ✓ | remove expac as a dependency | – | self-referencing field |
+| ✓ | package provisions | ✓ | JSON output |
+| ✓ | optional full timestamp | ✓ | no-headers option |
+| ✓ | add CI to release binaries | ✓ | provides query |
+| ✓ | remove Go as a dependency | ✓ | depends query |
+| ✓ | query by range of size on disk | ✓ | all-fields option |
+| ✓ | user defined field selection | ✓ | required-by query |
+| – | key/value output | ✓ | list of packages for package queries |
+| ✓ | config dependency injection for testing | – | required-by count sort |
+| ✓ | optimize file reading (28% speed boost) | ✓ | metaflag for all queries |
+| ✓ | package license field | – | XML output |
+| – | package base query | – | package description sort |
+| – | required-by sort | ✓ | package base field |
+| ✓ | package base sort | ✓ | use chunked channel-based concurrent querying (12% speed boost) |
+| – | short-args for queries | ✓ | license sort |
+| – | packager field | – | streaming pipeline |
+| ✓ | architecture query | ✓ | optimize query order (4% speed boost) |
+| – | dependency count sort | ✓ | replaces field |
+| ✓ | license query | – | optional dependency field |
+| ✓ | improve sorting efficiency (8% speed boost) | ✓ | package description query |
+| ✓ | dependency depth resolution | ✓ | no-cache option |
+| ✓ | build-date field | - | rebuild-cache option |
+
 
 ## installation
 
@@ -193,7 +168,7 @@ qp [options]
 - `-s <list>` | `--select <list>`: comma-separated list of fields to display (cannot use with `--select-all` or `--select-add`)
 - `-S <list>` | `--select-add <list>`: comma-separated list of fields to add to defaults or `--select-all`
 - `-A` | `--select-all`: output all available fields (overrides defaults)
-- `--full-timestamp`: display the full timestamp (date and time) of package installations instead of just the date
+- `--full-timestamp`: display the full timestamp (date and time) of package install/build instead of just the date
 - `--json`: output results in JSON format (overrides table output and `--full-timestamp`)
 - `--no-progress`: force no progress bar outside of non-interactive environments
 - `--no-cache`: disable cache loading/saving and force fresh package data loading
@@ -223,6 +198,7 @@ short-flag queries and long-flag queries can be combined.
 
 ### available fields for selection
 - `date` - installation date of the package
+- `build-date` - date the package was built
 - `name` - package name
 - `reason` - installation reason (explicit/dependency)
 - `size` - package size on disk

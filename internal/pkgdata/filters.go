@@ -48,14 +48,14 @@ func GetRelationsByDepth(relations []Relation, targetDepth int32) []Relation {
 
 // filters for packages installed on specific date
 func FilterByDate(pkg *PkgInfo, date int64) bool {
-	pkgDate := time.Unix(pkg.Timestamp, 0)
+	pkgDate := time.Unix(pkg.InstallTimestamp, 0)
 	targetDate := time.Unix(date, 0) // TODO: we can pull this out to the top level
 	return pkgDate.Year() == targetDate.Year() && pkgDate.YearDay() == targetDate.YearDay()
 }
 
 // inclusive
 func FilterByDateRange(pkg *PkgInfo, start int64, end int64) bool {
-	return !(pkg.Timestamp < start || pkg.Timestamp > end)
+	return !(pkg.InstallTimestamp < start || pkg.InstallTimestamp > end)
 }
 
 func roundSizeInBytes(num int64) int64 {

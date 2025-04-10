@@ -20,19 +20,20 @@ type Relation struct {
 }
 
 type PkgInfo struct {
-	Timestamp   int64
-	Size        int64
-	Name        string
-	Reason      string
-	Version     string
-	Arch        string
-	License     string
-	Url         string
-	Description string
-	PkgBase     string
-	Depends     []Relation
-	RequiredBy  []Relation
-	Provides    []Relation
-	Conflicts   []Relation
-	Replaces    []Relation
+	InstallTimestamp int64
+	BuildTimestamp   int64
+	Size             int64
+	Name             string
+	Reason           string
+	Version          string
+	Arch             string
+	License          string
+	Url              string
+	Description      string
+	PkgBase          string
+	Depends          []Relation
+	RequiredBy       []Relation
+	Provides         []Relation
+	Conflicts        []Relation
+	Replaces         []Relation
 }
