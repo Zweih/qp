@@ -1,5 +1,11 @@
 # qp Release Notes
 
+## v4.10.0
+### What's Changed
+* Feature: Comprehensive forward dependency resolution by @Zweih in https://github.com/Zweih/qp/pull/168
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v4.9.0...v4.10.0
+
 ## v4.9.0
 ### What's Changed
 * Feature: Improve provision resolution by @Zweih in https://github.com/Zweih/qp/pull/166
