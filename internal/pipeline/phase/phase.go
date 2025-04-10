@@ -16,7 +16,7 @@ type (
 )
 
 type Step func(
-	cfg config.Config,
+	cfg *config.Config,
 	packages []*PkgInfo,
 	progressReporter meta.ProgressReporter,
 	pipelineCtx *meta.PipelineContext,
@@ -37,7 +37,7 @@ func New(name string, step Step, wg *sync.WaitGroup) PipelinePhase {
 }
 
 func (phase PipelinePhase) Run(
-	cfg config.Config,
+	cfg *config.Config,
 	packages []*PkgInfo,
 	pipelineCtx *meta.PipelineContext,
 ) ([]*PkgInfo, error) {
