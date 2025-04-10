@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"qp/internal/consts"
 	"qp/internal/pkgdata"
+	"sort"
 	"strings"
 	"time"
 )
@@ -19,6 +20,10 @@ func formatRelations(relations []pkgdata.Relation) string {
 func flattenRelations(relations []pkgdata.Relation) []string {
 	relationsAtDepth := pkgdata.GetRelationsByDepth(relations, 1)
 	relationOutputs := make([]string, 0, len(relationsAtDepth))
+
+	sort.Slice(relationsAtDepth, func(a int, b int) bool {
+		return relationsAtDepth[a].Name < relationsAtDepth[b].Name
+	})
 
 	for _, rel := range relationsAtDepth {
 		var virtualFormat string
