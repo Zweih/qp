@@ -52,6 +52,7 @@ func PrintHelp() {
 
 	fmt.Println("\nAvailable Fields:")
 	fmt.Println("  date         Installation date of the package")
+	fmt.Println("  build-date   Date the package was built")
 	fmt.Println("  name         Package name")
 	fmt.Println("  reason       Installation reason (explicit/dependency)")
 	fmt.Println("  size         Package size on disk")
