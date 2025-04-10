@@ -9,21 +9,22 @@ import (
 )
 
 type PkgInfoJson struct {
-	Timestamp   int64    `json:"timestamp,omitempty"`
-	Size        int64    `json:"size,omitempty"`
-	Name        string   `json:"name,omitempty"`
-	Reason      string   `json:"reason,omitempty"`
-	Version     string   `json:"version,omitempty"`
-	Arch        string   `json:"arch,omitempty"`
-	License     string   `json:"license,omitempty"`
-	Url         string   `json:"url,omitempty"`
-	Description string   `json:"description,omitempty"`
-	PkgBase     string   `json:"pkgbase,omitempty"`
-	Depends     []string `json:"depends,omitempty"`
-	RequiredBy  []string `json:"requiredBy,omitempty"`
-	Provides    []string `json:"provides,omitempty"`
-	Conflicts   []string `json:"conflicts,omitempty"`
-	Replaces    []string `json:"replaces,omitempty"`
+	InstallTimestamp int64    `json:"installTimestamp,omitempty"`
+	BuildTimestamp   int64    `json:"buildTimestamp,omitempty"`
+	Size             int64    `json:"size,omitempty"`
+	Name             string   `json:"name,omitempty"`
+	Reason           string   `json:"reason,omitempty"`
+	Version          string   `json:"version,omitempty"`
+	Arch             string   `json:"arch,omitempty"`
+	License          string   `json:"license,omitempty"`
+	Url              string   `json:"url,omitempty"`
+	Description      string   `json:"description,omitempty"`
+	PkgBase          string   `json:"pkgbase,omitempty"`
+	Depends          []string `json:"depends,omitempty"`
+	RequiredBy       []string `json:"requiredBy,omitempty"`
+	Provides         []string `json:"provides,omitempty"`
+	Conflicts        []string `json:"conflicts,omitempty"`
+	Replaces         []string `json:"replaces,omitempty"`
 }
 
 func (o *OutputManager) renderJson(pkgPtrs []*pkgdata.PkgInfo, fields []consts.FieldType) {
@@ -74,7 +75,9 @@ func getJsonValues(pkg *pkgdata.PkgInfo, fields []consts.FieldType) *PkgInfoJson
 	for _, field := range fields {
 		switch field {
 		case consts.FieldDate:
-			filteredPackage.Timestamp = pkg.Timestamp
+			filteredPackage.InstallTimestamp = pkg.InstallTimestamp
+		case consts.FieldBuildDate:
+			filteredPackage.BuildTimestamp = pkg.BuildTimestamp
 		case consts.FieldName:
 			filteredPackage.Name = pkg.Name
 		case consts.FieldReason:

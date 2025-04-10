@@ -16,6 +16,7 @@ const (
 	FieldUrl
 	FieldSize
 	FieldDate
+	FieldBuildDate
 	FieldVersion
 	FieldDepends
 	FieldRequiredBy
@@ -31,6 +32,7 @@ const (
 
 const (
 	date        = "date"
+	buildDate   = "build-date"
 	name        = "name"
 	reason      = "reason"
 	size        = "size"
@@ -50,18 +52,20 @@ const (
 )
 
 var FieldTypeLookup = map[string]FieldType{
-	"d": FieldDate,
-	"n": FieldName,
-	"r": FieldReason,
-	"s": FieldSize,
-	"v": FieldVersion,
-	"D": FieldDepends,
-	"R": FieldRequiredBy,
-	"p": FieldProvides,
+	"d":  FieldDate,
+	"n":  FieldName,
+	"r":  FieldReason,
+	"s":  FieldSize,
+	"v":  FieldVersion,
+	"D":  FieldDepends,
+	"R":  FieldRequiredBy,
+	"p":  FieldProvides,
+	"bd": FieldBuildDate,
 
 	"alphabetical": FieldName, // legacy flag, to be deprecated
 
 	date:        FieldDate,
+	buildDate:   FieldBuildDate,
 	name:        FieldName,
 	reason:      FieldReason,
 	arch:        FieldArch,
@@ -86,6 +90,7 @@ var SubfieldTypeLookup = map[string]SubfieldType{
 
 var FieldNameLookup = map[FieldType]string{
 	FieldDate:        date,
+	FieldBuildDate:   buildDate,
 	FieldName:        name,
 	FieldSize:        size,
 	FieldReason:      reason,
@@ -116,6 +121,7 @@ var (
 	}
 	ValidFields = []FieldType{
 		FieldDate,
+		FieldBuildDate,
 		FieldName,
 		FieldReason,
 		FieldSize,

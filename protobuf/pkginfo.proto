@@ -24,7 +24,9 @@ message Relation {
 }
 
 message PkgInfo {
-  int64 timestamp = 1;
+  reserved 1;
+  int64 install_timestamp = 17;
+  int64 build_timestamp = 16;
   int64 size = 2;
   string name = 3;
   string reason = 4;

@@ -55,9 +55,9 @@ func relationOpToString(op pkgdata.RelationOp) string {
 	}
 }
 
-func formatDate(pkg *pkgdata.PkgInfo, ctx tableContext) string {
-	timestamp := time.Unix(pkg.Timestamp, 0)
-	return timestamp.Format(ctx.DateFormat)
+func formatDate(timestamp int64, ctx tableContext) string {
+	unixTimestamp := time.Unix(timestamp, 0)
+	return unixTimestamp.Format(ctx.DateFormat)
 }
 
 func formatSize(size int64) string {

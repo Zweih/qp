@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	cacheVersion    = 6 // bump when updating structure of PkgInfo/Relation/pkginfo.proto OR when dependency resolution is updated
+	cacheVersion    = 7 // bump when updating structure of PkgInfo/Relation/pkginfo.proto OR when dependency resolution is updated
 	xdgCacheHomeEnv = "XDG_CACHE_HOME"
 	homeEnv         = "HOME"
 	qpCacheDir      = "query-packages"
@@ -119,21 +119,22 @@ func pkgsToProtos(pkgs []*PkgInfo) []*pb.PkgInfo {
 	pbPkgs := make([]*pb.PkgInfo, len(pkgs))
 	for i, pkg := range pkgs {
 		pbPkgs[i] = &pb.PkgInfo{
-			Timestamp:   pkg.Timestamp,
-			Size:        pkg.Size,
-			Name:        pkg.Name,
-			Reason:      pkg.Reason,
-			Version:     pkg.Version,
-			Arch:        pkg.Arch,
-			License:     pkg.License,
-			Url:         pkg.Url,
-			Description: pkg.Description,
-			PkgBase:     pkg.PkgBase,
-			Depends:     relationsToProtos(pkg.Depends),
-			RequiredBy:  relationsToProtos(pkg.RequiredBy),
-			Provides:    relationsToProtos(pkg.Provides),
-			Conflicts:   relationsToProtos(pkg.Conflicts),
-			Replaces:    relationsToProtos(pkg.Replaces),
+			InstallTimestamp: pkg.InstallTimestamp,
+			BuildTimestamp:   pkg.BuildTimestamp,
+			Size:             pkg.Size,
+			Name:             pkg.Name,
+			Reason:           pkg.Reason,
+			Version:          pkg.Version,
+			Arch:             pkg.Arch,
+			License:          pkg.License,
+			Url:              pkg.Url,
+			Description:      pkg.Description,
+			PkgBase:          pkg.PkgBase,
+			Depends:          relationsToProtos(pkg.Depends),
+			RequiredBy:       relationsToProtos(pkg.RequiredBy),
+			Provides:         relationsToProtos(pkg.Provides),
+			Conflicts:        relationsToProtos(pkg.Conflicts),
+			Replaces:         relationsToProtos(pkg.Replaces),
 		}
 	}
 
@@ -159,21 +160,22 @@ func protosToPkgs(pbPkgs []*pb.PkgInfo) []*PkgInfo {
 	pkgs := make([]*PkgInfo, len(pbPkgs))
 	for i, pbPkg := range pbPkgs {
 		pkgs[i] = &PkgInfo{
-			Timestamp:   pbPkg.Timestamp,
-			Size:        pbPkg.Size,
-			Name:        pbPkg.Name,
-			Reason:      pbPkg.Reason,
-			Version:     pbPkg.Version,
-			Arch:        pbPkg.Arch,
-			License:     pbPkg.License,
-			Url:         pbPkg.Url,
-			Description: pbPkg.Description,
-			PkgBase:     pbPkg.PkgBase,
-			Depends:     protosToRelations(pbPkg.Depends),
-			RequiredBy:  protosToRelations(pbPkg.RequiredBy),
-			Provides:    protosToRelations(pbPkg.Provides),
-			Conflicts:   protosToRelations(pbPkg.Conflicts),
-			Replaces:    protosToRelations(pbPkg.Replaces),
+			InstallTimestamp: pbPkg.InstallTimestamp,
+			BuildTimestamp:   pbPkg.BuildTimestamp,
+			Size:             pbPkg.Size,
+			Name:             pbPkg.Name,
+			Reason:           pbPkg.Reason,
+			Version:          pbPkg.Version,
+			Arch:             pbPkg.Arch,
+			License:          pbPkg.License,
+			Url:              pbPkg.Url,
+			Description:      pbPkg.Description,
+			PkgBase:          pbPkg.PkgBase,
+			Depends:          protosToRelations(pbPkg.Depends),
+			RequiredBy:       protosToRelations(pbPkg.RequiredBy),
+			Provides:         protosToRelations(pbPkg.Provides),
+			Conflicts:        protosToRelations(pbPkg.Conflicts),
+			Replaces:         protosToRelations(pbPkg.Replaces),
 		}
 	}
 

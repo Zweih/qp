@@ -15,6 +15,7 @@ type tableContext struct {
 
 var columnHeaders = map[consts.FieldType]string{
 	consts.FieldDate:        "DATE",
+	consts.FieldBuildDate:   "BUILD DATE",
 	consts.FieldName:        "NAME",
 	consts.FieldReason:      "REASON",
 	consts.FieldSize:        "SIZE",
@@ -88,7 +89,9 @@ func renderRows(
 func getTableValue(pkg *pkgdata.PkgInfo, field consts.FieldType, ctx tableContext) string {
 	switch field {
 	case consts.FieldDate:
-		return formatDate(pkg, ctx)
+		return formatDate(pkg.InstallTimestamp, ctx)
+	case consts.FieldBuildDate:
+		return formatDate(pkg.BuildTimestamp, ctx)
 	case consts.FieldName:
 		return pkg.Name
 	case consts.FieldReason:

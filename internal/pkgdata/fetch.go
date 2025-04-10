@@ -27,6 +27,7 @@ const (
 	fieldDescription = "%DESC%"
 	fieldPkgBase     = "%BASE%"
 	fieldReplaces    = "%REPLACES%"
+	fieldBuildDate   = "%BUILDDATE%"
 
 	PacmanDbPath = "/var/lib/pacman/local"
 )
@@ -137,7 +138,7 @@ func parseDescFile(descPath string) (*PkgInfo, error) {
 
 			switch line {
 			case fieldName, fieldInstallDate, fieldSize, fieldReason, fieldVersion,
-				fieldArch, fieldLicense, fieldUrl, fieldDescription, fieldPkgBase:
+				fieldArch, fieldLicense, fieldUrl, fieldDescription, fieldPkgBase, fieldBuildDate:
 				currentField = line
 
 			case fieldDepends, fieldProvides, fieldConflicts, fieldReplaces:
@@ -218,7 +219,15 @@ func applySingleLineField(pkg *PkgInfo, field string, value string) error {
 			return fmt.Errorf("invalid install date value %q: %w", value, err)
 		}
 
-		pkg.Timestamp = installDate
+		pkg.InstallTimestamp = installDate
+
+	case fieldBuildDate:
+		buildDate, err := strconv.ParseInt(value, 10, 64)
+		if err != nil {
+			return fmt.Errorf("invalid build date value %q: %w", value, err)
+		}
+
+		pkg.BuildTimestamp = buildDate
 
 	case fieldVersion:
 		pkg.Version = value
