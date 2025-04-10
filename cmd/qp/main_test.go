@@ -13,8 +13,8 @@ type MockConfigProvider struct {
 	mockConfig config.Config
 }
 
-func (m *MockConfigProvider) GetConfig() (config.Config, error) {
-	return m.mockConfig, nil
+func (m *MockConfigProvider) GetConfig() (*config.Config, error) {
+	return &m.mockConfig, nil
 }
 
 // TODO: more testing, this is just validating if the depenendency injection works for testing
