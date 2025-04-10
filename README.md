@@ -168,7 +168,7 @@ qp [options]
 - `-s <list>` | `--select <list>`: comma-separated list of fields to display (cannot use with `--select-all` or `--select-add`)
 - `-S <list>` | `--select-add <list>`: comma-separated list of fields to add to defaults or `--select-all`
 - `-A` | `--select-all`: output all available fields (overrides defaults)
-- `--full-timestamp`: display the full timestamp (date and time) of package installations instead of just the date
+- `--full-timestamp`: display the full timestamp (date and time) of package install/build instead of just the date
 - `--json`: output results in JSON format (overrides table output and `--full-timestamp`)
 - `--no-progress`: force no progress bar outside of non-interactive environments
 - `--no-cache`: disable cache loading/saving and force fresh package data loading
