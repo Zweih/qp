@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	cacheVersion    = 5 // bump when updating structure of PkgInfo/Relation/pkginfo.proto
+	cacheVersion    = 6 // bump when updating structure of PkgInfo/Relation/pkginfo.proto OR when dependency resolution is updated
 	xdgCacheHomeEnv = "XDG_CACHE_HOME"
 	homeEnv         = "HOME"
 	qpCacheDir      = "query-packages"
@@ -104,10 +104,11 @@ func relationsToProtos(rels []Relation) []*pb.Relation {
 	pbRels := make([]*pb.Relation, len(rels))
 	for i, rel := range rels {
 		pbRels[i] = &pb.Relation{
-			Name:     rel.Name,
-			Version:  rel.Version,
-			Operator: pb.RelationOp(rel.Operator),
-			Depth:    rel.Depth,
+			Name:         rel.Name,
+			Version:      rel.Version,
+			Operator:     pb.RelationOp(rel.Operator),
+			Depth:        rel.Depth,
+			ProviderName: rel.ProviderName,
 		}
 	}
 
@@ -143,10 +144,11 @@ func protosToRelations(pbRels []*pb.Relation) []Relation {
 	rels := make([]Relation, len(pbRels))
 	for i, pbRel := range pbRels {
 		rels[i] = Relation{
-			Name:     pbRel.Name,
-			Version:  pbRel.Version,
-			Operator: RelationOp(pbRel.Operator),
-			Depth:    pbRel.Depth,
+			Name:         pbRel.Name,
+			Version:      pbRel.Version,
+			Operator:     RelationOp(pbRel.Operator),
+			Depth:        pbRel.Depth,
+			ProviderName: pbRel.ProviderName,
 		}
 	}
 

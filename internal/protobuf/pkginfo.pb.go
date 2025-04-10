@@ -87,6 +87,7 @@ type Relation struct {
 	Version       string                 `protobuf:"bytes,2,opt,name=version,proto3" json:"version,omitempty"`
 	Operator      RelationOp             `protobuf:"varint,3,opt,name=operator,proto3,enum=pkginfo.RelationOp" json:"operator,omitempty"`
 	Depth         int32                  `protobuf:"varint,4,opt,name=depth,proto3" json:"depth,omitempty"`
+	ProviderName  string                 `protobuf:"bytes,5,opt,name=providerName,proto3" json:"providerName,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -147,6 +148,13 @@ func (x *Relation) GetDepth() int32 {
 		return x.Depth
 	}
 	return 0
+}
+
+func (x *Relation) GetProviderName() string {
+	if x != nil {
+		return x.ProviderName
+	}
+	return ""
 }
 
 type PkgInfo struct {
@@ -369,12 +377,13 @@ var File_protobuf_pkginfo_proto protoreflect.FileDescriptor
 
 const file_protobuf_pkginfo_proto_rawDesc = "" +
 	"\n" +
-	"\x16protobuf/pkginfo.proto\x12\apkginfo\"\x7f\n" +
+	"\x16protobuf/pkginfo.proto\x12\apkginfo\"\xa3\x01\n" +
 	"\bRelation\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x18\n" +
 	"\aversion\x18\x02 \x01(\tR\aversion\x12/\n" +
 	"\boperator\x18\x03 \x01(\x0e2\x13.pkginfo.RelationOpR\boperator\x12\x14\n" +
-	"\x05depth\x18\x04 \x01(\x05R\x05depth\"\xee\x03\n" +
+	"\x05depth\x18\x04 \x01(\x05R\x05depth\x12\"\n" +
+	"\fproviderName\x18\x05 \x01(\tR\fproviderName\"\xee\x03\n" +
 	"\aPkgInfo\x12\x1c\n" +
 	"\ttimestamp\x18\x01 \x01(\x03R\ttimestamp\x12\x12\n" +
 	"\x04size\x18\x02 \x01(\x03R\x04size\x12\x12\n" +

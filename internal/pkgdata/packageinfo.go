@@ -12,10 +12,11 @@ const (
 )
 
 type Relation struct {
-	Name     string
-	Version  string
-	Operator RelationOp
-	Depth    int32
+	Name         string
+	ProviderName string
+	Version      string
+	Operator     RelationOp
+	Depth        int32
 }
 
 type PkgInfo struct {

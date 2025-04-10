@@ -36,10 +36,10 @@ func (o *OutputManager) renderJson(pkgPtrs []*pkgdata.PkgInfo, fields []consts.F
 	encoder.SetIndent("", "  ")
 
 	if err := encoder.Encode(filteredPkgPtrs); err != nil {
-		o.writeLine(fmt.Sprintf("Error genereating JSON output: %v", err))
+		o.writeLine(fmt.Sprintf("Error generating JSON output: %v", err))
 	}
 
-	o.writeLine(buffer.String())
+	o.write(buffer.String())
 }
 
 func getUniqueFields(fields []consts.FieldType) []consts.FieldType {
@@ -96,9 +96,7 @@ func getJsonValues(pkg *pkgdata.PkgInfo, fields []consts.FieldType) *PkgInfoJson
 		case consts.FieldDepends:
 			filteredPackage.Depends = flattenRelations(pkg.Depends)
 		case consts.FieldRequiredBy:
-			filteredPackage.RequiredBy = flattenRelations(
-				pkgdata.GetRelationsByDepth(pkg.RequiredBy, 1),
-			)
+			filteredPackage.RequiredBy = flattenRelations(pkg.RequiredBy)
 		case consts.FieldProvides:
 			filteredPackage.Provides = flattenRelations(pkg.Provides)
 		case consts.FieldConflicts:

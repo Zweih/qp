@@ -49,7 +49,7 @@ func FetchStep(
 	return pkgPtrs, nil
 }
 
-func ReverseDepStep(
+func ResolveDepTreeStep(
 	_ config.Config,
 	pkgPtrs []*pkgdata.PkgInfo,
 	reportProgress ProgressReporter,
@@ -59,7 +59,7 @@ func ReverseDepStep(
 		return pkgPtrs, nil
 	}
 
-	return pkgdata.CalculateReverseDependencies(pkgPtrs, reportProgress)
+	return pkgdata.ResolveDependencyTree(pkgPtrs, reportProgress)
 }
 
 // TODO: add progress reporting
