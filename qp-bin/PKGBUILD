@@ -26,5 +26,5 @@ package() {
 
   install -Dm755 "${srcdir}/qp-${CARCH}" "$pkgdir/usr/bin/qp"
   install -Dm644 "${srcdir}/qp.1" "${pkgdir}/usr/share/man/man1/qp.1"
-  install -Dm644 "${srcdir}/NEWS" "${pkgdir}/usr/share/doc/${pkgname}/NEWS"
+  install -Dm644 "${srcdir}/NEWS" "${pkgdir}/usr/share/doc/qp/NEWS"
 }
