@@ -118,7 +118,7 @@ for the latest (unstable) version from git w/ the AUR, use `qp-git`*.
 the cache is located under `/query-packages` at `$HOME/.cache/` or wherever you have `$XDG_HOME_CACHE` set to.
 
 ### building from source + manual installation
-**note**: this packages is specific to arch-based linux distributions
+**note**: this package is specific to arch-based linux distributions
 
 1. clone the repo:
    ```bash
