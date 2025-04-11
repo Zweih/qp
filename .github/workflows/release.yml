@@ -71,6 +71,14 @@ jobs:
           path: ./release
           merge-multiple: true
 
+      - name: Import GPG key
+        run: |
+          echo "$GPG_PRIVATE_KEY" | gpg --batch --import
+          KEY_ID=$(gpg --list-keys --with-colons | awk -F: '/^pub/ { print $5; exit }')
+          echo -e "5\ny\n" | gpg --command-fd 0 --expert --edit-key "$KEY_ID" trust
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+
       - name: Create Draft Release
         run: |
           gh release create "${GITHUB_REF#refs/tags/}" \
@@ -125,6 +133,22 @@ jobs:
         run: |
           cd ./release
           sha256sum qp-*.tar.gz > SHA256SUMS.txt
+
+      - name: Sign release tarballs
+        run: |
+          for file in ./release/qp-*.tar.gz; do
+            gpg --batch --yes --armor --detach-sign "$file"
+          done
+
+      - name: Upload signatures to query-packages-signatures release
+        run: |
+          gh release create "${GITHUB_REF#refs/tags/}" \
+            --repo Zweih/query-packages-signatures \
+            --title "Signatures for qp ${GITHUB_REF#refs/tags/}" \
+            --notes "Detached signatures for qp release ${GITHUB_REF#refs/tags/}" \
+            ./release/qp-*.tar.gz.asc
+        env:
+          GH_TOKEN: ${{ secrets.SIGNATURES_REPO_TOKEN }}
 
       - name: Update qp-bin and qp-src PKGBUILDs with version and checksums  
         run: |
