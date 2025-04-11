@@ -79,6 +79,16 @@ func FilterBySizeRange(pkg *PkgInfo, startSize int64, endSize int64) bool {
 	return !(roundedSize < roundSizeInBytes(startSize) || roundedSize > roundSizeInBytes(endSize))
 }
 
+func FilterSliceByStrings(pkgStrings []string, targetStrings []string) bool {
+	for _, pkgString := range pkgStrings {
+		if FilterByStrings(pkgString, targetStrings) {
+			return true
+		}
+	}
+
+	return false
+}
+
 func FilterByStrings(pkgString string, targetStrings []string) bool {
 	pkgString = strings.ToLower(pkgString)
 

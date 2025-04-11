@@ -14,21 +14,22 @@ import (
 )
 
 const (
-	fieldName        = "%NAME%"
 	fieldInstallDate = "%INSTALLDATE%"
+	fieldBuildDate   = "%BUILDDATE%"
+	fieldName        = "%NAME%"
 	fieldSize        = "%SIZE%"
 	fieldReason      = "%REASON%"
 	fieldVersion     = "%VERSION%"
+	fieldArch        = "%ARCH%"
+	fieldLicense     = "%LICENSE%"
+	fieldPkgBase     = "%BASE%"
+	fieldDescription = "%DESC%"
+	fieldUrl         = "%URL%"
+	fieldGroups      = "%GROUPS%"
 	fieldDepends     = "%DEPENDS%"
 	fieldProvides    = "%PROVIDES%"
 	fieldConflicts   = "%CONFLICTS%"
-	fieldArch        = "%ARCH%"
-	fieldLicense     = "%LICENSE%"
-	fieldUrl         = "%URL%"
-	fieldDescription = "%DESC%"
-	fieldPkgBase     = "%BASE%"
 	fieldReplaces    = "%REPLACES%"
-	fieldBuildDate   = "%BUILDDATE%"
 	fieldXData       = "%XDATA%"
 
 	subfieldPkgType = "pkgtype"
@@ -145,7 +146,7 @@ func parseDescFile(descPath string) (*PkgInfo, error) {
 				fieldArch, fieldLicense, fieldUrl, fieldDescription, fieldPkgBase, fieldBuildDate:
 				currentField = line
 
-			case fieldDepends, fieldProvides, fieldConflicts, fieldReplaces, fieldXData:
+			case fieldGroups, fieldDepends, fieldProvides, fieldConflicts, fieldReplaces, fieldXData:
 				currentField = line
 				block, next := collectBlockBytes(data, end+1)
 
@@ -268,6 +269,8 @@ func applySingleLineField(pkg *PkgInfo, field string, value string) error {
 
 func applyMultiLineField(pkg *PkgInfo, field string, block []string) {
 	switch field {
+	case fieldGroups:
+		pkg.Groups = block
 	case fieldDepends, fieldProvides, fieldConflicts, fieldReplaces:
 		applyRelations(pkg, field, block)
 	case fieldXData:

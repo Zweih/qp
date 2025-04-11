@@ -46,6 +46,8 @@ type PkgInfo struct {
 	Description string
 	PkgBase     string
 
+	Groups []string
+
 	Depends    []Relation
 	RequiredBy []Relation
 	Provides   []Relation
