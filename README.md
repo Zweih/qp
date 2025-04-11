@@ -4,7 +4,7 @@
 
 you can find installation instructions [here](#installation).
 
-`qp` supports querying/sorting for install date, package name, install reason (explicit/dependency), size on disk, reverse dependencies, dependency requirements, description, replacements, conflicts, provision, and more. check [usage](#usage) for all available options.
+`qp` supports querying/sorting for install date, package name, install reason (explicit/dependency), size on disk, reverse dependencies, dependency requirements, description, replacements, conflicts, provisions, build date, package type and more. check [usage](#usage) for all available options.
 
 ![qp logo | query packages logo](https://gistcdn.githack.com/Zweih/9009d5c74eab8a5515a8a64a0495df32/raw/ef8a8ac3655fd3dee24494a3403867919d806b63/qp-logo_clean.svg)
 
@@ -37,7 +37,7 @@ this package is compatible with the following distributions:
 
 ## features
 
-- list installed packages with date/timestamps, dependencies, provisions, requirements, size on disk, conflicts, replacements, architecture, license, description, build date, package base, and version
+- list installed packages with install date/timestamps, dependencies, provisions, requirements, size on disk, conflicts, replacements, architecture, license, description, build date, package base, package type, and version
 - query by explicitly installed packages
 - query by packages installed as dependencies
 - query by packages required by specified packages
@@ -60,43 +60,43 @@ this package is compatible with the following distributions:
 
 | Status | Feature | Status | Feature |
 |--------|---------|--------|---------|
-| ✓ | rewrite in golang | ✓ | remove expac as a dependency (300% speed boost) |
-| ✓ | additional queries | ✓ | package provisions |
-| – | list possibly or confirmed stale/abandoned packages | ✓ | optional full timestamp |
-| ✓ | sort by size on disk | ✓ | add CI to release binaries |
-| ✓ | protobuf caching (127% speed boost) | ✓ | remove Go as a dependency |
-| – | dependency graph | ✓ | query by range of size on disk |
-| ✓ | concurrent querying | ✓ | user defined field selection |
-| ✓ | query by size on disk | ✓ | dependencies of each package (dependency field) |
-| ✓ | asynchronous progress bar | ✓ | reverse-dependencies of each package (required-by field) |
-| ✓ | channel-based aggregation | ✓ | package description field |
-| ✓ | concurrent sorting | ✓ | package URL field |
-| ✓ | query by package name | ✓ | package architecture field |
-| ✓ | package version field | ✓ | package conflicts field |
-| ✓ | query by date range | ✓ | conflicts query |
-| ✓ | concurrent file reading (200% speed boost) | – | name exclusion query |
-| ✓ | remove expac as a dependency | – | self-referencing field |
-| ✓ | package provisions | ✓ | JSON output |
-| ✓ | optional full timestamp | ✓ | no-headers option |
-| ✓ | add CI to release binaries | ✓ | provides query |
-| ✓ | remove Go as a dependency | ✓ | depends query |
-| ✓ | query by range of size on disk | ✓ | all-fields option |
-| ✓ | user defined field selection | ✓ | required-by query |
-| – | key/value output | ✓ | list of packages for package queries |
-| ✓ | config dependency injection for testing | – | required-by count sort |
-| ✓ | optimize file reading (28% speed boost) | ✓ | metaflag for all queries |
-| ✓ | package license field | – | XML output |
-| – | package base query | – | package description sort |
-| – | required-by sort | ✓ | package base field |
-| ✓ | package base sort | ✓ | use chunked channel-based concurrent querying (12% speed boost) |
-| – | short-args for queries | ✓ | license sort |
-| – | packager field | – | streaming pipeline |
-| ✓ | architecture query | ✓ | optimize query order (4% speed boost) |
-| – | dependency count sort | ✓ | replaces field |
-| ✓ | license query | – | optional dependency field |
-| ✓ | improve sorting efficiency (8% speed boost) | ✓ | package description query |
-| ✓ | dependency depth resolution | ✓ | no-cache option |
-| ✓ | build-date field | - | rebuild-cache option |
+| ✓ | remove expac as a dependency (300% speed boost) | ✓ | concurrent file reading (200% speed boost) |
+| ✓ | protobuf caching (127% speed boost) | ✓ | use chunked channel-based concurrent querying (12% speed boost) |
+| ✓ | optimize file reading (28% speed boost) | ✓ | improve sorting efficiency (8% speed boost) |
+| ✓ | optimize query order (4% speed boost) | ✓ | concurrent querying |
+| ✓ | concurrent sorting | ✓ | asynchronous progress bar |
+| ✓ | channel-based aggregation | ✓ | rewrite in golang |
+| ✓ | automate binaries packaging | ✓ | add CI to release binaries |
+| ✓ | dependency depth resolution | ✓ | config dependency injection for testing |
+| ✓ | query by package name | ✓ | query by size on disk |
+| ✓ | query by range of size on disk | ✓ | query by date range |
+| ✓ | user defined field selection | ✓ | dependencies of each package (dependency field) |
+| ✓ | reverse-dependencies of each package (required-by field) | ✓ | list of packages for package queries |
+| ✓ | package provisions | ✓ | package description query |
+| ✓ | package conflicts field | ✓ | package architecture field |
+| ✓ | package URL field | ✓ | package version field |
+| ✓ | package license field | ✓ | package base field |
+| ✓ | package base sort | ✓ | license query |
+| ✓ | license sort | ✓ | dependency graph |
+| ✓ | metaflag for all queries | ✓ | JSON output |
+| ✓ | no-headers option | ✓ | provides query |
+| ✓ | depends query | ✓ | all-fields option |
+| ✓ | required-by query | ✓ | no-cache option |
+| ✓ | optional full timestamp | ✓ | package description field |
+| – | list possibly or confirmed stale/abandoned packages | – | self-referencing field |
+| – | name exclusion query | – | streaming pipeline |
+| – | short-args for queries | – | key/value output |
+| – | XML output | – | package description sort |
+| – | package base query | – | required-by sort |
+| – | required-by count sort | – | dependency count sort |
+| ✓ | build-date field | - | build-date filter |
+| - | build-date sort | ✓ | pkgtype field |
+| - | pkgtype filter | - | pkgtype sort |
+| ✓ | architecture query | - | groups field |
+| ✓	| conflicts query | - | package description sort |
+| - | regen-cache option | - | groups filter |
+| - | packager field | - | optional dependency field |
+| ✓ | sort by size on disk | - | conflicts sort |
 
 
 ## installation
@@ -203,16 +203,18 @@ short-flag queries and long-flag queries can be combined.
 - `reason` - installation reason (explicit/dependency)
 - `size` - package size on disk
 - `version` - installed package version
+- `pkgtype` - package type (standard, split, debug, source, unknown*)
+    - ***note**: older packages may show "unknown" pkgtype if built before pacman introduced XDATA
+- `arch` - architecture the package was built for (e.g., x86_64, aarch64, any)
+- `license` - package software license
+- `pkgbase` - name of the base package used to group split packages; for non-split packages, it is the same as the package name. 
+- `description` - package description
+- `url` - the URL of the official site of the software being packaged
+- `conflicts` - list of packages that conflict, or cause problems, with the package
+- `replaces` - list of packages that are replaced by the package
 - `depends` - list of dependencies (output can be long)
 - `required-by` - list of packages required by the package and are dependent (output can be long) 
 - `provides` - list of alternative package names or shared libraries provided by package (output can be long)
-- `conflicts` - list of packages that conflict, or cause problems, with the package
-- `replaces` - list of packages that are replaced by the package
-- `arch` - architecture the package was built for (e.g., x86_64, aarch64, any)
-- `license` - package software license
-- `url` - the URL of the official site of the software being packaged
-- `description` - package description
-- `pkgbase` - name of the base package used to group split packages; for non-split packages, it is the same as the package name. 
 
 ### JSON output
 the `--json` flag outputs the package data as structured JSON instead of a table. this can be useful for scripts or automation.
@@ -228,16 +230,24 @@ output format:
 ```json
 [
   {
-    "timestamp": 1743448252,
+    "installTimestamp": 1743448252,
+    "buildTimestamp": 1742778264,
     "size": 4446373,
     "name": "tinysparql",
     "reason": "dependency",
     "version": "3.9.1-1",
+    "pkgtype": "split",
     "arch": "aarch64",
     "license": "GPL-2.0-or-later",
-    "url": "https://tinysparql.org/",
-    "description": "Low-footprint RDF triple store with SPARQL 1.1 interface",
     "pkgbase": "tinysparql",
+    "description": "Low-footprint RDF triple store with SPARQL 1.1 interface",
+    "url": "https://tinysparql.org/",
+    "conflicts": [
+      "tracker3<=3.7.3-2"
+    ],
+    "replaces": [
+      "tracker3<=3.7.3-2"
+    ],
     "depends": [
       "avahi",
       "gcc-libs",
@@ -255,14 +265,8 @@ output format:
       "gtk4"
     ],
     "provides": [
-      "tracker3=3.9.1",
-      "libtinysparql-3.0.so=0-64"
-    ],
-    "conflicts": [
-      "tracker3<=3.7.3-2"
-    ],
-    "replaces": [
-      "tracker3<=3.7.3-2"
+      "libtinysparql-3.0.so=0-64",
+      "tracker3=3.9.1"
     ]
   }
 ]

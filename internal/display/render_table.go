@@ -20,16 +20,17 @@ var columnHeaders = map[consts.FieldType]string{
 	consts.FieldReason:      "REASON",
 	consts.FieldSize:        "SIZE",
 	consts.FieldVersion:     "VERSION",
+	consts.FieldPkgType:     "PKGTYPE",
+	consts.FieldArch:        "ARCH",
+	consts.FieldLicense:     "LICENSE",
+	consts.FieldPkgBase:     "PKGBASE",
+	consts.FieldDescription: "DESCRIPTION",
+	consts.FieldUrl:         "URL",
+	consts.FieldConflicts:   "CONFLICTS",
+	consts.FieldReplaces:    "REPLACES",
 	consts.FieldDepends:     "DEPENDS",
 	consts.FieldRequiredBy:  "REQUIRED BY",
 	consts.FieldProvides:    "PROVIDES",
-	consts.FieldConflicts:   "CONFLICTS",
-	consts.FieldReplaces:    "REPLACES",
-	consts.FieldArch:        "ARCH",
-	consts.FieldLicense:     "LICENSE",
-	consts.FieldUrl:         "URL",
-	consts.FieldDescription: "DESCRIPTION",
-	consts.FieldPkgBase:     "PKGBASE",
 }
 
 // displays data in tab format
@@ -120,6 +121,8 @@ func getTableValue(pkg *pkgdata.PkgInfo, field consts.FieldType, ctx tableContex
 		return pkg.Description
 	case consts.FieldPkgBase:
 		return pkg.PkgBase
+	case consts.FieldPkgType:
+		return pkgTypeToString(pkg.PkgType)
 	default:
 		return ""
 	}

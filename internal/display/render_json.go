@@ -15,16 +15,17 @@ type PkgInfoJson struct {
 	Name             string   `json:"name,omitempty"`
 	Reason           string   `json:"reason,omitempty"`
 	Version          string   `json:"version,omitempty"`
+	PkgType          string   `json:"pkgtype,omitempty"`
 	Arch             string   `json:"arch,omitempty"`
 	License          string   `json:"license,omitempty"`
-	Url              string   `json:"url,omitempty"`
-	Description      string   `json:"description,omitempty"`
 	PkgBase          string   `json:"pkgbase,omitempty"`
+	Description      string   `json:"description,omitempty"`
+	Url              string   `json:"url,omitempty"`
+	Conflicts        []string `json:"conflicts,omitempty"`
+	Replaces         []string `json:"replaces,omitempty"`
 	Depends          []string `json:"depends,omitempty"`
 	RequiredBy       []string `json:"requiredBy,omitempty"`
 	Provides         []string `json:"provides,omitempty"`
-	Conflicts        []string `json:"conflicts,omitempty"`
-	Replaces         []string `json:"replaces,omitempty"`
 }
 
 func (o *OutputManager) renderJson(pkgPtrs []*pkgdata.PkgInfo, fields []consts.FieldType) {
@@ -86,26 +87,28 @@ func getJsonValues(pkg *pkgdata.PkgInfo, fields []consts.FieldType) *PkgInfoJson
 			filteredPackage.Size = pkg.Size // return in bytes for json
 		case consts.FieldVersion:
 			filteredPackage.Version = pkg.Version
+		case consts.FieldPkgType:
+			filteredPackage.PkgType = pkgTypeToString(pkg.PkgType)
 		case consts.FieldArch:
 			filteredPackage.Arch = pkg.Arch
 		case consts.FieldLicense:
 			filteredPackage.License = pkg.License
-		case consts.FieldUrl:
-			filteredPackage.Url = pkg.Url
-		case consts.FieldDescription:
-			filteredPackage.Description = pkg.Description
 		case consts.FieldPkgBase:
 			filteredPackage.PkgBase = pkg.PkgBase
+		case consts.FieldDescription:
+			filteredPackage.Description = pkg.Description
+		case consts.FieldUrl:
+			filteredPackage.Url = pkg.Url
+		case consts.FieldConflicts:
+			filteredPackage.Conflicts = flattenRelations(pkg.Conflicts)
+		case consts.FieldReplaces:
+			filteredPackage.Replaces = flattenRelations(pkg.Replaces)
 		case consts.FieldDepends:
 			filteredPackage.Depends = flattenRelations(pkg.Depends)
 		case consts.FieldRequiredBy:
 			filteredPackage.RequiredBy = flattenRelations(pkg.RequiredBy)
 		case consts.FieldProvides:
 			filteredPackage.Provides = flattenRelations(pkg.Provides)
-		case consts.FieldConflicts:
-			filteredPackage.Conflicts = flattenRelations(pkg.Conflicts)
-		case consts.FieldReplaces:
-			filteredPackage.Replaces = flattenRelations(pkg.Replaces)
 		}
 	}
 

@@ -9,12 +9,11 @@
 package protobuf
 
 import (
+	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
+	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
-
-	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
-	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
 
 const (
@@ -80,6 +79,61 @@ func (x RelationOp) Number() protoreflect.EnumNumber {
 // Deprecated: Use RelationOp.Descriptor instead.
 func (RelationOp) EnumDescriptor() ([]byte, []int) {
 	return file_protobuf_pkginfo_proto_rawDescGZIP(), []int{0}
+}
+
+type PkgType int32
+
+const (
+	PkgType_UNKNOWN PkgType = 0
+	PkgType_PKG     PkgType = 1
+	PkgType_SPLIT   PkgType = 2
+	PkgType_SRC     PkgType = 3
+	PkgType_DEBUG   PkgType = 4
+)
+
+// Enum value maps for PkgType.
+var (
+	PkgType_name = map[int32]string{
+		0: "UNKNOWN",
+		1: "PKG",
+		2: "SPLIT",
+		3: "SRC",
+		4: "DEBUG",
+	}
+	PkgType_value = map[string]int32{
+		"UNKNOWN": 0,
+		"PKG":     1,
+		"SPLIT":   2,
+		"SRC":     3,
+		"DEBUG":   4,
+	}
+)
+
+func (x PkgType) Enum() *PkgType {
+	p := new(PkgType)
+	*p = x
+	return p
+}
+
+func (x PkgType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (PkgType) Descriptor() protoreflect.EnumDescriptor {
+	return file_protobuf_pkginfo_proto_enumTypes[1].Descriptor()
+}
+
+func (PkgType) Type() protoreflect.EnumType {
+	return &file_protobuf_pkginfo_proto_enumTypes[1]
+}
+
+func (x PkgType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use PkgType.Descriptor instead.
+func (PkgType) EnumDescriptor() ([]byte, []int) {
+	return file_protobuf_pkginfo_proto_rawDescGZIP(), []int{1}
 }
 
 type Relation struct {
@@ -163,6 +217,7 @@ type PkgInfo struct {
 	InstallTimestamp int64                  `protobuf:"varint,17,opt,name=install_timestamp,json=installTimestamp,proto3" json:"install_timestamp,omitempty"`
 	BuildTimestamp   int64                  `protobuf:"varint,16,opt,name=build_timestamp,json=buildTimestamp,proto3" json:"build_timestamp,omitempty"`
 	Size             int64                  `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
+	PkgType          PkgType                `protobuf:"varint,18,opt,name=pkg_type,json=pkgType,proto3,enum=pkginfo.PkgType" json:"pkg_type,omitempty"`
 	Name             string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
 	Reason           string                 `protobuf:"bytes,4,opt,name=reason,proto3" json:"reason,omitempty"`
 	Version          string                 `protobuf:"bytes,5,opt,name=version,proto3" json:"version,omitempty"`
@@ -229,6 +284,13 @@ func (x *PkgInfo) GetSize() int64 {
 		return x.Size
 	}
 	return 0
+}
+
+func (x *PkgInfo) GetPkgType() PkgType {
+	if x != nil {
+		return x.PkgType
+	}
+	return PkgType_UNKNOWN
 }
 
 func (x *PkgInfo) GetName() string {
@@ -392,11 +454,12 @@ const file_protobuf_pkginfo_proto_rawDesc = "" +
 	"\aversion\x18\x02 \x01(\tR\aversion\x12/\n" +
 	"\boperator\x18\x03 \x01(\x0e2\x13.pkginfo.RelationOpR\boperator\x12\x14\n" +
 	"\x05depth\x18\x04 \x01(\x05R\x05depth\x12\"\n" +
-	"\fproviderName\x18\x05 \x01(\tR\fproviderName\"\xac\x04\n" +
+	"\fproviderName\x18\x05 \x01(\tR\fproviderName\"\xd9\x04\n" +
 	"\aPkgInfo\x12+\n" +
 	"\x11install_timestamp\x18\x11 \x01(\x03R\x10installTimestamp\x12'\n" +
 	"\x0fbuild_timestamp\x18\x10 \x01(\x03R\x0ebuildTimestamp\x12\x12\n" +
-	"\x04size\x18\x02 \x01(\x03R\x04size\x12\x12\n" +
+	"\x04size\x18\x02 \x01(\x03R\x04size\x12+\n" +
+	"\bpkg_type\x18\x12 \x01(\x0e2\x10.pkginfo.PkgTypeR\apkgType\x12\x12\n" +
 	"\x04name\x18\x03 \x01(\tR\x04name\x12\x16\n" +
 	"\x06reason\x18\x04 \x01(\tR\x06reason\x12\x18\n" +
 	"\aversion\x18\x05 \x01(\tR\aversion\x12\x12\n" +
@@ -425,7 +488,13 @@ const file_protobuf_pkginfo_proto_rawDesc = "" +
 	"\n" +
 	"LESS_EQUAL\x10\x03\x12\v\n" +
 	"\aGREATER\x10\x04\x12\x11\n" +
-	"\rGREATER_EQUAL\x10\x05B\x1cZ\x1ainternal/protobuf;protobufb\x06proto3"
+	"\rGREATER_EQUAL\x10\x05*>\n" +
+	"\aPkgType\x12\v\n" +
+	"\aUNKNOWN\x10\x00\x12\a\n" +
+	"\x03PKG\x10\x01\x12\t\n" +
+	"\x05SPLIT\x10\x02\x12\a\n" +
+	"\x03SRC\x10\x03\x12\t\n" +
+	"\x05DEBUG\x10\x04B\x1cZ\x1ainternal/protobuf;protobufb\x06proto3"
 
 var (
 	file_protobuf_pkginfo_proto_rawDescOnce sync.Once
@@ -439,29 +508,29 @@ func file_protobuf_pkginfo_proto_rawDescGZIP() []byte {
 	return file_protobuf_pkginfo_proto_rawDescData
 }
 
-var (
-	file_protobuf_pkginfo_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-	file_protobuf_pkginfo_proto_msgTypes  = make([]protoimpl.MessageInfo, 3)
-	file_protobuf_pkginfo_proto_goTypes   = []any{
-		(RelationOp)(0),    // 0: pkginfo.RelationOp
-		(*Relation)(nil),   // 1: pkginfo.Relation
-		(*PkgInfo)(nil),    // 2: pkginfo.PkgInfo
-		(*CachedPkgs)(nil), // 3: pkginfo.CachedPkgs
-	}
-)
+var file_protobuf_pkginfo_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_protobuf_pkginfo_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_protobuf_pkginfo_proto_goTypes = []any{
+	(RelationOp)(0),    // 0: pkginfo.RelationOp
+	(PkgType)(0),       // 1: pkginfo.PkgType
+	(*Relation)(nil),   // 2: pkginfo.Relation
+	(*PkgInfo)(nil),    // 3: pkginfo.PkgInfo
+	(*CachedPkgs)(nil), // 4: pkginfo.CachedPkgs
+}
 var file_protobuf_pkginfo_proto_depIdxs = []int32{
 	0, // 0: pkginfo.Relation.operator:type_name -> pkginfo.RelationOp
-	1, // 1: pkginfo.PkgInfo.depends:type_name -> pkginfo.Relation
-	1, // 2: pkginfo.PkgInfo.required_by:type_name -> pkginfo.Relation
-	1, // 3: pkginfo.PkgInfo.provides:type_name -> pkginfo.Relation
-	1, // 4: pkginfo.PkgInfo.conflicts:type_name -> pkginfo.Relation
-	1, // 5: pkginfo.PkgInfo.replaces:type_name -> pkginfo.Relation
-	2, // 6: pkginfo.CachedPkgs.pkgs:type_name -> pkginfo.PkgInfo
-	7, // [7:7] is the sub-list for method output_type
-	7, // [7:7] is the sub-list for method input_type
-	7, // [7:7] is the sub-list for extension type_name
-	7, // [7:7] is the sub-list for extension extendee
-	0, // [0:7] is the sub-list for field type_name
+	1, // 1: pkginfo.PkgInfo.pkg_type:type_name -> pkginfo.PkgType
+	2, // 2: pkginfo.PkgInfo.depends:type_name -> pkginfo.Relation
+	2, // 3: pkginfo.PkgInfo.required_by:type_name -> pkginfo.Relation
+	2, // 4: pkginfo.PkgInfo.provides:type_name -> pkginfo.Relation
+	2, // 5: pkginfo.PkgInfo.conflicts:type_name -> pkginfo.Relation
+	2, // 6: pkginfo.PkgInfo.replaces:type_name -> pkginfo.Relation
+	3, // 7: pkginfo.CachedPkgs.pkgs:type_name -> pkginfo.PkgInfo
+	8, // [8:8] is the sub-list for method output_type
+	8, // [8:8] is the sub-list for method input_type
+	8, // [8:8] is the sub-list for extension type_name
+	8, // [8:8] is the sub-list for extension extendee
+	0, // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_protobuf_pkginfo_proto_init() }
@@ -474,7 +543,7 @@ func file_protobuf_pkginfo_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_protobuf_pkginfo_proto_rawDesc), len(file_protobuf_pkginfo_proto_rawDesc)),
-			NumEnums:      1,
+			NumEnums:      2,
 			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   0,

@@ -8,6 +8,7 @@ type (
 // ordered by filter efficiency
 const (
 	FieldReason FieldType = iota
+	FieldPkgType
 	FieldArch
 	FieldLicense
 	FieldName
@@ -37,30 +38,33 @@ const (
 	reason      = "reason"
 	size        = "size"
 	version     = "version"
-	description = "description"
+	pkgType     = "pkgtype"
+	arch        = "arch"
+	license     = "license"
 	pkgBase     = "pkgbase"
+	description = "description"
+	url         = "url"
+	conflicts   = "conflicts"
+	replaces    = "replaces"
 	depends     = "depends"
 	requiredBy  = "required-by"
 	provides    = "provides"
-	conflicts   = "conflicts"
-	replaces    = "replaces"
-	arch        = "arch"
-	license     = "license"
-	url         = "url"
-	target      = "target"
-	depth       = "depth"
+
+	target = "target"
+	depth  = "depth"
 )
 
 var FieldTypeLookup = map[string]FieldType{
-	"d":  FieldDate,
-	"n":  FieldName,
-	"r":  FieldReason,
-	"s":  FieldSize,
-	"v":  FieldVersion,
-	"D":  FieldDepends,
-	"R":  FieldRequiredBy,
-	"p":  FieldProvides,
-	"bd": FieldBuildDate,
+	"d":    FieldDate,
+	"n":    FieldName,
+	"r":    FieldReason,
+	"s":    FieldSize,
+	"v":    FieldVersion,
+	"D":    FieldDepends,
+	"R":    FieldRequiredBy,
+	"p":    FieldProvides,
+	"bd":   FieldBuildDate,
+	"type": FieldPkgType,
 
 	"alphabetical": FieldName, // legacy flag, to be deprecated
 
@@ -68,18 +72,19 @@ var FieldTypeLookup = map[string]FieldType{
 	buildDate:   FieldBuildDate,
 	name:        FieldName,
 	reason:      FieldReason,
-	arch:        FieldArch,
-	license:     FieldLicense,
-	url:         FieldUrl,
-	description: FieldDescription,
-	pkgBase:     FieldPkgBase,
 	size:        FieldSize,
 	version:     FieldVersion,
+	pkgType:     FieldPkgType,
+	arch:        FieldArch,
+	license:     FieldLicense,
+	pkgBase:     FieldPkgBase,
+	description: FieldDescription,
+	url:         FieldUrl,
+	conflicts:   FieldConflicts,
+	replaces:    FieldReplaces,
 	depends:     FieldDepends,
 	requiredBy:  FieldRequiredBy,
 	provides:    FieldProvides,
-	conflicts:   FieldConflicts,
-	replaces:    FieldReplaces,
 }
 
 var SubfieldTypeLookup = map[string]SubfieldType{
@@ -95,16 +100,17 @@ var FieldNameLookup = map[FieldType]string{
 	FieldSize:        size,
 	FieldReason:      reason,
 	FieldVersion:     version,
+	FieldPkgType:     pkgType,
+	FieldArch:        arch,
+	FieldLicense:     license,
+	FieldPkgBase:     pkgBase,
+	FieldDescription: description,
+	FieldUrl:         url,
+	FieldConflicts:   conflicts,
+	FieldReplaces:    replaces,
 	FieldDepends:     depends,
 	FieldRequiredBy:  requiredBy,
 	FieldProvides:    provides,
-	FieldConflicts:   conflicts,
-	FieldReplaces:    replaces,
-	FieldArch:        arch,
-	FieldLicense:     license,
-	FieldUrl:         url,
-	FieldDescription: description,
-	FieldPkgBase:     pkgBase,
 }
 
 var SubfieldNameLookup = map[SubfieldType]string{
@@ -126,9 +132,10 @@ var (
 		FieldReason,
 		FieldSize,
 		FieldVersion,
-		FieldPkgBase,
+		FieldPkgType,
 		FieldArch,
 		FieldLicense,
+		FieldPkgBase,
 		FieldDescription,
 		FieldUrl,
 		FieldConflicts,
