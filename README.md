@@ -4,7 +4,7 @@
 
 you can find installation instructions [here](#installation).
 
-`qp` supports querying/sorting for install date, package name, install reason (explicit/dependency), size on disk, reverse dependencies, dependency requirements, description, replacements, conflicts, provisions, build date, package type and more. check [usage](#usage) for all available options.
+`qp` supports querying and sorting for install date, package name, install reason (explicit/dependency), size on disk, reverse dependencies (required by), dependencies, validation, description, replacements, conflicts, provisions, build date, package type and more. check [usage](#usage) for all available options.
 
 ![qp logo | query packages logo](https://gistcdn.githack.com/Zweih/9009d5c74eab8a5515a8a64a0495df32/raw/ef8a8ac3655fd3dee24494a3403867919d806b63/qp-logo_clean.svg)
 
@@ -37,7 +37,7 @@ this package is compatible with the following distributions:
 
 ## features
 
-- list installed packages with install date/timestamps, dependencies, provisions, requirements, size on disk, conflicts, replacements, architecture, license, description, build date, package base, package type, groups, and version
+- list installed packages with install date/timestamps, dependencies, provisions, reverse dependencies (required by), size on disk, conflicts, replacements, architecture, license, description, build date, package base, package type, validation, groups, and version
 - query by explicitly installed packages
 - query by packages installed as dependencies
 - query by packages required by specified packages
@@ -97,7 +97,7 @@ this package is compatible with the following distributions:
 | ✓	| regenerate cache option | - | groups filter |
 | - | packager field | - | optional dependency field |
 | ✓ | sort by size on disk | - | conflicts sort |
-| - | validation field | - | validation sort |
+| ✓ | validation field | - | validation sort |
 
 ## installation
 
@@ -211,6 +211,7 @@ short-flag queries and long-flag queries can be combined.
 - `pkgbase` - name of the base package used to group split packages; for non-split packages, it is the same as the package name. 
 - `description` - package description
 - `url` - the URL of the official site of the software being packaged
+- `validation` - package integrity validation method (e.g., sha256", "pgp")
 - `groups` - package groups or categories (e.g., base, gnome, xfce4)
 - `conflicts` - list of packages that conflict, or cause problems, with the package
 - `replaces` - list of packages that are replaced by the package
@@ -244,6 +245,7 @@ output format:
     "pkgbase": "tinysparql",
     "description": "Low-footprint RDF triple store with SPARQL 1.1 interface",
     "url": "https://tinysparql.org/",
+    "validation": "pgp",
     "conflicts": [
       "tracker3<=3.7.3-2"
     ],

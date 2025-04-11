@@ -69,6 +69,7 @@ func PrintHelp() {
 	fmt.Println("  pkgtype      Type of the package (standard, split, debug, source, unknown)")
 	fmt.Println("               Note: Older packages may show \"unknown\" pkgtype if built before pacman introduced XDATA.")
 	fmt.Println("  groups       Package groups or categories (e.g., base, gnome, xfce4)")
+	fmt.Println("  validation   Package integrity validation method (e.g., \"sha256\", \"pgp\")")
 
 	fmt.Println("\nExamples:")
 	fmt.Println("  qp -l 10                      # Show the last 10 installed packages")
