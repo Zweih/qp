@@ -66,7 +66,7 @@ func pkgTypeToString(pkgType pkgdata.PkgType) string {
 	case pkgdata.PkgTypeDebug:
 		return "debug"
 	default:
-		return "unknown"
+		return ""
 	}
 }
 

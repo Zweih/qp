@@ -14,6 +14,7 @@ const (
 	FieldName
 	FieldPkgBase
 	FieldValidation
+	FieldPackager
 	FieldDescription
 	FieldUrl
 	FieldGroups
@@ -47,6 +48,7 @@ const (
 	description = "description"
 	url         = "url"
 	validation  = "validation"
+	packager    = "packager"
 	groups      = "groups"
 	conflicts   = "conflicts"
 	replaces    = "replaces"
@@ -74,17 +76,18 @@ var FieldTypeLookup = map[string]FieldType{
 
 	date:        FieldDate,
 	buildDate:   FieldBuildDate,
+	size:        FieldSize,
+	pkgType:     FieldPkgType,
 	name:        FieldName,
 	reason:      FieldReason,
-	size:        FieldSize,
 	version:     FieldVersion,
-	pkgType:     FieldPkgType,
 	arch:        FieldArch,
 	license:     FieldLicense,
 	pkgBase:     FieldPkgBase,
 	description: FieldDescription,
 	url:         FieldUrl,
 	validation:  FieldValidation,
+	packager:    FieldPackager,
 	groups:      FieldGroups,
 	conflicts:   FieldConflicts,
 	replaces:    FieldReplaces,
@@ -102,17 +105,18 @@ var SubfieldTypeLookup = map[string]SubfieldType{
 var FieldNameLookup = map[FieldType]string{
 	FieldDate:        date,
 	FieldBuildDate:   buildDate,
-	FieldName:        name,
 	FieldSize:        size,
+	FieldPkgType:     pkgType,
+	FieldName:        name,
 	FieldReason:      reason,
 	FieldVersion:     version,
-	FieldPkgType:     pkgType,
 	FieldArch:        arch,
 	FieldLicense:     license,
 	FieldPkgBase:     pkgBase,
 	FieldDescription: description,
 	FieldUrl:         url,
 	FieldValidation:  validation,
+	FieldPackager:    packager,
 	FieldGroups:      groups,
 	FieldConflicts:   conflicts,
 	FieldReplaces:    replaces,
@@ -137,17 +141,18 @@ var (
 	ValidFields = []FieldType{
 		FieldDate,
 		FieldBuildDate,
+		FieldSize,
+		FieldPkgType,
 		FieldName,
 		FieldReason,
-		FieldSize,
 		FieldVersion,
-		FieldPkgType,
 		FieldArch,
 		FieldLicense,
 		FieldPkgBase,
 		FieldDescription,
 		FieldUrl,
 		FieldValidation,
+		FieldPackager,
 		FieldGroups,
 		FieldConflicts,
 		FieldReplaces,

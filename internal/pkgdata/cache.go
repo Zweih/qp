@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	cacheVersion    = 10 // bump when updating structure of PkgInfo/Relation/pkginfo.proto OR when dependency resolution is updated
+	cacheVersion    = 11 // bump when updating structure of PkgInfo/Relation/pkginfo.proto OR when dependency resolution is updated
 	xdgCacheHomeEnv = "XDG_CACHE_HOME"
 	homeEnv         = "HOME"
 	qpCacheDir      = "query-packages"
@@ -132,6 +132,7 @@ func pkgsToProtos(pkgs []*PkgInfo) []*pb.PkgInfo {
 			Description:      pkg.Description,
 			PkgBase:          pkg.PkgBase,
 			Validation:       pkg.Validation,
+			Packager:         pkg.Packager,
 			Groups:           pkg.Groups,
 			Depends:          relationsToProtos(pkg.Depends),
 			RequiredBy:       relationsToProtos(pkg.RequiredBy),
@@ -176,6 +177,7 @@ func protosToPkgs(pbPkgs []*pb.PkgInfo) []*PkgInfo {
 			Description:      pbPkg.Description,
 			PkgBase:          pbPkg.PkgBase,
 			Validation:       pbPkg.Validation,
+			Packager:         pbPkg.Packager,
 			Groups:           pbPkg.Groups,
 			Depends:          protosToRelations(pbPkg.Depends),
 			RequiredBy:       protosToRelations(pbPkg.RequiredBy),

@@ -12,16 +12,17 @@ type PkgInfoJson struct {
 	InstallTimestamp int64    `json:"installTimestamp,omitempty"`
 	BuildTimestamp   int64    `json:"buildTimestamp,omitempty"`
 	Size             int64    `json:"size,omitempty"`
+	PkgType          string   `json:"pkgtype,omitempty"`
 	Name             string   `json:"name,omitempty"`
 	Reason           string   `json:"reason,omitempty"`
 	Version          string   `json:"version,omitempty"`
-	PkgType          string   `json:"pkgtype,omitempty"`
 	Arch             string   `json:"arch,omitempty"`
 	License          string   `json:"license,omitempty"`
 	PkgBase          string   `json:"pkgbase,omitempty"`
 	Description      string   `json:"description,omitempty"`
 	Url              string   `json:"url,omitempty"`
 	Validation       string   `json:"validation,omitempty"`
+	Packager         string   `json:"packager,omitempty"`
 	Groups           []string `json:"groups,omitempty"`
 	Conflicts        []string `json:"conflicts,omitempty"`
 	Replaces         []string `json:"replaces,omitempty"`
@@ -81,6 +82,8 @@ func getJsonValues(pkg *pkgdata.PkgInfo, fields []consts.FieldType) *PkgInfoJson
 			filteredPackage.InstallTimestamp = pkg.InstallTimestamp
 		case consts.FieldBuildDate:
 			filteredPackage.BuildTimestamp = pkg.BuildTimestamp
+		case consts.FieldPkgType:
+			filteredPackage.PkgType = pkgTypeToString(pkg.PkgType)
 		case consts.FieldName:
 			filteredPackage.Name = pkg.Name
 		case consts.FieldReason:
@@ -89,8 +92,6 @@ func getJsonValues(pkg *pkgdata.PkgInfo, fields []consts.FieldType) *PkgInfoJson
 			filteredPackage.Size = pkg.Size // return in bytes for json
 		case consts.FieldVersion:
 			filteredPackage.Version = pkg.Version
-		case consts.FieldPkgType:
-			filteredPackage.PkgType = pkgTypeToString(pkg.PkgType)
 		case consts.FieldArch:
 			filteredPackage.Arch = pkg.Arch
 		case consts.FieldLicense:
@@ -105,6 +106,8 @@ func getJsonValues(pkg *pkgdata.PkgInfo, fields []consts.FieldType) *PkgInfoJson
 			filteredPackage.Groups = pkg.Groups
 		case consts.FieldValidation:
 			filteredPackage.Validation = pkg.Validation
+		case consts.FieldPackager:
+			filteredPackage.Packager = pkg.Packager
 		case consts.FieldConflicts:
 			filteredPackage.Conflicts = flattenRelations(pkg.Conflicts)
 		case consts.FieldReplaces:

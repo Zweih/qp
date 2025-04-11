@@ -26,6 +26,7 @@ const (
 	fieldDescription = "%DESC%"
 	fieldUrl         = "%URL%"
 	fieldValidation  = "%VALIDATION%"
+	fieldPackager    = "%PACKAGER%"
 	fieldGroups      = "%GROUPS%"
 	fieldDepends     = "%DEPENDS%"
 	fieldProvides    = "%PROVIDES%"
@@ -143,10 +144,11 @@ func parseDescFile(descPath string) (*PkgInfo, error) {
 			line := string(bytes.TrimSpace(data[start:end]))
 
 			switch line {
-			case fieldName, fieldInstallDate, fieldSize,
-				fieldReason, fieldVersion, fieldArch,
-				fieldLicense, fieldUrl, fieldDescription,
-				fieldValidation, fieldPkgBase, fieldBuildDate:
+
+			case fieldInstallDate, fieldBuildDate, fieldSize,
+				fieldName, fieldReason, fieldVersion, fieldArch,
+				fieldLicense, fieldPkgBase, fieldDescription,
+				fieldUrl, fieldValidation, fieldPackager:
 				currentField = line
 
 			case fieldGroups, fieldDepends, fieldProvides,
@@ -212,6 +214,12 @@ func collectBlockBytes(data []byte, start int) ([]string, int) {
 
 func applySingleLineField(pkg *PkgInfo, field string, value string) error {
 	switch field {
+	case fieldInstallDate, fieldBuildDate, fieldSize:
+		err := applyIntField(pkg, field, value)
+		if err != nil {
+			return err
+		}
+
 	case fieldName:
 		pkg.Name = value
 
@@ -222,32 +230,8 @@ func applySingleLineField(pkg *PkgInfo, field string, value string) error {
 			pkg.Reason = "explicit"
 		}
 
-	case fieldInstallDate:
-		installDate, err := strconv.ParseInt(value, 10, 64)
-		if err != nil {
-			return fmt.Errorf("invalid install date value %q: %w", value, err)
-		}
-
-		pkg.InstallTimestamp = installDate
-
-	case fieldBuildDate:
-		buildDate, err := strconv.ParseInt(value, 10, 64)
-		if err != nil {
-			return fmt.Errorf("invalid build date value %q: %w", value, err)
-		}
-
-		pkg.BuildTimestamp = buildDate
-
 	case fieldVersion:
 		pkg.Version = value
-
-	case fieldSize:
-		size, err := strconv.ParseInt(value, 10, 64)
-		if err != nil {
-			return fmt.Errorf("invalid size value %q: %w", value, err)
-		}
-
-		pkg.Size = size
 
 	case fieldArch:
 		pkg.Arch = value
@@ -267,8 +251,30 @@ func applySingleLineField(pkg *PkgInfo, field string, value string) error {
 	case fieldPkgBase:
 		pkg.PkgBase = value
 
+	case fieldPackager:
+		if value != "Unknown Packager" {
+			pkg.Packager = value
+		}
+
 	default:
 		// ignore unknown fields
+	}
+	return nil
+}
+
+func applyIntField(pkg *PkgInfo, field string, value string) error {
+	parsedValue, err := strconv.ParseInt(value, 10, 64)
+	if err != nil {
+		return fmt.Errorf("invalid %s value %q: %w", field, value, err)
+	}
+
+	switch field {
+	case fieldInstallDate:
+		pkg.InstallTimestamp = parsedValue
+	case fieldBuildDate:
+		pkg.BuildTimestamp = parsedValue
+	case fieldSize:
+		pkg.Size = parsedValue
 	}
 
 	return nil
@@ -308,14 +314,14 @@ func applyRelations(pkg *PkgInfo, field string, block []string) {
 	}
 
 	switch field {
-	case fieldDepends:
-		pkg.Depends = relations
-	case fieldProvides:
-		pkg.Provides = relations
 	case fieldConflicts:
 		pkg.Conflicts = relations
 	case fieldReplaces:
 		pkg.Replaces = relations
+	case fieldDepends:
+		pkg.Depends = relations
+	case fieldProvides:
+		pkg.Provides = relations
 	}
 }
 
