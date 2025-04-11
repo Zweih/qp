@@ -16,6 +16,7 @@ func ParseFlags(args []string) (Config, error) {
 	var showFullTimestamp bool
 	var disableProgress bool
 	var noCache bool
+	var regenCache bool
 
 	var filterInputs []string
 	var sortInput string
@@ -46,6 +47,7 @@ func ParseFlags(args []string) (Config, error) {
 	pflag.BoolVar(&outputJson, "json", false, "Output results in JSON format")
 	pflag.BoolVar(&disableProgress, "no-progress", false, "Force suppress progress output")
 	pflag.BoolVar(&noCache, "no-cache", false, "Disable cache loading/saving and force fresh package data loading")
+	pflag.BoolVar(&regenCache, "regen-cache", false, "Disable cache loading, force fresh package data loading, and save fresh cache")
 
 	pflag.BoolVarP(&showHelp, "help", "h", false, "Display help")
 
@@ -110,6 +112,7 @@ func ParseFlags(args []string) (Config, error) {
 		HasNoHeaders:      hasNoHeaders,
 		ShowFullTimestamp: showFullTimestamp,
 		NoCache:           noCache,
+		RegenCache:        regenCache,
 		DisableProgress:   disableProgress,
 		SortOption:        sortOption,
 		Fields:            fieldsParsed,
