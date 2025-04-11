@@ -15,6 +15,7 @@ const (
 	FieldPkgBase
 	FieldDescription
 	FieldUrl
+	FieldGroups
 	FieldSize
 	FieldDate
 	FieldBuildDate
@@ -44,6 +45,7 @@ const (
 	pkgBase     = "pkgbase"
 	description = "description"
 	url         = "url"
+	groups      = "groups"
 	conflicts   = "conflicts"
 	replaces    = "replaces"
 	depends     = "depends"
@@ -80,6 +82,7 @@ var FieldTypeLookup = map[string]FieldType{
 	pkgBase:     FieldPkgBase,
 	description: FieldDescription,
 	url:         FieldUrl,
+	groups:      FieldGroups,
 	conflicts:   FieldConflicts,
 	replaces:    FieldReplaces,
 	depends:     FieldDepends,
@@ -106,6 +109,7 @@ var FieldNameLookup = map[FieldType]string{
 	FieldPkgBase:     pkgBase,
 	FieldDescription: description,
 	FieldUrl:         url,
+	FieldGroups:      groups,
 	FieldConflicts:   conflicts,
 	FieldReplaces:    replaces,
 	FieldDepends:     depends,
@@ -125,6 +129,7 @@ var (
 		FieldReason,
 		FieldSize,
 	}
+	// note: this is also the order the columns will be displayed in table output
 	ValidFields = []FieldType{
 		FieldDate,
 		FieldBuildDate,
@@ -138,6 +143,7 @@ var (
 		FieldPkgBase,
 		FieldDescription,
 		FieldUrl,
+		FieldGroups,
 		FieldConflicts,
 		FieldReplaces,
 		FieldDepends,

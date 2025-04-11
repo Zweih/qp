@@ -37,7 +37,7 @@ this package is compatible with the following distributions:
 
 ## features
 
-- list installed packages with install date/timestamps, dependencies, provisions, requirements, size on disk, conflicts, replacements, architecture, license, description, build date, package base, package type, and version
+- list installed packages with install date/timestamps, dependencies, provisions, requirements, size on disk, conflicts, replacements, architecture, license, description, build date, package base, package type, groups, and version
 - query by explicitly installed packages
 - query by packages installed as dependencies
 - query by packages required by specified packages
@@ -92,12 +92,12 @@ this package is compatible with the following distributions:
 | ✓ | build-date field | - | build-date filter |
 | - | build-date sort | ✓ | pkgtype field |
 | - | pkgtype filter | - | pkgtype sort |
-| ✓ | architecture query | - | groups field |
+| ✓ | architecture query | ✓ | groups field |
 | ✓	| conflicts query | - | package description sort |
 | ✓	| regenerate cache option | - | groups filter |
 | - | packager field | - | optional dependency field |
 | ✓ | sort by size on disk | - | conflicts sort |
-
+| - | validation field | - | validation sort |
 
 ## installation
 
@@ -211,6 +211,7 @@ short-flag queries and long-flag queries can be combined.
 - `pkgbase` - name of the base package used to group split packages; for non-split packages, it is the same as the package name. 
 - `description` - package description
 - `url` - the URL of the official site of the software being packaged
+- `groups` - package groups or categories (e.g., base, gnome, xfce4)
 - `conflicts` - list of packages that conflict, or cause problems, with the package
 - `replaces` - list of packages that are replaced by the package
 - `depends` - list of dependencies (output can be long)

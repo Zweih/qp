@@ -68,6 +68,7 @@ func PrintHelp() {
 	fmt.Println("  pkgbase      Name of the base package used to group split packages; for non-split packages, it is the same as the package name.")
 	fmt.Println("  pkgtype      Type of the package (standard, split, debug, source, unknown)")
 	fmt.Println("               Note: Older packages may show \"unknown\" pkgtype if built before pacman introduced XDATA.")
+	fmt.Println("  groups       Package groups or categories (e.g., base, gnome, xfce4)")
 
 	fmt.Println("\nExamples:")
 	fmt.Println("  qp -l 10                      # Show the last 10 installed packages")

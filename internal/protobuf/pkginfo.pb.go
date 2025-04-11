@@ -226,6 +226,7 @@ type PkgInfo struct {
 	Url              string                 `protobuf:"bytes,8,opt,name=url,proto3" json:"url,omitempty"`
 	Description      string                 `protobuf:"bytes,13,opt,name=description,proto3" json:"description,omitempty"`
 	PkgBase          string                 `protobuf:"bytes,14,opt,name=pkg_base,json=pkgBase,proto3" json:"pkg_base,omitempty"`
+	Groups           []string               `protobuf:"bytes,19,rep,name=groups,proto3" json:"groups,omitempty"`
 	Depends          []*Relation            `protobuf:"bytes,9,rep,name=depends,proto3" json:"depends,omitempty"`
 	RequiredBy       []*Relation            `protobuf:"bytes,10,rep,name=required_by,json=requiredBy,proto3" json:"required_by,omitempty"`
 	Provides         []*Relation            `protobuf:"bytes,11,rep,name=provides,proto3" json:"provides,omitempty"`
@@ -349,6 +350,13 @@ func (x *PkgInfo) GetPkgBase() string {
 	return ""
 }
 
+func (x *PkgInfo) GetGroups() []string {
+	if x != nil {
+		return x.Groups
+	}
+	return nil
+}
+
 func (x *PkgInfo) GetDepends() []*Relation {
 	if x != nil {
 		return x.Depends
@@ -454,7 +462,7 @@ const file_protobuf_pkginfo_proto_rawDesc = "" +
 	"\aversion\x18\x02 \x01(\tR\aversion\x12/\n" +
 	"\boperator\x18\x03 \x01(\x0e2\x13.pkginfo.RelationOpR\boperator\x12\x14\n" +
 	"\x05depth\x18\x04 \x01(\x05R\x05depth\x12\"\n" +
-	"\fproviderName\x18\x05 \x01(\tR\fproviderName\"\xd9\x04\n" +
+	"\fproviderName\x18\x05 \x01(\tR\fproviderName\"\xf1\x04\n" +
 	"\aPkgInfo\x12+\n" +
 	"\x11install_timestamp\x18\x11 \x01(\x03R\x10installTimestamp\x12'\n" +
 	"\x0fbuild_timestamp\x18\x10 \x01(\x03R\x0ebuildTimestamp\x12\x12\n" +
@@ -467,7 +475,8 @@ const file_protobuf_pkginfo_proto_rawDesc = "" +
 	"\alicense\x18\a \x01(\tR\alicense\x12\x10\n" +
 	"\x03url\x18\b \x01(\tR\x03url\x12 \n" +
 	"\vdescription\x18\r \x01(\tR\vdescription\x12\x19\n" +
-	"\bpkg_base\x18\x0e \x01(\tR\apkgBase\x12+\n" +
+	"\bpkg_base\x18\x0e \x01(\tR\apkgBase\x12\x16\n" +
+	"\x06groups\x18\x13 \x03(\tR\x06groups\x12+\n" +
 	"\adepends\x18\t \x03(\v2\x11.pkginfo.RelationR\adepends\x122\n" +
 	"\vrequired_by\x18\n" +
 	" \x03(\v2\x11.pkginfo.RelationR\n" +

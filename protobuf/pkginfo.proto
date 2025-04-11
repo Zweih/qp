@@ -46,6 +46,8 @@ message PkgInfo {
   string description = 13;
   string pkg_base = 14;
 
+  repeated string groups = 19;
+
   repeated Relation depends = 9;
   repeated Relation required_by = 10;
   repeated Relation provides = 11;

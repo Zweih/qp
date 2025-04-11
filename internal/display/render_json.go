@@ -21,6 +21,7 @@ type PkgInfoJson struct {
 	PkgBase          string   `json:"pkgbase,omitempty"`
 	Description      string   `json:"description,omitempty"`
 	Url              string   `json:"url,omitempty"`
+	Groups           []string `json:"groups,omitempty"`
 	Conflicts        []string `json:"conflicts,omitempty"`
 	Replaces         []string `json:"replaces,omitempty"`
 	Depends          []string `json:"depends,omitempty"`
@@ -99,6 +100,8 @@ func getJsonValues(pkg *pkgdata.PkgInfo, fields []consts.FieldType) *PkgInfoJson
 			filteredPackage.Description = pkg.Description
 		case consts.FieldUrl:
 			filteredPackage.Url = pkg.Url
+		case consts.FieldGroups:
+			filteredPackage.Groups = pkg.Groups
 		case consts.FieldConflicts:
 			filteredPackage.Conflicts = flattenRelations(pkg.Conflicts)
 		case consts.FieldReplaces:

@@ -26,6 +26,7 @@ var columnHeaders = map[consts.FieldType]string{
 	consts.FieldPkgBase:     "PKGBASE",
 	consts.FieldDescription: "DESCRIPTION",
 	consts.FieldUrl:         "URL",
+	consts.FieldGroups:      "GROUPS",
 	consts.FieldConflicts:   "CONFLICTS",
 	consts.FieldReplaces:    "REPLACES",
 	consts.FieldDepends:     "DEPENDS",
@@ -81,7 +82,12 @@ func renderRows(
 ) {
 	row := make([]string, len(fields))
 	for i, fields := range fields {
-		row[i] = getTableValue(pkg, fields, ctx)
+		value := getTableValue(pkg, fields, ctx)
+		if value == "" {
+			value = "-"
+		}
+
+		row[i] = value
 	}
 
 	fmt.Fprintln(w, strings.Join(row, "\t"))
@@ -117,6 +123,8 @@ func getTableValue(pkg *pkgdata.PkgInfo, field consts.FieldType, ctx tableContex
 		return pkg.License
 	case consts.FieldUrl:
 		return pkg.Url
+	case consts.FieldGroups:
+		return strings.Join(pkg.Groups, ", ")
 	case consts.FieldDescription:
 		return pkg.Description
 	case consts.FieldPkgBase:
