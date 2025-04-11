@@ -101,28 +101,24 @@ func getTableValue(pkg *pkgdata.PkgInfo, field consts.FieldType, ctx tableContex
 		return formatDate(pkg.InstallTimestamp, ctx)
 	case consts.FieldBuildDate:
 		return formatDate(pkg.BuildTimestamp, ctx)
+	case consts.FieldSize:
+		return formatSize(pkg.Size)
+	case consts.FieldPkgType:
+		return pkgTypeToString(pkg.PkgType)
 	case consts.FieldName:
 		return pkg.Name
 	case consts.FieldReason:
 		return pkg.Reason
-	case consts.FieldSize:
-		return formatSize(pkg.Size)
 	case consts.FieldVersion:
 		return pkg.Version
-	case consts.FieldDepends:
-		return formatRelations(pkg.Depends)
-	case consts.FieldRequiredBy:
-		return formatRelations(pkgdata.GetRelationsByDepth(pkg.RequiredBy, 1))
-	case consts.FieldProvides:
-		return formatRelations(pkg.Provides)
-	case consts.FieldConflicts:
-		return formatRelations(pkg.Conflicts)
-	case consts.FieldReplaces:
-		return formatRelations(pkg.Replaces)
 	case consts.FieldArch:
 		return pkg.Arch
 	case consts.FieldLicense:
 		return pkg.License
+	case consts.FieldPkgBase:
+		return pkg.PkgBase
+	case consts.FieldDescription:
+		return pkg.Description
 	case consts.FieldUrl:
 		return pkg.Url
 	case consts.FieldValidation:
@@ -131,12 +127,16 @@ func getTableValue(pkg *pkgdata.PkgInfo, field consts.FieldType, ctx tableContex
 		return pkg.Packager
 	case consts.FieldGroups:
 		return strings.Join(pkg.Groups, ", ")
-	case consts.FieldDescription:
-		return pkg.Description
-	case consts.FieldPkgBase:
-		return pkg.PkgBase
-	case consts.FieldPkgType:
-		return pkgTypeToString(pkg.PkgType)
+	case consts.FieldDepends:
+		return formatRelations(pkg.Depends)
+	case consts.FieldRequiredBy:
+		return formatRelations(pkg.RequiredBy)
+	case consts.FieldProvides:
+		return formatRelations(pkg.Provides)
+	case consts.FieldConflicts:
+		return formatRelations(pkg.Conflicts)
+	case consts.FieldReplaces:
+		return formatRelations(pkg.Replaces)
 	default:
 		return ""
 	}

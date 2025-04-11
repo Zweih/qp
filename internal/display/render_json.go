@@ -12,10 +12,10 @@ type PkgInfoJson struct {
 	InstallTimestamp int64    `json:"installTimestamp,omitempty"`
 	BuildTimestamp   int64    `json:"buildTimestamp,omitempty"`
 	Size             int64    `json:"size,omitempty"`
+	PkgType          string   `json:"pkgtype,omitempty"`
 	Name             string   `json:"name,omitempty"`
 	Reason           string   `json:"reason,omitempty"`
 	Version          string   `json:"version,omitempty"`
-	PkgType          string   `json:"pkgtype,omitempty"`
 	Arch             string   `json:"arch,omitempty"`
 	License          string   `json:"license,omitempty"`
 	PkgBase          string   `json:"pkgbase,omitempty"`
@@ -82,6 +82,8 @@ func getJsonValues(pkg *pkgdata.PkgInfo, fields []consts.FieldType) *PkgInfoJson
 			filteredPackage.InstallTimestamp = pkg.InstallTimestamp
 		case consts.FieldBuildDate:
 			filteredPackage.BuildTimestamp = pkg.BuildTimestamp
+		case consts.FieldPkgType:
+			filteredPackage.PkgType = pkgTypeToString(pkg.PkgType)
 		case consts.FieldName:
 			filteredPackage.Name = pkg.Name
 		case consts.FieldReason:
@@ -90,8 +92,6 @@ func getJsonValues(pkg *pkgdata.PkgInfo, fields []consts.FieldType) *PkgInfoJson
 			filteredPackage.Size = pkg.Size // return in bytes for json
 		case consts.FieldVersion:
 			filteredPackage.Version = pkg.Version
-		case consts.FieldPkgType:
-			filteredPackage.PkgType = pkgTypeToString(pkg.PkgType)
 		case consts.FieldArch:
 			filteredPackage.Arch = pkg.Arch
 		case consts.FieldLicense:
