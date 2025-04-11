@@ -45,6 +45,7 @@ type PkgInfo struct {
 	Url         string
 	Description string
 	PkgBase     string
+	Validation  string
 
 	Groups []string
 

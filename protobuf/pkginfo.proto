@@ -45,6 +45,7 @@ message PkgInfo {
   string url = 8;
   string description = 13;
   string pkg_base = 14;
+  string validation = 20;
 
   repeated string groups = 19;
 
