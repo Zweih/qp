@@ -25,6 +25,7 @@ const (
 	fieldPkgBase     = "%BASE%"
 	fieldDescription = "%DESC%"
 	fieldUrl         = "%URL%"
+	fieldValidation  = "%VALIDATION%"
 	fieldGroups      = "%GROUPS%"
 	fieldDepends     = "%DEPENDS%"
 	fieldProvides    = "%PROVIDES%"
@@ -142,11 +143,14 @@ func parseDescFile(descPath string) (*PkgInfo, error) {
 			line := string(bytes.TrimSpace(data[start:end]))
 
 			switch line {
-			case fieldName, fieldInstallDate, fieldSize, fieldReason, fieldVersion,
-				fieldArch, fieldLicense, fieldUrl, fieldDescription, fieldPkgBase, fieldBuildDate:
+			case fieldName, fieldInstallDate, fieldSize,
+				fieldReason, fieldVersion, fieldArch,
+				fieldLicense, fieldUrl, fieldDescription,
+				fieldValidation, fieldPkgBase, fieldBuildDate:
 				currentField = line
 
-			case fieldGroups, fieldDepends, fieldProvides, fieldConflicts, fieldReplaces, fieldXData:
+			case fieldGroups, fieldDepends, fieldProvides,
+				fieldConflicts, fieldReplaces, fieldXData:
 				currentField = line
 				block, next := collectBlockBytes(data, end+1)
 
@@ -253,6 +257,9 @@ func applySingleLineField(pkg *PkgInfo, field string, value string) error {
 
 	case fieldUrl:
 		pkg.Url = value
+
+	case fieldValidation:
+		pkg.Validation = value
 
 	case fieldDescription:
 		pkg.Description = value
