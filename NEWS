@@ -1,5 +1,11 @@
 # qp Release Notes
 
+## v4.12.1
+### What's Changed
+* Refactor: Use pointer for config by @Zweih in https://github.com/Zweih/qp/pull/173
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v4.12.0...v4.12.1
+
 ## v4.12.0
 ### What's Changed
 * Feature: Add build date field by @Zweih in https://github.com/Zweih/qp/pull/171
