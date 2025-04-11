@@ -96,7 +96,7 @@ this package is compatible with the following distributions:
 | ✓	| conflicts query | - | package description sort |
 | - | regen-cache option | - | groups filter |
 | - | packager field | - | optional dependency field |
-| ✓ | query by size on disk | - | conflicts sort |
+| ✓ | sort by size on disk | - | conflicts sort |
 
 
 ## installation
