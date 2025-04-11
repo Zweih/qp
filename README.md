@@ -81,7 +81,7 @@ this package is compatible with the following distributions:
 | ✓ | metaflag for all queries | ✓ | JSON output |
 | ✓ | no-headers option | ✓ | provides query |
 | ✓ | depends query | ✓ | all-fields option |
-| ✓ | required-by query | ✓ | no-cache option |
+| ✓ | required-by query | ✓ | no cache option |
 | ✓ | optional full timestamp | ✓ | package description field |
 | – | list possibly or confirmed stale/abandoned packages | – | self-referencing field |
 | – | name exclusion query | – | streaming pipeline |
@@ -94,7 +94,7 @@ this package is compatible with the following distributions:
 | - | pkgtype filter | - | pkgtype sort |
 | ✓ | architecture query | - | groups field |
 | ✓	| conflicts query | - | package description sort |
-| - | regen-cache option | - | groups filter |
+| ✓	| regenerate cache option | - | groups filter |
 | - | packager field | - | optional dependency field |
 | ✓ | sort by size on disk | - | conflicts sort |
 
@@ -118,7 +118,7 @@ for the latest (unstable) version from git w/ the AUR, use `qp-git`*.
 the cache is located under `/query-packages` at `$HOME/.cache/` or wherever you have `$XDG_HOME_CACHE` set to.
 
 ### building from source + manual installation
-**note**: this package is specific to arch-based linux distributions
+**note**: this packages is specific to arch-based linux distributions
 
 1. clone the repo:
    ```bash
@@ -172,10 +172,11 @@ qp [options]
 - `--json`: output results in JSON format (overrides table output and `--full-timestamp`)
 - `--no-progress`: force no progress bar outside of non-interactive environments
 - `--no-cache`: disable cache loading/saving and force fresh package data loading
+- `--regen-cache`: disable cache loading, force fresh package data loading, and save fresh cache
 - `-h` | `--help`: print help info
 
 ### querying with `--where`
-the `--where` (short-flag: `-w`) flag allows for powerful querying of installed packages. queries can be combined by using multiple query flags. 
+the `--where` (short-flag: `-w`) flag allows for powerful querying of installed packages. queries can be combined by using multiple `--where/-w` flags.
 
 all queries that take package/library/program names as arguments can also take a comma-separated list. this applies to the queries `name`, `depends`, and `required-by`. 
 

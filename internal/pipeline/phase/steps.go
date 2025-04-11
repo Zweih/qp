@@ -15,7 +15,7 @@ func LoadCacheStep(
 	_ ProgressReporter,
 	pipelineCtx *meta.PipelineContext,
 ) ([]*PkgInfo, error) {
-	if cfg.NoCache {
+	if cfg.NoCache || cfg.RegenCache {
 		return nil, nil
 	}
 

@@ -18,6 +18,7 @@ type Config struct {
 	ShowFullTimestamp bool
 	DisableProgress   bool
 	NoCache           bool
+	RegenCache        bool
 	SortOption        SortOption
 	Fields            []consts.FieldType
 	FieldQueries      FieldQueries
