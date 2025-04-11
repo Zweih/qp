@@ -26,6 +26,7 @@ const (
 	fieldDescription = "%DESC%"
 	fieldUrl         = "%URL%"
 	fieldValidation  = "%VALIDATION%"
+	fieldPackager    = "%PACKAGER%"
 	fieldGroups      = "%GROUPS%"
 	fieldDepends     = "%DEPENDS%"
 	fieldProvides    = "%PROVIDES%"
@@ -146,7 +147,8 @@ func parseDescFile(descPath string) (*PkgInfo, error) {
 			case fieldName, fieldInstallDate, fieldSize,
 				fieldReason, fieldVersion, fieldArch,
 				fieldLicense, fieldUrl, fieldDescription,
-				fieldValidation, fieldPkgBase, fieldBuildDate:
+				fieldValidation, fieldPackager, fieldPkgBase,
+				fieldBuildDate:
 				currentField = line
 
 			case fieldGroups, fieldDepends, fieldProvides,
@@ -266,6 +268,11 @@ func applySingleLineField(pkg *PkgInfo, field string, value string) error {
 
 	case fieldPkgBase:
 		pkg.PkgBase = value
+
+	case fieldPackager:
+		if value != "Unknown Packager" {
+			pkg.Packager = value
+		}
 
 	default:
 		// ignore unknown fields

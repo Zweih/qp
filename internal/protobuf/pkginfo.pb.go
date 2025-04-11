@@ -227,6 +227,7 @@ type PkgInfo struct {
 	Description      string                 `protobuf:"bytes,13,opt,name=description,proto3" json:"description,omitempty"`
 	PkgBase          string                 `protobuf:"bytes,14,opt,name=pkg_base,json=pkgBase,proto3" json:"pkg_base,omitempty"`
 	Validation       string                 `protobuf:"bytes,20,opt,name=validation,proto3" json:"validation,omitempty"`
+	Packager         string                 `protobuf:"bytes,21,opt,name=packager,proto3" json:"packager,omitempty"`
 	Groups           []string               `protobuf:"bytes,19,rep,name=groups,proto3" json:"groups,omitempty"`
 	Depends          []*Relation            `protobuf:"bytes,9,rep,name=depends,proto3" json:"depends,omitempty"`
 	RequiredBy       []*Relation            `protobuf:"bytes,10,rep,name=required_by,json=requiredBy,proto3" json:"required_by,omitempty"`
@@ -358,6 +359,13 @@ func (x *PkgInfo) GetValidation() string {
 	return ""
 }
 
+func (x *PkgInfo) GetPackager() string {
+	if x != nil {
+		return x.Packager
+	}
+	return ""
+}
+
 func (x *PkgInfo) GetGroups() []string {
 	if x != nil {
 		return x.Groups
@@ -470,7 +478,7 @@ const file_protobuf_pkginfo_proto_rawDesc = "" +
 	"\aversion\x18\x02 \x01(\tR\aversion\x12/\n" +
 	"\boperator\x18\x03 \x01(\x0e2\x13.pkginfo.RelationOpR\boperator\x12\x14\n" +
 	"\x05depth\x18\x04 \x01(\x05R\x05depth\x12\"\n" +
-	"\fproviderName\x18\x05 \x01(\tR\fproviderName\"\x91\x05\n" +
+	"\fproviderName\x18\x05 \x01(\tR\fproviderName\"\xad\x05\n" +
 	"\aPkgInfo\x12+\n" +
 	"\x11install_timestamp\x18\x11 \x01(\x03R\x10installTimestamp\x12'\n" +
 	"\x0fbuild_timestamp\x18\x10 \x01(\x03R\x0ebuildTimestamp\x12\x12\n" +
@@ -486,7 +494,8 @@ const file_protobuf_pkginfo_proto_rawDesc = "" +
 	"\bpkg_base\x18\x0e \x01(\tR\apkgBase\x12\x1e\n" +
 	"\n" +
 	"validation\x18\x14 \x01(\tR\n" +
-	"validation\x12\x16\n" +
+	"validation\x12\x1a\n" +
+	"\bpackager\x18\x15 \x01(\tR\bpackager\x12\x16\n" +
 	"\x06groups\x18\x13 \x03(\tR\x06groups\x12+\n" +
 	"\adepends\x18\t \x03(\v2\x11.pkginfo.RelationR\adepends\x122\n" +
 	"\vrequired_by\x18\n" +

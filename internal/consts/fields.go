@@ -14,6 +14,7 @@ const (
 	FieldName
 	FieldPkgBase
 	FieldValidation
+	FieldPackager
 	FieldDescription
 	FieldUrl
 	FieldGroups
@@ -47,6 +48,7 @@ const (
 	description = "description"
 	url         = "url"
 	validation  = "validation"
+	packager    = "packager"
 	groups      = "groups"
 	conflicts   = "conflicts"
 	replaces    = "replaces"
@@ -85,6 +87,7 @@ var FieldTypeLookup = map[string]FieldType{
 	description: FieldDescription,
 	url:         FieldUrl,
 	validation:  FieldValidation,
+	packager:    FieldPackager,
 	groups:      FieldGroups,
 	conflicts:   FieldConflicts,
 	replaces:    FieldReplaces,
@@ -148,6 +151,7 @@ var (
 		FieldDescription,
 		FieldUrl,
 		FieldValidation,
+		FieldPackager,
 		FieldGroups,
 		FieldConflicts,
 		FieldReplaces,

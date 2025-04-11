@@ -27,6 +27,7 @@ var columnHeaders = map[consts.FieldType]string{
 	consts.FieldDescription: "DESCRIPTION",
 	consts.FieldUrl:         "URL",
 	consts.FieldValidation:  "VALIDATION",
+	consts.FieldPackager:    "PACKAGER",
 	consts.FieldGroups:      "GROUPS",
 	consts.FieldConflicts:   "CONFLICTS",
 	consts.FieldReplaces:    "REPLACES",
@@ -126,6 +127,8 @@ func getTableValue(pkg *pkgdata.PkgInfo, field consts.FieldType, ctx tableContex
 		return pkg.Url
 	case consts.FieldValidation:
 		return pkg.Validation
+	case consts.FieldPackager:
+		return pkg.Packager
 	case consts.FieldGroups:
 		return strings.Join(pkg.Groups, ", ")
 	case consts.FieldDescription:
