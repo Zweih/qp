@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	cacheVersion    = 11 // bump when updating structure of PkgInfo/Relation/pkginfo.proto OR when dependency resolution is updated
+	cacheVersion    = 12 // bump when updating structure of PkgInfo/Relation/pkginfo.proto OR when dependency resolution is updated
 	xdgCacheHomeEnv = "XDG_CACHE_HOME"
 	homeEnv         = "HOME"
 	qpCacheDir      = "query-packages"
@@ -104,11 +104,12 @@ func relationsToProtos(rels []Relation) []*pb.Relation {
 	pbRels := make([]*pb.Relation, len(rels))
 	for i, rel := range rels {
 		pbRels[i] = &pb.Relation{
-			Name:         rel.Name,
-			Version:      rel.Version,
 			Operator:     pb.RelationOp(rel.Operator),
 			Depth:        rel.Depth,
+			Name:         rel.Name,
+			Version:      rel.Version,
 			ProviderName: rel.ProviderName,
+			Why:          rel.Why,
 		}
 	}
 
@@ -135,6 +136,7 @@ func pkgsToProtos(pkgs []*PkgInfo) []*pb.PkgInfo {
 			Packager:         pkg.Packager,
 			Groups:           pkg.Groups,
 			Depends:          relationsToProtos(pkg.Depends),
+			OptDepends:       relationsToProtos(pkg.OptDepends),
 			RequiredBy:       relationsToProtos(pkg.RequiredBy),
 			Provides:         relationsToProtos(pkg.Provides),
 			Conflicts:        relationsToProtos(pkg.Conflicts),
@@ -149,11 +151,12 @@ func protosToRelations(pbRels []*pb.Relation) []Relation {
 	rels := make([]Relation, len(pbRels))
 	for i, pbRel := range pbRels {
 		rels[i] = Relation{
-			Name:         pbRel.Name,
-			Version:      pbRel.Version,
 			Operator:     RelationOp(pbRel.Operator),
 			Depth:        pbRel.Depth,
+			Name:         pbRel.Name,
+			Version:      pbRel.Version,
 			ProviderName: pbRel.ProviderName,
+			Why:          pbRel.Why,
 		}
 	}
 
@@ -180,6 +183,7 @@ func protosToPkgs(pbPkgs []*pb.PkgInfo) []*PkgInfo {
 			Packager:         pbPkg.Packager,
 			Groups:           pbPkg.Groups,
 			Depends:          protosToRelations(pbPkg.Depends),
+			OptDepends:       protosToRelations(pbPkg.OptDepends),
 			RequiredBy:       protosToRelations(pbPkg.RequiredBy),
 			Provides:         protosToRelations(pbPkg.Provides),
 			Conflicts:        protosToRelations(pbPkg.Conflicts),

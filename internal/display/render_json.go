@@ -27,6 +27,7 @@ type PkgInfoJson struct {
 	Conflicts        []string `json:"conflicts,omitempty"`
 	Replaces         []string `json:"replaces,omitempty"`
 	Depends          []string `json:"depends,omitempty"`
+	OptDepends       []string `json:"optDepends,omitempty"`
 	RequiredBy       []string `json:"requiredBy,omitempty"`
 	Provides         []string `json:"provides,omitempty"`
 }
@@ -114,6 +115,8 @@ func getJsonValues(pkg *pkgdata.PkgInfo, fields []consts.FieldType) *PkgInfoJson
 			filteredPackage.Replaces = flattenRelations(pkg.Replaces)
 		case consts.FieldDepends:
 			filteredPackage.Depends = flattenRelations(pkg.Depends)
+		case consts.FieldOptDepends:
+			filteredPackage.OptDepends = flattenRelations(pkg.OptDepends)
 		case consts.FieldRequiredBy:
 			filteredPackage.RequiredBy = flattenRelations(pkg.RequiredBy)
 		case consts.FieldProvides:

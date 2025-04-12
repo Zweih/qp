@@ -29,6 +29,7 @@ const (
 	fieldPackager    = "%PACKAGER%"
 	fieldGroups      = "%GROUPS%"
 	fieldDepends     = "%DEPENDS%"
+	fieldOptDepends  = "%OPTDEPENDS%"
 	fieldProvides    = "%PROVIDES%"
 	fieldConflicts   = "%CONFLICTS%"
 	fieldReplaces    = "%REPLACES%"
@@ -151,8 +152,8 @@ func parseDescFile(descPath string) (*PkgInfo, error) {
 				fieldUrl, fieldValidation, fieldPackager:
 				currentField = line
 
-			case fieldGroups, fieldDepends, fieldProvides,
-				fieldConflicts, fieldReplaces, fieldXData:
+			case fieldGroups, fieldConflicts, fieldReplaces,
+				fieldDepends, fieldOptDepends, fieldProvides, fieldXData:
 				currentField = line
 				block, next := collectBlockBytes(data, end+1)
 
@@ -284,7 +285,8 @@ func applyMultiLineField(pkg *PkgInfo, field string, block []string) {
 	switch field {
 	case fieldGroups:
 		pkg.Groups = block
-	case fieldDepends, fieldProvides, fieldConflicts, fieldReplaces:
+	case fieldConflicts, fieldReplaces,
+		fieldDepends, fieldOptDepends, fieldProvides:
 		applyRelations(pkg, field, block)
 	case fieldXData:
 		applyXData(pkg, block)
@@ -320,6 +322,8 @@ func applyRelations(pkg *PkgInfo, field string, block []string) {
 		pkg.Replaces = relations
 	case fieldDepends:
 		pkg.Depends = relations
+	case fieldOptDepends:
+		pkg.OptDepends = relations
 	case fieldProvides:
 		pkg.Provides = relations
 	}
@@ -333,13 +337,23 @@ func parseRelation(input string) Relation {
 		switch input[i] {
 		case '=', '<', '>':
 			opStart = i
-			goto parseOp
+			goto parseVersion
+		case ':':
+			opStart = i
+			goto parseWhy
 		}
 	}
 
 	return Relation{Name: input, Depth: depth}
 
-parseOp:
+parseWhy:
+	return Relation{
+		Name:  input[:opStart],
+		Why:   strings.TrimSpace(input[(opStart + 1):]),
+		Depth: depth,
+	}
+
+parseVersion:
 	name := input[:opStart]
 	opEnd := opStart + 1
 

@@ -21,6 +21,7 @@ message Relation {
   RelationOp operator = 3;
   int32 depth = 4;
   string providerName = 5;
+  string why = 6;
 }
 
 enum PkgType {
@@ -51,6 +52,7 @@ message PkgInfo {
   repeated string groups = 19;
 
   repeated Relation depends = 9;
+  repeated Relation opt_depends = 22;
   repeated Relation required_by = 10;
   repeated Relation provides = 11;
   repeated Relation conflicts = 12;
