@@ -1,5 +1,11 @@
 # qp Release Notes
 
+## v4.13.0
+### What's Changed
+* Feature: Add pkgtype field by @Zweih in https://github.com/Zweih/qp/pull/176
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v4.12.2...v4.13.0
+
 ## v4.12.2
 ### What's Changed
 * Refactor: Rename dependency resolution by @Zweih in https://github.com/Zweih/qp/pull/174
