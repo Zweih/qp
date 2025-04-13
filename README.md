@@ -98,7 +98,8 @@ this package is compatible with the following distributions:
 | ✓ | packager field | ✓ | optional dependency field |
 | ✓ | sort by size on disk | - | conflicts sort |
 | ✓ | validation field | - | validation sort |
-| ✓ | reverse optional dependencies field (optional for) | - | optional-for query | 
+| ✓ | reverse optional dependencies field (optional for) | - | optdepends installation indicator |
+| - | optional-for query | - | separate field for optdepends reason |
 
 ## installation
 
@@ -303,10 +304,10 @@ output format:
       "libdbusmenu-gtk3"
     ],
     "optionalFor": [
-      "avahi",
-      "libdecor",
-      "pinentry"
-    ]
+      "avahi (avahi-discover, avahi-discover-standalone, bshell, bssh, bvnc)",
+      "libdecor (gtk3 support)",
+      "pinentry (GTK backend)"
+    ],
     "provides": [
       "gtk3-print-backends",
       "libgailutil-3.so=0-64",

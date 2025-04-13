@@ -111,6 +111,7 @@ func buildShallowTrees(
 				Version:  depPackage.Version,
 				Operator: depPackage.Operator,
 				Depth:    1,
+				Why:      depPackage.Why,
 			}
 
 			addToDependencyTree(reverseKey, reverseTree, reverseRelation)
