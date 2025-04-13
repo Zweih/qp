@@ -4,11 +4,6 @@ import (
 	"qp/internal/pipeline/meta"
 )
 
-type dependencyGraph struct {
-	forward map[string][]Relation
-	reverse map[string][]Relation
-}
-
 // TODO: we can do this concurrently. let's get on that.
 func ResolveDependencyGraph(
 	pkgs []*PkgInfo,
