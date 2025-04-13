@@ -35,7 +35,6 @@ func flattenRelations(relations []pkgdata.Relation) []string {
 
 		if rel.Why != "" {
 			whyFormat = fmt.Sprintf(" (%s)", rel.Why)
-			fmt.Println(rel.Why)
 		}
 
 		op := relationOpToString(rel.Operator)
