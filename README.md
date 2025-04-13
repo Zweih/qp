@@ -237,6 +237,7 @@ output format:
   {
     "timestamp": 1741107872,
     "size": 15514095,
+    "pkgtype": "split"
     "name": "util-linux",
     "reason": "dependency",
     "version": "2.40.4-1",
