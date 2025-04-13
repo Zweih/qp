@@ -51,12 +51,13 @@ message PkgInfo {
 
   repeated string groups = 19;
 
+  repeated Relation conflicts = 12;
+  repeated Relation replaces = 15;
   repeated Relation depends = 9;
   repeated Relation opt_depends = 22;
   repeated Relation required_by = 10;
+  repeated Relation optional_for = 23;
   repeated Relation provides = 11;
-  repeated Relation conflicts = 12;
-  repeated Relation replaces = 15;
 }
 
 message CachedPkgs {

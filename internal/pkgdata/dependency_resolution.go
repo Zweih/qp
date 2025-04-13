@@ -32,8 +32,6 @@ func ResolveDependencyGraph(
 			walkFullGraph(name, forwardShallow, visited, ""),
 		)
 
-		// pkg.OptionalFor = optReverseShallow[name]
-
 		pkg.OptionalFor = collapseRelations(
 			walkFullOptGraph(name, optReverseShallow[name], reverseShallow),
 		)

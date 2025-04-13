@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	cacheVersion    = 12 // bump when updating structure of PkgInfo/Relation/pkginfo.proto OR when dependency resolution is updated
+	cacheVersion    = 13 // bump when updating structure of PkgInfo/Relation/pkginfo.proto OR when dependency resolution is updated
 	xdgCacheHomeEnv = "XDG_CACHE_HOME"
 	homeEnv         = "HOME"
 	qpCacheDir      = "query-packages"
@@ -135,12 +135,13 @@ func pkgsToProtos(pkgs []*PkgInfo) []*pb.PkgInfo {
 			Validation:       pkg.Validation,
 			Packager:         pkg.Packager,
 			Groups:           pkg.Groups,
+			Conflicts:        relationsToProtos(pkg.Conflicts),
+			Replaces:         relationsToProtos(pkg.Replaces),
 			Depends:          relationsToProtos(pkg.Depends),
 			OptDepends:       relationsToProtos(pkg.OptDepends),
 			RequiredBy:       relationsToProtos(pkg.RequiredBy),
+			OptionalFor:      relationsToProtos(pkg.OptionalFor),
 			Provides:         relationsToProtos(pkg.Provides),
-			Conflicts:        relationsToProtos(pkg.Conflicts),
-			Replaces:         relationsToProtos(pkg.Replaces),
 		}
 	}
 
@@ -182,12 +183,13 @@ func protosToPkgs(pbPkgs []*pb.PkgInfo) []*PkgInfo {
 			Validation:       pbPkg.Validation,
 			Packager:         pbPkg.Packager,
 			Groups:           pbPkg.Groups,
+			Conflicts:        protosToRelations(pbPkg.Conflicts),
+			Replaces:         protosToRelations(pbPkg.Replaces),
 			Depends:          protosToRelations(pbPkg.Depends),
 			OptDepends:       protosToRelations(pbPkg.OptDepends),
 			RequiredBy:       protosToRelations(pbPkg.RequiredBy),
+			OptionalFor:      protosToRelations(pbPkg.OptionalFor),
 			Provides:         protosToRelations(pbPkg.Provides),
-			Conflicts:        protosToRelations(pbPkg.Conflicts),
-			Replaces:         protosToRelations(pbPkg.Replaces),
 		}
 	}
 

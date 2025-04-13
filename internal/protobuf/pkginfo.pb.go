@@ -237,12 +237,13 @@ type PkgInfo struct {
 	Validation       string                 `protobuf:"bytes,20,opt,name=validation,proto3" json:"validation,omitempty"`
 	Packager         string                 `protobuf:"bytes,21,opt,name=packager,proto3" json:"packager,omitempty"`
 	Groups           []string               `protobuf:"bytes,19,rep,name=groups,proto3" json:"groups,omitempty"`
+	Conflicts        []*Relation            `protobuf:"bytes,12,rep,name=conflicts,proto3" json:"conflicts,omitempty"`
+	Replaces         []*Relation            `protobuf:"bytes,15,rep,name=replaces,proto3" json:"replaces,omitempty"`
 	Depends          []*Relation            `protobuf:"bytes,9,rep,name=depends,proto3" json:"depends,omitempty"`
 	OptDepends       []*Relation            `protobuf:"bytes,22,rep,name=opt_depends,json=optDepends,proto3" json:"opt_depends,omitempty"`
 	RequiredBy       []*Relation            `protobuf:"bytes,10,rep,name=required_by,json=requiredBy,proto3" json:"required_by,omitempty"`
+	OptionalFor      []*Relation            `protobuf:"bytes,23,rep,name=optional_for,json=optionalFor,proto3" json:"optional_for,omitempty"`
 	Provides         []*Relation            `protobuf:"bytes,11,rep,name=provides,proto3" json:"provides,omitempty"`
-	Conflicts        []*Relation            `protobuf:"bytes,12,rep,name=conflicts,proto3" json:"conflicts,omitempty"`
-	Replaces         []*Relation            `protobuf:"bytes,15,rep,name=replaces,proto3" json:"replaces,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -382,6 +383,20 @@ func (x *PkgInfo) GetGroups() []string {
 	return nil
 }
 
+func (x *PkgInfo) GetConflicts() []*Relation {
+	if x != nil {
+		return x.Conflicts
+	}
+	return nil
+}
+
+func (x *PkgInfo) GetReplaces() []*Relation {
+	if x != nil {
+		return x.Replaces
+	}
+	return nil
+}
+
 func (x *PkgInfo) GetDepends() []*Relation {
 	if x != nil {
 		return x.Depends
@@ -403,23 +418,16 @@ func (x *PkgInfo) GetRequiredBy() []*Relation {
 	return nil
 }
 
+func (x *PkgInfo) GetOptionalFor() []*Relation {
+	if x != nil {
+		return x.OptionalFor
+	}
+	return nil
+}
+
 func (x *PkgInfo) GetProvides() []*Relation {
 	if x != nil {
 		return x.Provides
-	}
-	return nil
-}
-
-func (x *PkgInfo) GetConflicts() []*Relation {
-	if x != nil {
-		return x.Conflicts
-	}
-	return nil
-}
-
-func (x *PkgInfo) GetReplaces() []*Relation {
-	if x != nil {
-		return x.Replaces
 	}
 	return nil
 }
@@ -495,7 +503,7 @@ const file_protobuf_pkginfo_proto_rawDesc = "" +
 	"\boperator\x18\x03 \x01(\x0e2\x13.pkginfo.RelationOpR\boperator\x12\x14\n" +
 	"\x05depth\x18\x04 \x01(\x05R\x05depth\x12\"\n" +
 	"\fproviderName\x18\x05 \x01(\tR\fproviderName\x12\x10\n" +
-	"\x03why\x18\x06 \x01(\tR\x03why\"\xe1\x05\n" +
+	"\x03why\x18\x06 \x01(\tR\x03why\"\x97\x06\n" +
 	"\aPkgInfo\x12+\n" +
 	"\x11install_timestamp\x18\x11 \x01(\x03R\x10installTimestamp\x12'\n" +
 	"\x0fbuild_timestamp\x18\x10 \x01(\x03R\x0ebuildTimestamp\x12\x12\n" +
@@ -513,16 +521,17 @@ const file_protobuf_pkginfo_proto_rawDesc = "" +
 	"validation\x18\x14 \x01(\tR\n" +
 	"validation\x12\x1a\n" +
 	"\bpackager\x18\x15 \x01(\tR\bpackager\x12\x16\n" +
-	"\x06groups\x18\x13 \x03(\tR\x06groups\x12+\n" +
+	"\x06groups\x18\x13 \x03(\tR\x06groups\x12/\n" +
+	"\tconflicts\x18\f \x03(\v2\x11.pkginfo.RelationR\tconflicts\x12-\n" +
+	"\breplaces\x18\x0f \x03(\v2\x11.pkginfo.RelationR\breplaces\x12+\n" +
 	"\adepends\x18\t \x03(\v2\x11.pkginfo.RelationR\adepends\x122\n" +
 	"\vopt_depends\x18\x16 \x03(\v2\x11.pkginfo.RelationR\n" +
 	"optDepends\x122\n" +
 	"\vrequired_by\x18\n" +
 	" \x03(\v2\x11.pkginfo.RelationR\n" +
-	"requiredBy\x12-\n" +
-	"\bprovides\x18\v \x03(\v2\x11.pkginfo.RelationR\bprovides\x12/\n" +
-	"\tconflicts\x18\f \x03(\v2\x11.pkginfo.RelationR\tconflicts\x12-\n" +
-	"\breplaces\x18\x0f \x03(\v2\x11.pkginfo.RelationR\breplacesJ\x04\b\x01\x10\x02\"q\n" +
+	"requiredBy\x124\n" +
+	"\foptional_for\x18\x17 \x03(\v2\x11.pkginfo.RelationR\voptionalFor\x12-\n" +
+	"\bprovides\x18\v \x03(\v2\x11.pkginfo.RelationR\bprovidesJ\x04\b\x01\x10\x02\"q\n" +
 	"\n" +
 	"CachedPkgs\x12#\n" +
 	"\rlast_modified\x18\x01 \x01(\x03R\flastModified\x12$\n" +
@@ -566,20 +575,21 @@ var file_protobuf_pkginfo_proto_goTypes = []any{
 	(*CachedPkgs)(nil), // 4: pkginfo.CachedPkgs
 }
 var file_protobuf_pkginfo_proto_depIdxs = []int32{
-	0, // 0: pkginfo.Relation.operator:type_name -> pkginfo.RelationOp
-	1, // 1: pkginfo.PkgInfo.pkg_type:type_name -> pkginfo.PkgType
-	2, // 2: pkginfo.PkgInfo.depends:type_name -> pkginfo.Relation
-	2, // 3: pkginfo.PkgInfo.opt_depends:type_name -> pkginfo.Relation
-	2, // 4: pkginfo.PkgInfo.required_by:type_name -> pkginfo.Relation
-	2, // 5: pkginfo.PkgInfo.provides:type_name -> pkginfo.Relation
-	2, // 6: pkginfo.PkgInfo.conflicts:type_name -> pkginfo.Relation
-	2, // 7: pkginfo.PkgInfo.replaces:type_name -> pkginfo.Relation
-	3, // 8: pkginfo.CachedPkgs.pkgs:type_name -> pkginfo.PkgInfo
-	9, // [9:9] is the sub-list for method output_type
-	9, // [9:9] is the sub-list for method input_type
-	9, // [9:9] is the sub-list for extension type_name
-	9, // [9:9] is the sub-list for extension extendee
-	0, // [0:9] is the sub-list for field type_name
+	0,  // 0: pkginfo.Relation.operator:type_name -> pkginfo.RelationOp
+	1,  // 1: pkginfo.PkgInfo.pkg_type:type_name -> pkginfo.PkgType
+	2,  // 2: pkginfo.PkgInfo.conflicts:type_name -> pkginfo.Relation
+	2,  // 3: pkginfo.PkgInfo.replaces:type_name -> pkginfo.Relation
+	2,  // 4: pkginfo.PkgInfo.depends:type_name -> pkginfo.Relation
+	2,  // 5: pkginfo.PkgInfo.opt_depends:type_name -> pkginfo.Relation
+	2,  // 6: pkginfo.PkgInfo.required_by:type_name -> pkginfo.Relation
+	2,  // 7: pkginfo.PkgInfo.optional_for:type_name -> pkginfo.Relation
+	2,  // 8: pkginfo.PkgInfo.provides:type_name -> pkginfo.Relation
+	3,  // 9: pkginfo.CachedPkgs.pkgs:type_name -> pkginfo.PkgInfo
+	10, // [10:10] is the sub-list for method output_type
+	10, // [10:10] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_protobuf_pkginfo_proto_init() }
