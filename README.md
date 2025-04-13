@@ -235,7 +235,8 @@ output format:
 ```json
 [
   {
-    "timestamp": 1741107872,
+    "installTimestamp": 1743448252,
+    "buildTimestamp": 1742778264,
     "size": 15514095,
     "pkgtype": "split"
     "name": "util-linux",
