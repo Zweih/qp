@@ -23,6 +23,7 @@ const (
 	FieldBuildDate
 	FieldVersion
 	FieldDepends
+	FieldOptDepends
 	FieldRequiredBy
 	FieldProvides
 	FieldConflicts
@@ -53,6 +54,7 @@ const (
 	conflicts   = "conflicts"
 	replaces    = "replaces"
 	depends     = "depends"
+	optdepends  = "optdepends"
 	requiredBy  = "required-by"
 	provides    = "provides"
 
@@ -92,6 +94,7 @@ var FieldTypeLookup = map[string]FieldType{
 	conflicts:   FieldConflicts,
 	replaces:    FieldReplaces,
 	depends:     FieldDepends,
+	optdepends:  FieldOptDepends,
 	requiredBy:  FieldRequiredBy,
 	provides:    FieldProvides,
 }
@@ -121,6 +124,7 @@ var FieldNameLookup = map[FieldType]string{
 	FieldConflicts:   conflicts,
 	FieldReplaces:    replaces,
 	FieldDepends:     depends,
+	FieldOptDepends:  optdepends,
 	FieldRequiredBy:  requiredBy,
 	FieldProvides:    provides,
 }
@@ -157,6 +161,7 @@ var (
 		FieldConflicts,
 		FieldReplaces,
 		FieldDepends,
+		FieldOptDepends,
 		FieldRequiredBy,
 		FieldProvides,
 	}

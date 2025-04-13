@@ -27,12 +27,18 @@ func flattenRelations(relations []pkgdata.Relation) []string {
 
 	for _, rel := range relationsAtDepth {
 		var virtualFormat string
+		var whyFormat string
+
 		if rel.ProviderName != "" {
-			virtualFormat = fmt.Sprintf(" (provided by %s)", rel.ProviderName)
+			virtualFormat = fmt.Sprintf(" → %s", rel.ProviderName)
+		}
+
+		if rel.Why != "" {
+			whyFormat = fmt.Sprintf(" (%s)", rel.Why)
 		}
 
 		op := relationOpToString(rel.Operator)
-		relationOutputs = append(relationOutputs, fmt.Sprintf("%s%s%s%s", rel.Name, op, rel.Version, virtualFormat))
+		relationOutputs = append(relationOutputs, fmt.Sprintf("%s%s%s%s%s", rel.Name, op, rel.Version, virtualFormat, whyFormat))
 	}
 
 	return relationOutputs

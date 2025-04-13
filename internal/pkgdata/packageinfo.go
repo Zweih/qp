@@ -25,9 +25,10 @@ type Relation struct {
 	Depth    int32
 	Operator RelationOp
 
-	Version      string
 	Name         string
+	Version      string
 	ProviderName string
+	Why          string
 }
 
 type PkgInfo struct {
@@ -51,6 +52,7 @@ type PkgInfo struct {
 	Groups []string
 
 	Depends    []Relation
+	OptDepends []Relation
 	RequiredBy []Relation
 	Provides   []Relation
 	Conflicts  []Relation
