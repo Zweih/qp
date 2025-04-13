@@ -29,6 +29,7 @@ type PkgInfoJson struct {
 	Depends          []string `json:"depends,omitempty"`
 	OptDepends       []string `json:"optDepends,omitempty"`
 	RequiredBy       []string `json:"requiredBy,omitempty"`
+	OptionalFor      []string `json:"optionalFor,omitempty"`
 	Provides         []string `json:"provides,omitempty"`
 }
 
@@ -119,6 +120,8 @@ func getJsonValues(pkg *pkgdata.PkgInfo, fields []consts.FieldType) *PkgInfoJson
 			filteredPackage.OptDepends = flattenRelations(pkg.OptDepends)
 		case consts.FieldRequiredBy:
 			filteredPackage.RequiredBy = flattenRelations(pkg.RequiredBy)
+		case consts.FieldOptionalFor:
+			filteredPackage.OptionalFor = flattenRelations(pkg.OptionalFor)
 		case consts.FieldProvides:
 			filteredPackage.Provides = flattenRelations(pkg.Provides)
 		}

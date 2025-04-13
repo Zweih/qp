@@ -51,10 +51,11 @@ type PkgInfo struct {
 
 	Groups []string
 
-	Depends    []Relation
-	OptDepends []Relation
-	RequiredBy []Relation
-	Provides   []Relation
-	Conflicts  []Relation
-	Replaces   []Relation
+	Depends     []Relation
+	OptDepends  []Relation
+	RequiredBy  []Relation
+	OptionalFor []Relation
+	Provides    []Relation
+	Conflicts   []Relation
+	Replaces    []Relation
 }

@@ -37,7 +37,7 @@ func mainWithConfig(configProvider config.ConfigProvider) error {
 	pipelinePhases := []phasekit.PipelinePhase{
 		phasekit.New("Loading cache", phasekit.LoadCacheStep, &wg),
 		phasekit.New("Fetching packages", phasekit.FetchStep, &wg),
-		phasekit.New("Resolving dependency tree", phasekit.ResolveDepTreeStep, &wg),
+		phasekit.New("Resolving dependency tree", phasekit.ResolveDepGraphStep, &wg),
 		phasekit.New("Saving cache", phasekit.SaveCacheStep, &wg),
 		phasekit.New("Filtering", phasekit.FilterStep, &wg),
 		phasekit.New("Sorting", phasekit.SortStep, &wg),

@@ -34,6 +34,7 @@ var columnHeaders = map[consts.FieldType]string{
 	consts.FieldDepends:     "DEPENDS",
 	consts.FieldOptDepends:  "OPT DEPENDS",
 	consts.FieldRequiredBy:  "REQUIRED BY",
+	consts.FieldOptionalFor: "OPTIONAL FOR",
 	consts.FieldProvides:    "PROVIDES",
 }
 
@@ -128,18 +129,20 @@ func getTableValue(pkg *pkgdata.PkgInfo, field consts.FieldType, ctx tableContex
 		return pkg.Packager
 	case consts.FieldGroups:
 		return strings.Join(pkg.Groups, ", ")
+	case consts.FieldConflicts:
+		return formatRelations(pkg.Conflicts)
+	case consts.FieldReplaces:
+		return formatRelations(pkg.Replaces)
 	case consts.FieldDepends:
 		return formatRelations(pkg.Depends)
 	case consts.FieldOptDepends:
 		return formatRelations(pkg.OptDepends)
 	case consts.FieldRequiredBy:
 		return formatRelations(pkg.RequiredBy)
+	case consts.FieldOptionalFor:
+		return formatRelations(pkg.OptionalFor)
 	case consts.FieldProvides:
 		return formatRelations(pkg.Provides)
-	case consts.FieldConflicts:
-		return formatRelations(pkg.Conflicts)
-	case consts.FieldReplaces:
-		return formatRelations(pkg.Replaces)
 	default:
 		return ""
 	}
