@@ -234,61 +234,77 @@ qp -Aw name=util-linux --json
 output format:
 ```json
 [
-  {
-    "installTimestamp": 1743448252,
-    "buildTimestamp": 1742778264,
-    "size": 15514095,
-    "pkgtype": "split"
-    "name": "util-linux",
+  { 
+    "installTimestamp": 1743448253,
+    "buildTimestamp": 1741400060,
+    "size": 58266727,
+    "pkgtype": "split",
+    "name": "gtk3",
     "reason": "dependency",
-    "version": "2.40.4-1",
-    "arch": "x86_64",
-    "license": "LicenseRef-PublicDomain",
-    "pkgbase": "util-linux",
-    "description": "Miscellaneous system utilities for Linux",
-    "url": "https://github.com/util-linux/util-linux",
+    "version": "1:3.24.49-1",
+    "arch": "aarch64",
+    "license": "LGPL-2.1-or-later",
+    "pkgbase": "gtk3",
+    "description": "GObject-based multi-platform GUI toolkit",
+    "url": "https://www.gtk.org/",
     "validation": "pgp",
-    "packager": "Christian Hesse <eworm@archlinux.org>",
+    "packager": "Jan Alexander Steffens (heftig) <heftig@archlinux.org>",
     "conflicts": [
-      "hardlink",
-      "rfkill"
+      "gtk3-print-backends"
     ],
     "replaces": [
-      "hardlink",
-      "rfkill"
+      "gtk3-print-backends<=3.22.26-1"
     ],
     "depends": [
-      "coreutils",
-      "file",
+      "adwaita-icon-theme",
+      "at-spi2-core",
+      "cairo",
+      "cantarell-fonts",
+      "dconf",
+      "desktop-file-utils",
+      "fontconfig",
+      "fribidi",
+      "gdk-pixbuf2",
+      "glib2",
       "glibc",
-      "libcap-ng",
-      "libcrypt.so=2-64 → libxcrypt",
-      "libmagic.so=1-64 → file",
-      "libncursesw.so=6-64 → ncurses",
-      "libsystemd.so=0-64 → systemd-libs",
-      "libudev.so=1-64 → systemd-libs",
-      "libxcrypt",
-      "ncurses",
-      "pam",
-      "readline",
-      "shadow",
-      "systemd-libs",
-      "util-linux-libs=2.41",
-      "zlib"
+      "gtk-update-icon-cache",
+      "harfbuzz",
+      "iso-codes",
+      "libcloudproviders",
+      "libcolord",
+      "libcups",
+      "libegl → libglvnd",
+      "libepoxy",
+      "libgl → libglvnd",
+      "librsvg",
+      "libx11",
+      "libxcomposite",
+      "libxcursor",
+      "libxdamage",
+      "libxext",
+      "libxfixes",
+      "libxi",
+      "libxinerama",
+      "libxkbcommon",
+      "libxrandr",
+      "libxrender",
+      "pango",
+      "shared-mime-info",
+      "tinysparql",
+      "wayland"
     ],
     "optDepends": [
-      "words (default dictionary for look)"
+      "evince (Default print preview command)"
     ],
     "requiredBy": [
-      "base",
-      "fakeroot",
-      "mkinitcpio",
-      "systemd",
-      "zeromq"
+      "ibus",
+      "libdbusmenu-gtk3"
     ],
     "provides": [
-      "hardlink",
-      "rfkill"
+      "gtk3-print-backends",
+      "libgailutil-3.so=0-64",
+      "libgdk-3.so=0-64",
+      "libgtk-3.so=0-64"
     ]
   }
 ]
