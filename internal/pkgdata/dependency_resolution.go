@@ -5,71 +5,113 @@ import (
 )
 
 // TODO: we can do this concurrently. let's get on that.
-func ResolveDependencyTree(
-	pkgPtrs []*PkgInfo,
+func ResolveDependencyGraph(
+	pkgs []*PkgInfo,
 	_ meta.ProgressReporter, // TODO: Add progress reporting
 ) ([]*PkgInfo, error) {
-	packagePointerMap := make(map[string]*PkgInfo)
-	reverseDependencyTree := make(map[string][]Relation)
-	forwardDependencyTree := make(map[string][]Relation)
-	providesMap := make(map[string][]string)
+	providesMap := buildProvidesMap(pkgs)
+	forwardShallow, reverseShallow, optReverseShallow := buildShallowGraph(pkgs, providesMap)
+
+	var visited map[string]int32
+
+	for _, pkg := range pkgs {
+		name := pkg.Name
+
+		visited = map[string]int32{name: 0}
+		pkg.RequiredBy = collapseRelations(
+			walkFullGraph(name, reverseShallow, visited, ""),
+		)
+
+		visited = map[string]int32{name: 0}
+		pkg.Depends = collapseRelations(
+			walkFullGraph(name, forwardShallow, visited, ""),
+		)
+
+		pkg.OptionalFor = collapseRelations(
+			walkFullOptGraph(name, optReverseShallow[name], reverseShallow),
+		)
+
+		pkg.OptDepends = collapseRelations(
+			walkFullOptGraph(name, pkg.OptDepends, forwardShallow),
+		)
+	}
+
+	return pkgs, nil
+}
+
+func buildProvidesMap(pkgs []*PkgInfo) map[string][]string {
 	// key: provided library/package, value: package that provides it (provider)
+	providesMap := make(map[string][]string)
 
-	for _, pkg := range pkgPtrs {
-		packagePointerMap[pkg.Name] = pkg
-
-		// populate providesMap
+	for _, pkg := range pkgs {
 		for _, provided := range pkg.Provides {
 			providesMap[provided.Name] = append(providesMap[provided.Name], pkg.Name)
 		}
 	}
 
-	for _, pkg := range pkgPtrs {
-		for _, depPackage := range pkg.Depends {
-			depName := depPackage.Name
-			if depName == pkg.Name {
-				continue // prevent checking self-referencing packages
+	return providesMap
+}
+
+func buildShallowGraph(
+	pkgs []*PkgInfo,
+	providesMap map[string][]string,
+) (
+	forwardShallow map[string][]Relation,
+	reverseShallow map[string][]Relation,
+	optReverseShallow map[string][]Relation,
+) {
+	forwardShallow = make(map[string][]Relation)
+	reverseShallow = make(map[string][]Relation)
+	optReverseShallow = make(map[string][]Relation)
+
+	for _, pkg := range pkgs {
+		buildShallowTrees(pkg, pkg.Depends, providesMap, forwardShallow, reverseShallow)
+		buildShallowTrees(pkg, pkg.OptDepends, providesMap, nil, optReverseShallow)
+	}
+
+	return forwardShallow, reverseShallow, optReverseShallow
+}
+
+func buildShallowTrees(
+	pkg *PkgInfo,
+	deps []Relation,
+	providesMap map[string][]string,
+	forwardTree map[string][]Relation,
+	reverseTree map[string][]Relation,
+) {
+	for _, depPackage := range deps {
+		depName := depPackage.Name
+		if depName == pkg.Name {
+			continue // prevent checking self-referencing packages
+		}
+
+		targets := resolveProvisions(depName, depPackage.Version, depPackage.Operator, providesMap)
+
+		for _, target := range targets {
+			if target.Name == pkg.Name {
+				continue
 			}
 
-			targets := resolveProvisions(depName, depPackage.Version, depPackage.Operator, providesMap)
-
-			for _, target := range targets {
-				if target.Name == pkg.Name {
-					continue
-				}
-
-				addToDependencyTree(pkg.Name, forwardDependencyTree, target)
-
-				reverseKey := target.ProviderName
-				if reverseKey == "" {
-					reverseKey = target.Name
-				}
-
-				reverseRelation := Relation{
-					Name:     pkg.Name,
-					Version:  depPackage.Version,
-					Operator: depPackage.Operator,
-					Depth:    1,
-				}
-
-				addToDependencyTree(reverseKey, reverseDependencyTree, reverseRelation)
+			if forwardTree != nil {
+				addToDependencyTree(pkg.Name, forwardTree, target)
 			}
+
+			reverseKey := target.ProviderName
+			if reverseKey == "" {
+				reverseKey = target.Name
+			}
+
+			reverseRelation := Relation{
+				Name:     pkg.Name,
+				Version:  depPackage.Version,
+				Operator: depPackage.Operator,
+				Depth:    1,
+				Why:      depPackage.Why,
+			}
+
+			addToDependencyTree(reverseKey, reverseTree, reverseRelation)
 		}
 	}
-
-	for _, pkg := range pkgPtrs {
-		name := pkg.Name
-		visitedReverse := map[string]int32{name: 0}
-		visitedForward := map[string]int32{name: 0}
-
-		fullReverseDepGraph := walkDependencyGraph(name, reverseDependencyTree, visitedReverse, "")
-		fullForwardDepGraph := walkDependencyGraph(name, forwardDependencyTree, visitedForward, "")
-
-		pkg.RequiredBy = dedupToLowestDepth(fullReverseDepGraph)
-		pkg.Depends = dedupToLowestDepth(fullForwardDepGraph)
-	}
-
-	return pkgPtrs, nil
 }
 
 func addToDependencyTree(
@@ -106,7 +148,7 @@ func resolveProvisions(
 }
 
 // TODO: we can memoize this. we can also paralellize as well.
-func walkDependencyGraph(
+func walkFullGraph(
 	name string,
 	dependencyTree map[string][]Relation,
 	visited map[string]int32,
@@ -132,14 +174,34 @@ func walkDependencyGraph(
 
 		results = append(results, relationCopy)
 
-		subTree := walkDependencyGraph(relation.Name, dependencyTree, visited, relationCopy.ProviderName)
+		subTree := walkFullGraph(relation.Name, dependencyTree, visited, relationCopy.ProviderName)
 		results = append(results, subTree...)
 	}
 
 	return results
 }
 
-func dedupToLowestDepth(relations []Relation) []Relation {
+func walkFullOptGraph(
+	name string,
+	optionalGraph []Relation,
+	hardGraph map[string][]Relation,
+) []Relation {
+	var results []Relation
+	visited := map[string]int32{name: 0}
+
+	for _, optRelation := range optionalGraph {
+		visited[optRelation.Name] = 1
+		optRelation.Depth = 1
+		results = append(results, optRelation)
+
+		subTree := walkFullGraph(optRelation.Name, hardGraph, visited, "")
+		results = append(results, subTree...)
+	}
+
+	return results
+}
+
+func collapseRelations(relations []Relation) []Relation {
 	seen := map[string]Relation{}
 	for _, relation := range relations {
 		existingRelation, ok := seen[relation.Name]

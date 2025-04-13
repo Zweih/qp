@@ -4,7 +4,7 @@
 
 you can find installation instructions [here](#installation).
 
-`qp` supports querying and sorting for install date, package name, install reason (explicit/dependency), size on disk, reverse dependencies (required by), dependencies, validation, description, replacements, conflicts, provisions, build date, packager, package type and more. check [usage](#usage) for all available options.
+`qp` supports querying and sorting for install date, package name, install reason (explicit/dependency), size on disk, reverse dependencies (required by), dependencies, validation, description, replacements, conflicts, provisions, build date, packager, optional dependencies, reverse optional dependencies (optional for), package type and more. check [usage](#usage) for all available options.
 
 ![qp logo | query packages logo](https://gistcdn.githack.com/Zweih/9009d5c74eab8a5515a8a64a0495df32/raw/ef8a8ac3655fd3dee24494a3403867919d806b63/qp-logo_clean.svg)
 
@@ -12,7 +12,7 @@ you can find installation instructions [here](#installation).
 [![AUR version - qp-bin](https://img.shields.io/aur/version/qp-bin?style=flat-square&logo=arch-linux&logoColor=1793d1&label=qp-bin&color=1793d1)](https://aur.archlinux.org/packages/qp-bin)
 [![AUR version - qp-git](https://img.shields.io/aur/version/qp-git?style=flat-square&logo=arch-linux&logoColor=1793d1&label=qp-git&color=1793d1)](https://aur.archlinux.org/packages/qp-git)
 
-![GitHub Downloads](https://img.shields.io/github/downloads/Zweih/qp/total?style=for-the-badge&logo=github&label=Downloads%20Since%202%2F4%2F2025&color=1793d1)
+![GitHub Downloads](https://img.shields.io/github/downloads/Zweih/qp/total?style=for-the-badge&logo=github&label=Downloads%20since%202%2F4%2F2025&color=1793d1)
 
 ![Alt](https://repobeats.axiom.co/api/embed/a13406d103a649d70641774ee85e7a9983ccf96b.svg "Repobeats analytics image")
 
@@ -37,7 +37,7 @@ this package is compatible with the following distributions:
 
 ## features
 
-- list installed packages with install date/timestamps, dependencies, provisions, reverse dependencies (required by), size on disk, conflicts, replacements, architecture, license, description, build date, package base, package type, validation, packager, optional dependencies, groups, and version
+- list installed packages with install date/timestamps, dependencies, provisions, reverse dependencies (required by), size on disk, conflicts, replacements, architecture, license, description, build date, package base, package type, validation, packager, optional dependencies, reverse optional dependencies (optional for), groups, and version
 - query by explicitly installed packages
 - query by packages installed as dependencies
 - query by packages required by specified packages
@@ -98,6 +98,8 @@ this package is compatible with the following distributions:
 | ✓ | packager field | ✓ | optional dependency field |
 | ✓ | sort by size on disk | - | conflicts sort |
 | ✓ | validation field | - | validation sort |
+| ✓ | reverse optional dependencies field (optional for) | - | optdepends installation indicator |
+| - | optional-for query | - | separate field for optdepends reason |
 
 ## installation
 
@@ -200,12 +202,12 @@ short-flag queries and long-flag queries can be combined.
 ### available fields for selection
 - `date` - installation date of the package
 - `build-date` - date the package was built
+- `size` - package size on disk
+- `pkgtype` - package type (pkg, split, debug, source, unknown*)
+    - ***note**: older packages may show "unknown" pkgtype if built before pacman introduced XDATA
 - `name` - package name
 - `reason` - installation reason (explicit/dependency)
-- `size` - package size on disk
 - `version` - installed package version
-- `pkgtype` - package type (standard, split, debug, source, unknown*)
-    - ***note**: older packages may show "unknown" pkgtype if built before pacman introduced XDATA
 - `arch` - architecture the package was built for (e.g., x86_64, aarch64, any)
 - `license` - package software license
 - `pkgbase` - name of the base package used to group split packages; for non-split packages, it is the same as the package name. 
@@ -218,7 +220,8 @@ short-flag queries and long-flag queries can be combined.
 - `replaces` - list of packages that are replaced by the package
 - `depends` - list of dependencies
 - `optdepends` - list of optional dependencies
-- `required-by` - list of packages required by the package and are dependent 
+- `required-by` - list of packages required by the package and are dependent
+- `optional-for` - list of packages that optionally depend on the package (optionally dependent)
 - `provides` - list of alternative package names or shared libraries provided by package
 
 ### JSON output
@@ -299,6 +302,11 @@ output format:
     "requiredBy": [
       "ibus",
       "libdbusmenu-gtk3"
+    ],
+    "optionalFor": [
+      "avahi (avahi-discover, avahi-discover-standalone, bshell, bssh, bvnc)",
+      "libdecor (gtk3 support)",
+      "pinentry (GTK backend)"
     ],
     "provides": [
       "gtk3-print-backends",
