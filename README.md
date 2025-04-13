@@ -226,10 +226,10 @@ the `--json` flag outputs the package data as structured JSON instead of a table
 
 example:
 ```bash
-qp -Aw name=util-linux --json
+qp -Aw name=gtk3 --json
 ```
 
-`util-linux` is one of the few packages that actually has all the fields populated.
+`gtk3` is one of the few packages that actually has all the fields populated.
 
 output format:
 ```json
