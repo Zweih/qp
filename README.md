@@ -14,7 +14,7 @@ you can find installation instructions [here](#installation).
 
 ![GitHub Downloads](https://img.shields.io/github/downloads/Zweih/qp/total?style=for-the-badge&logo=github&label=Downloads%20Since%202%2F4%2F2025&color=1793d1)
 
-![Alt](https://repobeats.axiom.co/api/embed/504d7ad06523d97d04d9fa0c5f694922ec779b96.svg "Repobeats analytics image")
+![Alt](https://repobeats.axiom.co/api/embed/a13406d103a649d70641774ee85e7a9983ccf96b.svg "Repobeats analytics image")
 
 <details open>
 <summary><strong>download and clone statistics</strong></summary>
@@ -37,7 +37,7 @@ this package is compatible with the following distributions:
 
 ## features
 
-- list installed packages with install date/timestamps, dependencies, provisions, reverse dependencies (required by), size on disk, conflicts, replacements, architecture, license, description, build date, package base, package type, validation, packager, groups, and version
+- list installed packages with install date/timestamps, dependencies, provisions, reverse dependencies (required by), size on disk, conflicts, replacements, architecture, license, description, build date, package base, package type, validation, packager, optional dependencies, groups, and version
 - query by explicitly installed packages
 - query by packages installed as dependencies
 - query by packages required by specified packages
@@ -95,7 +95,7 @@ this package is compatible with the following distributions:
 | ✓ | architecture query | ✓ | groups field |
 | ✓	| conflicts query | - | package description sort |
 | ✓	| regenerate cache option | - | groups filter |
-| ✓ | packager field | - | optional dependency field |
+| ✓ | packager field | ✓ | optional dependency field |
 | ✓ | sort by size on disk | - | conflicts sort |
 | ✓ | validation field | - | validation sort |
 
@@ -216,63 +216,77 @@ short-flag queries and long-flag queries can be combined.
 - `groups` - package groups or categories (e.g., base, gnome, xfce4)
 - `conflicts` - list of packages that conflict, or cause problems, with the package
 - `replaces` - list of packages that are replaced by the package
-- `depends` - list of dependencies (output can be long)
-- `required-by` - list of packages required by the package and are dependent (output can be long) 
-- `provides` - list of alternative package names or shared libraries provided by package (output can be long)
+- `depends` - list of dependencies
+- `optdepends` - list of optional dependencies
+- `required-by` - list of packages required by the package and are dependent 
+- `provides` - list of alternative package names or shared libraries provided by package
 
 ### JSON output
 the `--json` flag outputs the package data as structured JSON instead of a table. this can be useful for scripts or automation.
 
 example:
 ```bash
-qp -Aw name=tinysparql --json
+qp -Aw name=util-linux --json
 ```
 
-`tinysparql` is one of the few packages that actually has all the fields populated.
+`util-linux` is one of the few packages that actually has all the fields populated.
 
 output format:
 ```json
 [
   {
-    "installTimestamp": 1743448252,
-    "buildTimestamp": 1742778264,
-    "size": 4446373,
-    "name": "tinysparql",
+    "timestamp": 1741107872,
+    "size": 15514095,
+    "name": "util-linux",
     "reason": "dependency",
-    "version": "3.9.1-1",
-    "pkgtype": "split",
-    "arch": "aarch64",
-    "license": "GPL-2.0-or-later",
-    "pkgbase": "tinysparql",
-    "description": "Low-footprint RDF triple store with SPARQL 1.1 interface",
-    "url": "https://tinysparql.org/",
+    "version": "2.40.4-1",
+    "arch": "x86_64",
+    "license": "LicenseRef-PublicDomain",
+    "pkgbase": "util-linux",
+    "description": "Miscellaneous system utilities for Linux",
+    "url": "https://github.com/util-linux/util-linux",
     "validation": "pgp",
-    "packager": "Fabian Bornschein <fabiscafe@archlinux.org>",
+    "packager": "Christian Hesse <eworm@archlinux.org>",
     "conflicts": [
-      "tracker3<=3.7.3-2"
+      "hardlink",
+      "rfkill"
     ],
     "replaces": [
-      "tracker3<=3.7.3-2"
+      "hardlink",
+      "rfkill"
     ],
     "depends": [
-      "avahi",
-      "gcc-libs",
-      "glib2",
+      "coreutils",
+      "file",
       "glibc",
-      "icu",
-      "json-glib",
-      "libsoup3",
-      "libstemmer",
-      "libxml2",
-      "sqlite"
+      "libcap-ng",
+      "libcrypt.so=2-64 → libxcrypt",
+      "libmagic.so=1-64 → file",
+      "libncursesw.so=6-64 → ncurses",
+      "libsystemd.so=0-64 → systemd-libs",
+      "libudev.so=1-64 → systemd-libs",
+      "libxcrypt",
+      "ncurses",
+      "pam",
+      "readline",
+      "shadow",
+      "systemd-libs",
+      "util-linux-libs=2.41",
+      "zlib"
+    ],
+    "optDepends": [
+      "words (default dictionary for look)"
     ],
     "requiredBy": [
-      "gtk3",
-      "gtk4"
+      "base",
+      "fakeroot",
+      "mkinitcpio",
+      "systemd",
+      "zeromq"
     ],
     "provides": [
-      "libtinysparql-3.0.so=0-64",
-      "tracker3=3.9.1"
+      "hardlink",
+      "rfkill"
     ]
   }
 ]
