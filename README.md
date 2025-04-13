@@ -202,12 +202,12 @@ short-flag queries and long-flag queries can be combined.
 ### available fields for selection
 - `date` - installation date of the package
 - `build-date` - date the package was built
+- `size` - package size on disk
+- `pkgtype` - package type (pkg, split, debug, source, unknown*)
+    - ***note**: older packages may show "unknown" pkgtype if built before pacman introduced XDATA
 - `name` - package name
 - `reason` - installation reason (explicit/dependency)
-- `size` - package size on disk
 - `version` - installed package version
-- `pkgtype` - package type (standard, split, debug, source, unknown*)
-    - ***note**: older packages may show "unknown" pkgtype if built before pacman introduced XDATA
 - `arch` - architecture the package was built for (e.g., x86_64, aarch64, any)
 - `license` - package software license
 - `pkgbase` - name of the base package used to group split packages; for non-split packages, it is the same as the package name. 
