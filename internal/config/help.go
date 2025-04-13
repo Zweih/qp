@@ -72,6 +72,7 @@ func PrintHelp() {
 	fmt.Println("  validation   Package integrity validation method (e.g., \"sha256\", \"pgp\")")
 	fmt.Println("  packager     Person/entity who built the package (if available)")
 	fmt.Println("  optdepends   List of optional dependencies")
+	fmt.Println("  optional-for List of packages that optionally depend on this package")
 
 	fmt.Println("\nExamples:")
 	fmt.Println("  qp -l 10                      # Show the last 10 installed packages")

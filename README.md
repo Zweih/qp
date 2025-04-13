@@ -4,7 +4,7 @@
 
 you can find installation instructions [here](#installation).
 
-`qp` supports querying and sorting for install date, package name, install reason (explicit/dependency), size on disk, reverse dependencies (required by), dependencies, validation, description, replacements, conflicts, provisions, build date, packager, package type and more. check [usage](#usage) for all available options.
+`qp` supports querying and sorting for install date, package name, install reason (explicit/dependency), size on disk, reverse dependencies (required by), dependencies, validation, description, replacements, conflicts, provisions, build date, packager, optional dependencies, reverse optional dependencies (optional for), package type and more. check [usage](#usage) for all available options.
 
 ![qp logo | query packages logo](https://gistcdn.githack.com/Zweih/9009d5c74eab8a5515a8a64a0495df32/raw/ef8a8ac3655fd3dee24494a3403867919d806b63/qp-logo_clean.svg)
 
@@ -37,7 +37,7 @@ this package is compatible with the following distributions:
 
 ## features
 
-- list installed packages with install date/timestamps, dependencies, provisions, reverse dependencies (required by), size on disk, conflicts, replacements, architecture, license, description, build date, package base, package type, validation, packager, optional dependencies, groups, and version
+- list installed packages with install date/timestamps, dependencies, provisions, reverse dependencies (required by), size on disk, conflicts, replacements, architecture, license, description, build date, package base, package type, validation, packager, optional dependencies, reverse optional dependencies (optional for), groups, and version
 - query by explicitly installed packages
 - query by packages installed as dependencies
 - query by packages required by specified packages
@@ -98,6 +98,7 @@ this package is compatible with the following distributions:
 | ✓ | packager field | ✓ | optional dependency field |
 | ✓ | sort by size on disk | - | conflicts sort |
 | ✓ | validation field | - | validation sort |
+| ✓ | reverse optional dependencies field (optional for) | - | optional-for query | 
 
 ## installation
 
@@ -218,7 +219,8 @@ short-flag queries and long-flag queries can be combined.
 - `replaces` - list of packages that are replaced by the package
 - `depends` - list of dependencies
 - `optdepends` - list of optional dependencies
-- `required-by` - list of packages required by the package and are dependent 
+- `required-by` - list of packages required by the package and are dependent
+- `optional-for` - list of packages that optionally depend on the package (optionally dependent)
 - `provides` - list of alternative package names or shared libraries provided by package
 
 ### JSON output
@@ -300,6 +302,11 @@ output format:
       "ibus",
       "libdbusmenu-gtk3"
     ],
+    "optionalFor": [
+      "avahi",
+      "libdecor",
+      "pinentry"
+    ]
     "provides": [
       "gtk3-print-backends",
       "libgailutil-3.so=0-64",
