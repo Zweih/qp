@@ -75,7 +75,7 @@ jobs:
         run: |
           echo "$GPG_PRIVATE_KEY" | gpg --batch --import
           KEY_ID=$(gpg --list-keys --with-colons | awk -F: '/^pub/ { print $5; exit }')
-          echo -e "5\ny\n" | gpg --command-fd 0 --expert --edit-key "$KEY_ID" trust
+          echo -e "5\ny\n" | gpg --batch --yes --no-tty --command-fd 0 --expert --edit-key "$KEY_ID" trust
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
 
