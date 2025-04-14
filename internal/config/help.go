@@ -14,6 +14,7 @@ func PrintHelp() {
 
 	fmt.Println("\nQuerying Options:")
 	fmt.Println("  -w, --where <field>=<value> Apply queries to refine package listings. Can be used multiple times.")
+	fmt.Println("                              Exact queryies use '==' and fuzzy queries use '='.")
 	fmt.Println("                               Example: --where size=100MB:1GB --where name=firefox")
 
 	fmt.Println("\n  Available queries:")
