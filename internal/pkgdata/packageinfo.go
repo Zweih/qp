@@ -15,16 +15,6 @@ const (
 	OpGreaterEqual
 )
 
-type PkgType int32
-
-const (
-	PkgTypeUnknown PkgType = iota
-	PkgTypePkg
-	PkgTypeSplit
-	PkgTypeSrc
-	PkgTypeDebug
-)
-
 type Relation struct {
 	Depth    int32
 	Operator RelationOp
@@ -40,8 +30,6 @@ type PkgInfo struct {
 	BuildTimestamp   int64
 	Size             int64
 
-	PkgType PkgType
-
 	Name        string
 	Reason      string
 	Version     string
@@ -52,6 +40,7 @@ type PkgInfo struct {
 	Url         string
 	Validation  string
 	Packager    string
+	PkgType     string
 
 	Groups []string
 
@@ -62,6 +51,19 @@ type PkgInfo struct {
 	Provides    []Relation
 	Conflicts   []Relation
 	Replaces    []Relation
+}
+
+func (pkg *PkgInfo) GetInt(field consts.FieldType) int64 {
+	switch field {
+	case consts.FieldDate:
+		return pkg.InstallTimestamp
+	case consts.FieldBuildDate:
+		return pkg.BuildTimestamp
+	case consts.FieldSize:
+		return pkg.Size
+	default:
+		panic("invalid field passed to GetInt")
+	}
 }
 
 func (pkg *PkgInfo) GetString(field consts.FieldType) string {
@@ -86,6 +88,8 @@ func (pkg *PkgInfo) GetString(field consts.FieldType) string {
 		return pkg.Validation
 	case consts.FieldPackager:
 		return pkg.Packager
+	case consts.FieldPkgType:
+		return pkg.PkgType
 	default:
 		panic("invalid field passed to GetString: " + consts.FieldNameLookup[field])
 	}
@@ -112,17 +116,44 @@ func (pkg *PkgInfo) GetRelations(field consts.FieldType) []Relation {
 	}
 }
 
-func (pkg *PkgInfo) GetInt(field consts.FieldType) int64 {
-	switch field {
-	case consts.FieldDate:
-		return pkg.InstallTimestamp
-	case consts.FieldBuildDate:
-		return pkg.BuildTimestamp
-	case consts.FieldSize:
-		return pkg.Size
-	case consts.FieldPkgType:
-		return int64(pkg.PkgType)
+const (
+	equal        = "="
+	less         = "<"
+	greater      = ">"
+	lessEqual    = less + equal
+	greaterEqual = greater + equal
+)
+
+func StringToOperator(operatorInput string) RelationOp {
+	switch operatorInput {
+	case equal:
+		return OpEqual
+	case less:
+		return OpLess
+	case greater:
+		return OpGreater
+	case lessEqual:
+		return OpLessEqual
+	case greaterEqual:
+		return OpGreaterEqual
 	default:
-		panic("invalid field passed to GetInt")
+		return OpNone
+	}
+}
+
+func OperatorToString(op RelationOp) string {
+	switch op {
+	case OpEqual:
+		return equal
+	case OpLess:
+		return less
+	case OpGreater:
+		return greater
+	case OpLessEqual:
+		return lessEqual
+	case OpGreaterEqual:
+		return greaterEqual
+	default:
+		return ""
 	}
 }

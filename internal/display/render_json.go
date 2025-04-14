@@ -87,7 +87,7 @@ func getJsonValues(pkg *pkgdata.PkgInfo, fields []consts.FieldType) *PkgInfoJson
 		case consts.FieldSize:
 			filteredPackage.Size = pkg.GetInt(field)
 		case consts.FieldPkgType:
-			filteredPackage.PkgType = pkgTypeToString(pkgdata.PkgType(pkg.GetInt(field)))
+			filteredPackage.PkgType = pkg.GetString(field)
 		case consts.FieldName:
 			filteredPackage.Name = pkg.GetString(field)
 		case consts.FieldReason:

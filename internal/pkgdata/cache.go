@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	cacheVersion    = 13 // bump when updating structure of PkgInfo/Relation/pkginfo.proto OR when dependency resolution is updated
+	cacheVersion    = 14 // bump when updating structure of PkgInfo/Relation/pkginfo.proto OR when dependency resolution is updated
 	xdgCacheHomeEnv = "XDG_CACHE_HOME"
 	homeEnv         = "HOME"
 	qpCacheDir      = "query-packages"
@@ -126,7 +126,6 @@ func pkgsToProtos(pkgs []*PkgInfo) []*pb.PkgInfo {
 			Name:             pkg.Name,
 			Reason:           pkg.Reason,
 			Version:          pkg.Version,
-			PkgType:          pb.PkgType(pkg.PkgType),
 			Arch:             pkg.Arch,
 			License:          pkg.License,
 			Url:              pkg.Url,
@@ -134,6 +133,7 @@ func pkgsToProtos(pkgs []*PkgInfo) []*pb.PkgInfo {
 			PkgBase:          pkg.PkgBase,
 			Validation:       pkg.Validation,
 			Packager:         pkg.Packager,
+			PkgType:          pkg.PkgType,
 			Groups:           pkg.Groups,
 			Conflicts:        relationsToProtos(pkg.Conflicts),
 			Replaces:         relationsToProtos(pkg.Replaces),
@@ -174,7 +174,6 @@ func protosToPkgs(pbPkgs []*pb.PkgInfo) []*PkgInfo {
 			Name:             pbPkg.Name,
 			Reason:           pbPkg.Reason,
 			Version:          pbPkg.Version,
-			PkgType:          PkgType(pbPkg.PkgType),
 			Arch:             pbPkg.Arch,
 			License:          pbPkg.License,
 			Url:              pbPkg.Url,
@@ -182,6 +181,7 @@ func protosToPkgs(pbPkgs []*pb.PkgInfo) []*PkgInfo {
 			PkgBase:          pbPkg.PkgBase,
 			Validation:       pbPkg.Validation,
 			Packager:         pbPkg.Packager,
+			PkgType:          pbPkg.PkgType,
 			Groups:           pbPkg.Groups,
 			Conflicts:        protosToRelations(pbPkg.Conflicts),
 			Replaces:         protosToRelations(pbPkg.Replaces),

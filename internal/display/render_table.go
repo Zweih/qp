@@ -103,13 +103,11 @@ func getTableValue(pkg *pkgdata.PkgInfo, field consts.FieldType, ctx tableContex
 		return formatDate(pkg.GetInt(field), ctx)
 	case consts.FieldSize:
 		return formatSize(pkg.GetInt(field))
-	case consts.FieldPkgType:
-		return pkgTypeToString(pkgdata.PkgType(pkg.GetInt(field)))
 
-	case consts.FieldName, consts.FieldArch, consts.FieldLicense,
-		consts.FieldDescription, consts.FieldReason, consts.FieldUrl,
-		consts.FieldValidation, consts.FieldPackager, consts.FieldVersion,
-		consts.FieldPkgBase:
+	case consts.FieldName, consts.FieldReason, consts.FieldVersion,
+		consts.FieldArch, consts.FieldLicense, consts.FieldUrl,
+		consts.FieldDescription, consts.FieldPkgBase, consts.FieldValidation,
+		consts.FieldPackager, consts.FieldPkgType:
 		return pkg.GetString(field)
 
 	case consts.FieldGroups:

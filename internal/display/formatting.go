@@ -37,43 +37,11 @@ func flattenRelations(relations []pkgdata.Relation) []string {
 			whyFormat = fmt.Sprintf(" (%s)", rel.Why)
 		}
 
-		op := relationOpToString(rel.Operator)
+		op := pkgdata.OperatorToString(rel.Operator)
 		relationOutputs = append(relationOutputs, fmt.Sprintf("%s%s%s%s%s", rel.Name, op, rel.Version, virtualFormat, whyFormat))
 	}
 
 	return relationOutputs
-}
-
-func relationOpToString(op pkgdata.RelationOp) string {
-	switch op {
-	case pkgdata.OpEqual:
-		return "="
-	case pkgdata.OpLess:
-		return "<"
-	case pkgdata.OpLessEqual:
-		return "<="
-	case pkgdata.OpGreater:
-		return ">"
-	case pkgdata.OpGreaterEqual:
-		return ">="
-	default:
-		return ""
-	}
-}
-
-func pkgTypeToString(pkgType pkgdata.PkgType) string {
-	switch pkgType {
-	case pkgdata.PkgTypePkg:
-		return "pkg"
-	case pkgdata.PkgTypeSplit:
-		return "split"
-	case pkgdata.PkgTypeSrc:
-		return "src"
-	case pkgdata.PkgTypeDebug:
-		return "debug"
-	default:
-		return ""
-	}
 }
 
 func formatDate(timestamp int64, ctx tableContext) string {
