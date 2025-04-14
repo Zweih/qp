@@ -177,7 +177,7 @@ jobs:
           git fetch origin packaging
           git checkout packaging
 
-          VERSION="${{ env.TAG_NAME }}"
+          VERSION="${{ env.TAG_NAME } }"
           CHECKSUMS_FILE=./release/SHA256SUMS.txt
 
           for pkg in qp-bin qp-src; do
@@ -197,7 +197,7 @@ jobs:
           makepkg --nobuild --nodeps --clean --cleanbuild --noconfirm
           echo "Updated qp-git/pkgver to $(grep '^pkgver=' PKGBUILD | cut -d'=' -f2)"
 
-          rm -rf src pkg qp          
+          rm -rf src pkg qp 
 
       - name: Generate .SRCINFO for qp-bin, qp-src, and qp-git
         run: |
