@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest  # ubuntu includes cross-compilation toolchains
 
     env:
-      TAG_NAME: ${{ github.ref_name != '' && github.ref_name || inputs.ref }}
+      TAG_NAME: ${{ inputs.ref }}
 
     strategy:
       matrix:
