@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest  # ubuntu includes cross-compilation toolchains
 
     env:
-      TAG_NAME: ${{ inputs.ref }}
+      TAG_NAME: ${{ github.ref_type == 'tag' && github.ref_name || inputs.ref }}
 
     strategy:
       matrix:
@@ -70,7 +70,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     env:
-      TAG_NAME: ${{ inputs.ref }}
+      TAG_NAME: ${{ github.ref_type == 'tag' && github.ref_name || inputs.ref }}
 
     steps:
       - name: echo TAG_NAME
