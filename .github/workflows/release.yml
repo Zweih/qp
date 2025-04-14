@@ -70,7 +70,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     env:
-      TAG_NAME: ${{ github.ref_name != '' && github.ref_name || inputs.ref }}
+      TAG_NAME: ${{ inputs.ref }}
 
     steps:
       - name: echo TAG_NAME
@@ -170,7 +170,7 @@ jobs:
             --notes "Detached signatures for qp release ${{ env.TAG_NAME }}" \
             ./release/qp-*.tar.gz.asc
         env:
-          GH_TOKEN: ${{ secrets.SIGNATURES_REPO_TOKEN }}
+          GH_TOKEN: ${{ secrets.QP_SIGNATURES_TOKEN }}
 
       - name: Update qp-bin and qp-src PKGBUILDs with version and checksums  
         run: |
