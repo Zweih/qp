@@ -5,6 +5,7 @@ import (
 	"math"
 	"qp/internal/consts"
 	"qp/internal/pipeline/meta"
+	"slices"
 	"strings"
 	"sync"
 	"time"
@@ -18,10 +19,22 @@ type FilterCondition struct {
 	FieldType consts.FieldType
 }
 
-func FilterByRelation(relations []Relation, targetNames []string) bool {
+func ExactRelations(relations []Relation, targetNames []string) bool {
 	for _, targetName := range targetNames {
 		for _, relation := range relations {
 			if relation.Name == targetName {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+func FuzzyRelations(relations []Relation, targetNames []string) bool {
+	for _, targetName := range targetNames {
+		for _, relation := range relations {
+			if strings.Contains(relation.Name, targetName) {
 				return true
 			}
 		}
@@ -81,7 +94,7 @@ func FilterBySizeRange(pkg *PkgInfo, startSize int64, endSize int64) bool {
 
 func FilterSliceByStrings(pkgStrings []string, targetStrings []string) bool {
 	for _, pkgString := range pkgStrings {
-		if FilterByStrings(pkgString, targetStrings) {
+		if FuzzyStrings(pkgString, targetStrings) {
 			return true
 		}
 	}
@@ -89,7 +102,7 @@ func FilterSliceByStrings(pkgStrings []string, targetStrings []string) bool {
 	return false
 }
 
-func FilterByStrings(pkgString string, targetStrings []string) bool {
+func FuzzyStrings(pkgString string, targetStrings []string) bool {
 	pkgString = strings.ToLower(pkgString)
 
 	for _, targetString := range targetStrings {
@@ -99,6 +112,12 @@ func FilterByStrings(pkgString string, targetStrings []string) bool {
 	}
 
 	return false
+}
+
+func ExactStrings(pkgString string, targetStrings []string) bool {
+	pkgString = strings.ToLower(pkgString)
+
+	return slices.Contains(targetStrings, pkgString)
 }
 
 func FilterPackages(

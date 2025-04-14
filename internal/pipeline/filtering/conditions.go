@@ -24,9 +24,21 @@ func newCondition(fieldType consts.FieldType) FilterCondition {
 	}
 }
 
-func newStringCondition(field consts.FieldType, targets []string) (*FilterCondition, error) {
+func newStringCondition(
+	field consts.FieldType,
+	targets []string,
+	match consts.MatchType,
+) (*FilterCondition, error) {
 	conditionFilter := newCondition(field)
 	var filterFunc pkgdata.Filter
+	var matcher func(string, []string) bool
+
+	switch match {
+	case consts.MatchExact:
+		matcher = pkgdata.ExactStrings
+	default:
+		matcher = pkgdata.FuzzyStrings
+	}
 
 	for i, target := range targets {
 		targets[i] = strings.ToLower(target)
@@ -35,19 +47,19 @@ func newStringCondition(field consts.FieldType, targets []string) (*FilterCondit
 	switch field {
 	case consts.FieldName:
 		filterFunc = func(pkg *PkgInfo) bool {
-			return pkgdata.FilterByStrings(pkg.Name, targets)
+			return matcher(pkg.Name, targets)
 		}
 	case consts.FieldArch:
 		filterFunc = func(pkg *PkgInfo) bool {
-			return pkgdata.FilterByStrings(pkg.Arch, targets)
+			return matcher(pkg.Arch, targets)
 		}
 	case consts.FieldLicense:
 		filterFunc = func(pkg *PkgInfo) bool {
-			return pkgdata.FilterByStrings(pkg.License, targets)
+			return matcher(pkg.License, targets)
 		}
 	case consts.FieldDescription:
 		filterFunc = func(pkg *PkgInfo) bool {
-			return pkgdata.FilterByStrings(pkg.Description, targets)
+			return matcher(pkg.Description, targets)
 		}
 	default:
 		return nil, fmt.Errorf("invalid field for string filter: %s", consts.FieldNameLookup[field])
@@ -62,9 +74,18 @@ func newRelationCondition(
 	field consts.FieldType,
 	targets []string,
 	depth int32,
+	match consts.MatchType,
 ) (*FilterCondition, error) {
 	conditionFilter := newCondition(field)
 	var filterFunc pkgdata.Filter
+	var matcher func([]pkgdata.Relation, []string) bool
+
+	switch match {
+	case consts.MatchExact:
+		matcher = pkgdata.ExactRelations
+	default:
+		matcher = pkgdata.FuzzyRelations
+	}
 
 	for i, target := range targets {
 		targets[i] = strings.ToLower(target)
@@ -74,22 +95,22 @@ func newRelationCondition(
 	case consts.FieldRequiredBy:
 		filterFunc = func(pkg *PkgInfo) bool {
 			relationsAtDepth := pkgdata.GetRelationsByDepth(pkg.RequiredBy, depth)
-			return pkgdata.FilterByRelation(relationsAtDepth, targets)
+			return matcher(relationsAtDepth, targets)
 		}
 	case consts.FieldDepends:
 		filterFunc = func(pkg *PkgInfo) bool {
 			relationsAtDepth := pkgdata.GetRelationsByDepth(pkg.Depends, depth)
-			return pkgdata.FilterByRelation(relationsAtDepth, targets)
+			return matcher(relationsAtDepth, targets)
 		}
 	case consts.FieldProvides:
 		filterFunc = func(pkg *PkgInfo) bool {
 			relationsAtDepth := pkgdata.GetRelationsByDepth(pkg.Provides, depth)
-			return pkgdata.FilterByRelation(relationsAtDepth, targets)
+			return matcher(relationsAtDepth, targets)
 		}
 	case consts.FieldConflicts:
 		filterFunc = func(pkg *PkgInfo) bool {
 			relationsAtDepth := pkgdata.GetRelationsByDepth(pkg.Conflicts, depth)
-			return pkgdata.FilterByRelation(relationsAtDepth, targets)
+			return matcher(relationsAtDepth, targets)
 		}
 	default:
 		return nil, fmt.Errorf("invalid field for relation filter: %s", consts.FieldNameLookup[field])

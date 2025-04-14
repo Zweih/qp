@@ -82,7 +82,9 @@ func parseRelationCondition(
 		}
 	}
 
-	return newRelationCondition(field, targetNames, int32(depth))
+	match := stringToMatchType(subfields[consts.SubfieldMatch])
+
+	return newRelationCondition(field, targetNames, int32(depth), match)
 }
 
 func parseStringCondition(
@@ -95,7 +97,9 @@ func parseStringCondition(
 	}
 
 	targets := strings.Split(targetString, ",")
-	return newStringCondition(field, targets)
+	match := stringToMatchType(subfields[consts.SubfieldMatch])
+
+	return newStringCondition(field, targets, match)
 }
 
 func parseReasonCondition(subfields config.SubfieldQueries) (*FilterCondition, error) {
@@ -145,4 +149,10 @@ func parseDateCondition(subfields config.SubfieldQueries) (*FilterCondition, err
 	}
 
 	return newDateCondition(dateFilter), nil
+}
+
+func stringToMatchType(input string) consts.MatchType {
+	parsed, _ := strconv.Atoi(input)
+
+	return consts.MatchType(parsed)
 }

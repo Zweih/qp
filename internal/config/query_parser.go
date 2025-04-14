@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"qp/internal/consts"
+	"strconv"
 	"strings"
 )
 
@@ -69,6 +70,28 @@ func addQuery(
 		subfields = make(SubfieldQueries)
 	}
 
+	value = parseMatchSugar(subfield, subfields, value)
+
 	subfields[subfield] = value
 	queries[field] = subfields
+}
+
+func parseMatchSugar(
+	subfield consts.SubfieldType,
+	subfields SubfieldQueries,
+	value string,
+) string {
+	if subfield != consts.SubfieldTarget || value == "" {
+		return value
+	}
+
+	matchType := consts.MatchFuzzy
+
+	if value[0] == '=' {
+		matchType = consts.MatchExact
+		value = value[1:]
+	}
+
+	subfields[consts.SubfieldMatch] = strconv.Itoa(int(matchType))
+	return value
 }
