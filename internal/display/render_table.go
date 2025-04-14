@@ -99,51 +99,26 @@ func renderRows(
 
 func getTableValue(pkg *pkgdata.PkgInfo, field consts.FieldType, ctx tableContext) string {
 	switch field {
-	case consts.FieldDate:
-		return formatDate(pkg.InstallTimestamp, ctx)
-	case consts.FieldBuildDate:
-		return formatDate(pkg.BuildTimestamp, ctx)
+	case consts.FieldDate, consts.FieldBuildDate:
+		return formatDate(pkg.GetInt(field), ctx)
 	case consts.FieldSize:
-		return formatSize(pkg.Size)
-	case consts.FieldPkgType:
-		return pkgTypeToString(pkg.PkgType)
-	case consts.FieldName:
-		return pkg.Name
-	case consts.FieldReason:
-		return pkg.Reason
-	case consts.FieldVersion:
-		return pkg.Version
-	case consts.FieldArch:
-		return pkg.Arch
-	case consts.FieldLicense:
-		return pkg.License
-	case consts.FieldPkgBase:
-		return pkg.PkgBase
-	case consts.FieldDescription:
-		return pkg.Description
-	case consts.FieldUrl:
-		return pkg.Url
-	case consts.FieldValidation:
-		return pkg.Validation
-	case consts.FieldPackager:
-		return pkg.Packager
+		return formatSize(pkg.GetInt(field))
+
+	case consts.FieldName, consts.FieldReason, consts.FieldVersion,
+		consts.FieldArch, consts.FieldLicense, consts.FieldUrl,
+		consts.FieldDescription, consts.FieldPkgBase, consts.FieldValidation,
+		consts.FieldPackager, consts.FieldPkgType:
+		return pkg.GetString(field)
+
 	case consts.FieldGroups:
 		return strings.Join(pkg.Groups, ", ")
-	case consts.FieldConflicts:
-		return formatRelations(pkg.Conflicts)
-	case consts.FieldReplaces:
-		return formatRelations(pkg.Replaces)
-	case consts.FieldDepends:
-		return formatRelations(pkg.Depends)
-	case consts.FieldOptDepends:
-		return formatRelations(pkg.OptDepends)
-	case consts.FieldRequiredBy:
-		return formatRelations(pkg.RequiredBy)
-	case consts.FieldOptionalFor:
-		return formatRelations(pkg.OptionalFor)
-	case consts.FieldProvides:
-		return formatRelations(pkg.Provides)
-	default:
-		return ""
+
+	case consts.FieldConflicts, consts.FieldReplaces, consts.FieldDepends,
+		consts.FieldOptDepends, consts.FieldRequiredBy, consts.FieldOptionalFor,
+		consts.FieldProvides:
+		relations := pkg.GetRelations(field)
+		return formatRelations(relations)
 	}
+
+	return ""
 }

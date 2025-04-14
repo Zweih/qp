@@ -81,49 +81,49 @@ func getJsonValues(pkg *pkgdata.PkgInfo, fields []consts.FieldType) *PkgInfoJson
 	for _, field := range fields {
 		switch field {
 		case consts.FieldDate:
-			filteredPackage.InstallTimestamp = pkg.InstallTimestamp
+			filteredPackage.InstallTimestamp = pkg.GetInt(field)
 		case consts.FieldBuildDate:
-			filteredPackage.BuildTimestamp = pkg.BuildTimestamp
-		case consts.FieldPkgType:
-			filteredPackage.PkgType = pkgTypeToString(pkg.PkgType)
-		case consts.FieldName:
-			filteredPackage.Name = pkg.Name
-		case consts.FieldReason:
-			filteredPackage.Reason = pkg.Reason
+			filteredPackage.BuildTimestamp = pkg.GetInt(field)
 		case consts.FieldSize:
-			filteredPackage.Size = pkg.Size // return in bytes for json
+			filteredPackage.Size = pkg.GetInt(field)
+		case consts.FieldPkgType:
+			filteredPackage.PkgType = pkg.GetString(field)
+		case consts.FieldName:
+			filteredPackage.Name = pkg.GetString(field)
+		case consts.FieldReason:
+			filteredPackage.Reason = pkg.GetString(field)
 		case consts.FieldVersion:
-			filteredPackage.Version = pkg.Version
+			filteredPackage.Version = pkg.GetString(field)
 		case consts.FieldArch:
-			filteredPackage.Arch = pkg.Arch
+			filteredPackage.Arch = pkg.GetString(field)
 		case consts.FieldLicense:
-			filteredPackage.License = pkg.License
+			filteredPackage.License = pkg.GetString(field)
 		case consts.FieldPkgBase:
-			filteredPackage.PkgBase = pkg.PkgBase
+			filteredPackage.PkgBase = pkg.GetString(field)
 		case consts.FieldDescription:
-			filteredPackage.Description = pkg.Description
+			filteredPackage.Description = pkg.GetString(field)
 		case consts.FieldUrl:
-			filteredPackage.Url = pkg.Url
+			filteredPackage.Url = pkg.GetString(field)
 		case consts.FieldGroups:
 			filteredPackage.Groups = pkg.Groups
 		case consts.FieldValidation:
-			filteredPackage.Validation = pkg.Validation
+			filteredPackage.Validation = pkg.GetString(field)
 		case consts.FieldPackager:
-			filteredPackage.Packager = pkg.Packager
+			filteredPackage.Packager = pkg.GetString(field)
 		case consts.FieldConflicts:
-			filteredPackage.Conflicts = flattenRelations(pkg.Conflicts)
+			filteredPackage.Conflicts = flattenRelations(pkg.GetRelations(field))
 		case consts.FieldReplaces:
-			filteredPackage.Replaces = flattenRelations(pkg.Replaces)
+			filteredPackage.Replaces = flattenRelations(pkg.GetRelations(field))
 		case consts.FieldDepends:
-			filteredPackage.Depends = flattenRelations(pkg.Depends)
+			filteredPackage.Depends = flattenRelations(pkg.GetRelations(field))
 		case consts.FieldOptDepends:
-			filteredPackage.OptDepends = flattenRelations(pkg.OptDepends)
+			filteredPackage.OptDepends = flattenRelations(pkg.GetRelations(field))
 		case consts.FieldRequiredBy:
-			filteredPackage.RequiredBy = flattenRelations(pkg.RequiredBy)
+			filteredPackage.RequiredBy = flattenRelations(pkg.GetRelations(field))
 		case consts.FieldOptionalFor:
-			filteredPackage.OptionalFor = flattenRelations(pkg.OptionalFor)
+			filteredPackage.OptionalFor = flattenRelations(pkg.GetRelations(field))
 		case consts.FieldProvides:
-			filteredPackage.Provides = flattenRelations(pkg.Provides)
+			filteredPackage.Provides = flattenRelations(pkg.GetRelations(field))
 		}
 	}
 

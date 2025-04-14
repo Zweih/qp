@@ -184,27 +184,29 @@ all queries that take package/library/program names as arguments can also take a
 
 short-flag queries and long-flag queries can be combined.
 
+you can also query for exact terms in each field by using `==` instead of `=` (excluding time and size fields).
+
+`=` will execute a fuzzy, substring match.
+
 #### available queries
 | query type  | syntax | description |
 |-------------|--------|-------------|
-| **license** | `license=<license>` / <br> `license=<license-1>,<license-2>,<etc>` | query by license name (substring match) |
 | **date** | `date=<value>` | query by installation date. supports exact dates, ranges (`YYYY-MM-DD:YYYY-MM-DD`), and open-ended ranges (`YYYY-MM-DD:` or `:YYYY-MM-DD`) |
-| **required by** | `required-by=<package>` / <br> `required-by=<package-1>,<package-2>,<etc>` | query by packages that are required by the specified packages |
-| **depends** | `depends=<package>` / <br> `depends=<package-1>,<package-2>,<etc>` | query by packages that have the specified packages as dependencies |
-| **provides** | `provides=<package>` / <br> `provides=<package-1>,<package-2>,<etc>` | query by package that provide the specified packages/libraries |
-| **conflicts** | `conflicts=<package>` / <br> `conflicts=<package-1,<package-2>,<etc>` | query by packages that conflict with the specified packages |
-| **architecture** | `arch=<architecture>` / <br> `arch=<architecture-1>,<architecture-2>,<etc>` | query by packages that are built for the specified architectures <br> **note**: "any" is a separate architecture category |
-| **name** | `name=<package>` / <br> `name=<package-1>,<package-2>,<etc>` | query by package name (substring match) |
-| **installation reason** | `reason=explicit` / `reason=dependencies` | query packages by installation reason: explicitly installed or installed as a dependency |
 | **size** | `size=<value>` | query by package size on disk. supports exact values (`10MB`), ranges (`10MB:1GB`), and open-ended ranges (`:500KB`, `1GB:`) |
-| **description** | `description=<string>` / <br> `description=<string-1>,<string-2>,<etc>` | query by package description (substring match) |
+| **name** | `name=<package>` / <br> `name=<package-1>,<package-2>,<etc>` | query by package name |
+| **installation reason** | `reason=explicit` / `reason=dependencies` | query packages by installation reason: explicitly installed or installed as a dependency |
+| **architecture** | `arch=<architecture>` / <br> `arch=<architecture-1>,<architecture-2>,<etc>` | query by packages that are built for the specified architectures <br> **note**: "any" is a separate architecture category |
+| **license** | `license=<license>` / <br> `license=<license-1>,<license-2>,<etc>` | query by license name (substring match) |
+| **description** | `description=<string>` / <br> `description=<string-1>,<string-2>,<etc>` | query by package description |
+| **conflicts** | `conflicts=<package>` / <br> `conflicts=<package-1,<package-2>,<etc>` | query by packages that conflict with the specified packages |
+| **depends** | `depends=<package>` / <br> `depends=<package-1>,<package-2>,<etc>` | query by packages that have the specified packages as dependencies |
+| **required by** | `required-by=<package>` / <br> `required-by=<package-1>,<package-2>,<etc>` | query by packages that are required by the specified packages |
+| **provides** | `provides=<package>` / <br> `provides=<package-1>,<package-2>,<etc>` | query by package that provide the specified packages/libraries |
 
 ### available fields for selection
 - `date` - installation date of the package
 - `build-date` - date the package was built
 - `size` - package size on disk
-- `pkgtype` - package type (pkg, split, debug, source, unknown*)
-    - ***note**: older packages may show "unknown" pkgtype if built before pacman introduced XDATA
 - `name` - package name
 - `reason` - installation reason (explicit/dependency)
 - `version` - installed package version
@@ -215,6 +217,8 @@ short-flag queries and long-flag queries can be combined.
 - `url` - the URL of the official site of the software being packaged
 - `validation` - package integrity validation method (e.g., sha256", "pgp")
 - `packager` - person/entity who built the package (if available)
+- `pkgtype` - package type (pkg, split, debug, source, unknown*)
+    - ***note**: older packages may show "unknown" pkgtype if built before pacman introduced XDATA
 - `groups` - package groups or categories (e.g., base, gnome, xfce4)
 - `conflicts` - list of packages that conflict, or cause problems, with the package
 - `replaces` - list of packages that are replaced by the package
@@ -505,6 +509,10 @@ are treated as separate parameters.
 36. sort packages by their package base while showing their names and package bases, in reverse alphabetical order:
    ```bash
    qp -O pkgbase:desc -s name,pkgbase
+   ```
+37. show packages that are exactly named "bash":
+   ```bash
+   qp -w name==bash
    ```
 
 ## license

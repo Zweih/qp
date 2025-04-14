@@ -3,6 +3,7 @@ package consts
 type (
 	FieldType    int
 	SubfieldType int32
+	MatchType    int32
 )
 
 // ordered by filter efficiency
@@ -34,6 +35,12 @@ const (
 const (
 	SubfieldDepth SubfieldType = iota
 	SubfieldTarget
+	SubfieldMatch
+)
+
+const (
+	MatchFuzzy MatchType = iota
+	MatchExact
 )
 
 const (
@@ -62,6 +69,7 @@ const (
 
 	target = "target"
 	depth  = "depth"
+	match  = "match"
 )
 
 var FieldTypeLookup = map[string]FieldType{
@@ -106,6 +114,7 @@ var SubfieldTypeLookup = map[string]SubfieldType{
 	"":     SubfieldTarget,
 	target: SubfieldTarget,
 	depth:  SubfieldDepth,
+	match:  SubfieldMatch,
 }
 
 var FieldNameLookup = map[FieldType]string{
@@ -136,6 +145,7 @@ var FieldNameLookup = map[FieldType]string{
 var SubfieldNameLookup = map[SubfieldType]string{
 	SubfieldTarget: target,
 	SubfieldDepth:  depth,
+	SubfieldMatch:  match,
 }
 
 var (

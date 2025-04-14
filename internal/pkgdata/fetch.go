@@ -302,7 +302,7 @@ func applyXData(pkg *PkgInfo, block []string) {
 
 			switch subfield {
 			case subfieldPkgType:
-				pkg.PkgType = stringToPkgType(value)
+				pkg.PkgType = value
 			}
 		}
 	}
@@ -364,7 +364,7 @@ parseVersion:
 		}
 	}
 
-	operator := stringToOperator(input[opStart:opEnd])
+	operator := StringToOperator(input[opStart:opEnd])
 	var version string
 
 	if opEnd < len(input) {
@@ -376,37 +376,5 @@ parseVersion:
 		Operator: operator,
 		Version:  version,
 		Depth:    depth,
-	}
-}
-
-func stringToPkgType(pkgTypeInput string) PkgType {
-	switch pkgTypeInput {
-	case "pkg":
-		return PkgTypePkg
-	case "split":
-		return PkgTypeSplit
-	case "src":
-		return PkgTypeSrc
-	case "debug":
-		return PkgTypeDebug
-	default:
-		return PkgTypeUnknown
-	}
-}
-
-func stringToOperator(operatorInput string) RelationOp {
-	switch operatorInput {
-	case "=":
-		return OpEqual
-	case "<":
-		return OpLess
-	case "<=":
-		return OpLessEqual
-	case ">":
-		return OpGreater
-	case ">=":
-		return OpGreaterEqual
-	default:
-		return OpNone
 	}
 }
