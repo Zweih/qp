@@ -19,30 +19,6 @@ type FilterCondition struct {
 	FieldType consts.FieldType
 }
 
-func ExactRelations(relations []Relation, targetNames []string) bool {
-	for _, targetName := range targetNames {
-		for _, relation := range relations {
-			if relation.Name == targetName {
-				return true
-			}
-		}
-	}
-
-	return false
-}
-
-func FuzzyRelations(relations []Relation, targetNames []string) bool {
-	for _, targetName := range targetNames {
-		for _, relation := range relations {
-			if strings.Contains(relation.Name, targetName) {
-				return true
-			}
-		}
-	}
-
-	return false
-}
-
 func FilterByReason(installReason string, targetReason string) bool {
 	return installReason == targetReason
 }

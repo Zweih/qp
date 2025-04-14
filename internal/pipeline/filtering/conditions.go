@@ -1,7 +1,6 @@
 package filtering
 
 import (
-	"fmt"
 	"qp/internal/consts"
 	"qp/internal/pkgdata"
 	"strings"
@@ -29,45 +28,18 @@ func newStringCondition(
 	targets []string,
 	match consts.MatchType,
 ) (*FilterCondition, error) {
-	conditionFilter := newCondition(field)
-	var filterFunc pkgdata.Filter
-	var matcher func(string, []string) bool
-
-	switch match {
-	case consts.MatchExact:
-		matcher = pkgdata.ExactStrings
-	default:
-		matcher = pkgdata.FuzzyStrings
-	}
+	condition := newCondition(field)
+	matcher := getStringMatcher(match)
 
 	for i, target := range targets {
 		targets[i] = strings.ToLower(target)
 	}
 
-	switch field {
-	case consts.FieldName:
-		filterFunc = func(pkg *PkgInfo) bool {
-			return matcher(pkg.Name, targets)
-		}
-	case consts.FieldArch:
-		filterFunc = func(pkg *PkgInfo) bool {
-			return matcher(pkg.Arch, targets)
-		}
-	case consts.FieldLicense:
-		filterFunc = func(pkg *PkgInfo) bool {
-			return matcher(pkg.License, targets)
-		}
-	case consts.FieldDescription:
-		filterFunc = func(pkg *PkgInfo) bool {
-			return matcher(pkg.Description, targets)
-		}
-	default:
-		return nil, fmt.Errorf("invalid field for string filter: %s", consts.FieldNameLookup[field])
+	condition.Filter = func(pkg *pkgdata.PkgInfo) bool {
+		return matcher(pkg.GetString(field), targets)
 	}
 
-	conditionFilter.Filter = filterFunc
-
-	return &conditionFilter, nil
+	return &condition, nil
 }
 
 func newRelationCondition(
@@ -76,49 +48,25 @@ func newRelationCondition(
 	depth int32,
 	match consts.MatchType,
 ) (*FilterCondition, error) {
-	conditionFilter := newCondition(field)
-	var filterFunc pkgdata.Filter
-	var matcher func([]pkgdata.Relation, []string) bool
-
-	switch match {
-	case consts.MatchExact:
-		matcher = pkgdata.ExactRelations
-	default:
-		matcher = pkgdata.FuzzyRelations
-	}
+	condition := newCondition(field)
+	matcher := getStringMatcher(match)
 
 	for i, target := range targets {
 		targets[i] = strings.ToLower(target)
 	}
 
-	switch field {
-	case consts.FieldRequiredBy:
-		filterFunc = func(pkg *PkgInfo) bool {
-			relationsAtDepth := pkgdata.GetRelationsByDepth(pkg.RequiredBy, depth)
-			return matcher(relationsAtDepth, targets)
+	condition.Filter = func(pkg *pkgdata.PkgInfo) bool {
+		relationsAtDepth := pkgdata.GetRelationsByDepth(pkg.GetRelations(field), depth)
+		for _, rel := range relationsAtDepth {
+			if matcher(rel.Name, targets) {
+				return true
+			}
 		}
-	case consts.FieldDepends:
-		filterFunc = func(pkg *PkgInfo) bool {
-			relationsAtDepth := pkgdata.GetRelationsByDepth(pkg.Depends, depth)
-			return matcher(relationsAtDepth, targets)
-		}
-	case consts.FieldProvides:
-		filterFunc = func(pkg *PkgInfo) bool {
-			relationsAtDepth := pkgdata.GetRelationsByDepth(pkg.Provides, depth)
-			return matcher(relationsAtDepth, targets)
-		}
-	case consts.FieldConflicts:
-		filterFunc = func(pkg *PkgInfo) bool {
-			relationsAtDepth := pkgdata.GetRelationsByDepth(pkg.Conflicts, depth)
-			return matcher(relationsAtDepth, targets)
-		}
-	default:
-		return nil, fmt.Errorf("invalid field for relation filter: %s", consts.FieldNameLookup[field])
+
+		return false
 	}
 
-	conditionFilter.Filter = filterFunc
-
-	return &conditionFilter, nil
+	return &condition, nil
 }
 
 func newRangeCondition(
@@ -169,4 +117,13 @@ func newReasonCondition(reason string) *FilterCondition {
 	}
 
 	return &condition
+}
+
+func getStringMatcher(match consts.MatchType) func(string, []string) bool {
+	switch match {
+	case consts.MatchExact:
+		return pkgdata.ExactStrings
+	default:
+		return pkgdata.FuzzyStrings
+	}
 }
