@@ -37,7 +37,7 @@ jobs:
     steps:
       - name: echo TAG_NAME
         run: |
-          echo "Resolved TAG_NAME is: ${env.TAG_NAME}"
+          echo "Resolved TAG_NAME is: ${{ env.TAG_NAME }}"
       
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -75,7 +75,7 @@ jobs:
     steps:
       - name: echo TAG_NAME
         run: |
-          echo "Resolved TAG_NAME is: ${env.TAG_NAME}"
+          echo "Resolved TAG_NAME is: ${{ env.TAG_NAME }}"
       
       - name: Install dependencies for .SRCINFO and NEWS generation
         run: |
@@ -166,8 +166,8 @@ jobs:
         run: |
           gh release create "${{ env.TAG_NAME }}" \
             --repo Zweih/query-packages-signatures \
-            --title "Signatures for qp ${env.TAG_NAME}" \
-            --notes "Detached signatures for qp release ${env.TAG_NAME}" \
+            --title "Signatures for qp ${{ env.TAG_NAME }}" \
+            --notes "Detached signatures for qp release ${{ env.TAG_NAME }}" \
             ./release/qp-*.tar.gz.asc
         env:
           GH_TOKEN: ${{ secrets.SIGNATURES_REPO_TOKEN }}
@@ -177,7 +177,7 @@ jobs:
           git fetch origin packaging
           git checkout packaging
 
-          VERSION="${env.TAG_NAME}"
+          VERSION="${{ env.TAG_NAME }}"
           CHECKSUMS_FILE=./release/SHA256SUMS.txt
 
           for pkg in qp-bin qp-src; do
