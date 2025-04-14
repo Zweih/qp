@@ -1,10 +1,9 @@
 .\" Man page for qp
-.TH qp 1 "April 2025" "qp 4.2.0" "User Commands"
+.TH qp 1 "April 2025" "qp 4.20.0" "User Commands"
 .SH NAME
-qp \- List and query installed packages on Arch-based systems.
+qp \- Query Packages. A CLI utility for querying installed packages.
 .SH SYNOPSIS
-.B qp
-.RI [ \-l | \-\-limit <number> ] [ \-a | \-\-all ] [ \-w <field>=<value> ] [ \-s | \-\-select <list> ] [ \-S | \-\-select-add <list> ] [ \-A | \-\-select-all ] [ \-O | \-\-order <field>:<direction> ] [ \-\-json ] [ \-\-no-headers ] [ \-\-full-timestamp ] [ \-\-no-progress ] [ \-\-no-cache ] [ \-h | \-\-help ]
+.B qp [options]
 
 .SH DESCRIPTION
 .B qp
@@ -27,189 +26,154 @@ The utility provides powerful querying capabilities, including:
 
 .SH OPTIONS
 .TP
-.B \-l, \-\-limit <number>
-Display the specified number of recent packages (default: 20). Ignored if
-.B \-a
-or
-.B \-\-all
-is used.
+.BR \-l " " \fInumber\fR ", " \-\-limit=\fInumber\fR
+Limit the number of recent packages displayed (default: 20).
 .TP
-.B \-a, \-\-all
-Show all installed packages, ignoring
-.B \-l
-/
-.B \-\-limit
+.BR \-a ", " \-\-all
+Show all installed packages, ignoring \-l/--limit.
 .TP
-.B \-w, \-\-where <field>=<value>
-Apply package queries. This option can be used multiple times. Exact query with `==`, substring query with `=`.
-
-.PP
-Supported queries:
-.IP
-.B license=<license-name>
-: Packages that contain the specified license. Supports comma-separated list.
-.IP
-.B date=<YYYY-MM-DD>
-: Packages installed on the specified date.
-.IP
-.B date=YYYY-MM-DD:
-: Packages installed on or after the date.
-.IP
-.B date=:YYYY-MM-DD
-: Packages installed up to the specified date.
-.IP
-.B date=YYYY-MM-DD:YYYY-MM-DD
-: Packages installed within a date range.
-.IP
-.B size=10MB:
-: Packages larger than 10MB.
-.IP
-.B size=:500KB
-: Packages up to 500KB.
-.IP
-.B size=1GB:5GB
-: Packages between 1GB and 5GB.
-.IP
-.B reason=explicit
-: Explicitly installed packages.
-.IP
-.B reason=dependencies
-: Packages installed as dependencies.
-.IP
-.B name=firefox
-: Match package names. Supports comma-separated list.
-.IP
-.B required-by=vlc
-: Packages required by "vlc".
-.IP
-.B depends=glibc
-: Packages that depend on "glibc".
-.IP
-.B provides=awk
-: Packages that provide "awk".
-.IP
-.B conflicts=linuxqq
-: Packages that conflict with "linuxqq".
-.IP
-.B arch=x86_64
-: Packages built for specified architectures. "any" is also valid.
-.IP
-.B description="linux kernel"
-: Packages that contain "linux kernel" in their description.
-
-.PP
-Example:
-.EX
-qp -w reason=explicit -w size=100MB:
-.EE
-
+.BR \-w " " \fIfield=value\fR ", " \-\-where=\fIfield=value\fR
+Apply multiple flexible queries. Can be used multiple times.
+Examples:
+.br
+\fB--where size=10MB:1GB\fR
+.br
+\fB--where date=2024-01-01:\fR
+.br
+\fB--where reason=explicit\fR
+.br
+\fB--where name=firefox\fR
+.br
+\fB--where required-by=vlc\fR
+.br
+\fB--where depends=glibc\fR
+.br
+\fB--where conflicts=sdl2\fR
+.br
+\fB--where arch=x86_64\fR
+.br
+\fB--where license=GPL\fR
+.br
+\fB--where description="linux kernel"\fR
 .TP
-.B \-O, \-\-order <field>:<direction>
-Sort results by the specified field, ascending or descending directions (asc/desc).
-Available fields for sorting.
-.IP
-.B date
-(default): Sort by installation date.
-.IP
-.B name
-: Sort alphabetically by package name.
-.IP
-.B size
-: Sort by size on disk
-.IP
-.B license
-: Sort alphabetically by package license.
-
+.BR \-O " " \fIfield:direction\fR ", " \-\-order=\fIfield:direction\fR
+Sort results. Default is \fBdate:asc\fR.
+Fields: \fIdate\fR, \fIname\fR, \fIsize\fR, \fIlicense\fR, \fIpkgbase\fR.
 .TP
 .B \-\-no-headers
-Omit headers in table output. Useful for scripting.
-
+Omit column headers in output (useful for scripting).
 .TP
-.B \-s, \-\-select <list>
-Specify a comma-separated list of fields to display. Overrides default fields.
-
+.BR \-s " " \fIlist\fR ", " \-\-select=\fIlist\fR
+Comma-separated list of fields to display.
+Cannot be used with \fB--select-all\fR or \fB--select-add\fR.
 .TP
-.B \-S, \-\-select-add <list>
-Add fields to default output or to
-.B \-\-select-all
-
+.BR \-S " " \fIlist\fR ", " \-\-select-add=\fIlist\fR
+Add comma-separated fields to the default selection.
 .TP
-.B \-A, \-\-select-all
+.BR \-A ", " \-\-select-all
 Display all available fields.
-
+.TP
+.B \-\-full-timestamp
+Show full install and build timestamps.
 .TP
 .B \-\-json
-Output results in JSON format. Overrides
-.B \-\-full-timestamp
-
-.PP
-Example:
-.EX
-qp -w name=sqlite --json -s name,version,size
-.EE
-
-.TP
-.B \-\-full-timestamp
-Show full date + time instead of just the date.
-
+Output results in JSON format.
 .TP
 .B \-\-no-progress
-Suppress progress output, even in interactive mode.
-
+Disable the progress bar in non-interactive environments.
 .TP
 .B \-\-no-cache
-Disable cache loading/saving and force fresh package data loading
-
+Disable cache loading/saving and force fresh package data loading.
 .TP
-.B \-h, \-\-help
-Show help information.
+.B \-\-regen-cache
+Force fresh data loading and update the cache.
+.TP
+.BR \-h ", " \-\-help
+Display help information.
+
+.SH QUERYING WITH --where
+The \fB--where\fR or \fB-w\fR option allows complex queries using multiple filters.
+Multiple \fB-w\fR flags can be combined.
+Queries support both substring (\fB=\fR) and exact (\fB==\fR) matches.
+
+Supported query types:
+.TP
+.B date=<value>
+Installation date (exact, range, or open-ended).
+.TP
+.B size=<value>
+Package size (exact, range, or open-ended).
+.TP
+.B name=<package>
+Filter by package name.
+.TP
+.B reason=explicit|dependencies
+Filter by installation reason.
+.TP
+.B arch=<arch>
+Filter by architecture.
+.TP
+.B license=<license>
+Filter by license name.
+.TP
+.B description=<text>
+Filter by package description.
+.TP
+.B conflicts=<package>
+Filter by conflicting packages.
+.TP
+.B depends=<package>
+Filter by dependencies.
+.TP
+.B required-by=<package>
+Filter by dependent packages.
+.TP
+.B provides=<package>
+Filter by provided libraries/packages.
+
+.SH AVAILABLE FIELDS
+Available fields for \fB--select\fR, \fB--select-add\fR, or \fB--select-all\fR:
+.IP
+date, build-date, size, name, reason, version, arch, license, pkgbase,
+description, url, validation, packager, pkgtype, groups, conflicts,
+replaces, depends, optdepends, required-by, optional-for, provides.
+
+.SH JSON OUTPUT
+Use \fB--json\fR to output query results in structured JSON format for scripts.
 
 .SH EXAMPLES
+Display all packages:
+.br
+\fBqp --all\fR
+.PP
+Query packages by size and output JSON:
+.br
+\fBqp -Aw size=10MB:100MB --json\fR
+.PP
+Select specific fields:
+.br
+\fBqp -s name,version,size\fR
+.PP
+Order packages by name:
+.br
+\fBqp --order=name\fR
+.PP
+Complex query:
+.br
+\fBqp -Aw arch=x86_64 depends=glibc --order=size:desc --select name,size\fR
+
+.SH TIPS
 .TP
-Last 10 installed packages:
-.EX
-qp -l 10
-.EE
+Group short flags:
+\fBqp -aw name=yay\fR
 .TP
-All explicitly installed packages:
-.EX
-qp -w reason=explicit
-.EE
+Pipe output for long lists:
+\fBqp -s name,depends | less\fR
 .TP
-Between 100MB–1GB, installed before June 30, 2024:
-.EX
-qp -w size=100MB:1GB -w date=:2024-06-30
-.EE
+Use --flag=value for clarity:
+\fBqp --select=name,size --limit=50\fR
 .TP
-Packages required by "firefox":
-.EX
-qp -w required-by=firefox
-.EE
-.TP
-JSON output:
-.EX
-qp --json
-.EE
-.TP
-Save explicit packages to JSON file:
-.EX
-qp -w reason=explicit --json > explicit-packages.json
-.EE
-.TP
-Show names and sizes without headers:
-.EX
-qp --no-headers -s name,size
-.EE
-.TP
-Packages that depend on "glibc" and are required by "ffmpeg":
-.EX
-qp -w depends=glibc -w required-by=ffmpeg
-.EE
-.TP
-Packages built for "any" architecture:
-.EX
-qp -w arch=any
-.EE
+Use --no-headers in scripts for clean output.
 
 .SH AUTHOR
 Written by Fernando Nunez <me@fernandonunez.io>.
