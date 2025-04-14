@@ -177,7 +177,7 @@ jobs:
           git fetch origin packaging
           git checkout packaging
 
-          VERSION="${{ env.TAG_NAME#v }}"
+          VERSION="${TAG_NAME#v}"
           CHECKSUMS_FILE=./release/SHA256SUMS.txt
 
           for pkg in qp-bin qp-src; do
