@@ -1,5 +1,11 @@
 # qp Release Notes
 
+## v4.15.1
+### What's Changed
+* Feature: Add PGP signing to CI/CD by @Zweih in https://github.com/Zweih/qp/pull/183
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v4.15.0...v4.15.1
+
 ## v4.15.0
 ### What's Changed
 * Feature: Add groups field by @Zweih in https://github.com/Zweih/qp/pull/180
@@ -115,19 +121,3 @@
 * Fix: qp-src installation by @Zweih in https://github.com/Zweih/qp/pull/151
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v4.1.3...v4.1.4
-
-## v4.1.3
-### What's Changed
-* Feature: Strip symbols from binaries by @Zweih in https://github.com/Zweih/qp/pull/148
-* Feature: Add news to releases by @Zweih in https://github.com/Zweih/qp/pull/149
-* Fix: qp-git validation by @Zweih in https://github.com/Zweih/qp/pull/150
-
-
-**Full Changelog**: https://github.com/Zweih/qp/compare/v4.1.0...v4.1.3
-
-## v4.1.0
-### What's Changed
-* Feature: Add description query by @Zweih in https://github.com/Zweih/qp/pull/146
-
-
-**Full Changelog**: https://github.com/Zweih/qp/compare/v4.0.0...v4.1.0
