@@ -118,7 +118,7 @@ jobs:
           cut -f1 | \
           grep -E '^v[0-9]+\.' | \
           sort -Vr | \
-          awk -v min="v4.1.0" '{ if (system("dpkg --compare-versions " $1 " ge " min) == 0) print $1 }' | \
+          awk -v min="v4.1.4" '{ if (system("dpkg --compare-versions " $1 " ge " min) == 0) print $1 }' | \
           while read tag; do
             echo "" >> ./release/NEWS
             echo "## $tag" >> ./release/NEWS
