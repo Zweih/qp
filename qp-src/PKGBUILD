@@ -9,7 +9,7 @@ license=("GPL3")
 makedepends=("go>=1.24.1")
 conflicts=("qp-bin" "qp-git")
 replaces=("yaylog" "yaylog-bin" "yaylog-git")
-validpgpkeys=("4B9765E9DBCCEC2A")
+validpgpkeys=("261EDB30E59226646CF3095E4B9765E9DBCCEC2A")
 source=(
   "${url}/releases/download/v${pkgver}/qp-v${pkgver}.tar.gz"
   "https://github.com/Zweih/query-packages-signatures/releases/download/v${pkgver}/qp-v${pkgver}.tar.gz.asc"
