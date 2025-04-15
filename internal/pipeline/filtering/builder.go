@@ -78,6 +78,10 @@ func parseStringCondition(query config.FieldQuery) (*FilterCondition, error) {
 }
 
 func parseRangeCondition(query config.FieldQuery) (*FilterCondition, error) {
+	if query.IsExistence {
+		return nil, nil
+	}
+
 	var parser func(string) (RangeSelector, error)
 
 	switch query.Field {

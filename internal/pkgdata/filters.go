@@ -2,7 +2,6 @@ package pkgdata
 
 import (
 	"fmt"
-	"math"
 	"qp/internal/consts"
 	"qp/internal/pipeline/meta"
 	"slices"
@@ -18,6 +17,8 @@ type FilterCondition struct {
 	PhaseName string
 	FieldType consts.FieldType
 }
+
+const fuzzySizeTolerancePercent = 0.3
 
 func FilterByReason(installReason string, targetReason string) bool {
 	return installReason == targetReason
@@ -35,20 +36,18 @@ func GetRelationsByDepth(relations []Relation, targetDepth int32) []Relation {
 	return filteredRelations
 }
 
-// filters for packages installed on specific date
 func FuzzyDate(pkg *PkgInfo, date int64) bool {
 	pkgDate := time.Unix(pkg.InstallTimestamp, 0)
 	targetDate := time.Unix(date, 0) // TODO: we can pull this out to the top level
 	return pkgDate.Year() == targetDate.Year() && pkgDate.YearDay() == targetDate.YearDay()
 }
 
-// inclusive
 func StrictDateRange(pkg *PkgInfo, start int64, end int64) bool {
 	return !(pkg.InstallTimestamp < start || pkg.InstallTimestamp > end)
 }
 
-func StrictDate(pkg *PkgInfo, date int64) bool {
-	return pkg.InstallTimestamp == date
+func StrictDate(pkg *PkgInfo, targetDate int64) bool {
+	return pkg.InstallTimestamp == targetDate
 }
 
 func FuzzyDateRange(pkg *PkgInfo, start int64, end int64) bool {
@@ -60,25 +59,21 @@ func FuzzyDateRange(pkg *PkgInfo, start int64, end int64) bool {
 		(pkgDate.Equal(endDate) || pkgDate.Before(endDate))
 }
 
-func roundSizeInBytes(num int64) int64 {
-	if num < 1000 {
-		return num
-	}
-
-	numDigits := int(math.Log10(float64(num))) + 1
-	scaleFactor := int64(math.Pow10(numDigits - 3))
-
-	return num / scaleFactor
+func FuzzySizeTolerance(targetSize int64) int64 {
+	return int64(float64(targetSize) * fuzzySizeTolerancePercent / 100.0)
 }
 
-// TODO: let's pre-round the inputs outside of these functions
 func FuzzySize(pkg *PkgInfo, targetSize int64) bool {
-	return roundSizeInBytes(pkg.Size) == roundSizeInBytes(targetSize)
+	tolerance := FuzzySizeTolerance(targetSize)
+	result := pkg.Size - targetSize
+	return max(result, -result) <= tolerance
 }
 
-func FuzzySizeRange(pkg *PkgInfo, startSize int64, endSize int64) bool {
-	roundedSize := roundSizeInBytes(pkg.Size)
-	return !(roundedSize < roundSizeInBytes(startSize) || roundedSize > roundSizeInBytes(endSize))
+func FuzzySizeRange(pkg *PkgInfo, start int64, end int64) bool {
+	toleranceStart := FuzzySizeTolerance(start)
+	toleranceEnd := FuzzySizeTolerance(end)
+
+	return pkg.Size >= (start-toleranceStart) && pkg.Size <= (end+toleranceEnd)
 }
 
 func StrictSize(pkg *PkgInfo, targetSize int64) bool {
