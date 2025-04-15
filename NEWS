@@ -1,15 +1,21 @@
 # qp Release Notes
 
+## v4.17.0
+### What's Changed
+* Feature: Add packager field by @Zweih in https://github.com/Zweih/qp/pull/185
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v4.16.0...v4.17.0
+
 ## v4.16.0
 ### What's Changed
 * Feature: Add validation field by @Zweih in https://github.com/Zweih/qp/pull/184
+
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v4.15.1...v4.16.0
 
 ## v4.15.1
 ### What's Changed
 * Feature: Add PGP signing to CI/CD by @Zweih in https://github.com/Zweih/qp/pull/183
-
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v4.15.0...v4.15.1
 
