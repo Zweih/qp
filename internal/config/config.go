@@ -21,13 +21,17 @@ type Config struct {
 	RegenCache        bool
 	SortOption        SortOption
 	Fields            []consts.FieldType
-	FieldQueries      FieldQueries
+	FieldQueries      []FieldQuery
 }
 
-type (
-	FieldQueries    map[consts.FieldType]SubfieldQueries
-	SubfieldQueries map[consts.SubfieldType]string
-)
+type FieldQuery struct {
+	IsExistence bool
+	Negate      bool
+	Field       consts.FieldType
+	Match       consts.MatchType
+	Depth       int32
+	Target      string
+}
 
 type SortOption struct {
 	Field consts.FieldType

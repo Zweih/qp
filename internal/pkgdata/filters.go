@@ -36,15 +36,28 @@ func GetRelationsByDepth(relations []Relation, targetDepth int32) []Relation {
 }
 
 // filters for packages installed on specific date
-func FilterByDate(pkg *PkgInfo, date int64) bool {
+func FuzzyDate(pkg *PkgInfo, date int64) bool {
 	pkgDate := time.Unix(pkg.InstallTimestamp, 0)
 	targetDate := time.Unix(date, 0) // TODO: we can pull this out to the top level
 	return pkgDate.Year() == targetDate.Year() && pkgDate.YearDay() == targetDate.YearDay()
 }
 
 // inclusive
-func FilterByDateRange(pkg *PkgInfo, start int64, end int64) bool {
+func StrictDateRange(pkg *PkgInfo, start int64, end int64) bool {
 	return !(pkg.InstallTimestamp < start || pkg.InstallTimestamp > end)
+}
+
+func StrictDate(pkg *PkgInfo, date int64) bool {
+	return pkg.InstallTimestamp == date
+}
+
+func FuzzyDateRange(pkg *PkgInfo, start int64, end int64) bool {
+	pkgDate := time.Unix(pkg.InstallTimestamp, 0).Truncate(24 * time.Hour)
+	startDate := time.Unix(start, 0).Truncate(24 * time.Hour)
+	endDate := time.Unix(end, 0).Truncate(24 * time.Hour)
+
+	return (pkgDate.Equal(startDate) || pkgDate.After(startDate)) &&
+		(pkgDate.Equal(endDate) || pkgDate.Before(endDate))
 }
 
 func roundSizeInBytes(num int64) int64 {
@@ -59,13 +72,21 @@ func roundSizeInBytes(num int64) int64 {
 }
 
 // TODO: let's pre-round the inputs outside of these functions
-func FilterBySize(pkg *PkgInfo, targetSize int64) bool {
+func FuzzySize(pkg *PkgInfo, targetSize int64) bool {
 	return roundSizeInBytes(pkg.Size) == roundSizeInBytes(targetSize)
 }
 
-func FilterBySizeRange(pkg *PkgInfo, startSize int64, endSize int64) bool {
+func FuzzySizeRange(pkg *PkgInfo, startSize int64, endSize int64) bool {
 	roundedSize := roundSizeInBytes(pkg.Size)
 	return !(roundedSize < roundSizeInBytes(startSize) || roundedSize > roundSizeInBytes(endSize))
+}
+
+func StrictSize(pkg *PkgInfo, targetSize int64) bool {
+	return pkg.Size == targetSize
+}
+
+func StrictSizeRange(pkg *PkgInfo, startSize int64, endSize int64) bool {
+	return !(pkg.Size < startSize || pkg.Size > endSize)
 }
 
 func FilterSliceByStrings(pkgStrings []string, targetStrings []string) bool {
@@ -90,7 +111,7 @@ func FuzzyStrings(pkgString string, targetStrings []string) bool {
 	return false
 }
 
-func ExactStrings(pkgString string, targetStrings []string) bool {
+func StrictStrings(pkgString string, targetStrings []string) bool {
 	pkgString = strings.ToLower(pkgString)
 
 	return slices.Contains(targetStrings, pkgString)
