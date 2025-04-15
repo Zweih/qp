@@ -1,6 +1,8 @@
 package filtering
 
 import (
+	"fmt"
+	"qp/internal/config"
 	"qp/internal/consts"
 	"qp/internal/pkgdata"
 	"strings"
@@ -12,9 +14,72 @@ type RangeSelector struct {
 	IsExact bool
 }
 
-type ExactFilter func(pkg *PkgInfo, target int64) bool
+type RangeMatcher map[bool]map[consts.MatchType]func(start int64, end int64) pkgdata.Filter
 
-type RangeFilter func(pkg *PkgInfo, start int64, end int64) bool
+var DateMatchers = RangeMatcher{
+	true: {
+		consts.MatchFuzzy: func(start, _ int64) pkgdata.Filter {
+			return func(pkg *pkgdata.PkgInfo) bool {
+				return pkgdata.FuzzyDate(pkg, start)
+			}
+		},
+		consts.MatchStrict: func(start, _ int64) pkgdata.Filter {
+			return func(pkg *pkgdata.PkgInfo) bool {
+				return pkgdata.StrictDate(pkg, start)
+			}
+		},
+	},
+
+	false: {
+		consts.MatchFuzzy: func(start, end int64) pkgdata.Filter {
+			return func(pkg *pkgdata.PkgInfo) bool {
+				return pkgdata.FuzzyDateRange(pkg, start, end)
+			}
+		},
+		consts.MatchStrict: func(start, end int64) pkgdata.Filter {
+			return func(pkg *pkgdata.PkgInfo) bool {
+				return pkgdata.StrictDateRange(pkg, start, end)
+			}
+		},
+	},
+}
+
+var SizeMatchers = RangeMatcher{
+	true: {
+		consts.MatchFuzzy: func(start, _ int64) pkgdata.Filter {
+			return func(pkg *pkgdata.PkgInfo) bool {
+				return pkgdata.FuzzySize(pkg, start)
+			}
+		},
+		consts.MatchStrict: func(start, _ int64) pkgdata.Filter {
+			return func(pkg *pkgdata.PkgInfo) bool {
+				return pkgdata.StrictSize(pkg, start)
+			}
+		},
+	},
+	false: {
+		consts.MatchFuzzy: func(start, end int64) pkgdata.Filter {
+			return func(pkg *pkgdata.PkgInfo) bool {
+				return pkgdata.FuzzySizeRange(pkg, start, end)
+			}
+		},
+		consts.MatchStrict: func(start, end int64) pkgdata.Filter {
+			return func(pkg *pkgdata.PkgInfo) bool {
+				return pkgdata.StrictSizeRange(pkg, start, end)
+			}
+		},
+	},
+}
+
+var RangeMatchers = map[consts.FieldType]RangeMatcher{
+	consts.FieldDate: DateMatchers,
+	consts.FieldSize: SizeMatchers,
+}
+
+var StringMatchers = map[consts.MatchType]func(string, []string) bool{
+	consts.MatchStrict: pkgdata.StrictStrings,
+	consts.MatchFuzzy:  pkgdata.FuzzyStrings,
+}
 
 func newCondition(fieldType consts.FieldType) FilterCondition {
 	return FilterCondition{
@@ -27,16 +92,17 @@ func newStringCondition(
 	field consts.FieldType,
 	targets []string,
 	match consts.MatchType,
+	mask bool,
 ) (*FilterCondition, error) {
 	condition := newCondition(field)
-	matcher := getStringMatcher(match)
+	matcher := StringMatchers[match]
 
 	for i, target := range targets {
 		targets[i] = strings.ToLower(target)
 	}
 
 	condition.Filter = func(pkg *pkgdata.PkgInfo) bool {
-		return matcher(pkg.GetString(field), targets)
+		return matcher(pkg.GetString(field), targets) != mask
 	}
 
 	return &condition, nil
@@ -47,9 +113,10 @@ func newRelationCondition(
 	targets []string,
 	depth int32,
 	match consts.MatchType,
+	mask bool,
 ) (*FilterCondition, error) {
 	condition := newCondition(field)
-	matcher := getStringMatcher(match)
+	matcher := StringMatchers[match]
 
 	for i, target := range targets {
 		targets[i] = strings.ToLower(target)
@@ -59,71 +126,42 @@ func newRelationCondition(
 		relationsAtDepth := pkgdata.GetRelationsByDepth(pkg.GetRelations(field), depth)
 		for _, rel := range relationsAtDepth {
 			if matcher(rel.Name, targets) {
-				return true
+				return !mask
 			}
 		}
 
-		return false
+		return mask
 	}
 
 	return &condition, nil
 }
 
 func newRangeCondition(
-	rangeSelector RangeSelector,
-	fieldType consts.FieldType,
-	exactFunc ExactFilter,
-	rangeFunc RangeFilter,
-) *FilterCondition {
-	condition := newCondition(fieldType)
-
-	if rangeSelector.IsExact {
-		condition.Filter = func(pkg *PkgInfo) bool {
-			return exactFunc(pkg, rangeSelector.Start)
-		}
-
-		return &condition
+	query config.FieldQuery,
+	selector RangeSelector,
+) (*FilterCondition, error) {
+	matchersByField, ok := RangeMatchers[query.Field]
+	if !ok {
+		return nil, fmt.Errorf("unsupported field type for range: %v", query.Field)
 	}
 
-	condition.Filter = func(pkg *PkgInfo) bool {
-		return rangeFunc(pkg, rangeSelector.Start, rangeSelector.End)
+	matchersByExact, ok := matchersByField[selector.IsExact]
+	if !ok {
+		return nil, fmt.Errorf("internal error: missing exactness entry")
 	}
 
-	return &condition
-}
-
-func newDateCondition(dateFilter RangeSelector) *FilterCondition {
-	return newRangeCondition(
-		dateFilter,
-		consts.FieldDate,
-		pkgdata.FilterByDate,
-		pkgdata.FilterByDateRange,
-	)
-}
-
-func newSizeCondition(sizeFilter RangeSelector) *FilterCondition {
-	return newRangeCondition(
-		sizeFilter,
-		consts.FieldSize,
-		pkgdata.FilterBySize, // TODO: maybe these two should be in maps that have the Field as a key
-		pkgdata.FilterBySizeRange,
-	)
-}
-
-func newReasonCondition(reason string) *FilterCondition {
-	condition := newCondition(consts.FieldReason)
-	condition.Filter = func(pkg *PkgInfo) bool {
-		return pkgdata.FilterByReason(pkg.Reason, reason)
+	builder, ok := matchersByExact[query.Match]
+	if !ok {
+		return nil, fmt.Errorf("unsupported match type: %v", query.Match)
 	}
 
-	return &condition
-}
+	matcher := builder(selector.Start, selector.End)
 
-func getStringMatcher(match consts.MatchType) func(string, []string) bool {
-	switch match {
-	case consts.MatchExact:
-		return pkgdata.ExactStrings
-	default:
-		return pkgdata.FuzzyStrings
+	condition := newCondition(query.Field)
+	mask := query.Negate
+	condition.Filter = func(pkg *pkgdata.PkgInfo) bool {
+		return matcher(pkg) != mask
 	}
+
+	return &condition, nil
 }

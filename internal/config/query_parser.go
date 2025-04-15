@@ -7,91 +7,115 @@ import (
 	"strings"
 )
 
-func parseQueries(queryInputs []string) (FieldQueries, error) {
-	queries := make(FieldQueries)
+func parseQueries(queryInputs []string) ([]FieldQuery, error) {
+	queries := make([]FieldQuery, 0, len(queryInputs))
 
-	for _, queryInput := range queryInputs {
-		fieldPart, value, err := parseQueryInput(queryInput)
+	for _, input := range queryInputs {
+		query, err := parseQueryInput(input)
 		if err != nil {
 			return nil, err
 		}
-
-		field, subfield, err := parseFieldPart(fieldPart)
-		if err != nil {
-			return nil, err
-		}
-
-		addQuery(queries, field, subfield, value)
+		queries = append(queries, query)
 	}
 
 	return queries, nil
 }
 
-func parseQueryInput(input string) (string, string, error) {
-	queryParts := strings.SplitN(input, "=", 2)
-	if len(queryParts) != 2 {
-		return "",
-			"",
-			fmt.Errorf("invalid query format: %s. Must be in form fireld.subfield=value", input)
+func parseQueryInput(input string) (
+	FieldQuery,
+	error,
+) {
+	if len(input) > 1 && input[len(input)-1] == '?' {
+		parseExistenceQuery(input)
 	}
 
-	return queryParts[0], queryParts[1], nil
+	opStart := -1
+	opEnd := -1
+	match := consts.MatchFuzzy
+	negation := false
+
+	for i := range input {
+		if input[i] == '=' {
+			negation = i >= 1 && input[i-1] == '!'
+			opStart = i
+			if negation {
+				opStart--
+			}
+
+			opEnd = i + 1
+
+			if opEnd < len(input) && input[opEnd] == '=' {
+				match = consts.MatchStrict
+				opEnd++
+			}
+
+			break
+		}
+	}
+
+	if opStart < 0 || opEnd < 0 {
+		err := fmt.Errorf("invalid query format: %s. Expected e.g. field=value or field==value", input)
+		return FieldQuery{}, err
+	}
+
+	field, err := parseField(input[:opStart])
+	if err != nil {
+		return FieldQuery{}, err
+	}
+
+	rawTarget := strings.TrimSpace(input[opEnd:])
+	target, depth := extractDepth(rawTarget)
+
+	return FieldQuery{
+		Negate: negation,
+		Field:  field,
+		Match:  match,
+		Depth:  depth,
+		Target: target,
+	}, nil
 }
 
-func parseFieldPart(fieldPart string) (consts.FieldType, consts.SubfieldType, error) {
-	fieldParts := strings.SplitN(fieldPart, ".", 2)
-	fieldName := fieldParts[0]
+func parseExistenceQuery(input string) (FieldQuery, error) {
+	negation := len(input) >= 2 && input[len(input)-2] == '!'
+	end := len(input) - 1
+	if negation {
+		end--
+	}
+
+	fieldName, depth := extractDepth(input[:end])
+	field, err := parseField(fieldName)
+	if err != nil {
+		return FieldQuery{}, err
+	}
+
+	return FieldQuery{
+		IsExistence: true,
+		Negate:      negation,
+		Field:       field,
+		Depth:       depth,
+	}, nil
+}
+
+func parseField(input string) (consts.FieldType, error) {
+	fieldName := strings.TrimSpace(input)
 	field, exists := consts.FieldTypeLookup[fieldName]
 	if !exists {
-		return 0, 0, fmt.Errorf("unknown query field: %s", fieldName)
+		return -1, fmt.Errorf("unknown query field: %s", fieldName)
 	}
 
-	subfieldName := ""
-	if len(fieldParts) == 2 {
-		subfieldName = fieldParts[1]
-	}
-
-	subfield, exists := consts.SubfieldTypeLookup[subfieldName]
-	if !exists {
-		return 0, 0, fmt.Errorf("unknown query subfield: %s", subfieldName)
-	}
-
-	return field, subfield, nil
+	return field, nil
 }
 
-func addQuery(
-	queries FieldQueries,
-	field consts.FieldType,
-	subfield consts.SubfieldType,
-	value string,
-) {
-	subfields, exists := queries[field]
-	if !exists {
-		subfields = make(SubfieldQueries)
+func extractDepth(input string) (target string, depth int32) {
+	parts := strings.SplitN(input, "@", 2)
+	target = parts[0]
+	depth = 1
+
+	if len(parts) == 2 {
+		if d, err := strconv.Atoi(parts[1]); err == nil && d > 0 {
+			depth = int32(d)
+		}
 	}
 
-	value = parseMatchSugar(subfield, subfields, value)
-
-	subfields[subfield] = value
-	queries[field] = subfields
-}
-
-func parseMatchSugar(
-	subfield consts.SubfieldType,
-	subfields SubfieldQueries,
-	value string,
-) string {
-	if subfield != consts.SubfieldTarget || value == "" {
-		return value
-	}
-
-	matchType := consts.MatchFuzzy
-
-	if value[0] == '=' {
-		matchType = consts.MatchExact
-		value = value[1:]
-	}
-
-	subfields[consts.SubfieldMatch] = strconv.Itoa(int(matchType))
-	return value
+	return target, depth
 }

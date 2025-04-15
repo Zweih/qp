@@ -100,6 +100,8 @@ this package is compatible with the following distributions:
 | ✓ | validation field | - | validation sort |
 | ✓ | reverse optional dependencies field (optional for) | - | optdepends installation indicator |
 | - | optional-for query | - | separate field for optdepends reason |
+| ✓ | fuzzy/strict querying | - | exclusion querying |
+| - | existence querying | - | depth querying |
 
 ## installation
 
@@ -184,9 +186,17 @@ all queries that take package/library/program names as arguments can also take a
 
 short-flag queries and long-flag queries can be combined.
 
-you can also query for exact terms in each field by using `==` instead of `=` (excluding time and size fields).
+you can also execute strict queries in each field by using `==` instead of `=`.
 
-`=` will execute a fuzzy, substring match.
+`=` will execute a fuzzy match:
+ - strings and relations -> substring match
+ - dates -> approximating by day
+ - sizes -> approximating with a 0.3% tolerance by total bytes
+
+`==` will execute a strict match:
+ - strings and relations -> exact character-by-character match
+ - dates -> exact timestamp match, to the second
+ - sizes -> exact size on disk match, to the byte
 
 #### available queries
 | query type  | syntax | description |

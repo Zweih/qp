@@ -2,7 +2,6 @@ package pkgdata
 
 import (
 	"fmt"
-	"math"
 	"qp/internal/consts"
 	"qp/internal/pipeline/meta"
 	"slices"
@@ -18,6 +17,8 @@ type FilterCondition struct {
 	PhaseName string
 	FieldType consts.FieldType
 }
+
+const fuzzySizeTolerancePercent = 0.3
 
 func FilterByReason(installReason string, targetReason string) bool {
 	return installReason == targetReason
@@ -35,37 +36,52 @@ func GetRelationsByDepth(relations []Relation, targetDepth int32) []Relation {
 	return filteredRelations
 }
 
-// filters for packages installed on specific date
-func FilterByDate(pkg *PkgInfo, date int64) bool {
+func FuzzyDate(pkg *PkgInfo, date int64) bool {
 	pkgDate := time.Unix(pkg.InstallTimestamp, 0)
 	targetDate := time.Unix(date, 0) // TODO: we can pull this out to the top level
 	return pkgDate.Year() == targetDate.Year() && pkgDate.YearDay() == targetDate.YearDay()
 }
 
-// inclusive
-func FilterByDateRange(pkg *PkgInfo, start int64, end int64) bool {
+func StrictDateRange(pkg *PkgInfo, start int64, end int64) bool {
 	return !(pkg.InstallTimestamp < start || pkg.InstallTimestamp > end)
 }
 
-func roundSizeInBytes(num int64) int64 {
-	if num < 1000 {
-		return num
-	}
-
-	numDigits := int(math.Log10(float64(num))) + 1
-	scaleFactor := int64(math.Pow10(numDigits - 3))
-
-	return num / scaleFactor
+func StrictDate(pkg *PkgInfo, targetDate int64) bool {
+	return pkg.InstallTimestamp == targetDate
 }
 
-// TODO: let's pre-round the inputs outside of these functions
-func FilterBySize(pkg *PkgInfo, targetSize int64) bool {
-	return roundSizeInBytes(pkg.Size) == roundSizeInBytes(targetSize)
+func FuzzyDateRange(pkg *PkgInfo, start int64, end int64) bool {
+	pkgDate := time.Unix(pkg.InstallTimestamp, 0).Truncate(24 * time.Hour)
+	startDate := time.Unix(start, 0).Truncate(24 * time.Hour)
+	endDate := time.Unix(end, 0).Truncate(24 * time.Hour)
+
+	return (pkgDate.Equal(startDate) || pkgDate.After(startDate)) &&
+		(pkgDate.Equal(endDate) || pkgDate.Before(endDate))
 }
 
-func FilterBySizeRange(pkg *PkgInfo, startSize int64, endSize int64) bool {
-	roundedSize := roundSizeInBytes(pkg.Size)
-	return !(roundedSize < roundSizeInBytes(startSize) || roundedSize > roundSizeInBytes(endSize))
+func FuzzySizeTolerance(targetSize int64) int64 {
+	return int64(float64(targetSize) * fuzzySizeTolerancePercent / 100.0)
+}
+
+func FuzzySize(pkg *PkgInfo, targetSize int64) bool {
+	tolerance := FuzzySizeTolerance(targetSize)
+	result := pkg.Size - targetSize
+	return max(result, -result) <= tolerance
+}
+
+func FuzzySizeRange(pkg *PkgInfo, start int64, end int64) bool {
+	toleranceStart := FuzzySizeTolerance(start)
+	toleranceEnd := FuzzySizeTolerance(end)
+
+	return pkg.Size >= (start-toleranceStart) && pkg.Size <= (end+toleranceEnd)
+}
+
+func StrictSize(pkg *PkgInfo, targetSize int64) bool {
+	return pkg.Size == targetSize
+}
+
+func StrictSizeRange(pkg *PkgInfo, startSize int64, endSize int64) bool {
+	return !(pkg.Size < startSize || pkg.Size > endSize)
 }
 
 func FilterSliceByStrings(pkgStrings []string, targetStrings []string) bool {
@@ -90,7 +106,7 @@ func FuzzyStrings(pkgString string, targetStrings []string) bool {
 	return false
 }
 
-func ExactStrings(pkgString string, targetStrings []string) bool {
+func StrictStrings(pkgString string, targetStrings []string) bool {
 	pkgString = strings.ToLower(pkgString)
 
 	return slices.Contains(targetStrings, pkgString)

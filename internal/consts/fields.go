@@ -1,10 +1,6 @@
 package consts
 
-type (
-	FieldType    int
-	SubfieldType int32
-	MatchType    int32
-)
+type FieldType int
 
 // ordered by filter efficiency
 const (
@@ -33,17 +29,6 @@ const (
 )
 
 const (
-	SubfieldDepth SubfieldType = iota
-	SubfieldTarget
-	SubfieldMatch
-)
-
-const (
-	MatchFuzzy MatchType = iota
-	MatchExact
-)
-
-const (
 	date        = "date"
 	buildDate   = "build-date"
 	name        = "name"
@@ -66,10 +51,6 @@ const (
 	requiredBy  = "required-by"
 	optionalFor = "optional-for"
 	provides    = "provides"
-
-	target = "target"
-	depth  = "depth"
-	match  = "match"
 )
 
 var FieldTypeLookup = map[string]FieldType{
@@ -110,13 +91,6 @@ var FieldTypeLookup = map[string]FieldType{
 	provides:    FieldProvides,
 }
 
-var SubfieldTypeLookup = map[string]SubfieldType{
-	"":     SubfieldTarget,
-	target: SubfieldTarget,
-	depth:  SubfieldDepth,
-	match:  SubfieldMatch,
-}
-
 var FieldNameLookup = map[FieldType]string{
 	FieldDate:        date,
 	FieldBuildDate:   buildDate,
@@ -140,12 +114,6 @@ var FieldNameLookup = map[FieldType]string{
 	FieldRequiredBy:  requiredBy,
 	FieldOptionalFor: optionalFor,
 	FieldProvides:    provides,
-}
-
-var SubfieldNameLookup = map[SubfieldType]string{
-	SubfieldTarget: target,
-	SubfieldDepth:  depth,
-	SubfieldMatch:  match,
 }
 
 var (
