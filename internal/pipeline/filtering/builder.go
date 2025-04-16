@@ -40,6 +40,10 @@ func QueriesToConditions(queries []config.FieldQuery) ([]*FilterCondition, error
 			return []*FilterCondition{}, err
 		}
 
+		if condition == nil {
+			continue
+		}
+
 		conditions = append(conditions, condition)
 	}
 
