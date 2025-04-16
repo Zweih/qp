@@ -88,7 +88,7 @@ this package is compatible with the following distributions:
 | – | name exclusion query | – | streaming pipeline |
 | – | short-args for queries | – | key/value output |
 | – | XML output | – | package description sort |
-| – | package base query | – | required-by sort |
+| ✓ | package base query | – | required-by sort |
 | – | required-by count sort | – | dependency count sort |
 | ✓ | build-date field | - | build-date filter |
 | - | build-date sort | ✓ | pkgtype field |
