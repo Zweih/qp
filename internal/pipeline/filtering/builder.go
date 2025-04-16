@@ -25,8 +25,8 @@ func QueriesToConditions(queries []config.FieldQuery) ([]*FilterCondition, error
 		case consts.FieldDate, consts.FieldSize:
 			condition, err = parseRangeCondition(query)
 
-		case consts.FieldName, consts.FieldReason,
-			consts.FieldArch, consts.FieldLicense, consts.FieldDescription:
+		case consts.FieldName, consts.FieldReason, consts.FieldArch,
+			consts.FieldLicense, consts.FieldPkgBase, consts.FieldDescription:
 			condition, err = parseStringCondition(query)
 
 		case consts.FieldRequiredBy, consts.FieldDepends,

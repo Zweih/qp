@@ -34,6 +34,7 @@ func PrintHelp() {
 	fmt.Println("    conflicts=fuse            Query packages that conflict with the specified packages")
 	fmt.Println("    arch=x86_64               Show packages built for the specified architectures. \"any\" is a valid category of architecture.")
 	fmt.Println("    description=x86_64        Query packages by description (substring match)")
+	fmt.Println("    pkgbase                   Query packages by pkgbase")
 
 	fmt.Println("\nSorting Options:")
 	fmt.Println("  -O, --order <type>:<direction> Apply sorting to package output")
