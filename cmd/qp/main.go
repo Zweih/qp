@@ -51,7 +51,10 @@ func mainWithConfig(configProvider config.ConfigProvider) error {
 		}
 
 		if i > 0 && len(pkgPtrs) == 0 { // only start checking once loading/fetching has completed
-			out.WriteLine("No packages to display.")
+			if isInteractive {
+				out.WriteLine("No packages to display.")
+			}
+
 			return nil
 		}
 	}
