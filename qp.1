@@ -1,5 +1,5 @@
 .\" Man page for qp
-.TH qp 1 "April 2025" "qp 4.20.0" "User Commands"
+.TH qp 1 "April 2025" "qp 4.22.0" "User Commands"
 .SH NAME
 qp \- Query Packages. A CLI utility for querying installed packages.
 .SH SYNOPSIS
@@ -10,18 +10,31 @@ qp \- Query Packages. A CLI utility for querying installed packages.
 is a standalone CLI utility for Arch and Arch-based Linux distributions to list and query installed packages. It works with any package manager that uses ALPM, like pacman and others.
 
 The utility provides powerful querying capabilities, including:
+.BR
 - Installation date queries
+.BR
 - Package size queries
+.BR
 - Install reason queries
+.BR
 - License queries
+.BR
 - Reverse dependency queries (requirements)
+.BR
 - Conflict queries
+.BR
 - Dependency queries
+.BR
 - Provision queries
+.BR
 - Package name queries
+.BR
 - Architecture queries
+.BR
 - Description queries
+.BR
 - Package base queries
+.BR
 - Sorting and JSON output
 
 .SH OPTIONS
@@ -94,7 +107,10 @@ Display help information.
 .SH QUERYING WITH --where
 The \fB--where\fR or \fB-w\fR option allows complex queries using multiple filters.
 Multiple \fB-w\fR flags can be combined.
-Queries support both substring (\fB=\fR) and strict (\fB==\fR) matches.
+.BR
+Queries support both fuzzy (\fB=\fR) and strict (\fB==\fR) matches.
+.BR
+Ranges are queried with \fIfield=value\fR, \fIfield=start-value:\fR, \fIfield=:end-value\fR, or \fIfield=start-value:end-value\fR
 
 Supported query types:
 .TP
