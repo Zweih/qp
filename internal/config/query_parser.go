@@ -31,11 +31,11 @@ func parseQueryInput(input string) (
 	negation := false
 
 	for i := range input {
-		switch input[i] {
-		case ':':
+		if input[i] == ':' {
 			return parseExistenceQuery(input, i)
+		}
 
-		case '=':
+		if input[i] == '=' {
 
 			negation = i >= 1 && input[i-1] == '!'
 			opStart = i
