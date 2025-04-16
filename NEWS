@@ -1,8 +1,18 @@
 # qp Release Notes
 
+## v4.20.0
+### What's Changed
+* Fix: GPG workflow by @Zweih in https://github.com/Zweih/qp/pull/190
+* Feature: Manual ref workflow by @Zweih in https://github.com/Zweih/qp/pull/191
+* Fix: Package signing by @Zweih in https://github.com/Zweih/qp/pull/192
+* Feature: Fuzzy/Exact querying (fuzzy: =, exact: ==) by @Zweih in https://github.com/Zweih/qp/pull/193
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v4.19.0...v4.20.0
+
 ## v4.19.0
 ### What's Changed
 * Feature: Add optional-for field by @Zweih in https://github.com/Zweih/qp/pull/189
+
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v4.18.0...v4.19.0
 
