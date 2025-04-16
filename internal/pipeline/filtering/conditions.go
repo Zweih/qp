@@ -108,6 +108,15 @@ func newStringCondition(
 	return &condition, nil
 }
 
+func newStringExistsCondition(field consts.FieldType, mask bool) (*FilterCondition, error) {
+	condition := newCondition(field)
+	condition.Filter = func(pkg *pkgdata.PkgInfo) bool {
+		return pkgdata.StringExists(pkg.GetString(field)) != mask
+	}
+
+	return &condition, nil
+}
+
 func newRelationCondition(
 	field consts.FieldType,
 	targets []string,
@@ -131,6 +140,21 @@ func newRelationCondition(
 		}
 
 		return mask
+	}
+
+	return &condition, nil
+}
+
+func newRelationExistsCondition(
+	field consts.FieldType,
+	depth int32,
+	mask bool,
+) (*FilterCondition, error) {
+	condition := newCondition(field)
+
+	condition.Filter = func(pkg *pkgdata.PkgInfo) bool {
+		relationsAtDepth := pkgdata.GetRelationsByDepth(pkg.GetRelations(field), depth)
+		return pkgdata.RelationExists(relationsAtDepth) != mask
 	}
 
 	return &condition, nil

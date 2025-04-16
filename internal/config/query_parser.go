@@ -25,17 +25,18 @@ func parseQueryInput(input string) (
 	FieldQuery,
 	error,
 ) {
-	if len(input) > 1 && input[len(input)-1] == '?' {
-		parseExistenceQuery(input)
-	}
-
 	opStart := -1
 	opEnd := -1
 	match := consts.MatchFuzzy
 	negation := false
 
 	for i := range input {
-		if input[i] == '=' {
+		switch input[i] {
+		case ':':
+			return parseExistenceQuery(input, i)
+
+		case '=':
+
 			negation = i >= 1 && input[i-1] == '!'
 			opStart = i
 			if negation {
@@ -75,14 +76,19 @@ func parseQueryInput(input string) (
 	}, nil
 }
 
-func parseExistenceQuery(input string) (FieldQuery, error) {
-	negation := len(input) >= 2 && input[len(input)-2] == '!'
-	end := len(input) - 1
-	if negation {
-		end--
+func parseExistenceQuery(input string, colonIdx int) (FieldQuery, error) {
+	prefix := input[:colonIdx]
+	negation := false
+
+	switch prefix {
+	case "has":
+	case "not":
+		negation = true
+	default:
+		return FieldQuery{}, fmt.Errorf("invalid existence query: %s", input)
 	}
 
-	fieldName, depth := extractDepth(input[:end])
+	fieldName, depth := extractDepth(input[colonIdx+1:])
 	field, err := parseField(fieldName)
 	if err != nil {
 		return FieldQuery{}, err

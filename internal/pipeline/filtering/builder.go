@@ -53,7 +53,7 @@ func QueriesToConditions(queries []config.FieldQuery) ([]*FilterCondition, error
 
 func parseRelationCondition(query config.FieldQuery) (*FilterCondition, error) {
 	if query.IsExistence {
-		return nil, nil
+		return newRelationExistsCondition(query.Field, query.Depth, query.Negate)
 	}
 
 	if query.Target == "" {
@@ -66,7 +66,7 @@ func parseRelationCondition(query config.FieldQuery) (*FilterCondition, error) {
 
 func parseStringCondition(query config.FieldQuery) (*FilterCondition, error) {
 	if query.IsExistence {
-		return nil, nil
+		return newStringExistsCondition(query.Field, query.Negate)
 	}
 
 	if query.Target == "" {
