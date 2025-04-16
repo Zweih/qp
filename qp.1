@@ -1,5 +1,5 @@
 .\" Man page for qp
-.TH qp 1 "April 2025" "qp 4.20.0" "User Commands"
+.TH qp 1 "April 2025" "qp 4.22.0" "User Commands"
 .SH NAME
 qp \- Query Packages. A CLI utility for querying installed packages.
 .SH SYNOPSIS
@@ -10,18 +10,33 @@ qp \- Query Packages. A CLI utility for querying installed packages.
 is a standalone CLI utility for Arch and Arch-based Linux distributions to list and query installed packages. It works with any package manager that uses ALPM, like pacman and others.
 
 The utility provides powerful querying capabilities, including:
+.br
+- Existence queries
+.br
 - Installation date queries
+.br
 - Package size queries
+.br
 - Install reason queries
+.br
 - License queries
+.br
 - Reverse dependency queries (requirements)
+.br
 - Conflict queries
+.br
 - Dependency queries
+.br
 - Provision queries
+.br
 - Package name queries
+.br
 - Architecture queries
+.br
 - Description queries
+.br
 - Package base queries
+.br
 - Sorting and JSON output
 
 .SH OPTIONS
@@ -32,29 +47,37 @@ Limit the number of recent packages displayed (default: 20).
 .BR \-a ", " \-\-all
 Show all installed packages, ignoring \-l/--limit.
 .TP
-.BR \-w " " \fIfield=value\fR ", " \-\-where=\fIfield=value\fR
-Apply multiple flexible queries. Can be used multiple times.
-Examples:
+.BR \-w " " \fIquery\fR ", " \-\-where=\fIquery\fR
+Apply one or more filters to refine package results.
+
+Supported query types:
+.RS
+.TP
+.B string match
+\fIfield=value\fR -> fuzzy match
 .br
-\fB--where size=10MB:1GB\fR
+\fIfield==value\fR -> strict match
+
+.TP
+.B range match
+\fIfield=start:end\fR -> fuzzy match
 .br
-\fB--where date=2024-01-01:\fR
+\fIfield==start:end\fR -> strict match
 .br
-\fB--where reason=explicit\fR
+Supports full ranges (\fBstart:end\fR), open-ended ranges (\fBstart:\fR or \fB:end\fR), and exact values.
 .br
-\fB--where name=firefox\fR
+Only supported for \fBdate\fR and \fBsize\fR.
+
+.TP
+.B existence check
+\fBhas:field\fR -> field must exist or be non-empty
 .br
-\fB--where required-by=vlc\fR
-.br
-\fB--where depends=glibc\fR
-.br
-\fB--where conflicts=sdl2\fR
-.br
-\fB--where arch=x86_64\fR
-.br
-\fB--where license=GPL\fR
-.br
-\fB--where description="linux kernel"\fR
+\fBnot:field\fR -> field must be missing or empty
+.RE
+
+This flag can be used multiple times and mixed freely.
+
+See below for a list of all available query fields.
 .TP
 .BR \-O " " \fIfield:direction\fR ", " \-\-order=\fIfield:direction\fR
 Sort results. Default is \fBdate:asc\fR.
@@ -92,9 +115,54 @@ Force fresh data loading and update the cache.
 Display help information.
 
 .SH QUERYING WITH --where
-The \fB--where\fR or \fB-w\fR option allows complex queries using multiple filters.
-Multiple \fB-w\fR flags can be combined.
-Queries support both substring (\fB=\fR) and strict (\fB==\fR) matches.
+The \fB--where\fR or \fB-w\fR option allows complex filtering by package metadata.
+
+You can provide multiple \fB-w\fR flags to combine different filters. Each query must follow one of the supported types:
+
+.TP
+.B string match
+\fIfield=value\fR -> fuzzy match
+.br
+\fIfield==value\fR -> strict match
+.br
+Applies to string fields like \fBname\fR, \fBlicense\fR, \fBdescription\fR, etc.
+
+.TP
+.B range match
+\fIfield=start:end\fR -> fuzzy match
+.br
+\fIfield==start:end\fR -> strict match
+.br
+Supported for fields like \fBdate\fR and \fBsize\fR.
+.br
+Ranges can be:
+.br
+- Full range: \fBstart:end\fR
+.br
+- Open-ended: \fBstart:\fR or \fB:end\fR
+.br
+- Exact: \fBvalue\fR
+
+.TP
+.B existence check
+\fBhas:field\fR -> filter for fields that exist or are non-empty
+
+.PP
+Multiple comma-separated values can be supplied for any query (e.g., \fBname=vim,nano\fR).
+
+.PP
+.B Match Behavior by Field Type:
+
+.TS
+box, tab(:);
+cb cb cb
+l l l.
+Field Type: Fuzzy Match: Strict Match
+_
+Strings & Relations: substring (case-insensitive): exact match (case-insensitive)
+Dates: matches by day (ignores time): exact timestamp (to the second)
+Size: ±0.3% byte tolerance (approximate): exact byte size
+.TE
 
 Supported query types:
 .TP

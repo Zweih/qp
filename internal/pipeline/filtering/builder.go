@@ -25,7 +25,8 @@ func QueriesToConditions(queries []config.FieldQuery) ([]*FilterCondition, error
 		case consts.FieldDate, consts.FieldSize:
 			condition, err = parseRangeCondition(query)
 
-		case consts.FieldName, consts.FieldArch, consts.FieldLicense, consts.FieldReason:
+		case consts.FieldName, consts.FieldReason,
+			consts.FieldArch, consts.FieldLicense, consts.FieldDescription:
 			condition, err = parseStringCondition(query)
 
 		case consts.FieldRequiredBy, consts.FieldDepends,
@@ -57,7 +58,7 @@ func QueriesToConditions(queries []config.FieldQuery) ([]*FilterCondition, error
 
 func parseRelationCondition(query config.FieldQuery) (*FilterCondition, error) {
 	if query.IsExistence {
-		return nil, nil
+		return newRelationExistsCondition(query.Field, query.Depth, query.Negate)
 	}
 
 	if query.Target == "" {
@@ -70,7 +71,7 @@ func parseRelationCondition(query config.FieldQuery) (*FilterCondition, error) {
 
 func parseStringCondition(query config.FieldQuery) (*FilterCondition, error) {
 	if query.IsExistence {
-		return nil, nil
+		return newStringExistsCondition(query.Field, query.Negate)
 	}
 
 	if query.Target == "" {

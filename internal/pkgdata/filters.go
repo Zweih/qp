@@ -112,6 +112,14 @@ func StrictStrings(pkgString string, targetStrings []string) bool {
 	return slices.Contains(targetStrings, pkgString)
 }
 
+func RelationExists(relations []Relation) bool {
+	return len(relations) > 0
+}
+
+func StringExists(pkgString string) bool {
+	return pkgString != ""
+}
+
 func FilterPackages(
 	pkgPtrs []*PkgInfo,
 	filterConditions []*FilterCondition,

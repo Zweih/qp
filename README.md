@@ -38,6 +38,7 @@ this package is compatible with the following distributions:
 ## features
 
 - list installed packages with install date/timestamps, dependencies, provisions, reverse dependencies (required by), size on disk, conflicts, replacements, architecture, license, description, build date, package base, package type, validation, packager, optional dependencies, reverse optional dependencies (optional for), groups, and version
+- query by field existence
 - query by explicitly installed packages
 - query by packages installed as dependencies
 - query by packages required by specified packages
@@ -101,7 +102,7 @@ this package is compatible with the following distributions:
 | ✓ | reverse optional dependencies field (optional for) | - | optdepends installation indicator |
 | - | optional-for query | - | separate field for optdepends reason |
 | ✓ | fuzzy/strict querying | - | exclusion querying |
-| - | existence querying | - | depth querying |
+| ✓ | existence querying | - | depth querying |
 
 ## installation
 
@@ -151,17 +152,15 @@ qp [options]
 ### options
 - `-l <number>` | `--limit <number>`: limit the amount of recent packages to display (default: 20)
 - `-a` | `all`: show all installed packages (ignores `-l`)
-- `-w <field>=<value>` | `--where <field>=<value>`: apply multiple queries for a flexible query system. they can be used multiple times command. examples:
-  - `--where size=10MB:1GB`    -> query by size range
-  - `--where date=2024-01-01:` -> query by installation date
-  - `--where reason=explicit`  -> query by explicit installations
-  - `--where name=firefox`     -> query by package names that contain `firefox`
-  - `--where required-by=vlc`  -> query by packages required by `vlc`
-  - `--where depends=glibc`    -> query by packages that depend on `glibc`
-  - `--where conflicts=sdl2`   -> query by packages that conflict with `sdl2`
-  - `--where arch=x86_64`      -> query by packages that are built for `x86_64` CPUs
-  - `--where license=GPL`      -> query by package licenses that contain `GPL`
-  - `--where description="linux kernel"` -> query by package descriptions that contain "linux kernel"
+- `-w <query>` | `--where <query>`: apply one or more filters to refine package results.
+  - supported query types:
+    - **string match** -> `field=value` (fuzzy) or `field==value` (strict)
+    - **range match** -> `field=start:end` (fuzzy) or `field==start:end` (strict)
+        - supports full ranges (`start:end`), open-ended ranges (`start:` or `:end`), and exact values (`value`)
+        - works with `date` and `size`
+    - **existence check** -> `has:field` or `not:field`
+  - this flag can be used multiple times and mixed freely
+  - [see all available query fields below](#available-queries)
 - `-O <field>:<direction>` | `--order <field>:<direction>`: sort results ascending or descending (default sort is `date:asc`):
   - `date`    -> sort by installation date
   - `name`    -> sort alphabetically by package name
@@ -180,23 +179,51 @@ qp [options]
 - `-h` | `--help`: print help info
 
 ### querying with `--where`
-the `--where` (short-flag: `-w`) flag allows for powerful querying of installed packages. queries can be combined by using multiple `--where/-w` flags.
+the `--where` (short: `-w`) flag is the core of qp's flexible query system. you can use it multiple times per command to combine different filters.
 
-all queries that take package/library/program names as arguments can also take a comma-separated list. this applies to the queries `name`, `depends`, and `required-by`. 
+#### query types
+all queries that take words as arguments can also take a comma-separated list.
 
-short-flag queries and long-flag queries can be combined.
+each `--where` query supports one of the following:
 
-you can also execute strict queries in each field by using `==` instead of `=`.
+- **string match**
+  - `field=value` -> fuzzy match
+  - `field==value` -> strict match
+  - applies to string-based fields like `name`, `license`, `description`, etc.
+- **range match**
+  - `field=start:end` -> fuzzy match
+  - `field==start:end` -> strict match
+  - works with `date` and `size`
+  - supports:
+    - full ranges: `start:end`
+    - open-ended ranges: `start:` or `:end`
+    - exact values: `value`
+- **existence check**
+  - `has:field` — field must exist or be non-empty
+  - `not:field` — field must be missing or empty
 
-`=` will execute a fuzzy match:
- - strings and relations -> substring match
- - dates -> approximating by day
- - sizes -> approximating with a 0.3% tolerance by total bytes
+#### match types
 
-`==` will execute a strict match:
- - strings and relations -> exact character-by-character match
- - dates -> exact timestamp match, to the second
- - sizes -> exact size on disk match, to the byte
+|field type | fuzzy | strict | 
+|-----------|-------|--------|
+| strings & relations | substring match (case-insensitive) | exact character match (case-insensitive) |
+| dates | matches by day (ignores time) | matches exact timestamp (to the second) |
+| size  | ±0.3% byte tolerance (approximate) | matches exact byte size |
+
+For example:
+  - `name=gtk` matches `gtk3`, `libgtk`, etc. (fuzzy)
+  - `name==gtk` only matches a package named exactly `gtk`
+
+#### query examples
+```bash
+qp -w size=100MB:1GB          # size range (fuzzy)
+qp -w date==2024-01-01        # exact install date
+qp -w name=firefox            # fuzzy name match
+qp -w name==bash              # strict name match
+qp -w reason=explicit         # packages installed explicitly
+qp -w has:depends             # must have dependencies
+qp -w not:conflicts           # must not conflict with anything
+```
 
 #### available queries
 | query type  | syntax | description |
