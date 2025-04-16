@@ -2,6 +2,7 @@ package config
 
 import (
 	"os"
+	"qp/internal/about"
 )
 
 func (c *CliConfigProvider) GetConfig() (*Config, error) {
@@ -12,6 +13,11 @@ func (c *CliConfigProvider) GetConfig() (*Config, error) {
 
 	if cfg.ShowHelp {
 		PrintHelp()
+		os.Exit(0)
+	}
+
+	if cfg.ShowVersion {
+		about.PrintVersionInfo()
 		os.Exit(0)
 	}
 

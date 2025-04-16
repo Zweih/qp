@@ -11,6 +11,7 @@ func ParseFlags(args []string) (Config, error) {
 	var allPackages bool
 	var hasAllFields bool
 	var showHelp bool
+	var showVersion bool
 	var outputJson bool
 	var hasNoHeaders bool
 	var showFullTimestamp bool
@@ -49,7 +50,8 @@ func ParseFlags(args []string) (Config, error) {
 	pflag.BoolVar(&noCache, "no-cache", false, "Disable cache loading/saving and force fresh package data loading")
 	pflag.BoolVar(&regenCache, "regen-cache", false, "Disable cache loading, force fresh package data loading, and save fresh cache")
 
-	pflag.BoolVarP(&showHelp, "help", "h", false, "Display help")
+	pflag.BoolVarP(&showHelp, "help", "h", false, "Show help information")
+	pflag.BoolVar(&showVersion, "version", false, "Show version, author, and license information")
 
 	// legacy hidden flags (still functional but hidden)
 	pflag.IntVarP(&count, "number", "n", 20, "Number of packages to show")
@@ -108,6 +110,7 @@ func ParseFlags(args []string) (Config, error) {
 		Count:             count,
 		AllPackages:       allPackages,
 		ShowHelp:          showHelp,
+		ShowVersion:       showVersion,
 		OutputJson:        outputJson,
 		HasNoHeaders:      hasNoHeaders,
 		ShowFullTimestamp: showFullTimestamp,

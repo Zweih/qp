@@ -56,8 +56,12 @@ jobs:
           if [ -n "${{ matrix.goarm }}" ]; then
             export GOARM=${{ matrix.goarm }}
           fi
-          
-          go build -trimpath -ldflags="-s -w" -v -o qp-${{ matrix.arch }} ./cmd/qp
+
+          go build -trimpath -ldflags="-s -w \
+            -X qp/internal/about.Version=${{ env.TAG_NAME }} \
+            -X qp/internal/about.Commit=$(git rev-parse HEAD) \
+            -X qp/internal/about.Date=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            -v -o qp-${{ matrix.arch }} ./cmd/qp
 
       - name: Upload built binary
         uses: actions/upload-artifact@v4

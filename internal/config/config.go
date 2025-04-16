@@ -13,6 +13,7 @@ type Config struct {
 	Count             int
 	AllPackages       bool
 	ShowHelp          bool
+	ShowVersion       bool
 	OutputJson        bool
 	HasNoHeaders      bool
 	ShowFullTimestamp bool
