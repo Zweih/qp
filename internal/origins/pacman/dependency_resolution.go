@@ -1,14 +1,15 @@
-package pkgdata
+package pacman
 
 import (
 	"qp/internal/pipeline/meta"
+	"qp/internal/pkgdata"
 )
 
 // TODO: we can do this concurrently. let's get on that.
-func ResolveDependencyGraph(
-	pkgs []*PkgInfo,
+func resolveDependencyGraph(
+	pkgs []*pkgdata.PkgInfo,
 	_ meta.ProgressReporter, // TODO: Add progress reporting
-) ([]*PkgInfo, error) {
+) ([]*pkgdata.PkgInfo, error) {
 	providesMap := buildProvidesMap(pkgs)
 	forwardShallow, reverseShallow, optReverseShallow := buildShallowGraph(pkgs, providesMap)
 
@@ -39,7 +40,7 @@ func ResolveDependencyGraph(
 	return pkgs, nil
 }
 
-func buildProvidesMap(pkgs []*PkgInfo) map[string][]string {
+func buildProvidesMap(pkgs []*pkgdata.PkgInfo) map[string][]string {
 	// key: provided library/package, value: package that provides it (provider)
 	providesMap := make(map[string][]string)
 
@@ -53,16 +54,16 @@ func buildProvidesMap(pkgs []*PkgInfo) map[string][]string {
 }
 
 func buildShallowGraph(
-	pkgs []*PkgInfo,
+	pkgs []*pkgdata.PkgInfo,
 	providesMap map[string][]string,
 ) (
-	forwardShallow map[string][]Relation,
-	reverseShallow map[string][]Relation,
-	optReverseShallow map[string][]Relation,
+	forwardShallow map[string][]pkgdata.Relation,
+	reverseShallow map[string][]pkgdata.Relation,
+	optReverseShallow map[string][]pkgdata.Relation,
 ) {
-	forwardShallow = make(map[string][]Relation)
-	reverseShallow = make(map[string][]Relation)
-	optReverseShallow = make(map[string][]Relation)
+	forwardShallow = make(map[string][]pkgdata.Relation)
+	reverseShallow = make(map[string][]pkgdata.Relation)
+	optReverseShallow = make(map[string][]pkgdata.Relation)
 
 	for _, pkg := range pkgs {
 		buildShallowTrees(pkg, pkg.Depends, providesMap, forwardShallow, reverseShallow)
@@ -73,11 +74,11 @@ func buildShallowGraph(
 }
 
 func buildShallowTrees(
-	pkg *PkgInfo,
-	deps []Relation,
+	pkg *pkgdata.PkgInfo,
+	deps []pkgdata.Relation,
 	providesMap map[string][]string,
-	forwardTree map[string][]Relation,
-	reverseTree map[string][]Relation,
+	forwardTree map[string][]pkgdata.Relation,
+	reverseTree map[string][]pkgdata.Relation,
 ) {
 	for _, depPackage := range deps {
 		depName := depPackage.Name
@@ -101,7 +102,7 @@ func buildShallowTrees(
 				reverseKey = target.Name
 			}
 
-			reverseRelation := Relation{
+			reverseRelation := pkgdata.Relation{
 				Name:     pkg.Name,
 				Version:  depPackage.Version,
 				Operator: depPackage.Operator,
@@ -116,8 +117,8 @@ func buildShallowTrees(
 
 func addToDependencyTree(
 	from string,
-	tree map[string][]Relation,
-	relation Relation,
+	tree map[string][]pkgdata.Relation,
+	relation pkgdata.Relation,
 ) {
 	tree[from] = append(tree[from], relation)
 }
@@ -125,14 +126,14 @@ func addToDependencyTree(
 func resolveProvisions(
 	depName string,
 	version string,
-	operator RelationOp,
+	operator pkgdata.RelationOp,
 	providesMap map[string][]string,
-) []Relation {
+) []pkgdata.Relation {
 	if providerNames, exists := providesMap[depName]; exists {
-		provisions := make([]Relation, 0, len(providerNames))
+		provisions := make([]pkgdata.Relation, 0, len(providerNames))
 
 		for _, providerName := range providerNames {
-			provisions = append(provisions, Relation{
+			provisions = append(provisions, pkgdata.Relation{
 				Name:         depName,
 				Version:      version,
 				Operator:     operator,
@@ -144,17 +145,17 @@ func resolveProvisions(
 		return provisions
 	}
 
-	return []Relation{{Name: depName, Version: version, Operator: operator}}
+	return []pkgdata.Relation{{Name: depName, Version: version, Operator: operator}}
 }
 
 // TODO: we can memoize this. we can also paralellize as well.
 func walkFullGraph(
 	name string,
-	dependencyTree map[string][]Relation,
+	dependencyTree map[string][]pkgdata.Relation,
 	visited map[string]int32,
 	parentVirtualName string,
-) []Relation {
-	var results []Relation
+) []pkgdata.Relation {
+	var results []pkgdata.Relation
 
 	for _, relation := range dependencyTree[name] {
 		newDepth := visited[name] + 1
@@ -183,10 +184,10 @@ func walkFullGraph(
 
 func walkFullOptGraph(
 	name string,
-	optionalGraph []Relation,
-	hardGraph map[string][]Relation,
-) []Relation {
-	var results []Relation
+	optionalGraph []pkgdata.Relation,
+	hardGraph map[string][]pkgdata.Relation,
+) []pkgdata.Relation {
+	var results []pkgdata.Relation
 	visited := map[string]int32{name: 0}
 
 	for _, optRelation := range optionalGraph {
@@ -201,8 +202,8 @@ func walkFullOptGraph(
 	return results
 }
 
-func collapseRelations(relations []Relation) []Relation {
-	seen := map[string]Relation{}
+func collapseRelations(relations []pkgdata.Relation) []pkgdata.Relation {
+	seen := map[string]pkgdata.Relation{}
 	for _, relation := range relations {
 		existingRelation, ok := seen[relation.Name]
 
@@ -211,7 +212,7 @@ func collapseRelations(relations []Relation) []Relation {
 		}
 	}
 
-	result := make([]Relation, 0, len(seen))
+	result := make([]pkgdata.Relation, 0, len(seen))
 	for _, relation := range seen {
 		result = append(result, relation)
 	}

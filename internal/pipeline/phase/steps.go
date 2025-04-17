@@ -2,6 +2,7 @@ package phase
 
 import (
 	"fmt"
+	"path/filepath"
 	"qp/internal/config"
 	out "qp/internal/display"
 	"qp/internal/pipeline/filtering"
@@ -9,112 +10,93 @@ import (
 	"qp/internal/pkgdata"
 )
 
-func LoadCacheStep(
+func (p *Pipeline) loadCacheStep(
 	cfg *config.Config,
-	_ []*PkgInfo,
-	_ ProgressReporter,
-	pipelineCtx *meta.PipelineContext,
-) ([]*PkgInfo, error) {
-	if cfg.NoCache || cfg.RegenCache {
+	_ []*pkgdata.PkgInfo,
+	_ meta.ProgressReporter,
+) ([]*pkgdata.PkgInfo, error) {
+	if cfg.RegenCache || cfg.NoCache {
 		return nil, nil
 	}
 
-	pkgPtrs, err := pkgdata.LoadProtoCache(pipelineCtx.CachePath)
+	cachePath := filepath.Join(p.CachePath)
+	pkgs, err := p.Origin.LoadCache(cachePath, p.ModTime)
 	if err == nil {
-		pipelineCtx.UsedCache = true
+		p.UsedCache = true
 	}
 
-	// TODO: use ProgressReporter to report cache status
-	return pkgPtrs, nil
+	return pkgs, nil
 }
 
-// TODO: add progress reporting
-func FetchStep(
-	_ *config.Config,
-	pkgPtrs []*PkgInfo,
-	_ ProgressReporter,
-	pipelineCtx *meta.PipelineContext,
-) ([]*PkgInfo, error) {
-	if !pipelineCtx.UsedCache {
-		var err error
-		pkgPtrs, err = pkgdata.FetchPackages()
-		if err != nil {
-			out.WriteLine(fmt.Sprintf(
-				"Warning: Some packages may be missing due to corrupted package database: %v",
-				err,
-			))
-		}
-	}
-
-	return pkgPtrs, nil
-}
-
-func ResolveDepGraphStep(
+func (p *Pipeline) fetchStep(
 	_ *config.Config,
 	pkgPtrs []*pkgdata.PkgInfo,
-	reportProgress ProgressReporter,
-	pipelineCtx *meta.PipelineContext,
-) ([]*PkgInfo, error) {
-	if pipelineCtx.UsedCache {
+	_ meta.ProgressReporter,
+) ([]*pkgdata.PkgInfo, error) {
+	if p.UsedCache {
 		return pkgPtrs, nil
 	}
 
-	return pkgdata.ResolveDependencyGraph(pkgPtrs, reportProgress)
+	pkgs, err := p.Origin.Load()
+	if err != nil {
+		out.WriteLine(fmt.Sprintf(
+			"Warning: failed to fetch packages for origin %s: %v",
+			p.Origin.Name(), err,
+		))
+		return nil, err
+	}
+
+	return pkgs, nil
 }
 
-// TODO: add progress reporting
-func SaveCacheStep(
+func (p *Pipeline) resolveStep(
+	_ *config.Config,
+	pkgPtrs []*pkgdata.PkgInfo,
+	reportProgress meta.ProgressReporter,
+) ([]*pkgdata.PkgInfo, error) {
+	if p.UsedCache {
+		return pkgPtrs, nil
+	}
+
+	pkgs, err := p.Origin.ResolveDeps(pkgPtrs)
+	if err != nil {
+		return nil, fmt.Errorf("dependency resolution failed for origin %s: %w", p.Origin.Name(), err)
+	}
+
+	return pkgs, nil
+}
+
+func (p *Pipeline) saveCacheStep(
 	cfg *config.Config,
-	pkgPtrs []*PkgInfo,
-	_ ProgressReporter,
-	pipelineCtx *meta.PipelineContext,
-) ([]*PkgInfo, error) {
-	if !cfg.NoCache && !pipelineCtx.UsedCache {
-		// TODO: we can probably save the file concurrently
-		err := pkgdata.SaveProtoCache(pkgPtrs, pipelineCtx.CachePath)
-		if err != nil {
-			out.WriteLine(fmt.Sprintf("Warning: Error saving cache: %v", err))
-		}
+	pkgPtrs []*pkgdata.PkgInfo,
+	_ meta.ProgressReporter,
+) ([]*pkgdata.PkgInfo, error) {
+	if cfg.NoCache || p.UsedCache {
+		return pkgPtrs, nil
+	}
+
+	cachePath := filepath.Join(p.CachePath)
+	err := p.Origin.SaveCache(cachePath, pkgPtrs, p.ModTime)
+	if err != nil {
+		out.WriteLine(fmt.Sprintf("Warning: failed to save cache for origin %s: %v", p.Origin.Name(), err))
 	}
 
 	return pkgPtrs, nil
 }
 
-func FilterStep(
+func (p *Pipeline) filterStep(
 	cfg *config.Config,
-	pkgPtrs []*PkgInfo,
-	reportProgress ProgressReporter,
-	_ *meta.PipelineContext,
-) ([]*PkgInfo, error) {
+	pkgPtrs []*pkgdata.PkgInfo,
+	reportProgress meta.ProgressReporter,
+) ([]*pkgdata.PkgInfo, error) {
 	if len(cfg.FieldQueries) == 0 {
 		return pkgPtrs, nil
 	}
 
 	filterConditions, err := filtering.QueriesToConditions(cfg.FieldQueries)
 	if err != nil {
-		return []*pkgdata.PkgInfo{}, err
+		return nil, fmt.Errorf("filter query error: %w", err)
 	}
 
 	return pkgdata.FilterPackages(pkgPtrs, filterConditions, reportProgress), nil
-}
-
-func SortStep(
-	cfg *config.Config,
-	pkgPtrs []*PkgInfo,
-	reportProgress ProgressReporter,
-	_ *meta.PipelineContext,
-) ([]*PkgInfo, error) {
-	comparator, err := pkgdata.GetComparator(cfg.SortOption.Field, cfg.SortOption.Asc)
-	if err != nil {
-		return []*pkgdata.PkgInfo{}, err
-	}
-
-	phase := "Sorting packages"
-
-	// threshold is 500 as that is where merge sorting chunk performance overtakes timsort
-	if len(pkgPtrs) < pkgdata.ConcurrentSortThreshold {
-		return pkgdata.SortNormally(pkgPtrs, comparator, phase, reportProgress), nil
-	}
-
-	return pkgdata.SortConcurrently(pkgPtrs, comparator, phase, reportProgress), nil
 }

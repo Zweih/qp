@@ -5,8 +5,8 @@ import (
 	"os"
 	"qp/internal/config"
 	out "qp/internal/display"
-	"qp/internal/pipeline/meta"
-	phasekit "qp/internal/pipeline/phase"
+	"qp/internal/origins"
+	"qp/internal/pipeline/phase"
 	"qp/internal/pkgdata"
 	"sync"
 
@@ -29,50 +29,80 @@ func mainWithConfig(configProvider config.ConfigProvider) error {
 		return err
 	}
 
+	isInteractive := isInteractive(cfg.DisableProgress)
+
+	cacheBasePath, err := pkgdata.GetCacheBasePath()
+	if err != nil {
+		out.WriteLine(fmt.Sprintf("WARNING: failed to set up cache dir: %v", err))
+	}
+
+	var pipelines []*phase.Pipeline
+	for _, driver := range origins.AvailableDrivers() {
+		p := phase.NewPipeline(driver, cfg, isInteractive, cacheBasePath)
+		pipelines = append(pipelines, p)
+	}
+
+	if len(pipelines) == 0 {
+		return fmt.Errorf("no supported package origins detected")
+	}
+
 	var wg sync.WaitGroup
-	isInteractive := term.IsTerminal(int(os.Stdout.Fd())) && !cfg.DisableProgress
-	pipelineCtx := &meta.PipelineContext{IsInteractive: isInteractive}
-	setupCache(pipelineCtx)
+	results := make(chan []*pkgdata.PkgInfo, len(pipelines))
 
-	pipelinePhases := []phasekit.PipelinePhase{
-		phasekit.New("Loading cache", phasekit.LoadCacheStep, &wg),
-		phasekit.New("Fetching packages", phasekit.FetchStep, &wg),
-		phasekit.New("Resolving dependency tree", phasekit.ResolveDepGraphStep, &wg),
-		phasekit.New("Saving cache", phasekit.SaveCacheStep, &wg),
-		phasekit.New("Filtering", phasekit.FilterStep, &wg),
-		phasekit.New("Sorting", phasekit.SortStep, &wg),
-	}
-
-	var pkgPtrs []*pkgdata.PkgInfo
-	for i, phase := range pipelinePhases {
-		pkgPtrs, err = phase.Run(cfg, pkgPtrs, pipelineCtx)
-		if err != nil {
-			return err
-		}
-
-		if i > 0 && len(pkgPtrs) == 0 { // only start checking once loading/fetching has completed
-			if isInteractive {
-				out.WriteLine("No packages to display.")
+	for _, p := range pipelines {
+		wg.Add(1)
+		go func(p *phase.Pipeline) {
+			defer wg.Done()
+			pkgs, err := p.Run()
+			if err != nil {
+				out.WriteLine(fmt.Sprintf("WARNING: [%s] pipeline failed: %v", p.Origin.Name(), err))
+				return
 			}
-
-			return nil
-		}
+			results <- pkgs
+		}(p)
 	}
 
-	pkgPtrs = trimPackagesLen(pkgPtrs, cfg)
-	renderOutput(pkgPtrs, cfg)
+	wg.Wait()
+	close(results)
+
+	var allPkgs []*pkgdata.PkgInfo
+	for pkgs := range results {
+		allPkgs = append(allPkgs, pkgs...)
+	}
+
+	if len(allPkgs) == 0 {
+		if isInteractive {
+			out.WriteLine("No packages to display.")
+		}
+
+		return nil
+	}
+
+	allPkgs, err = globalPackageSort(allPkgs, cfg)
+	if err != nil {
+		return err
+	}
+
+	allPkgs = trimPackagesLen(allPkgs, cfg)
+	renderOutput(allPkgs, cfg)
 
 	return nil
 }
 
-// mutates
-func setupCache(pipelineCtx *meta.PipelineContext) {
-	cachePath, err := pkgdata.GetCachePath()
+func globalPackageSort(
+	allPkgs []*pkgdata.PkgInfo,
+	cfg *config.Config,
+) ([]*pkgdata.PkgInfo, error) {
+	comparator, err := pkgdata.GetComparator(cfg.SortOption.Field, cfg.SortOption.Asc)
 	if err != nil {
-		out.WriteLine(fmt.Sprintf("Warning: cache setup failed %v", err))
+		return []*pkgdata.PkgInfo{}, err
 	}
 
-	pipelineCtx.CachePath = cachePath
+	if len(allPkgs) >= pkgdata.ConcurrentSortThreshold {
+		return pkgdata.SortConcurrently(allPkgs, comparator, "", nil), nil
+	}
+
+	return pkgdata.SortNormally(allPkgs, comparator, "", nil), nil
 }
 
 func trimPackagesLen(

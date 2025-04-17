@@ -19,7 +19,6 @@ type Step func(
 	cfg *config.Config,
 	packages []*PkgInfo,
 	progressReporter meta.ProgressReporter,
-	pipelineCtx *meta.PipelineContext,
 ) ([]*PkgInfo, error)
 
 type PipelinePhase struct {
@@ -28,7 +27,7 @@ type PipelinePhase struct {
 	wg   *sync.WaitGroup
 }
 
-func New(name string, step Step, wg *sync.WaitGroup) PipelinePhase {
+func NewPhase(name string, step Step, wg *sync.WaitGroup) PipelinePhase {
 	return PipelinePhase{
 		name,
 		step,
@@ -39,14 +38,13 @@ func New(name string, step Step, wg *sync.WaitGroup) PipelinePhase {
 func (phase PipelinePhase) Run(
 	cfg *config.Config,
 	packages []*PkgInfo,
-	pipelineCtx *meta.PipelineContext,
+	isInteractive bool,
 ) ([]*PkgInfo, error) {
-	progressChan := phase.startProgress(pipelineCtx.IsInteractive)
+	progressChan := phase.startProgress(isInteractive)
 	outputPackages, err := phase.step(
 		cfg,
 		packages,
 		phase.reportProgress(progressChan),
-		pipelineCtx,
 	)
 	phase.stopProgress(progressChan)
 
