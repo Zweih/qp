@@ -1,0 +1,32 @@
+name: CLA Assistant Lite
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_target:
+    types: [opened, reopened, synchronize, closed]
+
+permissions:
+  actions: write
+  contents: write
+  pull-requests: write
+  statuses: write
+
+jobs:
+  cla:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: contributor-assistant/github-action@v2.6.1
+        if: >
+          (github.event.comment.body == 'recheck' ||
+           github.event.comment.body ==
+             'I sign') ||
+          github.event_name == 'pull_request_target'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          path-to-signatures: 'cla-signatures/qp-cla.json'
+          path-to-document: 'https://gist.githubusercontent.com/Zweih/848b44b19b5b8518a474e9e098eec96d/raw/qp-ICLA.md'
+          branch: 'cla-signatures'
+          allowlist: dependabot[bot],greenkeeper[bot],renovate[bot],Zweih
+          custom-pr-sign-comment: 'I sign'
