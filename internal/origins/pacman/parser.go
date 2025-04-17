@@ -1,126 +1,16 @@
-package pkgdata
+package pacman
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"io"
 	"os"
-	"path/filepath"
-	"runtime"
+	"qp/internal/pkgdata"
 	"strconv"
 	"strings"
-	"sync"
 )
 
-const (
-	fieldInstallDate = "%INSTALLDATE%"
-	fieldBuildDate   = "%BUILDDATE%"
-	fieldName        = "%NAME%"
-	fieldSize        = "%SIZE%"
-	fieldReason      = "%REASON%"
-	fieldVersion     = "%VERSION%"
-	fieldArch        = "%ARCH%"
-	fieldLicense     = "%LICENSE%"
-	fieldPkgBase     = "%BASE%"
-	fieldDescription = "%DESC%"
-	fieldUrl         = "%URL%"
-	fieldValidation  = "%VALIDATION%"
-	fieldPackager    = "%PACKAGER%"
-	fieldGroups      = "%GROUPS%"
-	fieldDepends     = "%DEPENDS%"
-	fieldOptDepends  = "%OPTDEPENDS%"
-	fieldProvides    = "%PROVIDES%"
-	fieldConflicts   = "%CONFLICTS%"
-	fieldReplaces    = "%REPLACES%"
-	fieldXData       = "%XDATA%"
-
-	subfieldPkgType = "pkgtype"
-
-	PacmanDbPath = "/var/lib/pacman/local"
-)
-
-func FetchPackages() ([]*PkgInfo, error) {
-	pkgPaths, err := os.ReadDir(PacmanDbPath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read pacman database: %v", err)
-	}
-
-	numPkgs := len(pkgPaths)
-
-	var wg sync.WaitGroup
-	descPathChan := make(chan string, numPkgs)
-	pkgPtrsChan := make(chan *PkgInfo, numPkgs)
-	errorsChan := make(chan error, numPkgs)
-
-	// fun fact: NumCPU() does account for hyperthreading
-	numWorkers := getWorkerCount(runtime.NumCPU(), numPkgs)
-
-	for range numWorkers {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			for descPath := range descPathChan {
-				pkg, err := parseDescFile(descPath)
-				if err != nil {
-					errorsChan <- err
-					continue
-				}
-
-				pkgPtrsChan <- pkg
-			}
-		}()
-	}
-
-	for _, packagePath := range pkgPaths {
-		if packagePath.IsDir() {
-			descPath := filepath.Join(PacmanDbPath, packagePath.Name(), "desc")
-			descPathChan <- descPath
-		}
-	}
-
-	close(descPathChan)
-
-	wg.Wait()
-	close(pkgPtrsChan)
-	close(errorsChan)
-
-	if len(errorsChan) > 0 {
-		var collectedErrors []error
-
-		for err := range errorsChan {
-			collectedErrors = append(collectedErrors, err)
-		}
-
-		return nil, errors.Join(collectedErrors...)
-	}
-
-	pkgPtrs := make([]*PkgInfo, 0, numPkgs)
-	for pkg := range pkgPtrsChan {
-		pkgPtrs = append(pkgPtrs, pkg)
-	}
-
-	return pkgPtrs, nil
-}
-
-func getWorkerCount(numCPUs int, numFiles int) int {
-	var numWorkers int
-
-	if numCPUs <= 2 {
-		// let's keep it simple for devices like rPi zeroes
-		numWorkers = numCPUs
-	} else {
-		numWorkers = numCPUs * 2
-	}
-
-	if numWorkers > numFiles {
-		return numFiles // don't use more workers than files
-	}
-
-	return min(numWorkers, 12) // avoid overthreading on high-core systems
-}
-
-func parseDescFile(descPath string) (*PkgInfo, error) {
+func parseDescFile(descPath string) (*pkgdata.PkgInfo, error) {
 	file, err := os.Open(descPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open file: %v", err)
@@ -134,7 +24,7 @@ func parseDescFile(descPath string) (*PkgInfo, error) {
 		return nil, fmt.Errorf("failed to read file: %w", err)
 	}
 
-	var pkg PkgInfo
+	var pkg pkgdata.PkgInfo
 	var currentField string
 	start := 0
 	end := 0
@@ -213,7 +103,7 @@ func collectBlockBytes(data []byte, start int) ([]string, int) {
 	return block, i
 }
 
-func applySingleLineField(pkg *PkgInfo, field string, value string) error {
+func applySingleLineField(pkg *pkgdata.PkgInfo, field string, value string) error {
 	switch field {
 	case fieldInstallDate, fieldBuildDate, fieldSize:
 		err := applyIntField(pkg, field, value)
@@ -263,7 +153,7 @@ func applySingleLineField(pkg *PkgInfo, field string, value string) error {
 	return nil
 }
 
-func applyIntField(pkg *PkgInfo, field string, value string) error {
+func applyIntField(pkg *pkgdata.PkgInfo, field string, value string) error {
 	parsedValue, err := strconv.ParseInt(value, 10, 64)
 	if err != nil {
 		return fmt.Errorf("invalid %s value %q: %w", field, value, err)
@@ -281,7 +171,7 @@ func applyIntField(pkg *PkgInfo, field string, value string) error {
 	return nil
 }
 
-func applyMultiLineField(pkg *PkgInfo, field string, block []string) {
+func applyMultiLineField(pkg *pkgdata.PkgInfo, field string, block []string) {
 	switch field {
 	case fieldGroups:
 		pkg.Groups = block
@@ -293,7 +183,7 @@ func applyMultiLineField(pkg *PkgInfo, field string, block []string) {
 	}
 }
 
-func applyXData(pkg *PkgInfo, block []string) {
+func applyXData(pkg *pkgdata.PkgInfo, block []string) {
 	for _, line := range block {
 		parts := strings.SplitN(line, "=", 2)
 
@@ -308,8 +198,8 @@ func applyXData(pkg *PkgInfo, block []string) {
 	}
 }
 
-func applyRelations(pkg *PkgInfo, field string, block []string) {
-	relations := make([]Relation, 0, len(block))
+func applyRelations(pkg *pkgdata.PkgInfo, field string, block []string) {
+	relations := make([]pkgdata.Relation, 0, len(block))
 
 	for _, line := range block {
 		relations = append(relations, parseRelation(line))
@@ -329,7 +219,7 @@ func applyRelations(pkg *PkgInfo, field string, block []string) {
 	}
 }
 
-func parseRelation(input string) Relation {
+func parseRelation(input string) pkgdata.Relation {
 	opStart := 0
 	var depth int32 = 1
 
@@ -344,10 +234,10 @@ func parseRelation(input string) Relation {
 		}
 	}
 
-	return Relation{Name: input, Depth: depth}
+	return pkgdata.Relation{Name: input, Depth: depth}
 
 parseWhy:
-	return Relation{
+	return pkgdata.Relation{
 		Name:  input[:opStart],
 		Why:   strings.TrimSpace(input[(opStart + 1):]),
 		Depth: depth,
@@ -364,14 +254,14 @@ parseVersion:
 		}
 	}
 
-	operator := StringToOperator(input[opStart:opEnd])
+	operator := pkgdata.StringToOperator(input[opStart:opEnd])
 	var version string
 
 	if opEnd < len(input) {
 		version = input[opEnd:]
 	}
 
-	return Relation{
+	return pkgdata.Relation{
 		Name:     name,
 		Operator: operator,
 		Version:  version,

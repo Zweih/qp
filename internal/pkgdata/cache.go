@@ -11,14 +11,13 @@ import (
 )
 
 const (
-	cacheVersion    = 14 // bump when updating structure of PkgInfo/Relation/pkginfo.proto OR when dependency resolution is updated
+	cacheVersion    = 15 // bump when updating structure of PkgInfo/Relation/pkginfo.proto OR when dependency resolution is updated
 	xdgCacheHomeEnv = "XDG_CACHE_HOME"
 	homeEnv         = "HOME"
 	qpCacheDir      = "query-packages"
-	packageManager  = "pacman"
 )
 
-func GetCachePath() (string, error) {
+func GetCacheBasePath() (string, error) {
 	userCacheDir := os.Getenv(xdgCacheHomeEnv)
 	if userCacheDir == "" {
 		userCacheDir = filepath.Join(os.Getenv(homeEnv), ".cache")
@@ -26,31 +25,15 @@ func GetCachePath() (string, error) {
 
 	cachePath := filepath.Join(userCacheDir, qpCacheDir)
 	if err := os.MkdirAll(cachePath, 0755); err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to create cache directory: %w", err)
 	}
 
-	cacheFileName := "qp-" + packageManager + ".cache"
-
-	return filepath.Join(cachePath, cacheFileName), nil
+	return cachePath, nil
 }
 
-func getDbModTime() (int64, error) {
-	dirInfo, err := os.Stat(PacmanDbPath)
-	if err != nil {
-		return 0, fmt.Errorf("failed to read pacman DB mod time: %v", err)
-	}
-
-	return dirInfo.ModTime().Unix(), nil
-}
-
-func SaveProtoCache(pkgs []*PkgInfo, cachePath string) error {
+func SaveProtoCache(pkgs []*PkgInfo, cachePath string, lastModified int64) error {
 	if cachePath == "" {
 		return errors.New("invalid cache path, skipping cache save")
-	}
-
-	lastModified, err := getDbModTime()
-	if err != nil {
-		return err
 	}
 
 	cachedPkgs := &pb.CachedPkgs{
@@ -67,7 +50,7 @@ func SaveProtoCache(pkgs []*PkgInfo, cachePath string) error {
 	return os.WriteFile(cachePath, byteData, 0644)
 }
 
-func LoadProtoCache(cachePath string) ([]*PkgInfo, error) {
+func LoadProtoCache(cachePath string, sourceModTime int64) ([]*PkgInfo, error) {
 	if cachePath == "" {
 		return nil, errors.New("invalid cache path, skipping cache load")
 	}
@@ -87,16 +70,12 @@ func LoadProtoCache(cachePath string) ([]*PkgInfo, error) {
 		return nil, errors.New("cache version mismatch, regenerating fresh cache")
 	}
 
-	dbModTime, err := getDbModTime()
-	if err != nil {
-		return nil, err
-	}
-
-	if dbModTime > cachedPkgs.LastModified {
+	if sourceModTime > cachedPkgs.LastModified {
 		return nil, errors.New("cache is stale")
 	}
 
 	pkgs := protosToPkgs(cachedPkgs.Pkgs)
+
 	return pkgs, nil
 }
 
