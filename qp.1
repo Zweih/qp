@@ -37,6 +37,8 @@ The utility provides powerful querying capabilities, including:
 .br
 - Package base queries
 .br
+- Package type queries
+.br
 - Sorting and JSON output
 
 .SH OPTIONS
@@ -72,7 +74,7 @@ Only supported for \fBdate\fR and \fBsize\fR.
 .B existence check
 \fBhas:field\fR -> field must exist or be non-empty
 .br
-\fBnot:field\fR -> field must be missing or empty
+\fBno:field\fR -> field must be missing or empty
 .RE
 
 This flag can be used multiple times and mixed freely.
@@ -189,6 +191,8 @@ Filter by package base.
 .TP
 .B description=<text>
 Filter by package description.
+.TP pkgtype=<pkgtype>
+Filter by package type.
 .TP
 .B conflicts=<package>
 Filter by conflicting packages.

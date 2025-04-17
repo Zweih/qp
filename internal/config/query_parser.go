@@ -82,7 +82,7 @@ func parseExistenceQuery(input string, colonIdx int) (FieldQuery, error) {
 
 	switch prefix {
 	case "has":
-	case "not":
+	case "no", "not":
 		negation = true
 	default:
 		return FieldQuery{}, fmt.Errorf("invalid existence query: %s", input)

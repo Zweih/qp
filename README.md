@@ -38,21 +38,29 @@ this package is compatible with the following distributions:
 ## features
 
 - list installed packages with install date/timestamps, dependencies, provisions, reverse dependencies (required by), size on disk, conflicts, replacements, architecture, license, description, build date, package base, package type, validation, packager, optional dependencies, reverse optional dependencies (optional for), groups, and version
-- query by field existence
-- query by explicitly installed packages
-- query by packages installed as dependencies
-- query by packages required by specified packages
-- query by packages that depend upon specified packages
-- query by packages that provide specified packages
-- query by packages that conflict with specific packages
-- query by packages that contain specific licenses
-- query by a specific installation date or date range
-- query by packages built with specified architectures
-- query by package size or size range
-- query by package names
-- query by package description
-- sort by installation date, package name, license, or by size on disk
-- output as a table or JSON
+- query by:
+  - field existence
+  - explicitly installed packages
+  - packages installed as dependencies
+  - packages required by specified packages
+  - packages that depend upon specified packages
+  - packages that provide specified packages
+  - packages that conflict with specific packages
+  - packages that contain specific licenses
+  - specific installation date or date range
+  - packages built with specified architectures
+  - package size or size range
+  - package names
+  - package description
+- sort by: 
+  - installation date
+  - package name
+  - license
+  - size on disk
+  - package base
+- output as:
+  - table
+  - JSON
 
 ## is it good?
 [yes.](https://news.ycombinator.com/item?id=3067434)
@@ -85,7 +93,7 @@ this package is compatible with the following distributions:
 | ✓ | required-by query | ✓ | no cache option |
 | ✓ | optional full timestamp | ✓ | package description field |
 | – | list possibly or confirmed stale/abandoned packages | – | self-referencing field |
-| – | name exclusion query | – | streaming pipeline |
+| – | groups query | – | streaming pipeline |
 | – | short-args for queries | – | key/value output |
 | – | XML output | – | package description sort |
 | ✓ | package base query | – | required-by sort |
@@ -103,6 +111,9 @@ this package is compatible with the following distributions:
 | - | optional-for query | - | separate field for optdepends reason |
 | ✓ | fuzzy/strict querying | - | exclusion querying |
 | ✓ | existence querying | - | depth querying |
+| ✓ | pkgtype query | - | optdepends query |
+| - | packager query | - | origin field |
+| - | origin sort | - | origin query |
 
 ## installation
 
@@ -158,7 +169,7 @@ qp [options]
     - **range match** -> `field=start:end` (fuzzy) or `field==start:end` (strict)
         - supports full ranges (`start:end`), open-ended ranges (`start:` or `:end`), and exact values (`value`)
         - works with `date` and `size`
-    - **existence check** -> `has:field` or `not:field`
+    - **existence check** -> `has:field` or `no:field`
   - this flag can be used multiple times and mixed freely
   - [see all available query fields below](#available-queries)
 - `-O <field>:<direction>` | `--order <field>:<direction>`: sort results ascending or descending (default sort is `date:asc`):
@@ -168,7 +179,9 @@ qp [options]
   - `license` -> sort alphabetically by package license
   - `pkgbase` -> sort alphabetically by base package
 - `--no-headers`: omit column headers in table output (useful for scripting)
-- `-s <list>` | `--select <list>`: comma-separated list of fields to display (cannot use with `--select-all` or `--select-add`)
+- `-s <list>` | `--select <list>`: comma-separated list of fields to display 
+   - cannot use with `--select-all` or `--select-add`
+   - [see fields available for selection](#fields-available-for-selection)
 - `-S <list>` | `--select-add <list>`: comma-separated list of fields to add to defaults or `--select-all`
 - `-A` | `--select-all`: output all available fields (overrides defaults)
 - `--full-timestamp`: display the full timestamp (date and time) of package install/build instead of just the date
@@ -200,7 +213,7 @@ each `--where` query supports one of the following:
     - exact values: `value`
 - **existence check**
   - `has:field` — field must exist or be non-empty
-  - `not:field` — field must be missing or empty
+  - `no:field` — field must be missing or empty
 
 #### match types
 
@@ -216,13 +229,13 @@ For example:
 
 #### query examples
 ```bash
-qp -w size=100MB:1GB          # size range (fuzzy)
-qp -w date==2024-01-01        # exact install date
-qp -w name=firefox            # fuzzy name match
-qp -w name==bash              # strict name match
-qp -w reason=explicit         # packages installed explicitly
-qp -w has:depends             # must have dependencies
-qp -w not:conflicts           # must not conflict with anything
+qp -w size=100MB:1GB         # size range (fuzzy)
+qp -w date==2024-01-01       # exact install date
+qp -w name=firefox           # fuzzy name match
+qp -w name==bash             # strict name match
+qp -w reason=explicit        # packages installed explicitly
+qp -w has:depends            # must have dependencies
+qp -w no:conflicts           # must not conflict with anything
 ```
 
 #### query types
@@ -244,6 +257,7 @@ qp -w not:conflicts           # must not conflict with anything
 | pkgbase | string |
 | description | string |
 | url | string |
+| pkgtype | string |
 | conflicts | relation |
 | replaces | relation |
 | depends | relation |
@@ -561,6 +575,10 @@ are treated as separate parameters.
    ```bash
    qp -w name==bash
    ```
+38. show packages that have no dependencies:
+  ```bash
+  qp -w no:depends
+  ```
 
 ## license
 this project is licensed under GPL-3.0-only.

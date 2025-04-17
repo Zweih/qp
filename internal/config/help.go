@@ -15,7 +15,7 @@ func PrintHelp() {
 	fmt.Println("\nQuerying Options:")
 	fmt.Println("  -w, --where <field>=<value> Apply queries to refine package listings. Can be used multiple times.")
 	fmt.Println("                              Fuzzy queries use '=' and strict queries use '=='.")
-	fmt.Println("                              Existence queries are also available for all fields and is used with 'has:<field>' and 'not:field'")
+	fmt.Println("                              Existence queries are also available for all fields and is used with 'has:<field>' and 'no:field'")
 
 	fmt.Println("\n  Available queries:")
 	fmt.Println("    date=<YYYY-MM-DD>               Query packages installed on a specific date")
@@ -25,7 +25,7 @@ func PrintHelp() {
 	fmt.Println("    size=10MB:                      Query packages larger than 10MB")
 	fmt.Println("    size=:500KB                     Query packages up to 500KB")
 	fmt.Println("    size=1GB:5GB                    Query packages between 1GB and 5GB")
-	fmt.Println("    name=firefox              Query packages by names (substring match)")
+	fmt.Println("    name=firefox              Query packages by names")
 	fmt.Println("    reason=explicit           Query only explicitly installed packages")
 	fmt.Println("    reason=dependencies       Query only packages installed as dependencies")
 	fmt.Println("    required-by=vlc           Query packages required by specified packages")
@@ -33,8 +33,9 @@ func PrintHelp() {
 	fmt.Println("    provides=awk              Query packages that provide specified libraries, programs, or packages")
 	fmt.Println("    conflicts=fuse            Query packages that conflict with the specified packages")
 	fmt.Println("    arch=x86_64               Show packages built for the specified architectures. \"any\" is a valid category of architecture.")
-	fmt.Println("    description=x86_64        Query packages by description (substring match)")
-	fmt.Println("    pkgbase                   Query packages by pkgbase")
+	fmt.Println("    description=x86_64        Query packages by description")
+	fmt.Println("    pkgbase=pacman            Query packages by pkgbase")
+	fmt.Println("    pkgtype=split             Query packages by package type")
 
 	fmt.Println("\nSorting Options:")
 	fmt.Println("  -O, --order <type>:<direction> Apply sorting to package output")
@@ -79,7 +80,7 @@ func PrintHelp() {
 	fmt.Println("  qp --json                     # Output package data in JSON format")
 	fmt.Println("  qp -w name=sqlite --json      # Output details for SQLite in JSON")
 	fmt.Println("  qp --no-headers -s name,size  # Show package names and sizes without headers")
-	fmt.Println("  qp -a -w not:depends          # Show all packages with no dependencies")
+	fmt.Println("  qp -a -w no:depends          # Show all packages with no dependencies")
 
 	fmt.Println("\nFor more details, see the manpage: man qp")
 	fmt.Println("Or check the README on the GitHub repo.")
