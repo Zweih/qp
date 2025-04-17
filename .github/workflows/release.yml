@@ -152,6 +152,11 @@ jobs:
           mkdir -p ./release/temp-qp/qp-${{ env.TAG_NAME }}
           git archive --format=tar HEAD | tar -x -C ./release/temp-qp/qp-${{ env.TAG_NAME }}
           cp ./release/NEWS ./release/temp-qp/qp-${{ env.TAG_NAME }}/
+          
+          echo "-s -w \
+            -X qp/internal/about.Version=${TAG_NAME} \
+            -X qp/internal/about.Commit=$(git rev-parse HEAD) \
+            -X qp/internal/about.Date=$(date -u +%Y-%m-%dT%H:%M:%SZ)" > ./release/temp-qp/qp-${TAG_NAME}/.ldflags
 
           tar -czf ./release/qp-${{ env.TAG_NAME }}.tar.gz -C ./release/temp-qp qp-${{ env.TAG_NAME }}
 
