@@ -246,7 +246,7 @@ qp -w no:conflicts           # must not conflict with anything
 |range | matches numerical or time-based fields across a range. supports full ranges (start:end), open-ended ranges (start: / :end), or exact values. used for date and size.|
 |relation | matches fields that contain relationships to other packages (e.g., dependencies, conflicts, provides)|
 
-#### avaialble queries
+#### available queries
 | field name | field type |
 |------------|------------|
 | date | range |
