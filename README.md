@@ -88,7 +88,7 @@ this package is compatible with the following distributions:
 | – | name exclusion query | – | streaming pipeline |
 | – | short-args for queries | – | key/value output |
 | – | XML output | – | package description sort |
-| – | package base query | – | required-by sort |
+| ✓ | package base query | – | required-by sort |
 | – | required-by count sort | – | dependency count sort |
 | ✓ | build-date field | - | build-date filter |
 | - | build-date sort | ✓ | pkgtype field |
@@ -225,20 +225,30 @@ qp -w has:depends             # must have dependencies
 qp -w not:conflicts           # must not conflict with anything
 ```
 
-#### available queries
-| query type  | syntax | description |
-|-------------|--------|-------------|
-| **date** | `date=<value>` | query by installation date. supports exact dates, ranges (`YYYY-MM-DD:YYYY-MM-DD`), and open-ended ranges (`YYYY-MM-DD:` or `:YYYY-MM-DD`) |
-| **size** | `size=<value>` | query by package size on disk. supports exact values (`10MB`), ranges (`10MB:1GB`), and open-ended ranges (`:500KB`, `1GB:`) |
-| **name** | `name=<package>` / <br> `name=<package-1>,<package-2>,<etc>` | query by package name |
-| **installation reason** | `reason=explicit` / `reason=dependencies` | query packages by installation reason: explicitly installed or installed as a dependency |
-| **architecture** | `arch=<architecture>` / <br> `arch=<architecture-1>,<architecture-2>,<etc>` | query by packages that are built for the specified architectures <br> **note**: "any" is a separate architecture category |
-| **license** | `license=<license>` / <br> `license=<license-1>,<license-2>,<etc>` | query by license name (substring match) |
-| **description** | `description=<string>` / <br> `description=<string-1>,<string-2>,<etc>` | query by package description |
-| **conflicts** | `conflicts=<package>` / <br> `conflicts=<package-1,<package-2>,<etc>` | query by packages that conflict with the specified packages |
-| **depends** | `depends=<package>` / <br> `depends=<package-1>,<package-2>,<etc>` | query by packages that have the specified packages as dependencies |
-| **required by** | `required-by=<package>` / <br> `required-by=<package-1>,<package-2>,<etc>` | query by packages that are required by the specified packages |
-| **provides** | `provides=<package>` / <br> `provides=<package-1>,<package-2>,<etc>` | query by package that provide the specified packages/libraries |
+#### query types
+| field type | description|
+|------------|------------|
+|string | matches textual fields. used for fields like name, license, description, etc.|
+|range | matches numerical or time-based fields across a range. supports full ranges (start:end), open-ended ranges (start: / :end), or exact values. used for date and size.|
+|relation | matches fields that contain relationships to other packages (e.g., dependencies, conflicts, provides)|
+
+#### avaialble queries
+| field name | field type |
+|------------|------------|
+| date | range |
+| size | range |
+| name | string |
+| reason | string |
+| arch | string |
+| license | string |
+| pkgbase | string |
+| description | string |
+| url | string |
+| conflicts | relation |
+| replaces | relation |
+| depends | relation |
+| required-by | relation |
+| provides | relation |
 
 ### available fields for selection
 - `date` - installation date of the package
