@@ -19,6 +19,8 @@ you can find installation instructions [here](#installation).
 <details open>
 <summary><strong>download and clone statistics</strong></summary>
 <br>
+
+wording
  
 graphs are generated daily with my other project, [repulse analytics](https://github.com/Zweih/repulse-analytics)
 
