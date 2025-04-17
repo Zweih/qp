@@ -22,6 +22,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           path-to-signatures: 'cla-signatures/qp-cla.json'
-          path-to-document: 'https://gist.githubusercontent.com/Zweih/848b44b19b5b8518a474e9e098eec96d/raw/qp-ICLA.md'
+          path-to-document: 'https://gist.github.com/Zweih/848b44b19b5b8518a474e9e098eec96d'
           branch: 'cla-signatures'
           allowlist: dependabot[bot],greenkeeper[bot],renovate[bot],Zweih
