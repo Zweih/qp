@@ -15,7 +15,7 @@ func PrintHelp() {
 	fmt.Println("\nQuerying Options:")
 	fmt.Println("  -w, --where <field>=<value> Apply queries to refine package listings. Can be used multiple times.")
 	fmt.Println("                              Fuzzy queries use '=' and strict queries use '=='.")
-	fmt.Println("                              Existence queries are also available for all fields and is used with 'has:<field>' and 'not:field'")
+	fmt.Println("                              Existence queries are also available for all fields and is used with 'has:<field>' and 'no:field'")
 
 	fmt.Println("\n  Available queries:")
 	fmt.Println("    date=<YYYY-MM-DD>               Query packages installed on a specific date")
@@ -79,7 +79,7 @@ func PrintHelp() {
 	fmt.Println("  qp --json                     # Output package data in JSON format")
 	fmt.Println("  qp -w name=sqlite --json      # Output details for SQLite in JSON")
 	fmt.Println("  qp --no-headers -s name,size  # Show package names and sizes without headers")
-	fmt.Println("  qp -a -w not:depends          # Show all packages with no dependencies")
+	fmt.Println("  qp -a -w no:depends          # Show all packages with no dependencies")
 
 	fmt.Println("\nFor more details, see the manpage: man qp")
 	fmt.Println("Or check the README on the GitHub repo.")

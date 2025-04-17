@@ -31,9 +31,9 @@ const (
 const (
 	date        = "date"
 	buildDate   = "build-date"
+	size        = "size"
 	name        = "name"
 	reason      = "reason"
-	size        = "size"
 	version     = "version"
 	pkgType     = "pkgtype"
 	arch        = "arch"
