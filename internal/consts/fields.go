@@ -149,3 +149,33 @@ var (
 		FieldProvides,
 	}
 )
+
+var StringFields = map[FieldType]struct{}{
+	FieldPkgType:     {},
+	FieldName:        {},
+	FieldReason:      {},
+	FieldVersion:     {},
+	FieldArch:        {},
+	FieldLicense:     {},
+	FieldPkgBase:     {},
+	FieldDescription: {},
+	FieldUrl:         {},
+	FieldValidation:  {},
+	FieldPackager:    {},
+}
+
+var RelationFields = map[FieldType]struct{}{
+	FieldDepends:     {},
+	FieldOptDepends:  {},
+	FieldRequiredBy:  {},
+	FieldOptionalFor: {},
+	FieldProvides:    {},
+	FieldConflicts:   {},
+	FieldReplaces:    {},
+}
+
+var RangeFields = map[FieldType]struct{}{
+	FieldDate:      {},
+	FieldBuildDate: {},
+	FieldSize:      {},
+}

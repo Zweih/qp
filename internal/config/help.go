@@ -36,6 +36,7 @@ func PrintHelp() {
 	fmt.Println("    description=x86_64        Query packages by description")
 	fmt.Println("    pkgbase=pacman            Query packages by pkgbase")
 	fmt.Println("    pkgtype=split             Query packages by package type")
+	fmt.Println("    packager=archlinux.org    Query packages by packager")
 
 	fmt.Println("\nSorting Options:")
 	fmt.Println("  -O, --order <type>:<direction> Apply sorting to package output")

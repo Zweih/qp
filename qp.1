@@ -39,6 +39,8 @@ The utility provides powerful querying capabilities, including:
 .br
 - Package type queries
 .br
+- Package packager queries
+.br
 - Sorting and JSON output
 
 .SH OPTIONS
@@ -191,8 +193,12 @@ Filter by package base.
 .TP
 .B description=<text>
 Filter by package description.
-.TP pkgtype=<pkgtype>
+.TP 
+.B pkgtype=<pkgtype>
 Filter by package type.
+.TP
+.B packager=<packager>
+Filter by package packager
 .TP
 .B conflicts=<package>
 Filter by conflicting packages.
