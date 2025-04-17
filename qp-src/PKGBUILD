@@ -15,6 +15,15 @@ sha256sums=("bea7e80fd61d6aa203df3b7435ccb39f2cb38c4666ca59683d4a1745eb9f7860")
 build() {
   cd "${srcdir}/${pkgname}-v${pkgver}"
   export CGO_ENABLED=0
+
+  if [[ -f .ldflags ]]; then
+    ldflags=$(<.ldflags)
+  else
+    # interim until commit fix is released
+    ldflags="-s -w -X qp/internal/about.Version=${pkgver} \
+      -X qp/internal/about.Date=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+  fi
+
   go build -trimpath -o "${pkgname}" ./cmd/${pkgname}
 }
 
