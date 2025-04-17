@@ -52,6 +52,7 @@ this package is compatible with the following distributions:
   - package size or size range
   - package names
   - package description
+  - package packager
 - sort by: 
   - installation date
   - package name
@@ -112,7 +113,7 @@ this package is compatible with the following distributions:
 | ✓ | fuzzy/strict querying | - | exclusion querying |
 | ✓ | existence querying | - | depth querying |
 | ✓ | pkgtype query | - | optdepends query |
-| - | packager query | - | origin field |
+| ✓ | packager query | - | origin field |
 | - | origin sort | - | origin query |
 
 ## installation
@@ -258,6 +259,7 @@ qp -w no:conflicts           # must not conflict with anything
 | description | string |
 | url | string |
 | pkgtype | string |
+| packager | string |
 | conflicts | relation |
 | replaces | relation |
 | depends | relation |
