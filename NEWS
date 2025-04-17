@@ -1,8 +1,18 @@
 # qp Release Notes
 
+## v4.22.2
+### What's Changed
+* Fix: No package to display in non-interactive mode by @Zweih in https://github.com/Zweih/qp/pull/198
+* Feature: Existence querying with has:field and not:field by @Zweih in https://github.com/Zweih/qp/pull/202
+* Feature: Add version flag by @Zweih in https://github.com/Zweih/qp/pull/203
+* Fix: Value query parsing by @Zweih in https://github.com/Zweih/qp/pull/204
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v4.21.0...v4.22.2
+
 ## v4.21.0
 ### What's Changed
 * Feature: Fuzzy/Exact range querying by @Zweih in https://github.com/Zweih/qp/pull/195
+
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v4.20.0...v4.21.0
 
