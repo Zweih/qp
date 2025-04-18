@@ -22,6 +22,7 @@ func PrintHelp() {
 	fmt.Println("    date=<YYYY-MM-DD>:              Query packages installed on or after the given date")
 	fmt.Println("    date=:<YYYY-MM-DD>              Query packages installed up to the given date")
 	fmt.Println("    date=<YYYY-MM-DD>:<YYYY-MM-DD>  Query packages installed in a date range")
+	fmt.Println("    build-date=<YYYY-MM-DD          Same format options as date")
 	fmt.Println("    size=10MB:                      Query packages larger than 10MB")
 	fmt.Println("    size=:500KB                     Query packages up to 500KB")
 	fmt.Println("    size=1GB:5GB                    Query packages between 1GB and 5GB")
