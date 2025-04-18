@@ -29,6 +29,7 @@ func parseQueryInput(input string) (
 	opEnd := -1
 	match := consts.MatchFuzzy
 	negation := false
+	var depth int32 = 1
 
 	for i := range input {
 		if input[i] == ':' {
@@ -64,8 +65,11 @@ func parseQueryInput(input string) (
 		return FieldQuery{}, err
 	}
 
-	rawTarget := strings.TrimSpace(input[opEnd:])
-	target, depth := extractDepth(rawTarget)
+	target := strings.TrimSpace(input[opEnd:])
+
+	if _, exists := consts.RelationFields[field]; exists {
+		target, depth = extractDepth(target)
+	}
 
 	return FieldQuery{
 		Negate: negation,
@@ -82,7 +86,7 @@ func parseExistenceQuery(input string, colonIdx int) (FieldQuery, error) {
 
 	switch prefix {
 	case "has":
-	case "not":
+	case "no", "not":
 		negation = true
 	default:
 		return FieldQuery{}, fmt.Errorf("invalid existence query: %s", input)

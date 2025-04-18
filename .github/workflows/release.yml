@@ -137,10 +137,14 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
 
+      - name: Inject version and date into man page
+        run: |
+          VERSION="${TAG_NAME#v}"
+          DATE=$(date -u +'%B %Y')
+          sed -e "s/@VERSION@/${VERSION}/g" -e "s/@DATE@/$DATE/g" qp.1 > ./release/qp.1
+
       - name: Package binaries with manpage and NEWS
         run: |
-          cp qp.1 ./release/
-
           for binary in ./release/qp-*; do
             arch=$(basename "$binary" | cut -d'-' -f2)
           
@@ -152,11 +156,11 @@ jobs:
           mkdir -p ./release/temp-qp/qp-${{ env.TAG_NAME }}
           git archive --format=tar HEAD | tar -x -C ./release/temp-qp/qp-${{ env.TAG_NAME }}
           cp ./release/NEWS ./release/temp-qp/qp-${{ env.TAG_NAME }}/
-          
           echo "-s -w \
             -X qp/internal/about.Version=${TAG_NAME} \
             -X qp/internal/about.Commit=$(git rev-parse HEAD) \
             -X qp/internal/about.Date=$(date -u +%Y-%m-%dT%H:%M:%SZ)" > ./release/temp-qp/qp-${TAG_NAME}/.ldflags
+          cp ./release/qp.1 ./release/temp-qp/qp-${{ env.TAG_NAME }}/qp.1
 
           tar -czf ./release/qp-${{ env.TAG_NAME }}.tar.gz -C ./release/temp-qp qp-${{ env.TAG_NAME }}
 
