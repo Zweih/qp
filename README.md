@@ -100,7 +100,7 @@ this package is compatible with the following distributions:
 | ✓ | package base query | – | required-by sort |
 | – | required-by count sort | – | dependency count sort |
 | ✓ | build-date field | ✓ | build-date query |
-| - | build-date sort | ✓ | pkgtype field |
+| ✓ | build-date sort | ✓ | pkgtype field |
 | - | url query | - | pkgtype sort |
 | ✓ | architecture query | ✓ | groups field |
 | ✓	| conflicts query | - | package description sort |
@@ -175,6 +175,7 @@ qp [options]
   - [see all available query fields below](#available-queries)
 - `-O <field>:<direction>` | `--order <field>:<direction>`: sort results ascending or descending (default sort is `date:asc`):
   - `date`    -> sort by installation date
+  - `build-date` -> sort by installation date
   - `name`    -> sort alphabetically by package name
   - `size`    -> sort by package size on disk
   - `license` -> sort alphabetically by package license
@@ -182,7 +183,7 @@ qp [options]
 - `--no-headers`: omit column headers in table output (useful for scripting)
 - `-s <list>` | `--select <list>`: comma-separated list of fields to display 
    - cannot use with `--select-all` or `--select-add`
-   - [see fields available for selection](#fields-available-for-selection)
+   - [see fields available for selection](#available-fields-for-selection)
 - `-S <list>` | `--select-add <list>`: comma-separated list of fields to add to defaults or `--select-all`
 - `-A` | `--select-all`: output all available fields (overrides defaults)
 - `--full-timestamp`: display the full timestamp (date and time) of package install/build instead of just the date

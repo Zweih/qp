@@ -32,20 +32,13 @@ func makeComparator[T ordered](
 
 func GetComparator(field consts.FieldType, asc bool) (PkgComparator, error) {
 	switch field {
-	case consts.FieldDate:
-		return makeComparator(func(p *PkgInfo) int64 { return p.InstallTimestamp }, asc), nil
+	case consts.FieldDate, consts.FieldBuildDate, consts.FieldSize:
+		return makeComparator(func(p *PkgInfo) int64 { return p.GetInt(field) }, asc), nil
 
-	case consts.FieldSize:
-		return makeComparator(func(p *PkgInfo) int64 { return p.Size }, asc), nil
-
-	case consts.FieldName:
-		return makeComparator(func(p *PkgInfo) string { return strings.ToLower(p.Name) }, asc), nil
-
-	case consts.FieldLicense:
-		return makeComparator(func(p *PkgInfo) string { return strings.ToLower(p.License) }, asc), nil
-
-	case consts.FieldPkgBase:
-		return makeComparator(func(p *PkgInfo) string { return strings.ToLower(p.PkgBase) }, asc), nil
+	case consts.FieldName, consts.FieldLicense, consts.FieldPkgBase:
+		return makeComparator(func(p *PkgInfo) string {
+			return strings.ToLower(p.GetString(field))
+		}, asc), nil
 
 	default:
 		return nil, errors.New("invalid sort field")
