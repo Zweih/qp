@@ -24,7 +24,7 @@ build() {
       -X qp/internal/about.Date=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
   fi
 
-  go build -trimpath -o "${pkgname}" ./cmd/${pkgname}
+  go build -trimpath -ldflags "${ldflags}" -o "${pkgname}" ./cmd/${pkgname}
 }
 
 package() {
