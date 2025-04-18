@@ -22,7 +22,7 @@ func QueriesToConditions(queries []config.FieldQuery) ([]*FilterCondition, error
 		var err error
 
 		switch query.Field {
-		case consts.FieldDate, consts.FieldSize:
+		case consts.FieldDate, consts.FieldSize, consts.FieldBuildDate:
 			condition, err = parseRangeCondition(query)
 
 		case consts.FieldName, consts.FieldReason, consts.FieldArch,
@@ -89,18 +89,25 @@ func parseRangeCondition(query config.FieldQuery) (*FilterCondition, error) {
 	}
 
 	var parser func(string) (RangeSelector, error)
+	var validator func(RangeSelector) error
 
 	switch query.Field {
-	case consts.FieldDate:
+	case consts.FieldDate, consts.FieldBuildDate:
 		parser = parseDateFilter
+		validator = validateDateFilter
 	case consts.FieldSize:
 		parser = parseSizeFilter
+		validator = validateSizeFilter
 	default:
 		return nil, fmt.Errorf("field %v is not a valid range field", query.Field)
 	}
 
 	selector, err := parser(query.Target)
 	if err != nil {
+		return nil, err
+	}
+
+	if err = validator(selector); err != nil {
 		return nil, err
 	}
 

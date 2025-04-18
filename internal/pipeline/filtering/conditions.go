@@ -14,73 +14,6 @@ type RangeSelector struct {
 	IsExact bool
 }
 
-type RangeMatcher map[bool]map[consts.MatchType]func(start int64, end int64) pkgdata.Filter
-
-var DateMatchers = RangeMatcher{
-	true: {
-		consts.MatchFuzzy: func(start, _ int64) pkgdata.Filter {
-			return func(pkg *pkgdata.PkgInfo) bool {
-				return pkgdata.FuzzyDate(pkg, start)
-			}
-		},
-		consts.MatchStrict: func(start, _ int64) pkgdata.Filter {
-			return func(pkg *pkgdata.PkgInfo) bool {
-				return pkgdata.StrictDate(pkg, start)
-			}
-		},
-	},
-
-	false: {
-		consts.MatchFuzzy: func(start, end int64) pkgdata.Filter {
-			return func(pkg *pkgdata.PkgInfo) bool {
-				return pkgdata.FuzzyDateRange(pkg, start, end)
-			}
-		},
-		consts.MatchStrict: func(start, end int64) pkgdata.Filter {
-			return func(pkg *pkgdata.PkgInfo) bool {
-				return pkgdata.StrictDateRange(pkg, start, end)
-			}
-		},
-	},
-}
-
-var SizeMatchers = RangeMatcher{
-	true: {
-		consts.MatchFuzzy: func(start, _ int64) pkgdata.Filter {
-			return func(pkg *pkgdata.PkgInfo) bool {
-				return pkgdata.FuzzySize(pkg, start)
-			}
-		},
-		consts.MatchStrict: func(start, _ int64) pkgdata.Filter {
-			return func(pkg *pkgdata.PkgInfo) bool {
-				return pkgdata.StrictSize(pkg, start)
-			}
-		},
-	},
-	false: {
-		consts.MatchFuzzy: func(start, end int64) pkgdata.Filter {
-			return func(pkg *pkgdata.PkgInfo) bool {
-				return pkgdata.FuzzySizeRange(pkg, start, end)
-			}
-		},
-		consts.MatchStrict: func(start, end int64) pkgdata.Filter {
-			return func(pkg *pkgdata.PkgInfo) bool {
-				return pkgdata.StrictSizeRange(pkg, start, end)
-			}
-		},
-	},
-}
-
-var RangeMatchers = map[consts.FieldType]RangeMatcher{
-	consts.FieldDate: DateMatchers,
-	consts.FieldSize: SizeMatchers,
-}
-
-var StringMatchers = map[consts.MatchType]func(string, []string) bool{
-	consts.MatchStrict: pkgdata.StrictStrings,
-	consts.MatchFuzzy:  pkgdata.FuzzyStrings,
-}
-
 func newCondition(fieldType consts.FieldType) FilterCondition {
 	return FilterCondition{
 		PhaseName: "Filtering by " + consts.FieldNameLookup[fieldType],
@@ -166,7 +99,9 @@ func newRangeCondition(
 ) (*FilterCondition, error) {
 	matchersByField, ok := RangeMatchers[query.Field]
 	if !ok {
-		return nil, fmt.Errorf("unsupported field type for range: %v", query.Field)
+		return nil, fmt.Errorf(
+			"unsupported field type for range: %v", consts.FieldNameLookup[query.Field],
+		)
 	}
 
 	matchersByExact, ok := matchersByField[selector.IsExact]
@@ -180,11 +115,11 @@ func newRangeCondition(
 	}
 
 	matcher := builder(selector.Start, selector.End)
-
 	condition := newCondition(query.Field)
 	mask := query.Negate
+
 	condition.Filter = func(pkg *pkgdata.PkgInfo) bool {
-		return matcher(pkg) != mask
+		return matcher(pkg.GetInt(query.Field)) != mask
 	}
 
 	return &condition, nil
