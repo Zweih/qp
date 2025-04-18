@@ -1,8 +1,15 @@
 # qp Release Notes
 
+## v4.24.0
+### What's Changed
+* Feature: Add pkgbase query by @Zweih in https://github.com/Zweih/qp/pull/207
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v4.23.0...v4.24.0
+
 ## v4.23.0
 ### What's Changed
-* Feature: Add version flag (post-revert) by @Zweih in https://github.com/Zweih/qp/pull/205
+* Feature: Add version flag by @Zweih in https://github.com/Zweih/qp/pull/205
+
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v4.22.2...v4.23.0
 
