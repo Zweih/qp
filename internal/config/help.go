@@ -43,6 +43,7 @@ func PrintHelp() {
 	fmt.Println("  -O, --order <type>:<direction> Apply sorting to package output")
 	fmt.Println("                                 Default sort is date:asc")
 	fmt.Println("  --order date                   Sort packages by installation date")
+	fmt.Println("  --order build-date             Sort packages by build date")
 	fmt.Println("  --order name                   Sort packages alphabetically by package name")
 	fmt.Println("  --order size                   Sort packages by size in descending order")
 	fmt.Println("  --order license                Sort packages alphabetically by package license")
