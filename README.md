@@ -258,7 +258,6 @@ qp -w no:conflicts           # must not conflict with anything
 | license | string |
 | pkgbase | string |
 | description | string |
-| url | string |
 | pkgtype | string |
 | packager | string |
 | conflicts | relation |
