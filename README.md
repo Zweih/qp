@@ -99,12 +99,12 @@ this package is compatible with the following distributions:
 | – | XML output | – | package description sort |
 | ✓ | package base query | – | required-by sort |
 | – | required-by count sort | – | dependency count sort |
-| ✓ | build-date field | - | build-date filter |
+| ✓ | build-date field | ✓ | build-date query |
 | - | build-date sort | ✓ | pkgtype field |
-| - | pkgtype filter | - | pkgtype sort |
+| - | url query | - | pkgtype sort |
 | ✓ | architecture query | ✓ | groups field |
 | ✓	| conflicts query | - | package description sort |
-| ✓	| regenerate cache option | - | groups filter |
+| ✓	| regenerate cache option | - | groups query |
 | ✓ | packager field | ✓ | optional dependency field |
 | ✓ | sort by size on disk | - | conflicts sort |
 | ✓ | validation field | - | validation sort |
@@ -164,7 +164,7 @@ qp [options]
 ### options
 - `-l <number>` | `--limit <number>`: limit the amount of recent packages to display (default: 20)
 - `-a` | `all`: show all installed packages (ignores `-l`)
-- `-w <query>` | `--where <query>`: apply one or more filters to refine package results.
+- `-w <query>` | `--where <query>`: apply one or more queries to refine package results.
   - supported query types:
     - **string match** -> `field=value` (fuzzy) or `field==value` (strict)
     - **range match** -> `field=start:end` (fuzzy) or `field==start:end` (strict)
@@ -193,7 +193,7 @@ qp [options]
 - `-h` | `--help`: print help info
 
 ### querying with `--where`
-the `--where` (short: `-w`) flag is the core of qp's flexible query system. you can use it multiple times per command to combine different filters.
+the `--where` (short: `-w`) flag is the core of qp's flexible query system. you can use it multiple times per command to combine different queries.
 
 #### query types
 all queries that take words as arguments can also take a comma-separated list.
@@ -250,6 +250,7 @@ qp -w no:conflicts           # must not conflict with anything
 | field name | field type |
 |------------|------------|
 | date | range |
+| build-date | range |
 | size | range |
 | name | string |
 | reason | string |
@@ -257,7 +258,6 @@ qp -w no:conflicts           # must not conflict with anything
 | license | string |
 | pkgbase | string |
 | description | string |
-| url | string |
 | pkgtype | string |
 | packager | string |
 | conflicts | relation |
