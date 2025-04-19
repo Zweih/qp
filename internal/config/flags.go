@@ -13,8 +13,9 @@ func ParseFlags(args []string) (Config, error) {
 	var legacyFieldInput, legacyAddFieldInput string
 	var legacySortInput string
 	var legacyFilterInputs []string
+	var legacyCount int
 
-	var explicitOnly, dependenciesOnly, legacyHasAllFields bool
+	var explicitOnly, dependenciesOnly, legacyHasAllFields, legacyAllPackages bool
 	var dateFilter, sizeFilter, nameFilter, requiredByFilter string
 
 	registerCommonFlags(&flagCfg)
@@ -23,16 +24,13 @@ func ParseFlags(args []string) (Config, error) {
 		&legacySortInput, &legacyFilterInputs,
 		&explicitOnly, &dependenciesOnly, &legacyHasAllFields,
 		&dateFilter, &sizeFilter, &nameFilter, &requiredByFilter,
+		&legacyAllPackages, &legacyCount,
 	)
 
 	markHiddenFlags()
 
 	if err := pflag.CommandLine.Parse(args); err != nil {
 		return Config{}, fmt.Errorf("error parsing flags: %v", err)
-	}
-
-	if flagCfg.AllPackages {
-		flagCfg.Count = 0
 	}
 
 	remainingArgs := pflag.Args()
@@ -55,6 +53,7 @@ func ParseFlags(args []string) (Config, error) {
 				legacyFilterInputs,
 				dateFilter, nameFilter, sizeFilter, requiredByFilter,
 				explicitOnly, dependenciesOnly,
+				legacyAllPackages, legacyCount,
 			)
 		}
 	}
@@ -76,7 +75,7 @@ func isNewSyntax(args []string) bool {
 		}
 
 		switch lower {
-		case syntax.CmdSelect, syntax.CmdWhere, syntax.CmdOrder:
+		case syntax.CmdSelect, syntax.CmdWhere, syntax.CmdOrder, syntax.CmdLimit:
 			return true
 		default:
 			return false
@@ -90,6 +89,7 @@ func mergeTopLevelOptions(dst *Config, src *syntax.ParsedInput) {
 	dst.SortOption = src.SortOption
 	dst.Fields = src.Fields
 	dst.FieldQueries = src.FieldQueries
+	dst.Limit = src.Limit
 }
 
 func markHiddenFlags() {
@@ -106,6 +106,13 @@ func markHiddenFlags() {
 		"size",
 		"name",
 		"required-by",
+		"select-all",
+		"select",
+		"select-add",
+		"order",
+		"where",
+		"limit",
+		"all",
 	}
 
 	for _, flag := range hiddenFlags {
@@ -114,11 +121,9 @@ func markHiddenFlags() {
 }
 
 func registerCommonFlags(cfg *Config) {
-	pflag.IntVarP(&cfg.Count, "limit", "l", 20, "Number of packages to show")
-	pflag.BoolVarP(&cfg.AllPackages, "all", "a", false, "Show all packages")
 	pflag.BoolVar(&cfg.HasNoHeaders, "no-headers", false, "Hide headers")
 	pflag.BoolVar(&cfg.OutputJson, "json", false, "Output in JSON format")
-	pflag.BoolVar(&cfg.ShowHelp, "help", false, "Show help")
+	pflag.BoolVarP(&cfg.ShowHelp, "help", "h", false, "Show help")
 	pflag.BoolVar(&cfg.ShowVersion, "version", false, "Show version")
 	pflag.BoolVar(&cfg.ShowFullTimestamp, "full-timestamp", false, "Show full timestamp")
 	pflag.BoolVar(&cfg.DisableProgress, "no-progress", false, "Disable progress bar")
@@ -136,15 +141,19 @@ func registerLegacyFlags(
 	dependenciesOnly *bool,
 	hasAllFields *bool,
 	dateFilter, sizeFilter, nameFilter, requiredByFilter *string,
+	allPackages *bool,
+	count *int,
 ) {
 	pflag.BoolVarP(hasAllFields, "select-all", "A", false, "Show all fields")
 	pflag.StringVarP(fieldInput, "select", "s", "", "Select fields")
 	pflag.StringVarP(addFieldInput, "select-add", "S", "", "Add to selected fields")
 	pflag.StringVarP(sortInput, "order", "O", "date", "Sort order")
 	pflag.StringArrayVarP(filterInputs, "where", "w", []string{}, "Filter")
+	pflag.IntVarP(count, "limit", "l", 20, "Number of packages to show")
+	pflag.BoolVarP(allPackages, "all", "a", false, "Show all packages")
 
 	// hidden legacy flags
-	pflag.IntVarP(&cfg.Count, "number", "n", 20, "")
+	pflag.IntVarP(&cfg.Limit, "number", "n", 20, "")
 	pflag.StringVar(fieldInput, "columns", "", "")
 	pflag.StringVar(addFieldInput, "add-columns", "", "")
 	pflag.BoolVar(hasAllFields, "all-columns", false, "")

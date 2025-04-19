@@ -11,8 +11,7 @@ const (
 )
 
 type Config struct {
-	Count             int
-	AllPackages       bool
+	Limit             int
 	ShowHelp          bool
 	ShowVersion       bool
 	OutputJson        bool

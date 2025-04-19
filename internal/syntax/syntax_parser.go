@@ -3,6 +3,7 @@ package syntax
 import (
 	"fmt"
 	"qp/internal/consts"
+	"strconv"
 	"strings"
 )
 
@@ -13,18 +14,21 @@ const (
 	BlockSelect
 	BlockWhere
 	BlockOrder
+	BlockLimit
 )
 
 const (
 	CmdSelect = "select"
 	CmdWhere  = "where"
 	CmdOrder  = "order"
+	CmdLimit  = "limit"
 )
 
 type ParsedInput struct {
 	Fields       []consts.FieldType
 	FieldQueries []FieldQuery
 	SortOption   SortOption
+	Limit        int
 }
 
 func ParseSyntax(args []string) (ParsedInput, error) {
@@ -36,13 +40,22 @@ func ParseSyntax(args []string) (ParsedInput, error) {
 	var fields []consts.FieldType
 	var queries []FieldQuery
 	var sortOption SortOption
+	var limit int
+	var whereTokens []string
 
 	currentBlock := BlockNone
+	blockSeen := map[CmdType]bool{}
 
 	for _, token := range preprocessedArgs {
 		cmd := lookupCommand(token)
 		if cmd != BlockNone {
 			currentBlock = cmd
+
+			if blockSeen[cmd] {
+				return ParsedInput{}, fmt.Errorf("duplicate block: '%s'", cmdTypeName(cmd))
+			}
+			blockSeen[cmd] = true
+
 			continue
 		}
 
@@ -61,22 +74,32 @@ func ParseSyntax(args []string) (ParsedInput, error) {
 			}
 
 		case BlockWhere:
-			query, err := parseQueryInput(token)
-			if err != nil {
-				return ParsedInput{}, err
-			}
-			queries = append(queries, query)
+			whereTokens = append(whereTokens, token)
 
 		case BlockOrder:
-			opt, err := ParseSortOption(token)
+			sortOption, err = ParseSortOption(token)
 			if err != nil {
 				return ParsedInput{}, err
 			}
-			sortOption = opt
+
+		case BlockLimit:
+			limit, err = parseLimit(token)
+			if err != nil {
+				return ParsedInput{}, err
+			}
 
 		default:
-			return ParsedInput{}, fmt.Errorf("unexpected token: %q (expected in a command block like 'select', 'where', or 'order')", token)
+			return ParsedInput{}, fmt.Errorf("unexpected token: %q (expected in a command block like 'select', 'where', 'order', or 'limit')", token)
 		}
+	}
+
+	if len(whereTokens) > 0 {
+		parsedQueries, err := ParseQueriesBlock(whereTokens)
+		if err != nil {
+			return ParsedInput{}, err
+		}
+
+		queries = append(queries, parsedQueries...)
 	}
 
 	if len(fields) == 0 {
@@ -94,7 +117,17 @@ func ParseSyntax(args []string) (ParsedInput, error) {
 		Fields:       fields,
 		FieldQueries: queries,
 		SortOption:   sortOption,
+		Limit:        limit,
 	}, nil
+}
+
+func parseLimit(token string) (int, error) {
+	parsedInt, err := strconv.Atoi(token)
+	if err != nil {
+		return -2, fmt.Errorf("not a whole number (integer): %v", err)
+	}
+
+	return parsedInt, err
 }
 
 func lookupCommand(input string) CmdType {
@@ -105,6 +138,8 @@ func lookupCommand(input string) CmdType {
 		return BlockWhere
 	case CmdOrder:
 		return BlockOrder
+	case CmdLimit:
+		return BlockLimit
 	default:
 		return BlockNone
 	}

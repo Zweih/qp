@@ -109,8 +109,8 @@ func trimPackagesLen(
 	pkgPtrs []*pkgdata.PkgInfo,
 	cfg *config.Config,
 ) []*pkgdata.PkgInfo {
-	if cfg.Count > 0 && !cfg.AllPackages && len(pkgPtrs) > cfg.Count {
-		cutoffIdx := len(pkgPtrs) - cfg.Count
+	if cfg.Limit > 0 && len(pkgPtrs) > cfg.Limit {
+		cutoffIdx := len(pkgPtrs) - cfg.Limit
 		pkgPtrs = pkgPtrs[cutoffIdx:]
 	}
 

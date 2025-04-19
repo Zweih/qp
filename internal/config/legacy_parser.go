@@ -11,7 +11,8 @@ func ParseLegacyConfig(
 	sortInput string,
 	filterInputs []string,
 	dateFilter, nameFilter, sizeFilter, requiredByFilter string,
-	explicitOnly, dependenciesOnly bool,
+	explicitOnly, dependenciesOnly, allPackages bool,
+	count int,
 ) (syntax.ParsedInput, error) {
 	fields, err := parseSelection(fieldInput, addFieldInput, allFields)
 	if err != nil {
@@ -28,6 +29,10 @@ func ParseLegacyConfig(
 		return syntax.ParsedInput{}, err
 	}
 
+	if allPackages {
+		count = 0
+	}
+
 	queries = convertLegacyQueries(
 		queries,
 		dateFilter,
@@ -42,6 +47,7 @@ func ParseLegacyConfig(
 		Fields:       fields,
 		FieldQueries: queries,
 		SortOption:   sortOpt,
+		Limit:        count,
 	}, nil
 }
 

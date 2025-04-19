@@ -6,6 +6,7 @@ var ShorthandMap = map[string]string{
 	"s": CmdSelect,
 	"w": CmdWhere,
 	"o": CmdOrder,
+	"l": CmdLimit,
 }
 
 func ExpandShortSyntax(args []string) []string {
