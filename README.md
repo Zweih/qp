@@ -4,7 +4,11 @@
 
 you can find installation instructions [here](#installation).
 
-`qp` supports querying and sorting for install date, package name, install reason (explicit/dependency), size on disk, reverse dependencies (required by), dependencies, validation, description, replacements, conflicts, provisions, build date, packager, optional dependencies, reverse optional dependencies (optional for), package type and more. check [usage](#usage) for all available options.
+`qp` supports querying for package install dates, install reasons, sizes on disk, reverse dependencies (required by), dependencies, optional dependencies, reverse optional dependencies (optional for) and more.
+
+check [features](#features) to find out more.
+
+check [usage](#usage) for all available commands + options.
 
 ![qp logo | query packages logo](https://gistcdn.githack.com/Zweih/9009d5c74eab8a5515a8a64a0495df32/raw/ef8a8ac3655fd3dee24494a3403867919d806b63/qp-logo_clean.svg)
 
@@ -37,24 +41,19 @@ this package is compatible with the following distributions:
 
 ## features
 
-- list installed packages with install date/timestamps, dependencies, provisions, reverse dependencies (required by), size on disk, conflicts, replacements, architecture, license, description, build date, package base, package type, validation, packager, optional dependencies, reverse optional dependencies (optional for), groups, and version
+- list installed packages by numerous fields, see all available fields for selection [here](#available-fields-for-selection)
 - query by:
   - field existence
   - explicitly installed packages
-  - packages installed as dependencies
-  - packages required by specified packages
-  - packages that depend upon specified packages
-  - packages that provide specified packages
-  - packages that conflict with specific packages
+  - packages installed as dependencies, required by specified packages, depend upon specified packages, provide specified packages, conflict with specific packages
   - packages that contain specific licenses
-  - specific installation date or date range
+  - installation/build date or date range
   - packages built with specified architectures
   - package size or size range
-  - package names
-  - package description
-  - package packager
+  - package names, descriptions, and packagers
+  - learn more about querying [here](#querying-with-where)
 - sort by: 
-  - installation date
+  - installation date and build date
   - package name
   - license
   - size on disk
@@ -62,6 +61,11 @@ this package is compatible with the following distributions:
 - output as:
   - table
   - JSON
+
+
+learn about usage [here](#usage)
+
+learn about installation [here](#installation)
 
 ## is it good?
 [yes.](https://news.ycombinator.com/item?id=3067434)
@@ -115,7 +119,7 @@ this package is compatible with the following distributions:
 | ✓ | pkgtype query | - | optdepends query |
 | ✓ | packager query | - | origin field |
 | - | origin sort | - | origin query |
-| - | command-based syntax | - | full boolean logic |
+| ✓ | command-based syntax | - | full boolean logic |
 
 ## installation
 
@@ -432,7 +436,7 @@ output format:
 
 ### examples
 
-1. show the last 10 installed packages  
+ 1. show the last 10 installed packages  
    ```bash
    qp limit 10
    ```
@@ -447,12 +451,12 @@ output format:
    qp where reason=dependency and date=2025-03-01
    ```
 
- 4. show all packages sorted alphabetically by name  
+ 4. show all packages sorted alphabetically by name
    ```bash
    qp order name limit all
    ```
 
- 5. search for packages that contain a GPL license  
+ 5. search for packages that contain a GPL license 
    ```bash
    qp where license=gpl
    ```
@@ -472,12 +476,12 @@ output format:
    qp where size=20MB: limit 20
    ```
 
- 9. show packages between 100MB and 1GB installed up to February 27, 2025  
+ 9. show packages between 100MB and 1GB installed up to February 27, 2025
    ```bash
    qp where size=100MB:1GB and date=:2025-02-27
    ```
 
-10. show all packages sorted by size in descending order, installed after January 1, 2025  
+10. show all packages sorted by size in descending order, installed after January 1, 2025
    ```bash
    qp where date=2025-01-01: order size:desc limit all
    ```
@@ -487,137 +491,137 @@ output format:
    qp where name=python
    ```
 
-12. search for explicitly installed packages containing "lib" that are between 10MB and 1GB in size  
+12. search for explicitly installed packages containing "lib" that are between 10MB and 1GB in size
    ```bash
    qp where reason=explicit and name=lib and size=10MB:1GB
    ```
 
-13. search for packages with names containing "linux" installed between January 1 and March 30, 2025  
+13. search for packages with names containing "linux" installed between January 1 and March 30, 2025
    ```bash
    qp where name=linux and date=2025-01-01:2025-03-30
    ```
 
-14. search for packages containing "gtk" installed after January 1, 2025, and at least 5MB in size  
+14. search for packages containing "gtk" installed after January 1, 2025, and at least 5MB in size
    ```bash
    qp where name=gtk and date=2025-01-01: and size=5MB:
    ```
 
-15. show packages with name, version, and size  
+15. show packages with name, version, and size
    ```bash
    qp select name,version,size
    ```
 
-16. show package names, descriptions, and dependencies with `less` for readability  
+16. show package names, descriptions, and dependencies with `less` for readability
    ```bash
    qp select name,depends,description | less
    ```
 
-17. output package data in JSON format  
+17. output package data in JSON format
    ```bash
    qp --json
    ```
 
-18. save all explicitly installed packages to a JSON file  
+18. save all explicitly installed packages to a JSON file
    ```bash
    qp where reason=explicit --json > explicit-packages.json
    ```
 
-19. output all packages sorted by size (descending) in JSON  
+19. output all packages sorted by size (descending) in JSON
    ```bash
    qp order size:desc limit all --json
    ```
 
-20. output JSON with specific fields  
+20. output JSON with specific fields
    ```bash
    qp select name,version,size --json
    ```
 
-21. show all available package details for all packages  
+21. show all available package details for all packages
    ```bash
    qp select all limit all
    ```
 
-22. output all packages with all fields in JSON format  
+22. output all packages with all fields in JSON format
    ```bash
    qp select all limit all --json
    ```
 
-23. show package names and sizes without headers for scripting  
+23. show package names and sizes without headers for scripting
    ```bash
    qp select name,size --no-headers
    ```
 
-24. show all packages required by `firefox`  
+24. show all packages required by `firefox`
    ```bash
    qp where required-by=firefox limit all
    ```
 
-25. show all packages required by `gtk3` that are at least 50MB in size  
+25. show all packages required by `gtk3` that are at least 50MB in size
    ```bash
    qp where required-by=gtk3 and size=50MB: limit all
    ```
 
-26. show packages required by `vlc` and installed after January 1, 2025  
+26. show packages required by `vlc` and installed after January 1, 2025
    ```bash
    qp where required-by=vlc and date=2025-01-01:
    ```
 
-27. show all packages that have `glibc` as a dependency and are required by `ffmpeg`  
+27. show all packages that have `glibc` as a dependency and are required by `ffmpeg`
    ```bash
    qp where depends=glibc and required-by=ffmpeg limit all
    ```
 
-28. inclusively show packages that require `gcc` or `pacman`  
+28. inclusively show packages that require `gcc` or `pacman`
    ```bash
    qp where required-by=gcc,pacman
    ```
 
-29. show packages that provide `awk`  
+29. show packages that provide `awk`
    ```bash
    qp where provides=awk
    ```
 
-30. inclusively show packages that provide `rustc` or `python3`  
+30. inclusively show packages that provide `rustc` or `python3`
    ```bash
    qp where provides=rustc,python3
    ```
 
-31. show packages that conflict with `linuxqq`  
+31. show packages that conflict with `linuxqq`
    ```bash
    qp where conflicts=linuxqq
    ```
 
-32. show packages that are built for the `aarch64` CPU architecture or any architecture  
+32. show packages that are built for the `aarch64` CPU architecture or any architecture
    ```bash
    qp where arch=aarch64,any
    ```
 
-33. show all dependencies smaller than 500KB  
+33. show all dependencies smaller than 500KB
    ```bash
    qp where reason=dependency and size=:500KB
    ```
 
-34. show the 15 most recent explicitly installed packages  
+34. show the 15 most recent explicitly installed packages
    ```bash
    qp where reason=explicit limit 15
    ```
 
-35. show packages that contain "clang" in their description  
+35. show packages that contain "clang" in their description
    ```bash
    qp where description=clang
    ```
 
-36. sort packages by their package base while showing their names and package bases, in reverse alphabetical order  
+36. sort packages by their package base while showing their names and package bases, in reverse alphabetical order
    ```bash
    qp select name,pkgbase order pkgbase:desc
    ```
 
-37. show packages that are exactly named "bash"  
+37. show packages that are exactly named "bash"
    ```bash
    qp where name==bash
    ```
 
-38. show packages that have no dependencies  
+38. show packages that have no dependencies
    ```bash
    qp where no:depends
    ```
