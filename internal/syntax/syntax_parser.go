@@ -40,8 +40,8 @@ func ParseSyntax(args []string) (ParsedInput, error) {
 	var fields []consts.FieldType
 	var queries []FieldQuery
 	var sortOption SortOption
-	var limit int
 	var whereTokens []string
+	limit := 20
 
 	currentBlock := BlockNone
 	blockSeen := map[CmdType]bool{}
