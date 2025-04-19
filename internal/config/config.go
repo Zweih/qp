@@ -2,6 +2,7 @@ package config
 
 import (
 	"qp/internal/consts"
+	"qp/internal/syntax"
 )
 
 const (
@@ -20,23 +21,9 @@ type Config struct {
 	DisableProgress   bool
 	NoCache           bool
 	RegenCache        bool
-	SortOption        SortOption
+	SortOption        syntax.SortOption
 	Fields            []consts.FieldType
-	FieldQueries      []FieldQuery
-}
-
-type FieldQuery struct {
-	IsExistence bool
-	Negate      bool
-	Field       consts.FieldType
-	Match       consts.MatchType
-	Depth       int32
-	Target      string
-}
-
-type SortOption struct {
-	Field consts.FieldType
-	Asc   bool
+	FieldQueries      []syntax.FieldQuery
 }
 
 type ConfigProvider interface {

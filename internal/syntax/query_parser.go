@@ -1,4 +1,4 @@
-package config
+package syntax
 
 import (
 	"fmt"
@@ -7,7 +7,16 @@ import (
 	"strings"
 )
 
-func parseQueries(queryInputs []string) ([]FieldQuery, error) {
+type FieldQuery struct {
+	IsExistence bool
+	Negate      bool
+	Field       consts.FieldType
+	Match       consts.MatchType
+	Depth       int32
+	Target      string
+}
+
+func ParseQueries(queryInputs []string) ([]FieldQuery, error) {
 	queries := make([]FieldQuery, 0, len(queryInputs))
 
 	for _, input := range queryInputs {
@@ -86,7 +95,7 @@ func parseExistenceQuery(input string, colonIdx int) (FieldQuery, error) {
 
 	switch prefix {
 	case "has":
-	case "no", "not":
+	case "no", "not": // TODO: "not" is legacy, to deprecate
 		negation = true
 	default:
 		return FieldQuery{}, fmt.Errorf("invalid existence query: %s", input)
