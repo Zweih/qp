@@ -2,9 +2,9 @@ package filtering
 
 import (
 	"fmt"
-	"qp/internal/config"
 	"qp/internal/consts"
 	"qp/internal/pkgdata"
+	"qp/internal/syntax"
 	"strings"
 )
 
@@ -94,7 +94,7 @@ func newRelationExistsCondition(
 }
 
 func newRangeCondition(
-	query config.FieldQuery,
+	query syntax.FieldQuery,
 	selector RangeSelector,
 ) (*FilterCondition, error) {
 	matchersByField, ok := RangeMatchers[query.Field]

@@ -1,4 +1,4 @@
-package config
+package syntax
 
 import (
 	"fmt"
@@ -6,7 +6,12 @@ import (
 	"strings"
 )
 
-func parseSortOption(sortInput string) (SortOption, error) {
+type SortOption struct {
+	Field consts.FieldType
+	Asc   bool
+}
+
+func ParseSortOption(sortInput string) (SortOption, error) {
 	parts := strings.Split(sortInput, ":")
 	fieldKey := strings.ToLower(parts[0])
 	fieldType, exists := consts.FieldTypeLookup[fieldKey]
