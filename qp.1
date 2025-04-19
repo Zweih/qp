@@ -1,279 +1,174 @@
 .\" Man page for qp
 .TH qp 1 "@DATE@" "qp @VERSION@" "User Commands"
 .SH NAME
-qp \- Query Packages. A CLI utility for querying installed packages.
+qp \- query packages. A CLI utility for querying installed packages.
+
 .SH SYNOPSIS
-.B qp [options]
+.B qp [command] [args] [options]
 
 .SH DESCRIPTION
 .B qp
-is a standalone CLI utility for Arch and Arch-based Linux distributions to list and query installed packages. It works with any package manager that uses ALPM, like pacman and others.
+is a fast, flexible, and standalone CLI utility for querying installed packages on Arch Linux and Arch-based distributions. It supports advanced querying, sorting, and formatting features including:
 
-The utility provides powerful querying capabilities, including:
-.br
-- Existence queries
-.br
-- Installation date queries
-.br
-- Build date queries
-.br
-- Package size queries
-.br
-- Install reason queries
-.br
-- License queries
-.br
-- Reverse dependency queries (requirements or required-by)
-.br
-- Conflict queries
-.br
-- Dependency queries
-.br
-- Provision queries
-.br
-- Package name queries
-.br
-- Architecture queries
-.br
-- Description queries
-.br
-- Package base queries
-.br
-- Package type queries
-.br
-- Package packager queries
-.br
-- Sorting and JSON output
+- Existence checks
+- Field filtering
+- Date and size range queries
+- Reverse dependencies and provisions
+- Conflicts, optional dependencies, and groups
+- Sorting and output as table or JSON
+
+.SH COMMANDS
+.TP
+.B select <list>, s <list>
+Select fields to display (comma-separated). Use:
+.RS
+.IP \[bu] 
+select all — show all fields
+.IP \[bu] 
+select default — show default fields
+.IP \[bu] 
+select default,version — add to default
+.RE
+
+.TP
+.B where <query>, w <query>
+Apply one or more queries. Supported:
+.RS
+.IP \[bu] 
+String match — \fIfield=value\fR (fuzzy), \fIfield==value\fR (strict)
+.IP \[bu] 
+Range match — \fIfield=start:end\fR or \fIfield==start:end\fR (works with \fBdate\fR, \fBsize\fR)
+.IP \[bu] 
+Existence check — \fBhas:field\fR or \fBno:field\fR
+.RE
+
+.TP
+.B order <field>:<direction>, o <..>
+Sort results. Fields: \fBdate\fR, \fBbuild-date\fR, \fBname\fR, \fBsize\fR, \fBlicense\fR, \fBpkgbase\fR
+
+.TP
+.B limit <number>, l <number>
+Limit number of displayed results. Use \fBlimit all\fR to show all.
 
 .SH OPTIONS
 .TP
-.BR \-l " " \fInumber\fR ", " \-\-limit=\fInumber\fR
-Limit the number of recent packages displayed (default: 20).
-.TP
-.BR \-a ", " \-\-all
-Show all installed packages, ignoring \-l/--limit.
-.TP
-.BR \-w " " \fIquery\fR ", " \-\-where=\fIquery\fR
-Apply one or more filters to refine package results.
-
-Supported query types:
-.RS
-.TP
-.B string match
-\fIfield=value\fR -> fuzzy match
-.br
-\fIfield==value\fR -> strict match
-
-.TP
-.B range match
-\fIfield=start:end\fR -> fuzzy match
-.br
-\fIfield==start:end\fR -> strict match
-.br
-Supports full ranges (\fBstart:end\fR), open-ended ranges (\fBstart:\fR or \fB:end\fR), and exact values.
-.br
-Only supported for \fBdate\fR and \fBsize\fR.
-
-.TP
-.B existence check
-\fBhas:field\fR -> field must exist or be non-empty
-.br
-\fBno:field\fR -> field must be missing or empty
-.RE
-
-This flag can be used multiple times and mixed freely.
-
-See below for a list of all available query fields.
-.TP
-.BR \-O " " \fIfield:direction\fR ", " \-\-order=\fIfield:direction\fR
-Sort results. Default is \fBdate:asc\fR.
-Fields: \fIdate\fR, \fIbuild-date\fR, \fIname\fR, \fIsize\fR, \fIlicense\fR, \fIpkgbase\fR.
-.TP
 .B \-\-no-headers
-Omit column headers in output (useful for scripting).
-.TP
-.BR \-s " " \fIlist\fR ", " \-\-select=\fIlist\fR
-Comma-separated list of fields to display.
-Cannot be used with \fB--select-all\fR or \fB--select-add\fR.
-.TP
-.BR \-S " " \fIlist\fR ", " \-\-select-add=\fIlist\fR
-Add comma-separated fields to the default selection.
-.TP
-.BR \-A ", " \-\-select-all
-Display all available fields.
-.TP
-.B \-\-full-timestamp
-Show full install and build timestamps.
+Omit column headers (useful in scripts).
 .TP
 .B \-\-json
 Output results in JSON format.
 .TP
+.B \-\-full-timestamp
+Show full date+time for install/build.
+.TP
 .B \-\-no-progress
-Disable the progress bar in non-interactive environments.
+Disable progress bar.
 .TP
 .B \-\-no-cache
-Disable cache loading/saving and force fresh package data loading.
+Skip using cache, force fresh data load.
 .TP
 .B \-\-regen-cache
-Force fresh data loading and update the cache.
+Reload package data and regenerate cache.
 .TP
-.BR \-h ", " \-\-help
-Display help information.
+.B \-h, \-\-help
+Show help message.
 
-.SH QUERYING WITH --where
-The \fB--where\fR or \fB-w\fR option allows complex filtering by package metadata.
-
-You can provide multiple \fB-w\fR flags to combine different filters. Each query must follow one of the supported types:
+.SH QUERYING
+Use \fBwhere\fR (or \fBw\fR) one or more times to filter results.
 
 .TP
-.B string match
-\fIfield=value\fR -> fuzzy match
-.br
-\fIfield==value\fR -> strict match
-.br
-Applies to string fields like \fBname\fR, \fBlicense\fR, \fBdescription\fR, etc.
+.B String Match
+\fIfield=value\fR — fuzzy (substring, case-insensitive)  
+\fIfield==value\fR — strict (exact, case-insensitive)
 
 .TP
-.B range match
-\fIfield=start:end\fR -> fuzzy match
-.br
-\fIfield==start:end\fR -> strict match
-.br
-Supported for fields like \fBdate\fR and \fBsize\fR.
-.br
-Ranges can be:
-.br
-- Full range: \fBstart:end\fR
-.br
-- Open-ended: \fBstart:\fR or \fB:end\fR
-.br
-- Exact: \fBvalue\fR
+.B Range Match
+\fIfield=start:end\fR — fuzzy  
+\fIfield==start:end\fR — strict  
+Applies to \fBdate\fR and \fBsize\fR.  
+Supports full (e.g., 1GB:5GB), open-ended (e.g., 1GB:, :5GB), or exact values.
 
 .TP
-.B existence check
-\fBhas:field\fR -> filter for fields that exist or are non-empty
+.B Existence Check
+\fBhas:field\fR — must be non-empty  
+\fBno:field\fR — must be empty or missing
 
-.PP
-Multiple comma-separated values can be supplied for any query (e.g., \fBname=vim,nano\fR).
-
-.PP
-.B Match Behavior by Field Type:
-
+.TP
+.B Match Behavior Summary:
 .TS
 box, tab(:);
 cb cb cb
 l l l.
-Field Type: Fuzzy Match: Strict Match
+Field Type:Fuzzy Match:Strict Match
 _
-Strings & Relations: substring (case-insensitive): exact match (case-insensitive)
-Dates: matches by day (ignores time): exact timestamp (to the second)
-Size: ±0.3% byte tolerance (approximate): exact byte size
+Strings / Relations:substring (case-insensitive):exact (case-insensitive)
+Date:match by day:exact timestamp
+Size:±0.3% tolerance:exact byte size
 .TE
 
-Supported query types:
+.SH SUPPORTED QUERY FIELDS
 .TP
-.B date=<value>
-Installation date (exact, range, or open-ended).
+.B Range:
+date, build-date, size
 .TP
-.B build-date=<value>
-Build date (exact, range, or open-ended).
+.B String:
+name, reason, arch, license, pkgbase, description, url, pkgtype, packager
 .TP
-.B size=<value>
-Package size (exact, range, or open-ended).
-.TP
-.B name=<package>
-Filter by package name.
-.TP
-.B reason=explicit|dependencies
-Filter by installation reason.
-.TP
-.B arch=<arch>
-Filter by architecture.
-.TP
-.B license=<license>
-Filter by license name.
-.TP
-.B pkgbase=<pkgbase>
-Filter by package base.
-.TP
-.B description=<text>
-Filter by package description.
-.TP 
-.B pkgtype=<pkgtype>
-Filter by package type.
-.TP
-.B packager=<packager>
-Filter by package packager
-.TP
-.B conflicts=<package>
-Filter by conflicting packages.
-.TP
-.B depends=<package>
-Filter by dependencies.
-.TP
-.B required-by=<package>
-Filter by dependent packages.
-.TP
-.B provides=<package>
-Filter by provided libraries/packages.
+.B Relations:
+depends, provides, required-by, optional-for, optdepends, conflicts, replaces
 
 .SH AVAILABLE FIELDS
-Available fields for \fB--select\fR, \fB--select-add\fR, or \fB--select-all\fR:
-.IP
-date, build-date, size, name, reason, version, arch, license, pkgbase,
-description, url, validation, packager, pkgtype, groups, conflicts,
-replaces, depends, optdepends, required-by, optional-for, provides.
+Available for use with \fBselect\fR, \fBselect all\fR, etc:
 
-.SH JSON OUTPUT
-Use \fB--json\fR to output query results in structured JSON format for scripts.
+date, build-date, size, name, reason, version, arch, license, pkgbase,  
+description, url, validation, packager, pkgtype, groups, conflicts,  
+replaces, depends, optdepends, required-by, optional-for, provides
 
 .SH EXAMPLES
-Display all packages:
+List 10 smallest explicitly installed packages:
 .br
-\fBqp --all\fR
-.PP
-Query packages by size and output JSON:
+\fBqp w reason=explicit o size:asc l 10\fR
+
+Query packages larger than 500MB:
 .br
-\fBqp -Aw size=10MB:100MB --json\fR
-.PP
-Select specific fields:
+\fBqp w size=500MB:\fR
+
+Search packages that depend on \fBgtk3\fR:
 .br
-\fBqp -s name,version,size\fR
-.PP
-Order packages by name:
+\fBqp w required-by=gtk3\fR
+
+Get all fields for \fBgtk3\fR in JSON:
 .br
-\fBqp --order=name\fR
-.PP
-Complex query:
-.br
-\fBqp -Aw arch=x86_64 depends=glibc --order=size:desc --select name,size\fR
+\fBqp s all w name==gtk3 --json\fR
 
 .SH TIPS
-.TP
-Group short flags:
-\fBqp -aw name=yay\fR
-.TP
-Pipe output for long lists:
-\fBqp -s name,depends | less\fR
-.TP
-Use --flag=value for clarity:
-\fBqp --select=name,size --limit=50\fR
-.TP
-Use --no-headers in scripts for clean output.
+- Pipe long outputs:
+  \fBqp s name,depends | less\fR
+.br
+- Use comma-separated values:
+  \fBqp w arch=x86_64,any\fR
+.br
+- Omit headers for scripts:
+  \fBqp --no-headers s name,size\fR
+
+.SH FILES
+Cache is stored in:
+.br
+\fB$XDG_CACHE_HOME/query-packages\fR or \fB~/.cache/query-packages\fR
 
 .SH AUTHOR
-Written by Fernando Nunez <me@fernandonunez.io>.
+Written by Fernando Nunez <me@fernandonunez.io>
 
 .SH LICENSE
-GPLv3-only License. See
-.B LICENSE
-for details.
+GPLv3-only. For commercial licensing, see LICENSE.commercial.
 
 .SH BUGS
-Report bugs at:
+Report issues at:
 .UR https://github.com/Zweih/qp
 .UE
 
 .SH SEE ALSO
 .BR pacman(8),
+.BR yay(1),
+.BR paru(1)
 

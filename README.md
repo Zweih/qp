@@ -115,6 +115,7 @@ this package is compatible with the following distributions:
 | ✓ | pkgtype query | - | optdepends query |
 | ✓ | packager query | - | origin field |
 | - | origin sort | - | origin query |
+| - | command-based syntax | - | full boolean logic |
 
 ## installation
 
@@ -158,34 +159,39 @@ the cache is located under `/query-packages` at `$HOME/.cache/` or wherever you 
 ## usage
 
 ```bash
-qp [options]
+qp [command] [args] [options]
 ```
 
-### options
-- `-l <number>` | `--limit <number>`: limit the amount of recent packages to display (default: 20)
-- `-a` | `all`: show all installed packages (ignores `-l`)
-- `-w <query>` | `--where <query>`: apply one or more queries to refine package results.
+### commands
+
+- `select <list>` | `s <list>`: comma-separated list of fields to display
+  - `select all | s all` will act as a list of all available fields
+  - `select default | s default` will act as a list of all default fields
+  - use `select default,version` to list default fields + version
+  - use `select all,version` to list default fields + version
+  - [see fields available for selection](#available-fields-for-selection)
+- `where <query>` | `w <query>`: apply one or more queries to refine package results.
   - supported query types:
     - **string match** -> `field=value` (fuzzy) or `field==value` (strict)
     - **range match** -> `field=start:end` (fuzzy) or `field==start:end` (strict)
         - supports full ranges (`start:end`), open-ended ranges (`start:` or `:end`), and exact values (`value`)
         - works with `date` and `size`
     - **existence check** -> `has:field` or `no:field`
-  - this flag can be used multiple times and mixed freely
+  - this command can be used multiple times and mixed freely
   - [see all available query fields below](#available-queries)
-- `-O <field>:<direction>` | `--order <field>:<direction>`: sort results ascending or descending (default sort is `date:asc`):
+- `order <field>:<direction>` | `o <field>:<direction>`: sort results ascending or descending (default sort is `date:asc`):
   - `date`    -> sort by installation date
   - `build-date` -> sort by installation date
   - `name`    -> sort alphabetically by package name
   - `size`    -> sort by package size on disk
   - `license` -> sort alphabetically by package license
   - `pkgbase` -> sort alphabetically by base package
+- `limit <number>` | `l <number>`: limit the amount of packages to display (default: 20)
+  - `limit all | l all`: display all packages
+
+### options
+
 - `--no-headers`: omit column headers in table output (useful for scripting)
-- `-s <list>` | `--select <list>`: comma-separated list of fields to display 
-   - cannot use with `--select-all` or `--select-add`
-   - [see fields available for selection](#available-fields-for-selection)
-- `-S <list>` | `--select-add <list>`: comma-separated list of fields to add to defaults or `--select-all`
-- `-A` | `--select-all`: output all available fields (overrides defaults)
 - `--full-timestamp`: display the full timestamp (date and time) of package install/build instead of just the date
 - `--json`: output results in JSON format (overrides table output and `--full-timestamp`)
 - `--no-progress`: force no progress bar outside of non-interactive environments
@@ -193,13 +199,14 @@ qp [options]
 - `--regen-cache`: disable cache loading, force fresh package data loading, and save fresh cache
 - `-h` | `--help`: print help info
 
-### querying with `--where`
-the `--where` (short: `-w`) flag is the core of qp's flexible query system. you can use it multiple times per command to combine different queries.
+### querying with `where`
+
+The `where` (short: `w`) command is the core of qp's flexible query system. You can use it multiple times per command to combine different queries.
 
 #### query types
 all queries that take words as arguments can also take a comma-separated list.
 
-each `--where` query supports one of the following:
+each `where` query supports one of the following:
 
 - **string match**
   - `field=value` -> fuzzy match
@@ -231,13 +238,13 @@ For example:
 
 #### query examples
 ```bash
-qp -w size=100MB:1GB         # size range (fuzzy)
-qp -w date==2024-01-01       # exact install date
-qp -w name=firefox           # fuzzy name match
-qp -w name==bash             # strict name match
-qp -w reason=explicit        # packages installed explicitly
-qp -w has:depends            # must have dependencies
-qp -w no:conflicts           # must not conflict with anything
+qp where size=100MB:1GB         # size range (fuzzy)
+qp w date==2024-01-01           # exact install date
+qp where name=firefox           # fuzzy name match
+qp w name==bash                 # strict name match
+qp where reason=explicit        # packages installed explicitly
+qp where has:depends            # must have dependencies
+qp w no:conflicts               # must not conflict with anything
 ```
 
 #### query types
@@ -282,7 +289,7 @@ qp -w no:conflicts           # must not conflict with anything
 - `validation` - package integrity validation method (e.g., sha256", "pgp")
 - `packager` - person/entity who built the package (if available)
 - `pkgtype` - package type (pkg, split, debug, source, unknown*)
-    - ***note**: older packages may show "unknown" pkgtype if built before pacman introduced XDATA
+    - ***note**: older packages may have no pkgtype if built before pacman introduced XDATA
 - `groups` - package groups or categories (e.g., base, gnome, xfce4)
 - `conflicts` - list of packages that conflict, or cause problems, with the package
 - `replaces` - list of packages that are replaced by the package
@@ -297,7 +304,7 @@ the `--json` flag outputs the package data as structured JSON instead of a table
 
 example:
 ```bash
-qp -Aw name=gtk3 --json
+qp select all where name=gtk3 --json
 ```
 
 `gtk3` is one of the few packages that actually has all the fields populated.
@@ -388,203 +395,235 @@ output format:
 
 ### tips & tricks
 
-- when using multiple short flags at once (e.g. `-aw` or `-Al`), the flags like `-w`, `-l`, and `-s` must be last as they consume the next argument.
-this follows standard unix-style flag parsing, where positional arguments (like numbers and strings)
-are treated as separate parameters.
-  
-  invalid:
+- multiple short commands are supported using space separation (e.g. `s`, `w`, `l`, `o`), but **cannot** be combined as `swo` or `-swo`. use them like this:
   ```bash
-  qp -wa name=yay  # incorrect usage 
-  ```
-  valid:
-  ```bash
-  qp -aw name=yay  # correct usage
+  qp w name yay
+  qp s name,size w name=vim o date:asc l 10 # full query with shorthand
   ```
 
 - the `depends`, `provides`, and `required-by` table columns can be lengthy. packages like `glibc` are required by thousands of packages. to improve readability, pipe the output to tools like `moar` or `less` (i prefer `moar`, but `less` is usually pre-installed):
   ```bash
-  qp -s name,depends | less
+  qp select name,depends | less
+  qp s name,depends | moar
   ```
-- all options that take an argument can also be used in the `--<flag>=<argument>` format:
+
+- options that take arguments can be used in the `--<option>=<value>` form:
   ```bash
-  qp --select-add=name --limit=100
-  qp -s=date,name,version -O=name
+  qp select name,date --limit=100
+  qp s name,date o name
   ```
-  boolean flags can also be explicitly set using `--<flag>=true` or `--<flag>=false`:
+
+  boolean flags can be explicitly set using `--<option>=true` or `--<option>=false`:
   ```bash
   qp --no-headers=true --no-progress=true
   ```
-  string arguments can also be surrounded with quotes or double-quotes:
+
+  arguments to queries can be quoted if they contain special characters or spaces:
   ```bash
-  qp --order="name" -w name="vim"
+  qp where description="for tree-sitter"
   ```
 
-  this can be useful for scripts and automation where you might want to avoid any and all ambiguity.
-
-  **note**: `--no-progress` is automatically set to `true` when in a non-interactive environment, so you can pipe `|` into programs like `cat`, `grep`, or `less` without issue
+  **note**: `--no-progress` is automatically set to `true` in non-interactive environments, so you can pipe into programs like `cat`, `grep`, or `less` without issue.
 
 - the `--no-headers` flag is useful when processing output in scripts. It removes the header row, making it easier to parse package lists with tools like `awk`, `sed`, or `cut`:
   ```bash
-  qp --no-headers --select name,size | awk '{print $1, $2}'
+  qp --no-headers select name,size | awk '{print $1, $2}'
   ```
 
 ### examples
 
- 1. show the last 10 installed packages 
+1. show the last 10 installed packages  
    ```bash
-   qp -l 10
+   qp limit 10
    ```
- 2. show all explicitly installed packages
+
+ 2. show all explicitly installed packages  
    ```bash
-   qp -aw reason=explicit
+   qp where reason=explicit limit all
    ```
- 3. show only dependencies installed on a specific date
+
+ 3. show only dependencies installed on a specific date  
    ```bash
-   qp -w reason=dependency -w date=2025-03-01
+   qp where reason=dependency and date=2025-03-01
    ```
- 4. show all packages sorted alphabetically by name
+
+ 4. show all packages sorted alphabetically by name  
    ```bash
-   qp -aO name
+   qp order name limit all
    ```
- 5. search for packages that contain a GPL license
+
+ 5. search for packages that contain a GPL license  
    ```bash
-   qp -w license=gpl
+   qp where license=gpl
    ```
- 6. show packages installed between january 1, 2025, and january 5, 2025
+
+ 6. show packages installed between January 1, 2025, and January 5, 2025  
    ```bash
-   qp -w date=2025-01-01:2025-01-05
+   qp where date=2025-01-01:2025-01-05
    ```
- 7. sort all packages by their license, displaying name and license
+
+ 7. sort all packages by their license, displaying name and license  
    ```bash
-   qp -aO license -s name,license
+   qp select name,license order license limit all
    ```
- 8. show the 20 most recently installed packages larger than 20MB
+
+ 8. show the 20 most recently installed packages larger than 20MB  
    ```bash
-   qp -w size=20MB: -l 20
+   qp where size=20MB: limit 20
    ```
- 9. show packages between 100MB and 1GB installed up to february 27, 2025
+
+ 9. show packages between 100MB and 1GB installed up to February 27, 2025  
    ```bash
-   qp -w size=100MB:1GB -w date=:2025-02-27
+   qp where size=100MB:1GB and date=:2025-02-27
    ```
-10. show all packages sorted by size in descending order, installed after january 1, 2025
+
+10. show all packages sorted by size in descending order, installed after January 1, 2025  
    ```bash
-   qp -a --order size:desc -w date=2025-01-01:
+   qp where date=2025-01-01: order size:desc limit all
    ```
-11. search for installed packages containing "python
+
+11. search for installed packages containing "python"  
    ```bash
-   qp -w name=python
+   qp where name=python
    ```
-12. search for explicitly installed packages containing "lib" that are between 10MB and 1GB in size
+
+12. search for explicitly installed packages containing "lib" that are between 10MB and 1GB in size  
    ```bash
-   qp -w reason=explicit -w name=lib -w size=10MB:1GB
+   qp where reason=explicit and name=lib and size=10MB:1GB
    ```
-13. search for packages with names containing "linux" installed between january 1 and march 30, 2025
+
+13. search for packages with names containing "linux" installed between January 1 and March 30, 2025  
    ```bash
-   qp -w name=linux -w date=2025-01-01:2025-03-30
+   qp where name=linux and date=2025-01-01:2025-03-30
    ```
-14. search for packages containing "gtk" installed after january 1, 2025, and at least 5MB in size
+
+14. search for packages containing "gtk" installed after January 1, 2025, and at least 5MB in size  
    ```bash
-   qp -w name=gtk -w date=2025-01-01: -w size=5MB:
+   qp where name=gtk and date=2025-01-01: and size=5MB:
    ```
-15. show packages with name, version, and size
+
+15. show packages with name, version, and size  
    ```bash
-   qp -s name,version,size
+   qp select name,version,size
    ```
-16. show package names, descriptions, and dependencies with `less` for readability
+
+16. show package names, descriptions, and dependencies with `less` for readability  
    ```bash
-   qp --select name,depends,description | less
+   qp select name,depends,description | less
    ```
-17. output package data in JSON format
+
+17. output package data in JSON format  
    ```bash
    qp --json
    ```
-18. save all explicitly installed packages to a JSON file
+
+18. save all explicitly installed packages to a JSON file  
    ```bash
-   qp -w reason=explicit --json > explicit-packages.json
+   qp where reason=explicit --json > explicit-packages.json
    ```
-19. output all packages sorted by size (descending) in JSON
+
+19. output all packages sorted by size (descending) in JSON  
    ```bash
-   qp --json -a -O size:desc
+   qp order size:desc limit all --json
    ```
-20. output JSON with specific fields
+
+20. output JSON with specific fields  
    ```bash
-   qp --json -s name,version,size
+   qp select name,version,size --json
    ```
-21. show all available package details for all packages
+
+21. show all available package details for all packages  
    ```bash
-   qp -aA
+   qp select all limit all
    ```
-22. output all packages with all fields in JSON format
+
+22. output all packages with all fields in JSON format  
    ```bash
-   qp -aA --json
+   qp select all limit all --json
    ```
-23. show package names and sizes without headers for scripting
+
+23. show package names and sizes without headers for scripting  
    ```bash
-   qp --no-headers -s name,size
+   qp select name,size --no-headers
    ```
-24. show all packages required by `firefox`
+
+24. show all packages required by `firefox`  
    ```bash
-   qp -a -w required-by=firefox
+   qp where required-by=firefox limit all
    ```
-25. show all packages required by `gtk3` that are at least 50MB in size
+
+25. show all packages required by `gtk3` that are at least 50MB in size  
    ```bash
-   qp -a -w required-by=gtk3 -w size=50MB:
+   qp where required-by=gtk3 and size=50MB: limit all
    ```
-26. show packages required by `vlc` and installed after january 1, 2025 
+
+26. show packages required by `vlc` and installed after January 1, 2025  
    ```bash
-   qp -w required-by=vlc -w date=2025-01-01:
+   qp where required-by=vlc and date=2025-01-01:
    ```
-27. show all packages that have `glibc` as a dependency and are required by `ffmpeg`
+
+27. show all packages that have `glibc` as a dependency and are required by `ffmpeg`  
    ```bash
-   qp -a -w depends=glibc -w required-by=ffmpeg
+   qp where depends=glibc and required-by=ffmpeg limit all
    ```
-28. inclusively show packages that require `gcc` or `pacman`:
+
+28. inclusively show packages that require `gcc` or `pacman`  
    ```bash
-   qp -w required-by=base-devel,gcc
+   qp where required-by=gcc,pacman
    ```
-29. show packages that provide `awk`:
+
+29. show packages that provide `awk`  
    ```bash
-   qp -w provides=awk
+   qp where provides=awk
    ```
-30. inclusively show packages that provide `rustc` or `python3`:
+
+30. inclusively show packages that provide `rustc` or `python3`  
    ```bash
-   qp -w provides=rustc,python3
+   qp where provides=rustc,python3
    ```
-31. show packages that conflict with `linuxqq`:
+
+31. show packages that conflict with `linuxqq`  
    ```bash
-   qp -w conflicts=linuxqq
+   qp where conflicts=linuxqq
    ```
-32. show packages that are built for the `aarch64` CPU architecture or any architecture (non-CPU-specific):
+
+32. show packages that are built for the `aarch64` CPU architecture or any architecture  
    ```bash
-   qp -w arch=aarch64,any
+   qp where arch=aarch64,any
    ```
+
 33. show all dependencies smaller than 500KB  
    ```bash
-   qp -w reason=dependencies -w size=:500KB
+   qp where reason=dependency and size=:500KB
    ```
-34. show the 15 most recent explicitly installed packages
+
+34. show the 15 most recent explicitly installed packages  
    ```bash
-   qp -w reason=explicit -l 15
+   qp where reason=explicit limit 15
    ```
-35. show packages that contain "clang" in their description:
+
+35. show packages that contain "clang" in their description  
    ```bash
-   qp -w description=clang
+   qp where description=clang
    ```
-36. sort packages by their package base while showing their names and package bases, in reverse alphabetical order:
+
+36. sort packages by their package base while showing their names and package bases, in reverse alphabetical order  
    ```bash
-   qp -O pkgbase:desc -s name,pkgbase
+   qp select name,pkgbase order pkgbase:desc
    ```
-37. show packages that are exactly named "bash":
+
+37. show packages that are exactly named "bash"  
    ```bash
-   qp -w name==bash
+   qp where name==bash
    ```
-38. show packages that have no dependencies:
-  ```bash
-  qp -w no:depends
-  ```
+
+38. show packages that have no dependencies  
+   ```bash
+   qp where no:depends
+   ```
 
 ## license
+
 this project is licensed under GPL-3.0-only.
 
 for use cases not compatible with the GPL, such as proprietary redistribution or integration/ingestion into ML/LLM systems, a separate commercial license is available. see LICENSE.commercial for details.
- 

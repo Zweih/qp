@@ -5,6 +5,7 @@ import (
 	"os"
 	"qp/internal/config"
 	"qp/internal/consts"
+	"qp/internal/syntax"
 	"strings"
 	"testing"
 )
@@ -20,8 +21,8 @@ func (m *MockConfigProvider) GetConfig() (*config.Config, error) {
 // TODO: more testing, this is just validating if the depenendency injection works for testing
 func TestMainWithConfig(t *testing.T) {
 	mockCfg := config.Config{
-		Count:      5,
-		SortOption: config.SortOption{Field: consts.FieldSize, Asc: false},
+		Limit:      5,
+		SortOption: syntax.SortOption{Field: consts.FieldSize, Asc: false},
 		OutputJson: true,
 		Fields:     []consts.FieldType{consts.FieldName, consts.FieldSize},
 	}

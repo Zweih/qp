@@ -7,84 +7,89 @@ import (
 )
 
 func PrintHelp() {
-	fmt.Println("Usage: qp [options]")
+	const helpPart1 = `Usage:
+  qp [command] [args] [options]
 
-	fmt.Println("\nOptions:")
+Commands:
+  select <list> | s <list>      Fields to display (comma-separated)
+                                - 'select all'      → all fields
+                                - 'select default'  → default fields
+                                - e.g. 'select default,version'
+
+  where <query> | w <query>     Refine package results using one or more queries
+                                - Supports: field=value, field==value
+                                - Range: date=2024-01-01:2024-01-10
+                                - Existence: has:depends, no:conflicts
+                                - You can use multiple where clauses
+
+  order <field>:<dir> | o <..>  Sort by field in asc/desc order
+                                - Fields: date, build-date, name, size, license, pkgbase
+
+  limit <num> | l <num>         Limit number of results (default: 20)
+                                - Use 'limit all' to show everything
+Options:
+`
+
+	const helpPart2 = `
+Query Types:
+  - String match:
+      field=value       → fuzzy match (e.g., name=gtk)
+      field==value      → exact match (e.g., name==bash)
+
+  - Range match (date, size):
+      field=start:end   → fuzzy match
+      field==start:end  → exact match
+      Examples:
+        size=10MB:1GB
+        date==2024-01-01
+        date=2024-01-01: (open-ended range)
+
+  - Existence check:
+      has:field         → field must exist or be non-empty
+      no:field          → field must not exist or be empty
+
+Match Behavior:
+  - Strings: fuzzy = substring match (case-insensitive)
+             strict = exact match (case-insensitive)
+  - Date:    fuzzy = match by day
+             strict = exact timestamp
+  - Size:    fuzzy = ~0.3% byte tolerance
+             strict = exact byte size
+
+Short Command Examples:
+  qp s name,size w name=vim o date:asc l 10
+  qp where name=gtk
+  qp w name==bash
+  qp w reason=explicit and size=50MB:
+
+Tips:
+  - Queries can include comma-separated values:
+      arch=aarch64,any
+      provides=rustc,python3
+
+  - Pipe long output to 'less' or 'moar':
+      qp select name,depends | less
+
+  - Output for scripting:
+      qp --no-headers select name,size
+
+  - JSON output:
+      qp select name,version,size --json
+
+  - Quote arguments with spaces or special characters:
+      qp where description="for tree-sitter"
+
+Default Behavior:
+  - 20 results shown unless --limit specified
+  - Progress bar disabled in non-interactive terminals
+
+See full docs for:
+  - Available fields
+  - Query examples
+  - JSON schema
+`
+
+	fmt.Print(helpPart1)
 	pflag.PrintDefaults()
-
-	fmt.Println("\nQuerying Options:")
-	fmt.Println("  -w, --where <field>=<value> Apply queries to refine package listings. Can be used multiple times.")
-	fmt.Println("                              Fuzzy queries use '=' and strict queries use '=='.")
-	fmt.Println("                              Existence queries are also available for all fields and is used with 'has:<field>' and 'no:field'")
-
-	fmt.Println("\n  Available queries:")
-	fmt.Println("    date=<YYYY-MM-DD>               Query packages installed on a specific date")
-	fmt.Println("    date=<YYYY-MM-DD>:              Query packages installed on or after the given date")
-	fmt.Println("    date=:<YYYY-MM-DD>              Query packages installed up to the given date")
-	fmt.Println("    date=<YYYY-MM-DD>:<YYYY-MM-DD>  Query packages installed in a date range")
-	fmt.Println("    build-date=<YYYY-MM-DD          Same format options as date")
-	fmt.Println("    size=10MB:                      Query packages larger than 10MB")
-	fmt.Println("    size=:500KB                     Query packages up to 500KB")
-	fmt.Println("    size=1GB:5GB                    Query packages between 1GB and 5GB")
-	fmt.Println("    name=firefox              Query packages by names")
-	fmt.Println("    reason=explicit           Query only explicitly installed packages")
-	fmt.Println("    reason=dependencies       Query only packages installed as dependencies")
-	fmt.Println("    required-by=vlc           Query packages required by specified packages")
-	fmt.Println("    depends=glibc             Query packages that depend upon specified packages")
-	fmt.Println("    provides=awk              Query packages that provide specified libraries, programs, or packages")
-	fmt.Println("    conflicts=fuse            Query packages that conflict with the specified packages")
-	fmt.Println("    arch=x86_64               Show packages built for the specified architectures. \"any\" is a valid category of architecture.")
-	fmt.Println("    description=x86_64        Query packages by description")
-	fmt.Println("    pkgbase=pacman            Query packages by pkgbase")
-	fmt.Println("    pkgtype=split             Query packages by package type")
-	fmt.Println("    packager=archlinux.org    Query packages by packager")
-
-	fmt.Println("\nSorting Options:")
-	fmt.Println("  -O, --order <type>:<direction> Apply sorting to package output")
-	fmt.Println("                                 Default sort is date:asc")
-	fmt.Println("  --order date                   Sort packages by installation date")
-	fmt.Println("  --order build-date             Sort packages by build date")
-	fmt.Println("  --order name                   Sort packages alphabetically by package name")
-	fmt.Println("  --order size                   Sort packages by size in descending order")
-	fmt.Println("  --order license                Sort packages alphabetically by package license")
-
-	fmt.Println("\nAvailable Fields:")
-	fmt.Println("  date         Installation date of the package")
-	fmt.Println("  build-date   Date the package was built")
-	fmt.Println("  size         Package size on disk")
-	fmt.Println("  pkgtype      Type of the package (pkg, split, debug, source, unknown)")
-	fmt.Println("               Note: Older packages may show \"unknown\" pkgtype if built before pacman introduced XDATA.")
-	fmt.Println("  name         Package name")
-	fmt.Println("  reason       Installation reason (explicit/dependency)")
-	fmt.Println("  version      Installed package version")
-	fmt.Println("  arch         Architecture the package was built for")
-	fmt.Println("  license      Package software license")
-	fmt.Println("  pkgbase      Name of the base package used to group split packages; for non-split packages, it is the same as the package name.")
-	fmt.Println("  url          URL of the official site of the software being packaged")
-	fmt.Println("  description  Package description")
-	fmt.Println("  validation   Package integrity validation method")
-	fmt.Println("  packager     Person/entity who built the package (if available)")
-	fmt.Println("  groups       Package groups or categories (e.g., base, gnome, xfce4)")
-	fmt.Println("  conflicts    List of packages that conflict, or cause problems, with the package")
-	fmt.Println("  replaces     List of packages that are replaced by the package")
-	fmt.Println("  depends      List of dependencies")
-	fmt.Println("  optdepends   List of optional dependencies")
-	fmt.Println("  required-by  List of packages that depend on this package")
-	fmt.Println("  optional-for List of packages that optionally depend on this package")
-	fmt.Println("  provides     List of alternative package names or shared libraries provided")
-
-	fmt.Println("\nExamples:")
-	fmt.Println("  qp -l 10                      # Show the last 10 installed packages")
-	fmt.Println("  qp -a -w reason=explicit      # Show all explicitly installed packages")
-	fmt.Println("  qp -w reason=dependencies     # Show only dependencies")
-	fmt.Println("  qp -w date=2024-12-25         # Show packages installed on a specific date")
-	fmt.Println("  qp -w size=100MB:1GB          # Show packages between 100MB and 1GB")
-	fmt.Println("  qp -w required-by=vlc         # Show packages required by VLC")
-	fmt.Println("  qp --json                     # Output package data in JSON format")
-	fmt.Println("  qp -w name=sqlite --json      # Output details for SQLite in JSON")
-	fmt.Println("  qp --no-headers -s name,size  # Show package names and sizes without headers")
-	fmt.Println("  qp -a -w no:depends          # Show all packages with no dependencies")
-
-	fmt.Println("\nFor more details, see the manpage: man qp")
-	fmt.Println("Or check the README on the GitHub repo.")
+	fmt.Print(helpPart2)
 }

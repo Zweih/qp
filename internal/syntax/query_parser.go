@@ -1,4 +1,4 @@
-package config
+package syntax
 
 import (
 	"fmt"
@@ -7,7 +7,56 @@ import (
 	"strings"
 )
 
-func parseQueries(queryInputs []string) ([]FieldQuery, error) {
+type FieldQuery struct {
+	IsExistence bool
+	Negate      bool
+	Field       consts.FieldType
+	Match       consts.MatchType
+	Depth       int32
+	Target      string
+}
+
+// TODO: stopgap before logic is fleshed out
+func ParseQueriesBlock(tokens []string) ([]FieldQuery, error) {
+	var queries []FieldQuery
+	expectQuery := true
+
+	for i, token := range tokens {
+		token = strings.TrimSpace(token)
+		if token == "" {
+			continue
+		}
+
+		if strings.ToLower(token) == "and" {
+			if expectQuery {
+				return nil, fmt.Errorf("unexpected 'and' at position %d", i)
+			}
+
+			expectQuery = true
+			continue
+		}
+
+		if !expectQuery {
+			return nil, fmt.Errorf("missing 'and' between queries near: %q", token)
+		}
+
+		query, err := parseQueryInput(token)
+		if err != nil {
+			return nil, err
+		}
+
+		queries = append(queries, query)
+		expectQuery = false
+	}
+
+	if expectQuery && len(tokens) > 0 {
+		return nil, fmt.Errorf("trailing 'and' with no following condition")
+	}
+
+	return queries, nil
+}
+
+func ParseQueries(queryInputs []string) ([]FieldQuery, error) {
 	queries := make([]FieldQuery, 0, len(queryInputs))
 
 	for _, input := range queryInputs {
@@ -86,7 +135,7 @@ func parseExistenceQuery(input string, colonIdx int) (FieldQuery, error) {
 
 	switch prefix {
 	case "has":
-	case "no", "not":
+	case "no", "not": // TODO: "not" is legacy, to deprecate
 		negation = true
 	default:
 		return FieldQuery{}, fmt.Errorf("invalid existence query: %s", input)
