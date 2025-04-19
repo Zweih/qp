@@ -1,8 +1,17 @@
 # qp Release Notes
 
+## v4.26.2
+### What's Changed
+* Documentation: CLA Assistant by @Zweih in https://github.com/Zweih/qp/pull/209
+* Documentation: Update workflow URL by @Zweih in https://github.com/Zweih/qp/pull/211
+* Feature: Add pkgtype query by @Zweih in https://github.com/Zweih/qp/pull/213
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v4.25.0...v4.26.2
+
 ## v4.25.0
 ### What's Changed
 * Refactor: Multi-driver interface by @Zweih in https://github.com/Zweih/qp/pull/208
+
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v4.24.0...v4.25.0
 
