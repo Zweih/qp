@@ -21,10 +21,9 @@ func parseSelection(
 		selectFieldsRaw = addFieldInput
 		fallthrough
 	default:
+		fields = consts.DefaultFields
 		if hasAllFields {
 			fields = consts.ValidFields
-		} else {
-			fields = consts.DefaultFields
 		}
 	}
 

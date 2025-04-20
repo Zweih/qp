@@ -76,11 +76,10 @@ func fetchPackages() ([]*pkgdata.PkgInfo, error) {
 func getWorkerCount(numCPUs int, numFiles int) int {
 	var numWorkers int
 
+	numWorkers = numCPUs * 2
 	if numCPUs <= 2 {
 		// let's keep it simple for devices like rPi zeroes
 		numWorkers = numCPUs
-	} else {
-		numWorkers = numCPUs * 2
 	}
 
 	if numWorkers > numFiles {
