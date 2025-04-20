@@ -4,7 +4,7 @@
 
 you can find installation instructions [here](#installation).
 
-`qp` supports querying for package install dates, install reasons, sizes on disk, reverse dependencies (required by), dependencies, optional dependencies, reverse optional dependencies (optional for) and more.
+`qp` supports querying for package metadata, dependency relations, and more.
 
 check [features](#features) to find out more.
 
@@ -41,7 +41,8 @@ this package is compatible with the following distributions:
 
 ## features
 
-- list installed packages by numerous fields, see all available fields for selection [here](#available-fields-for-selection)
+- list installed packages by numerous fields
+  - see all available fields for selection [here](#available-fields-for-selection)
 - query by:
   - field existence
   - explicitly installed packages
@@ -120,6 +121,7 @@ learn about installation [here](#installation)
 | ✓ | packager query | - | origin field |
 | - | origin sort | - | origin query |
 | ✓ | command-based syntax | - | full boolean logic |
+| - | user-defined macros | - | parentetical (grouping) where logic |
 
 ## installation
 
@@ -173,7 +175,7 @@ qp [command] [args] [options]
   - `select default | s default` will act as a list of all default fields
   - use `select default,version` to list default fields + version
   - use `select all,version` to list default fields + version
-  - [see fields available for selection](#available-fields-for-selection)
+  - [see fields available for selection](#available-selectors)
 - `where <query>` | `w <query>`: apply one or more queries to refine package results.
   - supported query types:
     - **string match** -> `field=value` (fuzzy) or `field==value` (strict)
@@ -182,13 +184,9 @@ qp [command] [args] [options]
         - works with `date` and `size`
     - **existence check** -> `has:field` or `no:field`
   - this command can be used multiple times and mixed freely
-  - [see all available query fields below](#available-queries)
+  - [see fields available for querying](#available-queries)
 - `order <field>:<direction>` | `o <field>:<direction>`: sort results ascending or descending (default sort is `date:asc`):
-  - `date`    -> sort by installation date
-  - `build-date` -> sort by installation date
-  - `name`    -> sort alphabetically by package name
-  - `size`    -> sort by package size on disk
-  - `license` -> sort alphabetically by package license
+  - [see fields avaialble for sorting](#available-sorts)
   - `pkgbase` -> sort alphabetically by base package
 - `limit <number>` | `l <number>`: limit the amount of packages to display (default: 20)
   - `limit all | l all`: display all packages
@@ -208,6 +206,7 @@ qp [command] [args] [options]
 The `where` (short: `w`) command is the core of qp's flexible query system. You can use it multiple times per command to combine different queries.
 
 #### query types
+
 all queries that take words as arguments can also take a comma-separated list.
 
 each `where` query supports one of the following:
@@ -225,8 +224,8 @@ each `where` query supports one of the following:
     - open-ended ranges: `start:` or `:end`
     - exact values: `value`
 - **existence check**
-  - `has:field` — field must exist or be non-empty
-  - `no:field` — field must be missing or empty
+  - `has:field` -> field must exist or be non-empty
+  - `no:field` -> field must be missing or empty
 
 #### match types
 
@@ -236,7 +235,7 @@ each `where` query supports one of the following:
 | dates | matches by day (ignores time) | matches exact timestamp (to the second) |
 | size  | ±0.3% byte tolerance (approximate) | matches exact byte size |
 
-For example:
+for example:
   - `name=gtk` matches `gtk3`, `libgtk`, etc. (fuzzy)
   - `name==gtk` only matches a package named exactly `gtk`
 
@@ -252,13 +251,15 @@ qp w no:conflicts               # must not conflict with anything
 ```
 
 #### query types
-| field type | description|
-|------------|------------|
-|string | matches textual fields. used for fields like name, license, description, etc.|
-|range | matches numerical or time-based fields across a range. supports full ranges (start:end), open-ended ranges (start: / :end), or exact values. used for date and size.|
-|relation | matches fields that contain relationships to other packages (e.g., dependencies, conflicts, provides)|
+
+| field type | description |
+|------------|-------------|
+| string | matches textual fields. used for fields like name, license, description, etc. |
+| range | matches numerical or time-based fields across a range. <br> supports full ranges (start:end), open-ended ranges (start: / :end), or exact values |
+| relation | matches fields that contain relationships to other packages (e.g., dependencies, conflicts, provides) |
 
 #### available queries
+
 | field name | field type |
 |------------|------------|
 | date | range |
@@ -278,7 +279,7 @@ qp w no:conflicts               # must not conflict with anything
 | required-by | relation |
 | provides | relation |
 
-### available fields for selection
+### available selectors
 - `date` - installation date of the package
 - `build-date` - date the package was built
 - `size` - package size on disk
@@ -290,9 +291,9 @@ qp w no:conflicts               # must not conflict with anything
 - `pkgbase` - name of the base package used to group split packages; for non-split packages, it is the same as the package name. 
 - `description` - package description
 - `url` - the URL of the official site of the software being packaged
-- `validation` - package integrity validation method (e.g., sha256", "pgp")
+- `validation` - package integrity validation method (e.g., sha256, pgp)
 - `packager` - person/entity who built the package (if available)
-- `pkgtype` - package type (pkg, split, debug, source, unknown*)
+- `pkgtype` - package type (pkg, split, debug, src)
     - ***note**: older packages may have no pkgtype if built before pacman introduced XDATA
 - `groups` - package groups or categories (e.g., base, gnome, xfce4)
 - `conflicts` - list of packages that conflict, or cause problems, with the package
@@ -302,6 +303,14 @@ qp w no:conflicts               # must not conflict with anything
 - `required-by` - list of packages required by the package and are dependent
 - `optional-for` - list of packages that optionally depend on the package (optionally dependent)
 - `provides` - list of alternative package names or shared libraries provided by package
+
+### available sorts
+- `date`
+- `build-date`
+- `name`
+- `license`
+- `size`
+- `pkgbase`
 
 ### JSON output
 the `--json` flag outputs the package data as structured JSON instead of a table. this can be useful for scripts or automation.
