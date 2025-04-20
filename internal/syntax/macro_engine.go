@@ -50,7 +50,7 @@ func fieldTypesToNames(fields []consts.FieldType) []string {
 func expandWhereMacro(token string) ([]string, bool) {
 	switch token {
 	case "orphan":
-		return []string{"not:required-by", "reason=dependency"}, true
+		return []string{"not:required-by", "and", "reason=dependency"}, true
 	default:
 		return nil, false
 	}

@@ -115,10 +115,9 @@ func applySingleLineField(pkg *pkgdata.PkgInfo, field string, value string) erro
 		pkg.Name = value
 
 	case fieldReason:
+		pkg.Reason = "explicit"
 		if value == "1" {
 			pkg.Reason = "dependency"
-		} else {
-			pkg.Reason = "explicit"
 		}
 
 	case fieldVersion:
