@@ -1,11 +1,17 @@
 # qp Release Notes
 
+## v4.28.0
+### What's Changed
+* Feature: Add build date query by @Zweih in https://github.com/Zweih/qp/pull/219
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v4.27.4...v4.28.0
+
 ## v4.27.4
 ### What's Changed
 * Documentation: Inject version/date into man page by @Zweih in https://github.com/Zweih/qp/pull/214
 * Feature: Add packager query by @Zweih in https://github.com/Zweih/qp/pull/216
-* Documentation: Queries typo fix by @Zweih in https://github.com/Zweih/qp/pull/217
 * Fix: Add commit to qp-src by @Zweih in https://github.com/Zweih/qp/pull/221
+
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v4.26.2...v4.27.4
 
