@@ -27,6 +27,8 @@ Commands:
 
   limit <num> | l <num>         Limit number of results (default: 20)
                                 - Use 'limit all' to show everything
+                                - Use end:<num> / mid:<num> modifier to display from
+                                    different parts of the output
 Options:
 `
 
