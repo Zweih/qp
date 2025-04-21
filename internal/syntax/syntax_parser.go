@@ -3,7 +3,6 @@ package syntax
 import (
 	"fmt"
 	"qp/internal/consts"
-	"strconv"
 	"strings"
 )
 
@@ -29,6 +28,7 @@ type ParsedInput struct {
 	FieldQueries []FieldQuery
 	SortOption   SortOption
 	Limit        int
+	LimitMode    LimitMode
 }
 
 func ParseSyntax(args []string) (ParsedInput, error) {
@@ -41,6 +41,7 @@ func ParseSyntax(args []string) (ParsedInput, error) {
 	var queries []FieldQuery
 	var sortOption SortOption
 	var whereTokens []string
+	limitMode := LimitStart
 	limit := 20
 
 	currentBlock := BlockNone
@@ -83,7 +84,7 @@ func ParseSyntax(args []string) (ParsedInput, error) {
 			}
 
 		case BlockLimit:
-			limit, err = parseLimit(token)
+			limit, limitMode, err = parseLimit(token)
 			if err != nil {
 				return ParsedInput{}, err
 			}
@@ -118,16 +119,8 @@ func ParseSyntax(args []string) (ParsedInput, error) {
 		FieldQueries: queries,
 		SortOption:   sortOption,
 		Limit:        limit,
+		LimitMode:    limitMode,
 	}, nil
-}
-
-func parseLimit(token string) (int, error) {
-	parsedInt, err := strconv.Atoi(token)
-	if err != nil {
-		return -2, fmt.Errorf("not a whole number (integer): %v", err)
-	}
-
-	return parsedInt, err
 }
 
 func lookupCommand(input string) CmdType {

@@ -20,6 +20,7 @@ type Config struct {
 	DisableProgress   bool
 	NoCache           bool
 	RegenCache        bool
+	LimitMode         syntax.LimitMode
 	SortOption        syntax.SortOption
 	Fields            []consts.FieldType
 	FieldQueries      []syntax.FieldQuery
