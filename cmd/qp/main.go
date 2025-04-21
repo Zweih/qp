@@ -8,6 +8,7 @@ import (
 	"qp/internal/origins"
 	"qp/internal/pipeline/phase"
 	"qp/internal/pkgdata"
+	"qp/internal/syntax"
 	"sync"
 
 	"github.com/spf13/pflag"
@@ -106,15 +107,26 @@ func globalPackageSort(
 }
 
 func trimPackagesLen(
-	pkgPtrs []*pkgdata.PkgInfo,
+	pkgs []*pkgdata.PkgInfo,
 	cfg *config.Config,
 ) []*pkgdata.PkgInfo {
-	if cfg.Limit > 0 && len(pkgPtrs) > cfg.Limit {
-		cutoffIdx := len(pkgPtrs) - cfg.Limit
-		pkgPtrs = pkgPtrs[cutoffIdx:]
+	if cfg.Limit < 0 && len(pkgs) < cfg.Limit {
+		return pkgs
 	}
 
-	return pkgPtrs
+	switch cfg.LimitMode {
+	case syntax.LimitEnd:
+		return pkgs[:cfg.Limit]
+	case syntax.LimitMid:
+		start := (len(pkgs) - cfg.Limit) / 2
+		end := start + cfg.Limit
+		return pkgs[start:end]
+	case syntax.LimitStart:
+		fallthrough
+	default:
+		cutoffIdx := len(pkgs) - cfg.Limit
+		return pkgs[cutoffIdx:]
+	}
 }
 
 func renderOutput(pkgs []*pkgdata.PkgInfo, cfg *config.Config) {

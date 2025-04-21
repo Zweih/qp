@@ -90,6 +90,7 @@ func mergeTopLevelOptions(dst *Config, src *syntax.ParsedInput) {
 	dst.Fields = src.Fields
 	dst.FieldQueries = src.FieldQueries
 	dst.Limit = src.Limit
+	dst.LimitMode = src.LimitMode
 }
 
 func markHiddenFlags() {

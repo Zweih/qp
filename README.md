@@ -69,6 +69,7 @@ learn about usage [here](#usage)
 learn about installation [here](#installation)
 
 ## is it good?
+
 [yes.](https://news.ycombinator.com/item?id=3067434)
 
 ## roadmap
@@ -122,10 +123,12 @@ learn about installation [here](#installation)
 | - | origin sort | - | origin query |
 | ✓ | command-based syntax | - | full boolean logic |
 | - | user-defined macros | - | parentetical (grouping) where logic |
+| ✓ | limit from end | ✓ | limit from middle |
 
 ## installation
 
 ### from AUR (**recommended**)
+
 install using an [AUR helper](https://wiki.archlinux.org/title/AUR_helpers) like `yay`, `paru`, `aura`, etc.:
 ```bash
 yay -Sy qp
@@ -142,6 +145,7 @@ for the latest (unstable) version from git w/ the AUR, use `qp-git`*.
 the cache is located under `/query-packages` at `$HOME/.cache/` or wherever you have `$XDG_HOME_CACHE` set to.
 
 ### building from source + manual installation
+
 **note**: this packages is specific to arch-based linux distributions
 
 1. clone the repo:
@@ -190,6 +194,8 @@ qp [command] [args] [options]
   - `pkgbase` -> sort alphabetically by base package
 - `limit <number>` | `l <number>`: limit the amount of packages to display (default: 20)
   - `limit all | l all`: display all packages
+  - `limit end:<number>`: display last n packages
+  - `limit mid:<number>`: display middle n packages
 
 ### options
 
@@ -240,7 +246,8 @@ for example:
   - `name==gtk` only matches a package named exactly `gtk`
 
 #### query examples
-```bash
+
+```
 qp where size=100MB:1GB         # size range (fuzzy)
 qp w date==2024-01-01           # exact install date
 qp where name=firefox           # fuzzy name match
@@ -280,6 +287,7 @@ qp w no:conflicts               # must not conflict with anything
 | provides | relation |
 
 ### available selectors
+
 - `date` - installation date of the package
 - `build-date` - date the package was built
 - `size` - package size on disk
@@ -305,6 +313,7 @@ qp w no:conflicts               # must not conflict with anything
 - `provides` - list of alternative package names or shared libraries provided by package
 
 ### available sorts
+
 - `date`
 - `build-date`
 - `name`
@@ -313,10 +322,11 @@ qp w no:conflicts               # must not conflict with anything
 - `pkgbase`
 
 ### JSON output
+
 the `--json` flag outputs the package data as structured JSON instead of a table. this can be useful for scripts or automation.
 
 example:
-```bash
+```
 qp select all where name=gtk3 --json
 ```
 
@@ -325,7 +335,7 @@ qp select all where name=gtk3 --json
 output format:
 ```json
 [
-  { 
+  {
     "installTimestamp": 1743448253,
     "buildTimestamp": 1741400060,
     "size": 58266727,
@@ -409,229 +419,229 @@ output format:
 ### tips & tricks
 
 - multiple short commands are supported using space separation (e.g. `s`, `w`, `l`, `o`), but **cannot** be combined as `swo` or `-swo`. use them like this:
-  ```bash
+  ```
   qp w name yay
   qp s name,size w name=vim o date:asc l 10 # full query with shorthand
   ```
 
 - the `depends`, `provides`, and `required-by` table columns can be lengthy. packages like `glibc` are required by thousands of packages. to improve readability, pipe the output to tools like `moar` or `less` (i prefer `moar`, but `less` is usually pre-installed):
-  ```bash
+  ```
   qp select name,depends | less
   qp s name,depends | moar
   ```
 
 - options that take arguments can be used in the `--<option>=<value>` form:
-  ```bash
+  ```
   qp select name,date --limit=100
   qp s name,date o name
   ```
 
   boolean flags can be explicitly set using `--<option>=true` or `--<option>=false`:
-  ```bash
+  ```
   qp --no-headers=true --no-progress=true
   ```
 
   arguments to queries can be quoted if they contain special characters or spaces:
-  ```bash
+  ```
   qp where description="for tree-sitter"
   ```
 
   **note**: `--no-progress` is automatically set to `true` in non-interactive environments, so you can pipe into programs like `cat`, `grep`, or `less` without issue.
 
 - the `--no-headers` flag is useful when processing output in scripts. It removes the header row, making it easier to parse package lists with tools like `awk`, `sed`, or `cut`:
-  ```bash
+  ```
   qp --no-headers select name,size | awk '{print $1, $2}'
   ```
 
 ### examples
 
  1. show the last 10 installed packages  
-   ```bash
+   ```
    qp limit 10
    ```
 
  2. show all explicitly installed packages  
-   ```bash
+   ```
    qp where reason=explicit limit all
    ```
 
  3. show only dependencies installed on a specific date  
-   ```bash
+   ```
    qp where reason=dependency and date=2025-03-01
    ```
 
  4. show all packages sorted alphabetically by name
-   ```bash
+   ```
    qp order name limit all
    ```
 
  5. search for packages that contain a GPL license 
-   ```bash
+   ```
    qp where license=gpl
    ```
 
  6. show packages installed between January 1, 2025, and January 5, 2025  
-   ```bash
+   ```
    qp where date=2025-01-01:2025-01-05
    ```
 
  7. sort all packages by their license, displaying name and license  
-   ```bash
+   ```
    qp select name,license order license limit all
    ```
 
  8. show the 20 most recently installed packages larger than 20MB  
-   ```bash
+   ```
    qp where size=20MB: limit 20
    ```
 
  9. show packages between 100MB and 1GB installed up to February 27, 2025
-   ```bash
+   ```
    qp where size=100MB:1GB and date=:2025-02-27
    ```
 
 10. show all packages sorted by size in descending order, installed after January 1, 2025
-   ```bash
+   ```
    qp where date=2025-01-01: order size:desc limit all
    ```
 
 11. search for installed packages containing "python"  
-   ```bash
+   ```
    qp where name=python
    ```
 
 12. search for explicitly installed packages containing "lib" that are between 10MB and 1GB in size
-   ```bash
+   ```
    qp where reason=explicit and name=lib and size=10MB:1GB
    ```
 
 13. search for packages with names containing "linux" installed between January 1 and March 30, 2025
-   ```bash
+   ```
    qp where name=linux and date=2025-01-01:2025-03-30
    ```
 
 14. search for packages containing "gtk" installed after January 1, 2025, and at least 5MB in size
-   ```bash
+   ```
    qp where name=gtk and date=2025-01-01: and size=5MB:
    ```
 
 15. show packages with name, version, and size
-   ```bash
+   ```
    qp select name,version,size
    ```
 
 16. show package names, descriptions, and dependencies with `less` for readability
-   ```bash
+   ```
    qp select name,depends,description | less
    ```
 
 17. output package data in JSON format
-   ```bash
+   ```
    qp --json
    ```
 
 18. save all explicitly installed packages to a JSON file
-   ```bash
+   ```
    qp where reason=explicit --json > explicit-packages.json
    ```
 
 19. output all packages sorted by size (descending) in JSON
-   ```bash
+   ```
    qp order size:desc limit all --json
    ```
 
 20. output JSON with specific fields
-   ```bash
+   ```
    qp select name,version,size --json
    ```
 
 21. show all available package details for all packages
-   ```bash
+   ```
    qp select all limit all
    ```
 
 22. output all packages with all fields in JSON format
-   ```bash
+   ```
    qp select all limit all --json
    ```
 
 23. show package names and sizes without headers for scripting
-   ```bash
+   ```
    qp select name,size --no-headers
    ```
 
 24. show all packages required by `firefox`
-   ```bash
+   ```
    qp where required-by=firefox limit all
    ```
 
 25. show all packages required by `gtk3` that are at least 50MB in size
-   ```bash
+   ```
    qp where required-by=gtk3 and size=50MB: limit all
    ```
 
 26. show packages required by `vlc` and installed after January 1, 2025
-   ```bash
+   ```
    qp where required-by=vlc and date=2025-01-01:
    ```
 
 27. show all packages that have `glibc` as a dependency and are required by `ffmpeg`
-   ```bash
+   ```
    qp where depends=glibc and required-by=ffmpeg limit all
    ```
 
 28. inclusively show packages that require `gcc` or `pacman`
-   ```bash
+   ```
    qp where required-by=gcc,pacman
    ```
 
 29. show packages that provide `awk`
-   ```bash
+   ```
    qp where provides=awk
    ```
 
 30. inclusively show packages that provide `rustc` or `python3`
-   ```bash
+   ```
    qp where provides=rustc,python3
    ```
 
 31. show packages that conflict with `linuxqq`
-   ```bash
+   ```
    qp where conflicts=linuxqq
    ```
 
 32. show packages that are built for the `aarch64` CPU architecture or any architecture
-   ```bash
+   ```
    qp where arch=aarch64,any
    ```
 
 33. show all dependencies smaller than 500KB
-   ```bash
+   ```
    qp where reason=dependency and size=:500KB
    ```
 
 34. show the 15 most recent explicitly installed packages
-   ```bash
+   ```
    qp where reason=explicit limit 15
    ```
 
 35. show packages that contain "clang" in their description
-   ```bash
+   ```
    qp where description=clang
    ```
 
 36. sort packages by their package base while showing their names and package bases, in reverse alphabetical order
-   ```bash
+   ```
    qp select name,pkgbase order pkgbase:desc
    ```
 
 37. show packages that are exactly named "bash"
-   ```bash
+   ```
    qp where name==bash
    ```
 
 38. show packages that have no dependencies
-   ```bash
+   ```
    qp where no:depends
    ```
 
