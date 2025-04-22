@@ -1,12 +1,18 @@
 # qp Release Notes
 
+## v5.1.1
+### What's Changed
+* Feature: Limit modifiers by @Zweih in https://github.com/Zweih/qp/pull/229
+* Fix: Limit condition by @Zweih in https://github.com/Zweih/qp/pull/230
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.0.0...v5.1.1
+
 ## v5.0.0
 ### What's Changed
 * Feature: Command based syntax by @Zweih in https://github.com/Zweih/qp/pull/224
-* Documenation: Update README by @Zweih in https://github.com/Zweih/qp/pull/225
 * Fix: Default limit by @Zweih in https://github.com/Zweih/qp/pull/226
-* Documentation: Update README by @Zweih in https://github.com/Zweih/qp/pull/227
 * Refactor: Conditional cruft by @Zweih in https://github.com/Zweih/qp/pull/228
+
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v4.29.0...v5.0.0
 
