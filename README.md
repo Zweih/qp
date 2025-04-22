@@ -116,9 +116,9 @@ learn about installation [here](#installation)
 | ✓ | validation field | - | validation sort |
 | ✓ | reverse optional dependencies field (optional for) | - | optdepends installation indicator |
 | - | optional-for query | - | separate field for optdepends reason |
-| ✓ | fuzzy/strict querying | - | exclusion querying |
+| ✓ | fuzzy/strict querying | ✓ | existence querying |
 | ✓ | existence querying | - | depth querying |
-| ✓ | pkgtype query | - | optdepends query |
+| ✓ | pkgtype query | ✓ | optdepends query |
 | ✓ | packager query | - | origin field |
 | - | origin sort | - | origin query |
 | ✓ | command-based syntax | - | full boolean logic |
@@ -187,7 +187,7 @@ qp [command] [args] [options]
         - supports full ranges (`start:end`), open-ended ranges (`start:` or `:end`), and exact values (`value`)
         - works with `date` and `size`
     - **existence check** -> `has:field` or `no:field`
-  - this command can be used multiple times and mixed freely
+  - query multiple conditions with `and`
   - [see fields available for querying](#available-queries)
 - `order <field>:<direction>` | `o <field>:<direction>`: sort results ascending or descending (default sort is `date:asc`):
   - [see fields avaialble for sorting](#available-sorts)
@@ -209,7 +209,17 @@ qp [command] [args] [options]
 
 ### querying with `where`
 
-The `where` (short: `w`) command is the core of qp's flexible query system. You can use it multiple times per command to combine different queries.
+the `where` (short: `w`) command is the core of qp's flexible query system.
+
+#### combining multiple conditions
+
+use the `and` keyword to join multiple queries together. each condition must be valid on its own.
+
+```
+qp where name=vim and size=10MB:
+qp where reason=explicit and not:required-by
+qp where name==bash and has:depends
+```
 
 #### query types
 
@@ -248,22 +258,24 @@ for example:
 #### query examples
 
 ```
-qp where size=100MB:1GB         # size range (fuzzy)
-qp w date==2024-01-01           # exact install date
-qp where name=firefox           # fuzzy name match
-qp w name==bash                 # strict name match
-qp where reason=explicit        # packages installed explicitly
-qp where has:depends            # must have dependencies
-qp w no:conflicts               # must not conflict with anything
+qp where size=100MB:1GB              # size range (fuzzy)
+qp w date==2024-01-01                # exact install date
+qp where name=firefox                # fuzzy name match
+qp w name==bash                      # strict name match
+qp where reason=explicit             # packages installed explicitly
+qp where has:depends                 # must have dependencies
+qp w no:conflicts                    # must not conflict with anything
+qp w name=zoxide and optdepends=fzf  # fuzzy name match and fuzzy optional dependency match
+qp where name=python,cmake,yazi      # fuzzy match at least one of the three names
 ```
 
 #### query types
 
 | field type | description |
 |------------|-------------|
-| string | matches textual fields. used for fields like name, license, description, etc. |
+| string | matches textual fields. used for fields like name, license, description, etc. <br> can take a comma-separated list |
 | range | matches numerical or time-based fields across a range. <br> supports full ranges (start:end), open-ended ranges (start: / :end), or exact values |
-| relation | matches fields that contain relationships to other packages (e.g., dependencies, conflicts, provides) |
+| relation | matches fields that contain relationships to other packages (e.g., dependencies, conflicts, provides) <br> can take a comma-separated list |
 
 #### available queries
 
@@ -283,6 +295,7 @@ qp w no:conflicts               # must not conflict with anything
 | conflicts | relation |
 | replaces | relation |
 | depends | relation |
+| optdepnds | relation |
 | required-by | relation |
 | provides | relation |
 

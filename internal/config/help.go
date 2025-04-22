@@ -35,20 +35,20 @@ Options:
 	const helpPart2 = `
 Query Types:
   - String match:
-      field=value       → fuzzy match (e.g., name=gtk)
-      field==value      → exact match (e.g., name==bash)
+      field=value       -> fuzzy match (e.g., name=gtk)
+      field==value      -> exact match (e.g., name==bash)
 
   - Range match (date, size):
-      field=start:end   → fuzzy match
-      field==start:end  → exact match
+      field=start:end   -> fuzzy match
+      field==start:end  -> exact match
       Examples:
         size=10MB:1GB
         date==2024-01-01
         date=2024-01-01: (open-ended range)
 
   - Existence check:
-      has:field         → field must exist or be non-empty
-      no:field          → field must not exist or be empty
+      has:field         -> field must exist or be non-empty
+      no:field          -> field must not exist or be empty
 
 Match Behavior:
   - Strings: fuzzy = substring match (case-insensitive)
@@ -84,6 +84,9 @@ Tips:
 Default Behavior:
   - 20 results shown unless --limit specified
   - Progress bar disabled in non-interactive terminals
+
+Use 'man qp' to see all available fields
+    for select, where, and order.
 
 See full docs for:
   - Available fields
