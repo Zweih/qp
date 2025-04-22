@@ -110,7 +110,7 @@ learn about installation [here](#installation)
 | - | url query | - | pkgtype sort |
 | ✓ | architecture query | ✓ | groups field |
 | ✓	| conflicts query | - | package description sort |
-| ✓	| regenerate cache option | - | groups query |
+| ✓	| regenerate cache option | ✓ | validation query |
 | ✓ | packager field | ✓ | optional dependency field |
 | ✓ | sort by size on disk | - | conflicts sort |
 | ✓ | validation field | - | validation sort |
@@ -291,6 +291,7 @@ qp where name=python,cmake,yazi      # fuzzy match at least one of the three nam
 | pkgbase | string |
 | description | string |
 | url | string
+| validation | string |
 | pkgtype | string |
 | packager | string |
 | conflicts | relation |
