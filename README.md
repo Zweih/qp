@@ -115,7 +115,7 @@ learn about installation [here](#installation)
 | ✓ | sort by size on disk | - | conflicts sort |
 | ✓ | validation field | - | validation sort |
 | ✓ | reverse optional dependencies field (optional for) | - | optdepends installation indicator |
-| - | optional-for query | - | separate field for optdepends reason |
+| ✓ | optional-for query | - | separate field for optdepends reason |
 | ✓ | fuzzy/strict querying | ✓ | existence querying |
 | ✓ | existence querying | - | depth querying |
 | ✓ | pkgtype query | ✓ | optdepends query |
@@ -295,8 +295,9 @@ qp where name=python,cmake,yazi      # fuzzy match at least one of the three nam
 | conflicts | relation |
 | replaces | relation |
 | depends | relation |
-| optdepnds | relation |
+| optdepends | relation |
 | required-by | relation |
+| optional-for | relation |
 | provides | relation |
 
 ### available selectors

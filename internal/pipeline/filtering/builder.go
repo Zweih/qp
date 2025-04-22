@@ -31,7 +31,8 @@ func QueriesToConditions(queries []syntax.FieldQuery) ([]*FilterCondition, error
 			condition, err = parseStringCondition(query)
 
 		case consts.FieldDepends, consts.FieldOptDepends,
-			consts.FieldRequiredBy, consts.FieldProvides, consts.FieldConflicts:
+			consts.FieldRequiredBy, consts.FieldOptionalFor,
+			consts.FieldProvides, consts.FieldConflicts:
 			condition, err = parseRelationCondition(query)
 
 		default:
