@@ -187,7 +187,7 @@ qp [command] [args] [options]
         - supports full ranges (`start:end`), open-ended ranges (`start:` or `:end`), and exact values (`value`)
         - works with `date` and `size`
     - **existence check** -> `has:field` or `no:field`
-  - this command can be used multiple times and mixed freely
+  - query multiple conditions with `and`
   - [see fields available for querying](#available-queries)
 - `order <field>:<direction>` | `o <field>:<direction>`: sort results ascending or descending (default sort is `date:asc`):
   - [see fields avaialble for sorting](#available-sorts)
@@ -209,7 +209,17 @@ qp [command] [args] [options]
 
 ### querying with `where`
 
-The `where` (short: `w`) command is the core of qp's flexible query system. You can use it multiple times per command to combine different queries.
+the `where` (short: `w`) command is the core of qp's flexible query system.
+
+#### combining multiple conditions
+
+use the `and` keyword to join multiple queries together. each condition must be valid on its own.
+
+```
+qp where name=vim and size=10MB:
+qp where reason=explicit and not:required-by
+qp where name==bash and has:depends
+```
 
 #### query types
 
@@ -283,6 +293,7 @@ qp w no:conflicts               # must not conflict with anything
 | conflicts | relation |
 | replaces | relation |
 | depends | relation |
+| optdepnds | relation |
 | required-by | relation |
 | provides | relation |
 
