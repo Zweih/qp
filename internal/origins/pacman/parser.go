@@ -133,7 +133,9 @@ func applySingleLineField(pkg *pkgdata.PkgInfo, field string, value string) erro
 		pkg.Url = value
 
 	case fieldValidation:
-		pkg.Validation = value
+		if value != "none" {
+			pkg.Validation = value
+		}
 
 	case fieldDescription:
 		pkg.Description = value
