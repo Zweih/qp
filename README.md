@@ -116,9 +116,9 @@ learn about installation [here](#installation)
 | ✓ | validation field | - | validation sort |
 | ✓ | reverse optional dependencies field (optional for) | - | optdepends installation indicator |
 | - | optional-for query | - | separate field for optdepends reason |
-| ✓ | fuzzy/strict querying | - | exclusion querying |
+| ✓ | fuzzy/strict querying | ✓ | existence querying |
 | ✓ | existence querying | - | depth querying |
-| ✓ | pkgtype query | - | optdepends query |
+| ✓ | pkgtype query | ✓ | optdepends query |
 | ✓ | packager query | - | origin field |
 | - | origin sort | - | origin query |
 | ✓ | command-based syntax | - | full boolean logic |
