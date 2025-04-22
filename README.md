@@ -258,22 +258,24 @@ for example:
 #### query examples
 
 ```
-qp where size=100MB:1GB         # size range (fuzzy)
-qp w date==2024-01-01           # exact install date
-qp where name=firefox           # fuzzy name match
-qp w name==bash                 # strict name match
-qp where reason=explicit        # packages installed explicitly
-qp where has:depends            # must have dependencies
-qp w no:conflicts               # must not conflict with anything
+qp where size=100MB:1GB              # size range (fuzzy)
+qp w date==2024-01-01                # exact install date
+qp where name=firefox                # fuzzy name match
+qp w name==bash                      # strict name match
+qp where reason=explicit             # packages installed explicitly
+qp where has:depends                 # must have dependencies
+qp w no:conflicts                    # must not conflict with anything
+qp w name=zoxide and optdepends=fzf  # fuzzy name match and fuzzy optional dependency match
+qp where name=python,cmake,yazi      # fuzzy match at least one of the three names
 ```
 
 #### query types
 
 | field type | description |
 |------------|-------------|
-| string | matches textual fields. used for fields like name, license, description, etc. |
+| string | matches textual fields. used for fields like name, license, description, etc. <br> can take a comma-separated list |
 | range | matches numerical or time-based fields across a range. <br> supports full ranges (start:end), open-ended ranges (start: / :end), or exact values |
-| relation | matches fields that contain relationships to other packages (e.g., dependencies, conflicts, provides) |
+| relation | matches fields that contain relationships to other packages (e.g., dependencies, conflicts, provides) <br> can take a comma-separated list |
 
 #### available queries
 
