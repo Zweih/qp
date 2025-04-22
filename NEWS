@@ -1,8 +1,12 @@
 # qp Release Notes
 
+## v5.2.1
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.2.0...v5.2.1
+
 ## v5.2.0
 ### What's Changed
-* Fix: optdepends query by @Zweih in https://github.com/Zweih/qp/pull/235
+* Feature: Add optdepends query by @Zweih in https://github.com/Zweih/qp/pull/235
+
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v5.1.1...v5.2.0
 
