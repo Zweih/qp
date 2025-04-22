@@ -290,6 +290,7 @@ qp where name=python,cmake,yazi      # fuzzy match at least one of the three nam
 | license | string |
 | pkgbase | string |
 | description | string |
+| url | string
 | pkgtype | string |
 | packager | string |
 | conflicts | relation |
