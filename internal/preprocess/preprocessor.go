@@ -1,7 +1,8 @@
-package syntax
+package preprocess
 
 import (
 	"fmt"
+	"qp/internal/consts"
 	"strings"
 )
 
@@ -9,20 +10,20 @@ func Preprocess(args []string) ([]string, error) {
 	args = ExpandShortSyntax(args)
 
 	var processed []string
-	currentBlock := BlockNone
+	currentBlock := consts.BlockNone
 
 	for _, token := range args {
-		if block := lookupCommand(token); block != BlockNone {
+		if block := consts.CmdTypeLookup[token]; block != consts.BlockNone {
 			currentBlock = block
 			processed = append(processed, token)
 			continue
 		}
 
-		if currentBlock == BlockNone {
+		if currentBlock == consts.BlockNone {
 			return nil, fmt.Errorf("unexpected token: %q (expected in a command block like 'select', 'where', or 'order')", token)
 		}
 
-		if currentBlock == BlockWhere {
+		if currentBlock == consts.BlockWhere {
 			normalized := normalizeNegationShorthand(token)
 			if len(normalized) == 2 {
 				processed = append(processed, normalized...)
@@ -32,7 +33,7 @@ func Preprocess(args []string) ([]string, error) {
 
 		expanded, _ := macroExpansion(token, currentBlock)
 		if len(expanded) == 0 {
-			return nil, fmt.Errorf("macro expansion for %q in block %q produced no output", token, cmdTypeName(currentBlock))
+			return nil, fmt.Errorf("macro expansion for %q in block %q produced no output", token, consts.CmdNameLookup[currentBlock])
 		}
 
 		processed = append(processed, expanded...)
@@ -54,19 +55,4 @@ func normalizeNegationShorthand(input string) []string {
 	}
 
 	return []string{input}
-}
-
-func cmdTypeName(cmd CmdType) string {
-	switch cmd {
-	case BlockSelect:
-		return CmdSelect
-	case BlockWhere:
-		return CmdWhere
-	case BlockOrder:
-		return CmdOrder
-	case BlockLimit:
-		return CmdLimit
-	}
-
-	return "[INVALID BLOCK COMMAND]"
 }

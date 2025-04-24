@@ -4,25 +4,9 @@ import (
 	"fmt"
 	"qp/internal/ast"
 	"qp/internal/consts"
+	"qp/internal/preprocess"
 	"qp/internal/query"
 	"strings"
-)
-
-type CmdType int
-
-const (
-	BlockNone CmdType = iota
-	BlockSelect
-	BlockWhere
-	BlockOrder
-	BlockLimit
-)
-
-const (
-	CmdSelect = "select"
-	CmdWhere  = "where"
-	CmdOrder  = "order"
-	CmdLimit  = "limit"
 )
 
 type ParsedInput struct {
@@ -35,7 +19,7 @@ type ParsedInput struct {
 }
 
 func ParseSyntax(args []string) (ParsedInput, error) {
-	preprocessedArgs, err := Preprocess(args)
+	preprocessedArgs, err := preprocess.Preprocess(args)
 	if err != nil {
 		return ParsedInput{}, err
 	}
@@ -47,16 +31,16 @@ func ParseSyntax(args []string) (ParsedInput, error) {
 	limitMode := LimitStart
 	limit := 20
 
-	currentBlock := BlockNone
-	blockSeen := map[CmdType]bool{}
+	currentBlock := consts.BlockNone
+	blockSeen := map[consts.CmdType]bool{}
 
 	for _, token := range preprocessedArgs {
-		cmd := lookupCommand(token)
-		if cmd != BlockNone {
+		cmd := consts.CmdTypeLookup[token]
+		if cmd != consts.BlockNone {
 			currentBlock = cmd
 
 			if blockSeen[cmd] {
-				return ParsedInput{}, fmt.Errorf("duplicate block: '%s'", cmdTypeName(cmd))
+				return ParsedInput{}, fmt.Errorf("duplicate block: '%s'", consts.CmdNameLookup[cmd])
 			}
 			blockSeen[cmd] = true
 
@@ -64,7 +48,7 @@ func ParseSyntax(args []string) (ParsedInput, error) {
 		}
 
 		switch currentBlock {
-		case BlockSelect:
+		case consts.BlockSelect:
 			fieldTokens := strings.Split(token, ",")
 			for _, fieldStr := range fieldTokens {
 				fieldStr = strings.TrimSpace(fieldStr)
@@ -77,16 +61,16 @@ func ParseSyntax(args []string) (ParsedInput, error) {
 				fields = append(fields, fieldType)
 			}
 
-		case BlockWhere:
+		case consts.BlockWhere:
 			whereTokens = append(whereTokens, token)
 
-		case BlockOrder:
+		case consts.BlockOrder:
 			sortOption, err = ParseSortOption(token)
 			if err != nil {
 				return ParsedInput{}, err
 			}
 
-		case BlockLimit:
+		case consts.BlockLimit:
 			limit, limitMode, err = parseLimit(token)
 			if err != nil {
 				return ParsedInput{}, err
@@ -125,19 +109,4 @@ func ParseSyntax(args []string) (ParsedInput, error) {
 		Limit:        limit,
 		LimitMode:    limitMode,
 	}, nil
-}
-
-func lookupCommand(input string) CmdType {
-	switch strings.ToLower(input) {
-	case CmdSelect:
-		return BlockSelect
-	case CmdWhere:
-		return BlockWhere
-	case CmdOrder:
-		return BlockOrder
-	case CmdLimit:
-		return BlockLimit
-	default:
-		return BlockNone
-	}
 }

@@ -1,4 +1,4 @@
-package syntax
+package preprocess
 
 import (
 	"qp/internal/consts"
@@ -7,14 +7,7 @@ import (
 
 type MacroExpander func(token string) ([]string, bool)
 
-var macroRegistry = map[CmdType][]MacroExpander{
-	BlockSelect: {expandSelectMacro},
-	BlockWhere:  {expandWhereMacro},
-	BlockOrder:  {},
-	BlockLimit:  {expandLimitMacro},
-}
-
-func macroExpansion(token string, cmd CmdType) ([]string, bool) {
+func macroExpansion(token string, cmd consts.CmdType) ([]string, bool) {
 	expanders := macroRegistry[cmd]
 	for _, expander := range expanders {
 		if replacement, exists := expander(strings.ToLower(token)); exists {
