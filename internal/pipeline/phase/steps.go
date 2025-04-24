@@ -3,6 +3,7 @@ package phase
 import (
 	"fmt"
 	"path/filepath"
+	"qp/internal/compiler"
 	"qp/internal/config"
 	out "qp/internal/display"
 	"qp/internal/pipeline/filtering"
@@ -30,11 +31,11 @@ func (p *Pipeline) loadCacheStep(
 
 func (p *Pipeline) fetchStep(
 	_ *config.Config,
-	pkgPtrs []*pkgdata.PkgInfo,
+	pkgs []*pkgdata.PkgInfo,
 	_ meta.ProgressReporter,
 ) ([]*pkgdata.PkgInfo, error) {
 	if p.UsedCache {
-		return pkgPtrs, nil
+		return pkgs, nil
 	}
 
 	pkgs, err := p.Origin.Load()
@@ -51,14 +52,14 @@ func (p *Pipeline) fetchStep(
 
 func (p *Pipeline) resolveStep(
 	_ *config.Config,
-	pkgPtrs []*pkgdata.PkgInfo,
+	pkgs []*pkgdata.PkgInfo,
 	reportProgress meta.ProgressReporter,
 ) ([]*pkgdata.PkgInfo, error) {
 	if p.UsedCache {
-		return pkgPtrs, nil
+		return pkgs, nil
 	}
 
-	pkgs, err := p.Origin.ResolveDeps(pkgPtrs)
+	pkgs, err := p.Origin.ResolveDeps(pkgs)
 	if err != nil {
 		return nil, fmt.Errorf("dependency resolution failed for origin %s: %w", p.Origin.Name(), err)
 	}
@@ -68,29 +69,33 @@ func (p *Pipeline) resolveStep(
 
 func (p *Pipeline) saveCacheStep(
 	cfg *config.Config,
-	pkgPtrs []*pkgdata.PkgInfo,
+	pkgs []*pkgdata.PkgInfo,
 	_ meta.ProgressReporter,
 ) ([]*pkgdata.PkgInfo, error) {
 	if cfg.NoCache || p.UsedCache {
-		return pkgPtrs, nil
+		return pkgs, nil
 	}
 
 	cachePath := filepath.Join(p.CachePath)
-	err := p.Origin.SaveCache(cachePath, pkgPtrs, p.ModTime)
+	err := p.Origin.SaveCache(cachePath, pkgs, p.ModTime)
 	if err != nil {
 		out.WriteLine(fmt.Sprintf("Warning: failed to save cache for origin %s: %v", p.Origin.Name(), err))
 	}
 
-	return pkgPtrs, nil
+	return pkgs, nil
 }
 
 func (p *Pipeline) filterStep(
 	cfg *config.Config,
-	pkgPtrs []*pkgdata.PkgInfo,
+	pkgs []*pkgdata.PkgInfo,
 	reportProgress meta.ProgressReporter,
 ) ([]*pkgdata.PkgInfo, error) {
+	if cfg.QueryExpr != nil {
+		return compiler.RunDAG(cfg.QueryExpr, pkgs)
+	}
+
 	if len(cfg.FieldQueries) == 0 {
-		return pkgPtrs, nil
+		return pkgs, nil
 	}
 
 	filterConditions, err := filtering.QueriesToConditions(cfg.FieldQueries)
@@ -98,5 +103,5 @@ func (p *Pipeline) filterStep(
 		return nil, fmt.Errorf("filter query error: %w", err)
 	}
 
-	return pkgdata.FilterPackages(pkgPtrs, filterConditions, reportProgress), nil
+	return pkgdata.FilterPackages(pkgs, filterConditions, reportProgress), nil
 }

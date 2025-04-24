@@ -8,7 +8,7 @@ import (
 	"qp/internal/pkgdata"
 )
 
-type PkgInfoJson struct {
+type PkgInfoJSON struct {
 	InstallTimestamp int64    `json:"installTimestamp,omitempty"`
 	BuildTimestamp   int64    `json:"buildTimestamp,omitempty"`
 	Size             int64    `json:"size,omitempty"`
@@ -33,7 +33,7 @@ type PkgInfoJson struct {
 	Provides         []string `json:"provides,omitempty"`
 }
 
-func (o *OutputManager) renderJson(pkgPtrs []*pkgdata.PkgInfo, fields []consts.FieldType) {
+func (o *OutputManager) renderJSON(pkgPtrs []*pkgdata.PkgInfo, fields []consts.FieldType) {
 	uniqueFields := getUniqueFields(fields)
 	filteredPkgPtrs := selectJsonFields(pkgPtrs, uniqueFields)
 
@@ -66,8 +66,8 @@ func getUniqueFields(fields []consts.FieldType) []consts.FieldType {
 func selectJsonFields(
 	pkgPtrs []*pkgdata.PkgInfo,
 	fields []consts.FieldType,
-) []*PkgInfoJson {
-	filteredPkgPtrs := make([]*PkgInfoJson, len(pkgPtrs))
+) []*PkgInfoJSON {
+	filteredPkgPtrs := make([]*PkgInfoJSON, len(pkgPtrs))
 	for i, pkg := range pkgPtrs {
 		filteredPkgPtrs[i] = getJsonValues(pkg, fields)
 	}
@@ -75,8 +75,8 @@ func selectJsonFields(
 	return filteredPkgPtrs
 }
 
-func getJsonValues(pkg *pkgdata.PkgInfo, fields []consts.FieldType) *PkgInfoJson {
-	filteredPackage := PkgInfoJson{}
+func getJsonValues(pkg *pkgdata.PkgInfo, fields []consts.FieldType) *PkgInfoJSON {
+	filteredPackage := PkgInfoJSON{}
 
 	for _, field := range fields {
 		switch field {

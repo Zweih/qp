@@ -107,6 +107,24 @@ Date:match by day:exact timestamp
 Size:±0.3% tolerance:exact byte size
 .TE
 
+.TP
+.B Logical Operators
+Use to combine or negate queries:
+.RS
+.IP \[bu] 
+\fBand\fR - require all conditions to match
+.IP \[bu] 
+\fBor\fR - match if any condition matches
+.IP \[bu] 
+\fBnot\fR - invert a single condition
+.IP \[bu] 
+\fBq\fR ... \fBp\fR - group conditions (equivalent to parentheses)
+.RE
+
+.TP
+Group and combine logic:
+.B qp where q name=vim or name=nvim p and not has:conflicts
+
 .SH SUPPORTED QUERY FIELDS
 .TP
 .B Range:
@@ -142,6 +160,10 @@ Get all fields for \fBgtk3\fR in JSON:
 .br
 \fBqp s all w name==gtk3 --json\fR
 
+Group and filter multiple conditions:
+.br
+\fBqp w q name=zoxide or name=yazi p and optdepends=fzf\fR
+
 .SH TIPS
 - Pipe long outputs:
   \fBqp s name,depends | less\fR
@@ -156,6 +178,8 @@ Get all fields for \fBgtk3\fR in JSON:
 Cache is stored in:
 .br
 \fB$XDG_CACHE_HOME/query-packages\fR or \fB~/.cache/query-packages\fR
+.br
+If \fBXDG_CACHE_HOME\fR is not set, fallback is \fB~/.cache/query-packages\fR
 
 .SH AUTHOR
 Written by Fernando Nunez <me@fernandonunez.io>

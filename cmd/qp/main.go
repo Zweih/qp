@@ -130,8 +130,8 @@ func trimPackagesLen(
 }
 
 func renderOutput(pkgs []*pkgdata.PkgInfo, cfg *config.Config) {
-	if cfg.OutputJson {
-		out.RenderJson(pkgs, cfg.Fields)
+	if cfg.OutputJSON {
+		out.RenderJSON(pkgs, cfg.Fields)
 		return
 	}
 

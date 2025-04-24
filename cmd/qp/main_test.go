@@ -23,7 +23,7 @@ func TestMainWithConfig(t *testing.T) {
 	mockCfg := config.Config{
 		Limit:      5,
 		SortOption: syntax.SortOption{Field: consts.FieldSize, Asc: false},
-		OutputJson: true,
+		OutputJSON: true,
 		Fields:     []consts.FieldType{consts.FieldName, consts.FieldSize},
 	}
 
@@ -44,7 +44,7 @@ func TestMainWithConfig(t *testing.T) {
 	}
 
 	expectedSubstring := "{"
-	if mockCfg.OutputJson && !strings.Contains(output, expectedSubstring) {
+	if mockCfg.OutputJSON && !strings.Contains(output, expectedSubstring) {
 		t.Errorf("Expected JSON output but did not find JSON structure")
 	}
 }

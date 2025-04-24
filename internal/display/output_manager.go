@@ -59,8 +59,8 @@ func RenderTable(
 	manager.renderTable(pkgPtrs, fields, showFullTimestamp, hasNoHeaders)
 }
 
-func RenderJson(pkgPtrs []*pkgdata.PkgInfo, fields []consts.FieldType) {
-	manager.renderJson(pkgPtrs, fields)
+func RenderJSON(pkgPtrs []*pkgdata.PkgInfo, fields []consts.FieldType) {
+	manager.renderJSON(pkgPtrs, fields)
 }
 
 func (o *OutputManager) write(msg string) {

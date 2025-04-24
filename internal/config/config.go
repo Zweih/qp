@@ -1,7 +1,9 @@
 package config
 
 import (
+	"qp/internal/ast"
 	"qp/internal/consts"
+	"qp/internal/query"
 	"qp/internal/syntax"
 )
 
@@ -14,7 +16,7 @@ type Config struct {
 	Limit             int
 	ShowHelp          bool
 	ShowVersion       bool
-	OutputJson        bool
+	OutputJSON        bool
 	HasNoHeaders      bool
 	ShowFullTimestamp bool
 	DisableProgress   bool
@@ -23,7 +25,8 @@ type Config struct {
 	LimitMode         syntax.LimitMode
 	SortOption        syntax.SortOption
 	Fields            []consts.FieldType
-	FieldQueries      []syntax.FieldQuery
+	FieldQueries      []query.FieldQuery
+	QueryExpr         ast.Expr
 }
 
 type ConfigProvider interface {

@@ -4,7 +4,7 @@
 
 you can find installation instructions [here](#installation).
 
-`qp` supports querying for package metadata, dependency relations, and more.
+`qp` supports querying with full boolean logic for package metadata, dependency relations, and more.
 
 check [features](#features) to find out more.
 
@@ -121,8 +121,9 @@ learn about installation [here](#installation)
 | ✓ | pkgtype query | ✓ | optdepends query |
 | ✓ | packager query | - | origin field |
 | - | origin sort | - | origin query |
-| ✓ | command-based syntax | - | full boolean logic |
-| - | user-defined macros | - | parentetical (grouping) where logic |
+| ✓ | command-based syntax | ✓ | full boolean logic |
+| ✓ | abstract syntax tree | ✓ | directed acyclical graph for filtering |
+| - | user-defined macros | ✓ | parentetical (grouping) logic |
 | ✓ | limit from end | ✓ | limit from middle |
 
 ## installation
@@ -187,15 +188,15 @@ qp [command] [args] [options]
         - supports full ranges (`start:end`), open-ended ranges (`start:` or `:end`), and exact values (`value`)
         - works with `date` and `size`
     - **existence check** -> `has:field` or `no:field`
-  - query multiple conditions with `and`
-  - [see fields available for querying](#available-queries)
+  - use `and`, `or`, `not`, `q ... p` to build complex filters
+  - learn more about querying [here](#querying-with-where)
 - `order <field>:<direction>` | `o <field>:<direction>`: sort results ascending or descending (default sort is `date:asc`):
   - [see fields avaialble for sorting](#available-sorts)
   - `pkgbase` -> sort alphabetically by base package
 - `limit <number>` | `l <number>`: limit the amount of packages to display (default: 20)
   - `limit all | l all`: display all packages
-  - `limit end:<number>`: display last n packages
-  - `limit mid:<number>`: display middle n packages
+  - `limit end:<number>`: display last `n` packages
+  - `limit mid:<number>`: display middle `n` packages
 
 ### options
 
@@ -211,14 +212,23 @@ qp [command] [args] [options]
 
 the `where` (short: `w`) command is the core of qp's flexible query system.
 
-#### combining multiple conditions
+#### logical operations
 
-use the `and` keyword to join multiple queries together. each condition must be valid on its own.
+- `and`: combine multiple conditions where all must match
+- `or`: match any of multiple conditions
+- `not`: invert any condition
+- `q ... p`: group conditions for operation precedence, use them as you would parentheses with `q` being `(` and `p` being `)`
+    - the purpose of this is that `(` and `)` are not safe to use unquoted on the command line
+    - remember with:
+        - `q` is for **q**uery group start: `(`
+        - `p` is for query group sto**p**: `)`
 
-```
-qp where name=vim and size=10MB:
-qp where reason=explicit and not:required-by
-qp where name==bash and has:depends
+examples:
+```bash
+qp w name=vim and size=10MB:
+qp w reason=explicit and not required-by
+qp w q name=zoxide or name=yazi p and optdepends=fzf
+qp w q name=firefox or name=librewolf p and not has:conflicts
 ```
 
 #### query types
@@ -256,17 +266,14 @@ for example:
   - `name==gtk` only matches a package named exactly `gtk`
 
 #### query examples
-
 ```
-qp where size=100MB:1GB              # size range (fuzzy)
-qp w date==2024-01-01                # exact install date
-qp where name=firefox                # fuzzy name match
-qp w name==bash                      # strict name match
-qp where reason=explicit             # packages installed explicitly
-qp where has:depends                 # must have dependencies
-qp w no:conflicts                    # must not conflict with anything
-qp w name=zoxide and optdepends=fzf  # fuzzy name match and fuzzy optional dependency match
-qp where name=python,cmake,yazi      # fuzzy match at least one of the three names
+qp w name==bash and has:depends
+qp where size=100MB:2GB
+qp w name=python,cmake,yazi
+qp w date==2024-01-01
+qp where q name=vim or name=nvim p and not has:conflicts
+qp w not arch=x86_64
+qp w q has:depends or has:required-by p and not reason=explicit
 ```
 
 #### query types
@@ -440,7 +447,12 @@ output format:
   qp s name,size w name=vim o date:asc l 10 # full query with shorthand
   ```
 
-- the `depends`, `provides`, and `required-by` table columns can be lengthy. packages like `glibc` are required by thousands of packages. to improve readability, pipe the output to tools like `moar` or `less` (i prefer `moar`, but `less` is usually pre-installed):
+- group queries with `q ... p` to clarify order of operations:
+  ```
+  qp w q name=git or name=gh p and has:depends 
+  ```
+
+- the relations table columns can be lengthy. packages like `glibc` are required by thousands of packages. to improve readability, pipe the output to tools like `moar` or `less` (i prefer `moar`, but `less` is usually pre-installed):
   ```
   qp select name,depends | less
   qp s name,depends | moar
@@ -462,12 +474,13 @@ output format:
   qp where description="for tree-sitter"
   ```
 
-  **note**: `--no-progress` is automatically set to `true` in non-interactive environments, so you can pipe into programs like `cat`, `grep`, or `less` without issue.
-
 - the `--no-headers` flag is useful when processing output in scripts. It removes the header row, making it easier to parse package lists with tools like `awk`, `sed`, or `cut`:
   ```
   qp --no-headers select name,size | awk '{print $1, $2}'
   ```
+
+  **note**: `--no-progress` is automatically set to `true` in non-interactive environments, so you can pipe into programs like `cat`, `grep`, or `less` without issue.
+
 
 ### examples
 

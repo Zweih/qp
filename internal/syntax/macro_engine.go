@@ -48,12 +48,18 @@ func fieldTypesToNames(fields []consts.FieldType) []string {
 }
 
 func expandWhereMacro(token string) ([]string, bool) {
+	var expanded []string
+
 	switch token {
 	case "orphan":
-		return []string{"not:required-by", "and", "reason=dependency"}, true
+		expanded = []string{"no:required-by", "and", "reason=dependency"}
+	case "superorphan":
+		expanded = []string{"no:required-by", "and", "reason=dependency", "and", "no:optional-for"}
 	default:
 		return nil, false
 	}
+
+	return append([]string{"q"}, append(expanded, "p")...), true
 }
 
 func expandLimitMacro(token string) ([]string, bool) {
