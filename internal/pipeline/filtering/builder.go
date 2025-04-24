@@ -22,7 +22,7 @@ func QueriesToConditions(queries []query.FieldQuery) ([]*FilterCondition, error)
 		var err error
 
 		switch query.Field {
-		case consts.FieldDate, consts.FieldSize, consts.FieldBuildDate:
+		case consts.FieldDate, consts.FieldBuildDate, consts.FieldSize:
 			condition, err = parseRangeCondition(query)
 
 		case consts.FieldName, consts.FieldReason, consts.FieldArch,
@@ -30,9 +30,10 @@ func QueriesToConditions(queries []query.FieldQuery) ([]*FilterCondition, error)
 			consts.FieldUrl, consts.FieldValidation, consts.FieldPkgType, consts.FieldPackager:
 			condition, err = parseStringCondition(query)
 
-		case consts.FieldDepends, consts.FieldOptDepends,
+		case consts.FieldConflicts,
+			consts.FieldDepends, consts.FieldOptDepends,
 			consts.FieldRequiredBy, consts.FieldOptionalFor,
-			consts.FieldProvides, consts.FieldConflicts:
+			consts.FieldProvides:
 			condition, err = parseRelationCondition(query)
 
 		case consts.FieldGroups:
