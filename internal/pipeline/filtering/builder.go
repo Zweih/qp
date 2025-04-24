@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"qp/internal/consts"
 	"qp/internal/pkgdata"
-	"qp/internal/syntax"
+	"qp/internal/query"
 	"sort"
 	"strings"
 )
@@ -14,7 +14,7 @@ type (
 	FilterCondition = pkgdata.FilterCondition
 )
 
-func QueriesToConditions(queries []syntax.FieldQuery) ([]*FilterCondition, error) {
+func QueriesToConditions(queries []query.FieldQuery) ([]*FilterCondition, error) {
 	conditions := make([]*FilterCondition, 0, len(queries))
 
 	for _, query := range queries {
@@ -58,7 +58,7 @@ func QueriesToConditions(queries []syntax.FieldQuery) ([]*FilterCondition, error
 	return conditions, nil
 }
 
-func parseRelationCondition(query syntax.FieldQuery) (*FilterCondition, error) {
+func parseRelationCondition(query query.FieldQuery) (*FilterCondition, error) {
 	if query.IsExistence {
 		return newRelationExistsCondition(query.Field, query.Depth, query.Negate)
 	}
@@ -71,7 +71,7 @@ func parseRelationCondition(query syntax.FieldQuery) (*FilterCondition, error) {
 	return newRelationCondition(query.Field, targets, query.Depth, query.Match, query.Negate)
 }
 
-func parseStringCondition(query syntax.FieldQuery) (*FilterCondition, error) {
+func parseStringCondition(query query.FieldQuery) (*FilterCondition, error) {
 	if query.IsExistence {
 		return newStringExistsCondition(query.Field, query.Negate)
 	}
@@ -84,7 +84,7 @@ func parseStringCondition(query syntax.FieldQuery) (*FilterCondition, error) {
 	return newStringCondition(query.Field, targets, query.Match, query.Negate)
 }
 
-func parseRangeCondition(query syntax.FieldQuery) (*FilterCondition, error) {
+func parseRangeCondition(query query.FieldQuery) (*FilterCondition, error) {
 	if query.IsExistence {
 		return nil, nil
 	}

@@ -3,12 +3,12 @@ package phase
 import (
 	"fmt"
 	"path/filepath"
+	"qp/internal/compiler"
 	"qp/internal/config"
 	out "qp/internal/display"
 	"qp/internal/pipeline/filtering"
 	"qp/internal/pipeline/meta"
 	"qp/internal/pkgdata"
-	"qp/internal/querygraph"
 )
 
 func (p *Pipeline) loadCacheStep(
@@ -91,7 +91,7 @@ func (p *Pipeline) filterStep(
 	reportProgress meta.ProgressReporter,
 ) ([]*pkgdata.PkgInfo, error) {
 	if cfg.QueryExpr != nil {
-		return querygraph.RunDAG(cfg.QueryExpr, pkgs)
+		return compiler.RunDAG(cfg.QueryExpr, pkgs)
 	}
 
 	if len(cfg.FieldQueries) == 0 {

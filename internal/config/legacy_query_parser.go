@@ -2,6 +2,7 @@ package config
 
 import (
 	"qp/internal/consts"
+	"qp/internal/query"
 	"qp/internal/syntax"
 )
 
@@ -24,7 +25,7 @@ func ParseLegacyConfig(
 		return syntax.ParsedInput{}, err
 	}
 
-	queries, err := syntax.ParseQueries(filterInputs)
+	queries, err := query.ParseQueries(filterInputs)
 	if err != nil {
 		return syntax.ParsedInput{}, err
 	}
@@ -52,16 +53,16 @@ func ParseLegacyConfig(
 }
 
 func convertLegacyQueries(
-	queries []syntax.FieldQuery,
+	queries []query.FieldQuery,
 	dateFilter string,
 	nameFilter string,
 	sizeFilter string,
 	requiredByFilter string,
 	explicitOnly bool,
 	dependenciesOnly bool,
-) []syntax.FieldQuery {
+) []query.FieldQuery {
 	if dateFilter != "" {
-		queries = append(queries, syntax.FieldQuery{
+		queries = append(queries, query.FieldQuery{
 			Field:  consts.FieldDate,
 			Target: dateFilter,
 			Match:  consts.MatchFuzzy,
@@ -69,7 +70,7 @@ func convertLegacyQueries(
 	}
 
 	if nameFilter != "" {
-		queries = append(queries, syntax.FieldQuery{
+		queries = append(queries, query.FieldQuery{
 			Field:  consts.FieldName,
 			Target: nameFilter,
 			Match:  consts.MatchFuzzy,
@@ -77,7 +78,7 @@ func convertLegacyQueries(
 	}
 
 	if sizeFilter != "" {
-		queries = append(queries, syntax.FieldQuery{
+		queries = append(queries, query.FieldQuery{
 			Field:  consts.FieldSize,
 			Target: sizeFilter,
 			Match:  consts.MatchFuzzy,
@@ -85,7 +86,7 @@ func convertLegacyQueries(
 	}
 
 	if requiredByFilter != "" {
-		queries = append(queries, syntax.FieldQuery{
+		queries = append(queries, query.FieldQuery{
 			Field:  consts.FieldRequiredBy,
 			Target: requiredByFilter,
 			Match:  consts.MatchFuzzy,
@@ -94,7 +95,7 @@ func convertLegacyQueries(
 	}
 
 	if explicitOnly {
-		queries = append(queries, syntax.FieldQuery{
+		queries = append(queries, query.FieldQuery{
 			Field:  consts.FieldReason,
 			Target: ReasonExplicit,
 			Match:  consts.MatchFuzzy,
@@ -102,7 +103,7 @@ func convertLegacyQueries(
 	}
 
 	if dependenciesOnly {
-		queries = append(queries, syntax.FieldQuery{
+		queries = append(queries, query.FieldQuery{
 			Field:  consts.FieldReason,
 			Target: ReasonDependency,
 			Match:  consts.MatchFuzzy,

@@ -1,13 +1,14 @@
-package querygraph
+package compiler
 
 import (
 	"fmt"
+	"qp/internal/ast"
 	"qp/internal/pipeline/filtering"
 	"qp/internal/pkgdata"
-	"qp/internal/syntax"
+	"qp/internal/query"
 )
 
-func RunDAG(expr syntax.Expr, pkgs []*pkgdata.PkgInfo) ([]*pkgdata.PkgInfo, error) {
+func RunDAG(expr ast.Expr, pkgs []*pkgdata.PkgInfo) ([]*pkgdata.PkgInfo, error) {
 	root, err := BuildFilterDAG(expr)
 	if err != nil {
 		return nil, err
@@ -31,22 +32,22 @@ func RunDAG(expr syntax.Expr, pkgs []*pkgdata.PkgInfo) ([]*pkgdata.PkgInfo, erro
 	return filtered, nil
 }
 
-func BuildFilterDAG(expr syntax.Expr) (FilterNode, error) {
+func BuildFilterDAG(expr ast.Expr) (FilterNode, error) {
 	switch expr := expr.(type) {
-	case *syntax.AndExpr:
+	case *ast.AndExpr:
 		return buildAndNode(expr)
-	case *syntax.OrExpr:
+	case *ast.OrExpr:
 		return buildOrNode(expr)
-	case *syntax.NotExpr:
+	case *ast.NotExpr:
 		return buildNotNode(expr)
-	case *syntax.QueryExpr:
+	case *ast.QueryExpr:
 		return buildQueryNode(expr)
 	default:
 		return nil, fmt.Errorf("unsupported expression type")
 	}
 }
 
-func buildAndNode(expr *syntax.AndExpr) (FilterNode, error) {
+func buildAndNode(expr *ast.AndExpr) (FilterNode, error) {
 	left, err := BuildFilterDAG(expr.Left)
 	if err != nil {
 		return nil, err
@@ -60,7 +61,7 @@ func buildAndNode(expr *syntax.AndExpr) (FilterNode, error) {
 	return &AndNode{Left: left, Right: right}, nil
 }
 
-func buildOrNode(expr *syntax.OrExpr) (FilterNode, error) {
+func buildOrNode(expr *ast.OrExpr) (FilterNode, error) {
 	left, err := BuildFilterDAG(expr.Left)
 	if err != nil {
 		return nil, err
@@ -74,7 +75,7 @@ func buildOrNode(expr *syntax.OrExpr) (FilterNode, error) {
 	return &OrNode{left, right}, nil
 }
 
-func buildNotNode(expr *syntax.NotExpr) (FilterNode, error) {
+func buildNotNode(expr *ast.NotExpr) (FilterNode, error) {
 	inner, err := BuildFilterDAG(expr.Inner)
 	if err != nil {
 		return nil, err
@@ -83,8 +84,8 @@ func buildNotNode(expr *syntax.NotExpr) (FilterNode, error) {
 	return &NotNode{inner}, nil
 }
 
-func buildQueryNode(expr *syntax.QueryExpr) (FilterNode, error) {
-	conditions, err := filtering.QueriesToConditions([]syntax.FieldQuery{expr.Query})
+func buildQueryNode(expr *ast.QueryExpr) (FilterNode, error) {
+	conditions, err := filtering.QueriesToConditions([]query.FieldQuery{expr.Query})
 	if err != nil {
 		return nil, err
 	}

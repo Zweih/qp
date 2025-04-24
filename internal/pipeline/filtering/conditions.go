@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"qp/internal/consts"
 	"qp/internal/pkgdata"
-	"qp/internal/syntax"
+	"qp/internal/query"
 	"strings"
 )
 
@@ -94,7 +94,7 @@ func newRelationExistsCondition(
 }
 
 func newRangeCondition(
-	query syntax.FieldQuery,
+	query query.FieldQuery,
 	selector RangeSelector,
 ) (*FilterCondition, error) {
 	matchersByField, ok := RangeMatchers[query.Field]

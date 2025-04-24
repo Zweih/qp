@@ -2,7 +2,9 @@ package syntax
 
 import (
 	"fmt"
+	"qp/internal/ast"
 	"qp/internal/consts"
+	"qp/internal/query"
 	"strings"
 )
 
@@ -25,8 +27,8 @@ const (
 
 type ParsedInput struct {
 	Fields       []consts.FieldType
-	FieldQueries []FieldQuery
-	QueryExpr    Expr
+	FieldQueries []query.FieldQuery
+	QueryExpr    ast.Expr
 	SortOption   SortOption
 	Limit        int
 	LimitMode    LimitMode
@@ -39,7 +41,7 @@ func ParseSyntax(args []string) (ParsedInput, error) {
 	}
 
 	var fields []consts.FieldType
-	var queries []FieldQuery
+	var queries []query.FieldQuery
 	var sortOption SortOption
 	var whereTokens []string
 	limitMode := LimitStart
@@ -95,9 +97,9 @@ func ParseSyntax(args []string) (ParsedInput, error) {
 		}
 	}
 
-	var queryExpr Expr
+	var queryExpr ast.Expr
 	if len(whereTokens) > 0 {
-		expr, err := ParseExprBlock(whereTokens)
+		expr, err := ast.ParseExprBlock(whereTokens)
 		if err != nil {
 			return ParsedInput{}, err
 		}

@@ -1,6 +1,22 @@
-package syntax
+package ast
 
-import "fmt"
+import (
+	"fmt"
+	"qp/internal/query"
+)
+
+func ParseExprBlock(rawTokens []string) (Expr, error) {
+	if len(rawTokens) == 0 {
+		return nil, nil
+	}
+
+	tokens, err := tokenizeWhereTokens(rawTokens)
+	if err != nil {
+		return nil, err
+	}
+
+	return parseExpr(tokens)
+}
 
 func parseExpr(tokens []QueryToken) (Expr, error) {
 	pos := 0
@@ -34,7 +50,7 @@ func parseUnaryExpr(tokens []QueryToken, pos *int) (Expr, error) {
 func parseQueryExpr(tokens []QueryToken, pos *int) (Expr, error) {
 	raw := tokens[*pos].Value
 	*pos++
-	fieldQuery, err := parseQueryInput(raw)
+	fieldQuery, err := query.ParseQueryInput(raw)
 	if err != nil {
 		return nil, err
 	}

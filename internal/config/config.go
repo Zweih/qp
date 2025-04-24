@@ -1,7 +1,9 @@
 package config
 
 import (
+	"qp/internal/ast"
 	"qp/internal/consts"
+	"qp/internal/query"
 	"qp/internal/syntax"
 )
 
@@ -23,8 +25,8 @@ type Config struct {
 	LimitMode         syntax.LimitMode
 	SortOption        syntax.SortOption
 	Fields            []consts.FieldType
-	FieldQueries      []syntax.FieldQuery
-	QueryExpr         syntax.Expr
+	FieldQueries      []query.FieldQuery
+	QueryExpr         ast.Expr
 }
 
 type ConfigProvider interface {

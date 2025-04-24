@@ -1,4 +1,4 @@
-package querygraph
+package compiler
 
 import (
 	"qp/internal/pkgdata"

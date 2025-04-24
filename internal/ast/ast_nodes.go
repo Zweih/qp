@@ -1,6 +1,9 @@
-package syntax
+package ast
 
-import "qp/internal/pkgdata"
+import (
+	"qp/internal/pkgdata"
+	"qp/internal/query"
+)
 
 type ExprType int32
 
@@ -28,7 +31,7 @@ type NotExpr struct {
 }
 
 type QueryExpr struct {
-	Query FieldQuery
+	Query query.FieldQuery
 }
 
 func (a *AndExpr) Eval(pkg *pkgdata.PkgInfo) bool {

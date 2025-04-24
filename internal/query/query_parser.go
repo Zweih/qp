@@ -1,4 +1,4 @@
-package syntax
+package query
 
 import (
 	"fmt"
@@ -16,64 +16,11 @@ type FieldQuery struct {
 	Target      string
 }
 
-// TODO: stopgap before logic is fleshed out
-func ParseQueriesBlock(tokens []string) ([]FieldQuery, error) {
-	var queries []FieldQuery
-	expectQuery := true
-
-	for i, token := range tokens {
-		token = strings.TrimSpace(token)
-		if token == "" {
-			continue
-		}
-
-		if strings.ToLower(token) == "and" {
-			if expectQuery {
-				return nil, fmt.Errorf("unexpected 'and' at position %d", i)
-			}
-
-			expectQuery = true
-			continue
-		}
-
-		if !expectQuery {
-			return nil, fmt.Errorf("missing 'and' between queries near: %q", token)
-		}
-
-		query, err := parseQueryInput(token)
-		if err != nil {
-			return nil, err
-		}
-
-		queries = append(queries, query)
-		expectQuery = false
-	}
-
-	if expectQuery && len(tokens) > 0 {
-		return nil, fmt.Errorf("trailing 'and' with no following condition")
-	}
-
-	return queries, nil
-}
-
-func ParseExprBlock(rawTokens []string) (Expr, error) {
-	if len(rawTokens) == 0 {
-		return nil, nil
-	}
-
-	tokens, err := tokenizeWhereTokens(rawTokens)
-	if err != nil {
-		return nil, err
-	}
-
-	return parseExpr(tokens)
-}
-
 func ParseQueries(queryInputs []string) ([]FieldQuery, error) {
 	queries := make([]FieldQuery, 0, len(queryInputs))
 
 	for _, input := range queryInputs {
-		query, err := parseQueryInput(input)
+		query, err := ParseQueryInput(input)
 		if err != nil {
 			return nil, err
 		}
@@ -83,7 +30,7 @@ func ParseQueries(queryInputs []string) ([]FieldQuery, error) {
 	return queries, nil
 }
 
-func parseQueryInput(input string) (
+func ParseQueryInput(input string) (
 	FieldQuery,
 	error,
 ) {
