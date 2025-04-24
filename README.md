@@ -4,7 +4,7 @@
 
 you can find installation instructions [here](#installation).
 
-`qp` supports querying for package metadata, dependency relations, and more.
+`qp` supports querying with full boolean logic for package metadata, dependency relations, and more.
 
 check [features](#features) to find out more.
 
@@ -122,6 +122,7 @@ learn about installation [here](#installation)
 | ✓ | packager query | - | origin field |
 | - | origin sort | - | origin query |
 | ✓ | command-based syntax | ✓ | full boolean logic |
+| ✓ | abstract syntax tree | ✓ | directed acyclical graph for filtering |
 | - | user-defined macros | ✓ | parentetical (grouping) logic |
 | ✓ | limit from end | ✓ | limit from middle |
 
