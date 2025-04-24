@@ -301,8 +301,9 @@ qp w q has:depends or has:required-by p and not reason=explicit
 | validation | string |
 | pkgtype | string |
 | packager | string |
-| conflicts | relation |
 | groups | string |
+| conflicts | relation |
+| replaces | relation |
 | depends | relation |
 | optdepends | relation |
 | required-by | relation |

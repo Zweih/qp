@@ -30,7 +30,7 @@ func QueriesToConditions(queries []query.FieldQuery) ([]*FilterCondition, error)
 			consts.FieldUrl, consts.FieldValidation, consts.FieldPkgType, consts.FieldPackager:
 			condition, err = parseStringCondition(query)
 
-		case consts.FieldConflicts,
+		case consts.FieldConflicts, consts.FieldReplaces,
 			consts.FieldDepends, consts.FieldOptDepends,
 			consts.FieldRequiredBy, consts.FieldOptionalFor,
 			consts.FieldProvides:
