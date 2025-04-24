@@ -8,10 +8,6 @@ import (
 
 const fuzzySizeTolerancePercent = 0.3
 
-func FilterByReason(installReason string, targetReason string) bool {
-	return installReason == targetReason
-}
-
 func GetRelationsByDepth(relations []Relation, targetDepth int32) []Relation {
 	filteredRelations := []Relation{}
 
@@ -72,16 +68,6 @@ func StrictSizeRange(value int64, startSize int64, endSize int64) bool {
 	return !(value < startSize || value > endSize)
 }
 
-func FilterSliceByStrings(pkgStrings []string, targetStrings []string) bool {
-	for _, pkgString := range pkgStrings {
-		if FuzzyStrings(pkgString, targetStrings) {
-			return true
-		}
-	}
-
-	return false
-}
-
 func FuzzyStrings(pkgString string, targetStrings []string) bool {
 	pkgString = strings.ToLower(pkgString)
 
@@ -100,10 +86,14 @@ func StrictStrings(pkgString string, targetStrings []string) bool {
 	return slices.Contains(targetStrings, pkgString)
 }
 
-func RelationExists(relations []Relation) bool {
-	return len(relations) > 0
+func SliceExists[T any](s []T) bool {
+	return len(s) > 0
 }
 
 func StringExists(pkgString string) bool {
 	return pkgString != ""
+}
+
+func RelationExists(relations []Relation) bool {
+	return len(relations) > 0
 }

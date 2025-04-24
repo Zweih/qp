@@ -22,7 +22,7 @@ func QueriesToConditions(queries []query.FieldQuery) ([]*FilterCondition, error)
 		var err error
 
 		switch query.Field {
-		case consts.FieldDate, consts.FieldSize, consts.FieldBuildDate:
+		case consts.FieldDate, consts.FieldBuildDate, consts.FieldSize:
 			condition, err = parseRangeCondition(query)
 
 		case consts.FieldName, consts.FieldReason, consts.FieldArch,
@@ -30,10 +30,14 @@ func QueriesToConditions(queries []query.FieldQuery) ([]*FilterCondition, error)
 			consts.FieldUrl, consts.FieldValidation, consts.FieldPkgType, consts.FieldPackager:
 			condition, err = parseStringCondition(query)
 
-		case consts.FieldDepends, consts.FieldOptDepends,
+		case consts.FieldConflicts,
+			consts.FieldDepends, consts.FieldOptDepends,
 			consts.FieldRequiredBy, consts.FieldOptionalFor,
-			consts.FieldProvides, consts.FieldConflicts:
+			consts.FieldProvides:
 			condition, err = parseRelationCondition(query)
+
+		case consts.FieldGroups:
+			condition, err = parseStrArrCondition(query)
 
 		default:
 			err = fmt.Errorf("unsupported filter type: %s", consts.FieldNameLookup[query.Field])
@@ -69,6 +73,19 @@ func parseRelationCondition(query query.FieldQuery) (*FilterCondition, error) {
 
 	targets := strings.Split(query.Target, ",")
 	return newRelationCondition(query.Field, targets, query.Depth, query.Match, query.Negate)
+}
+
+func parseStrArrCondition(query query.FieldQuery) (*FilterCondition, error) {
+	if query.IsExistence {
+		return newStrArrExistsCondition(query.Field, query.Negate)
+	}
+
+	if query.Target == "" {
+		return nil, fmt.Errorf("query %s requires a target", consts.FieldNameLookup[query.Field])
+	}
+
+	targets := strings.Split(query.Target, ",")
+	return newStrArrCondition(query.Field, targets, query.Match, query.Negate)
 }
 
 func parseStringCondition(query query.FieldQuery) (*FilterCondition, error) {

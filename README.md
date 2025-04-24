@@ -100,7 +100,7 @@ learn about installation [here](#installation)
 | ✓ | required-by query | ✓ | no cache option |
 | ✓ | optional full timestamp | ✓ | package description field |
 | – | list possibly or confirmed stale/abandoned packages | – | self-referencing field |
-| – | groups query | – | streaming pipeline |
+| ✓  | groups query | – | streaming pipeline |
 | – | short-args for queries | – | key/value output |
 | – | XML output | – | package description sort |
 | ✓ | package base query | – | required-by sort |
@@ -302,7 +302,7 @@ qp w q has:depends or has:required-by p and not reason=explicit
 | pkgtype | string |
 | packager | string |
 | conflicts | relation |
-| replaces | relation |
+| groups | string |
 | depends | relation |
 | optdepends | relation |
 | required-by | relation |
@@ -323,9 +323,9 @@ qp w q has:depends or has:required-by p and not reason=explicit
 - `description` - package description
 - `url` - the URL of the official site of the software being packaged
 - `validation` - package integrity validation method (e.g., sha256, pgp)
-- `packager` - person/entity who built the package (if available)
 - `pkgtype` - package type (pkg, split, debug, src)
     - ***note**: older packages may have no pkgtype if built before pacman introduced XDATA
+- `packager` - person/entity who built the package (if available)
 - `groups` - package groups or categories (e.g., base, gnome, xfce4)
 - `conflicts` - list of packages that conflict, or cause problems, with the package
 - `replaces` - list of packages that are replaced by the package
