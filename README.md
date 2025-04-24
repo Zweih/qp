@@ -293,6 +293,7 @@ qp w q has:depends or has:required-by p and not reason=explicit
 | size | range |
 | name | string |
 | reason | string |
+| version | string |
 | arch | string |
 | license | string |
 | pkgbase | string |
