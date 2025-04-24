@@ -95,6 +95,15 @@ func (pkg *PkgInfo) GetString(field consts.FieldType) string {
 	}
 }
 
+func (pkg *PkgInfo) GetStrArr(field consts.FieldType) []string {
+	switch field {
+	case consts.FieldGroups:
+		return pkg.Groups
+	default:
+		panic("invalid field passed to GetStringSlice: " + consts.FieldNameLookup[field])
+	}
+}
+
 func (pkg *PkgInfo) GetRelations(field consts.FieldType) []Relation {
 	switch field {
 	case consts.FieldConflicts:

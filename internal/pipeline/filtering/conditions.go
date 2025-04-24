@@ -50,6 +50,45 @@ func newStringExistsCondition(field consts.FieldType, mask bool) (*FilterConditi
 	return &condition, nil
 }
 
+func newStrArrCondition(
+	field consts.FieldType,
+	targets []string,
+	match consts.MatchType,
+	mask bool,
+) (*FilterCondition, error) {
+	condition := newCondition(field)
+	matcher := StringMatchers[match]
+
+	for i, target := range targets {
+		targets[i] = strings.ToLower(target)
+	}
+
+	condition.Filter = func(pkg *pkgdata.PkgInfo) bool {
+		for _, s := range pkg.GetStrArr(field) {
+			if matcher(s, targets) {
+				return !mask
+			}
+		}
+
+		return mask
+	}
+
+	return &condition, nil
+}
+
+func newStrArrExistsCondition(
+	field consts.FieldType,
+	mask bool,
+) (*FilterCondition, error) {
+	condition := newCondition(field)
+
+	condition.Filter = func(pkg *pkgdata.PkgInfo) bool {
+		return pkgdata.SliceExists(pkg.GetStrArr(field)) != mask
+	}
+
+	return &condition, nil
+}
+
 func newRelationCondition(
 	field consts.FieldType,
 	targets []string,
