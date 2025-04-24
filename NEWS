@@ -1,8 +1,18 @@
 # qp Release Notes
 
+## v5.5.0
+### What's Changed
+* Feature: Add optional-for query by @Zweih in https://github.com/Zweih/qp/pull/236
+* Feature: Add URL query by @Zweih in https://github.com/Zweih/qp/pull/237
+* Feature: Add validation query by @Zweih in https://github.com/Zweih/qp/pull/239
+* Fix: Limit all by @Zweih in https://github.com/Zweih/qp/pull/240
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.2.0...v5.5.0
+
 ## v5.4.1
 ### What's Changed
 * Feature: Add URL query by @Zweih in https://github.com/Zweih/qp/pull/237
+
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v5.3.1...v5.4.1
 
