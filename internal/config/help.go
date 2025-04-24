@@ -50,6 +50,23 @@ Query Types:
       has:field         -> field must exist or be non-empty
       no:field          -> field must not exist or be empty
 
+  - Logical operators
+      and   -> both must match
+      or    -> either can match
+      not   -> exclude what follows
+      q, p  -> group logic: 
+                'q' = opening paren '(', 'p' = closing paren ')'
+                
+                Remember with:
+                  'q' is for *q*uery group start
+                  'p' is for query group sto*p*
+
+  Examples:
+    qp w name=gtk or name=qt
+    qp w not name==vim
+    qp w reason=explicit and size=50MB:
+    qp w q name=vim or name=emacs p and not has:depends
+
 Match Behavior:
   - Strings: fuzzy = substring match (case-insensitive)
              strict = exact match (case-insensitive)
@@ -63,9 +80,10 @@ Short Command Examples:
   qp where name=gtk
   qp w name==bash
   qp w reason=explicit and size=50MB:
+  qp w q size=10MB:1GB or size==20MB p and not has:depends
 
 Tips:
-  - Queries can include comma-separated values:
+  - Queries can include comma-separated values, these act a shorthand for 'or' logic:
       arch=aarch64,any
       provides=rustc,python3
 
@@ -81,8 +99,12 @@ Tips:
   - Quote arguments with spaces or special characters:
       qp where description="for tree-sitter"
 
+  - To group conditions, use q and p (like brackets):
+    qp where q name=curl or name=openssl and no:depends
+      -> matches packages named curl or openssl but only if they have no dependencies
+
 Default Behavior:
-  - 20 results shown unless --limit specified
+  - 20 results shown unless limit is specified
   - Progress bar disabled in non-interactive terminals
 
 Use 'man qp' to see all available fields
