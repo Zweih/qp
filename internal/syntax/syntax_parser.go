@@ -26,6 +26,7 @@ const (
 type ParsedInput struct {
 	Fields       []consts.FieldType
 	FieldQueries []FieldQuery
+	QueryExpr    Expr
 	SortOption   SortOption
 	Limit        int
 	LimitMode    LimitMode
@@ -94,13 +95,13 @@ func ParseSyntax(args []string) (ParsedInput, error) {
 		}
 	}
 
+	var queryExpr Expr
 	if len(whereTokens) > 0 {
-		parsedQueries, err := ParseQueriesBlock(whereTokens)
+		expr, err := ParseExprBlock(whereTokens)
 		if err != nil {
 			return ParsedInput{}, err
 		}
-
-		queries = append(queries, parsedQueries...)
+		queryExpr = expr
 	}
 
 	if len(fields) == 0 {
@@ -117,6 +118,7 @@ func ParseSyntax(args []string) (ParsedInput, error) {
 	return ParsedInput{
 		Fields:       fields,
 		FieldQueries: queries,
+		QueryExpr:    queryExpr,
 		SortOption:   sortOption,
 		Limit:        limit,
 		LimitMode:    limitMode,

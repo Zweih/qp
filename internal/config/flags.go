@@ -89,6 +89,7 @@ func mergeTopLevelOptions(dst *Config, src *syntax.ParsedInput) {
 	dst.SortOption = src.SortOption
 	dst.Fields = src.Fields
 	dst.FieldQueries = src.FieldQueries
+	dst.QueryExpr = src.QueryExpr
 	dst.Limit = src.Limit
 	dst.LimitMode = src.LimitMode
 }
@@ -123,7 +124,7 @@ func markHiddenFlags() {
 
 func registerCommonFlags(cfg *Config) {
 	pflag.BoolVar(&cfg.HasNoHeaders, "no-headers", false, "Hide headers")
-	pflag.BoolVar(&cfg.OutputJson, "json", false, "Output in JSON format")
+	pflag.BoolVar(&cfg.OutputJSON, "json", false, "Output in JSON format")
 	pflag.BoolVarP(&cfg.ShowHelp, "help", "h", false, "Show help")
 	pflag.BoolVar(&cfg.ShowVersion, "version", false, "Show version")
 	pflag.BoolVar(&cfg.ShowFullTimestamp, "full-timestamp", false, "Show full timestamp")

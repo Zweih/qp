@@ -56,6 +56,19 @@ func ParseQueriesBlock(tokens []string) ([]FieldQuery, error) {
 	return queries, nil
 }
 
+func ParseExprBlock(rawTokens []string) (Expr, error) {
+	if len(rawTokens) == 0 {
+		return nil, nil
+	}
+
+	tokens, err := tokenizeWhereTokens(rawTokens)
+	if err != nil {
+		return nil, err
+	}
+
+	return parseExpr(tokens)
+}
+
 func ParseQueries(queryInputs []string) ([]FieldQuery, error) {
 	queries := make([]FieldQuery, 0, len(queryInputs))
 
@@ -135,7 +148,7 @@ func parseExistenceQuery(input string, colonIdx int) (FieldQuery, error) {
 
 	switch prefix {
 	case "has":
-	case "no", "not": // TODO: "not" is legacy, to deprecate
+	case "no":
 		negation = true
 	default:
 		return FieldQuery{}, fmt.Errorf("invalid existence query: %s", input)

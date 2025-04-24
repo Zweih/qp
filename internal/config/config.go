@@ -14,7 +14,7 @@ type Config struct {
 	Limit             int
 	ShowHelp          bool
 	ShowVersion       bool
-	OutputJson        bool
+	OutputJSON        bool
 	HasNoHeaders      bool
 	ShowFullTimestamp bool
 	DisableProgress   bool
@@ -24,6 +24,7 @@ type Config struct {
 	SortOption        syntax.SortOption
 	Fields            []consts.FieldType
 	FieldQueries      []syntax.FieldQuery
+	QueryExpr         syntax.Expr
 }
 
 type ConfigProvider interface {
