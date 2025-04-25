@@ -2,6 +2,8 @@ package config
 
 import (
 	"fmt"
+	"qp/internal/consts"
+	"qp/internal/preprocess"
 	"qp/internal/syntax"
 	"strings"
 
@@ -70,12 +72,13 @@ func ParseFlags(args []string) (Config, error) {
 func isNewSyntax(args []string) bool {
 	for _, arg := range args {
 		lower := strings.ToLower(arg)
-		if expanded, exists := syntax.ShorthandMap[lower]; exists {
+		if expanded, exists := preprocess.ShorthandMap[lower]; exists {
 			lower = expanded
 		}
 
 		switch lower {
-		case syntax.CmdSelect, syntax.CmdWhere, syntax.CmdOrder, syntax.CmdLimit:
+		case consts.CmdSelect, consts.CmdWhere,
+			consts.CmdOrder, consts.CmdLimit:
 			return true
 		default:
 			return false
