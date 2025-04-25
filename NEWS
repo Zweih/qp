@@ -1,8 +1,15 @@
 # qp Release Notes
 
+## v5.7.0
+### What's Changed
+* Feature: Enforce logical operators between statements by @Zweih in https://github.com/Zweih/qp/pull/244
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.6.0...v5.7.0
+
 ## v5.6.0
 ### What's Changed
 * Feature: Revamped querying - and/or/not + grouping (parentheses) logic by @Zweih in https://github.com/Zweih/qp/pull/242
+
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v5.5.0...v5.6.0
 
@@ -11,7 +18,7 @@
 * Feature: Add validation query by @Zweih in https://github.com/Zweih/qp/pull/239
 
 
-**Full Changelog**: https://github.com/Zweih/qp/compare/v5.2.0...v5.5.0
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.4.1...v5.5.0
 
 ## v5.4.1
 ### What's Changed
