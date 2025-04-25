@@ -12,10 +12,10 @@ type PkgInfoJSON struct {
 	InstallTimestamp int64    `json:"installTimestamp,omitempty"`
 	BuildTimestamp   int64    `json:"buildTimestamp,omitempty"`
 	Size             int64    `json:"size,omitempty"`
-	PkgType          string   `json:"pkgtype,omitempty"`
 	Name             string   `json:"name,omitempty"`
 	Reason           string   `json:"reason,omitempty"`
 	Version          string   `json:"version,omitempty"`
+	PkgType          string   `json:"pkgtype,omitempty"`
 	Arch             string   `json:"arch,omitempty"`
 	License          string   `json:"license,omitempty"`
 	PkgBase          string   `json:"pkgbase,omitempty"`

@@ -36,8 +36,11 @@ this package is compatible with the following distributions:
  - [steamOS](https://store.steampowered.com/steamos)
  - [garuda linux](https://garudalinux.org/)
  - [endeavourOS](https://endeavouros.com/)
+ - [mabox linux](https://maboxlinux.org/)
  - [artix linux](https://artixlinux.org/)
- - the 50 other arch-based distros, as long as it has pacman installed 
+ - the 50 other arch-based distros, as long as it has pacman installed
+
+non-arch distros are planned!
 
 ## features
 
@@ -58,7 +61,7 @@ this package is compatible with the following distributions:
   - package name
   - license
   - size on disk
-  - package base
+  - package base and package type
 - output as:
   - table
   - JSON
@@ -104,16 +107,20 @@ learn about installation [here](#installation)
 | – | short-args for queries | – | key/value output |
 | – | XML output | – | package description sort |
 | ✓ | package base query | – | required-by sort |
-| – | required-by count sort | – | dependency count sort |
+| – | optdepends sort | – | depends sort |
 | ✓ | build-date field | ✓ | build-date query |
 | ✓ | build-date sort | ✓ | pkgtype field |
-| - | url query | - | pkgtype sort |
+| ✓ | url query | ✓ | pkgtype sort |
 | ✓ | architecture query | ✓ | groups field |
 | ✓	| conflicts query | - | package description sort |
 | ✓	| regenerate cache option | ✓ | validation query |
+| - | url sort | - | groups sort |
 | ✓ | packager field | ✓ | optional dependency field |
 | ✓ | sort by size on disk | - | conflicts sort |
+| - | optional-for sort | - | provides sort |
 | ✓ | validation field | - | validation sort |
+| - | packager sort | - | architecture sort |
+| - | reason sort | - |version sort |
 | ✓ | reverse optional dependencies field (optional for) | - | optdepends installation indicator |
 | ✓ | optional-for query | - | separate field for optdepends reason |
 | ✓ | fuzzy/strict querying | ✓ | existence querying |
@@ -125,6 +132,8 @@ learn about installation [here](#installation)
 | ✓ | abstract syntax tree | ✓ | directed acyclical graph for filtering |
 | - | user-defined macros | ✓ | parentetical (grouping) logic |
 | ✓ | limit from end | ✓ | limit from middle |
+| - | replaces sort | - | built-in macros |
+| - | query explaination | - | user configuration file |
 
 ## installation
 
@@ -190,9 +199,9 @@ qp [command] [args] [options]
     - **existence check** -> `has:field` or `no:field`
   - use `and`, `or`, `not`, `q ... p` to build complex filters
   - learn more about querying [here](#querying-with-where)
-- `order <field>:<direction>` | `o <field>:<direction>`: sort results ascending or descending (default sort is `date:asc`):
+- `order <field>:<direction>` | `o <field>:<direction>`: sort results ascending or descending
+  - default sort is `date:asc`:
   - [see fields avaialble for sorting](#available-sorts)
-  - `pkgbase` -> sort alphabetically by base package
 - `limit <number>` | `l <number>`: limit the amount of packages to display (default: 20)
   - `limit all | l all`: display all packages
   - `limit end:<number>`: display last `n` packages
@@ -266,6 +275,7 @@ for example:
   - `name==gtk` only matches a package named exactly `gtk`
 
 #### query examples
+
 ```
 qp w name==bash and has:depends
 qp where size=100MB:2GB
@@ -294,13 +304,13 @@ qp w q has:depends or has:required-by p and not reason=explicit
 | name | string |
 | reason | string |
 | version | string |
+| pkgtype | string |
 | arch | string |
 | license | string |
 | pkgbase | string |
 | description | string |
 | url | string
 | validation | string |
-| pkgtype | string |
 | packager | string |
 | groups | string |
 | conflicts | relation |
@@ -344,6 +354,7 @@ qp w q has:depends or has:required-by p and not reason=explicit
 - `name`
 - `license`
 - `size`
+- `pkgtype`
 - `pkgbase`
 
 ### JSON output
@@ -364,10 +375,10 @@ output format:
     "installTimestamp": 1743448253,
     "buildTimestamp": 1741400060,
     "size": 58266727,
-    "pkgtype": "split",
     "name": "gtk3",
     "reason": "dependency",
     "version": "1:3.24.49-1",
+    "pkgtype": "split",
     "arch": "aarch64",
     "license": "LGPL-2.1-or-later",
     "pkgbase": "gtk3",
