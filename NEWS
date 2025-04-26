@@ -1,8 +1,15 @@
 # qp Release Notes
 
+## v5.10.0
+### What's Changed
+* Feature: Add version query by @Zweih in https://github.com/Zweih/qp/pull/249
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.9.0...v5.10.0
+
 ## v5.9.0
 ### What's Changed
 * Feature: Add replaces query by @Zweih in https://github.com/Zweih/qp/pull/247
+
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v5.8.0...v5.9.0
 
