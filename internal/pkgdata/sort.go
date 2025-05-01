@@ -37,7 +37,7 @@ func GetComparator(field consts.FieldType, asc bool) (PkgComparator, error) {
 
 	case consts.FieldName, consts.FieldLicense,
 		consts.FieldPkgType, consts.FieldPkgBase,
-		consts.FieldPackager:
+		consts.FieldPackager, consts.FieldArch:
 		return makeComparator(func(p *PkgInfo) string {
 			return strings.ToLower(p.GetString(field))
 		}, asc), nil
