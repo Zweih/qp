@@ -126,7 +126,7 @@ learn about installation [here](#installation)
 | ✓ | fuzzy/strict querying | ✓ | existence querying |
 | ✓ | existence querying | - | depth querying |
 | ✓ | pkgtype query | ✓ | optdepends query |
-| ✓ | packager query | - | origin field |
+| ✓ | packager query | ✓ | origin field |
 | - | origin sort | - | origin query |
 | ✓ | command-based syntax | ✓ | full boolean logic |
 | ✓ | abstract syntax tree | ✓ | directed acyclical graph for filtering |
@@ -329,6 +329,7 @@ qp w q has:depends or has:required-by p and not reason=explicit
 - `name` - package name
 - `reason` - installation reason (explicit/dependency)
 - `version` - installed package version
+- `origin` - the package ecosystem or source the package belongs to (e.g., pacman); reflects which package manager or backend maintains it
 - `arch` - architecture the package was built for (e.g., x86_64, aarch64, any)
 - `license` - package software license
 - `pkgbase` - name of the base package used to group split packages; for non-split packages, it is the same as the package name. 
@@ -381,13 +382,14 @@ output format:
     "name": "gtk3",
     "reason": "dependency",
     "version": "1:3.24.49-1",
-    "pkgtype": "split",
-    "arch": "aarch64",
+    "origin": "pacman",
+    "arch": "x86_64",
     "license": "LGPL-2.1-or-later",
-    "pkgbase": "gtk3",
     "description": "GObject-based multi-platform GUI toolkit",
     "url": "https://www.gtk.org/",
     "validation": "pgp",
+    "pkgtype": "split",
+    "pkgbase": "gtk3",
     "packager": "Jan Alexander Steffens (heftig) <heftig@archlinux.org>",
     "conflicts": [
       "gtk3-print-backends"
