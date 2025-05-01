@@ -31,15 +31,28 @@ func Preprocess(args []string) ([]string, error) {
 			}
 		}
 
-		expanded, _ := macroExpansion(token, currentBlock)
-		if len(expanded) == 0 {
-			return nil, fmt.Errorf("macro expansion for %q in block %q produced no output", token, consts.CmdNameLookup[currentBlock])
-		}
+		subtokens := getSubtokens(currentBlock, token)
+		for _, subtoken := range subtokens {
+			subtoken = strings.TrimSpace(subtoken)
+			expanded, _ := macroExpansion(subtoken, currentBlock)
 
-		processed = append(processed, expanded...)
+			if len(expanded) == 0 {
+				return nil, fmt.Errorf("macro expansion for %q in block %q produced no output", subtoken, consts.CmdNameLookup[currentBlock])
+			}
+
+			processed = append(processed, expanded...)
+		}
 	}
 
 	return processed, nil
+}
+
+func getSubtokens(block consts.CmdType, token string) []string {
+	if block == consts.BlockSelect && strings.Contains(token, ",") {
+		return strings.Split(token, ",")
+	}
+
+	return []string{token}
 }
 
 func normalizeNegationShorthand(input string) []string {
