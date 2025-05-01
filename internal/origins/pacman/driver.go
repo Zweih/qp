@@ -18,7 +18,7 @@ func (d *PacmanDriver) Detect() bool {
 }
 
 func (d *PacmanDriver) Load() ([]*pkgdata.PkgInfo, error) {
-	return fetchPackages()
+	return fetchPackages(d.Name())
 }
 
 func (d *PacmanDriver) ResolveDeps(pkgs []*pkgdata.PkgInfo) ([]*pkgdata.PkgInfo, error) {

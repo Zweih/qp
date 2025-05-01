@@ -10,7 +10,7 @@ import (
 	"sync"
 )
 
-func fetchPackages() ([]*pkgdata.PkgInfo, error) {
+func fetchPackages(origin string) ([]*pkgdata.PkgInfo, error) {
 	pkgPaths, err := os.ReadDir(PacmanDbPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read pacman database: %v", err)
@@ -20,7 +20,7 @@ func fetchPackages() ([]*pkgdata.PkgInfo, error) {
 
 	var wg sync.WaitGroup
 	descPathChan := make(chan string, numPkgs)
-	pkgPtrsChan := make(chan *pkgdata.PkgInfo, numPkgs)
+	pkgChan := make(chan *pkgdata.PkgInfo, numPkgs)
 	errorsChan := make(chan error, numPkgs)
 
 	// fun fact: NumCPU() does account for hyperthreading
@@ -37,7 +37,8 @@ func fetchPackages() ([]*pkgdata.PkgInfo, error) {
 					continue
 				}
 
-				pkgPtrsChan <- pkg
+				pkg.Origin = origin
+				pkgChan <- pkg
 			}
 		}()
 	}
@@ -52,7 +53,7 @@ func fetchPackages() ([]*pkgdata.PkgInfo, error) {
 	close(descPathChan)
 
 	wg.Wait()
-	close(pkgPtrsChan)
+	close(pkgChan)
 	close(errorsChan)
 
 	if len(errorsChan) > 0 {
@@ -65,12 +66,12 @@ func fetchPackages() ([]*pkgdata.PkgInfo, error) {
 		return nil, errors.Join(collectedErrors...)
 	}
 
-	pkgPtrs := make([]*pkgdata.PkgInfo, 0, numPkgs)
-	for pkg := range pkgPtrsChan {
-		pkgPtrs = append(pkgPtrs, pkg)
+	pkgs := make([]*pkgdata.PkgInfo, 0, numPkgs)
+	for pkg := range pkgChan {
+		pkgs = append(pkgs, pkg)
 	}
 
-	return pkgPtrs, nil
+	return pkgs, nil
 }
 
 func getWorkerCount(numCPUs int, numFiles int) int {

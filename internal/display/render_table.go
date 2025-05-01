@@ -20,13 +20,14 @@ var columnHeaders = map[consts.FieldType]string{
 	consts.FieldReason:      "REASON",
 	consts.FieldSize:        "SIZE",
 	consts.FieldVersion:     "VERSION",
-	consts.FieldPkgType:     "PKGTYPE",
+	consts.FieldOrigin:      "ORIGIN",
 	consts.FieldArch:        "ARCH",
 	consts.FieldLicense:     "LICENSE",
 	consts.FieldPkgBase:     "PKGBASE",
 	consts.FieldDescription: "DESCRIPTION",
 	consts.FieldUrl:         "URL",
 	consts.FieldValidation:  "VALIDATION",
+	consts.FieldPkgType:     "PKGTYPE",
 	consts.FieldPackager:    "PACKAGER",
 	consts.FieldGroups:      "GROUPS",
 	consts.FieldConflicts:   "CONFLICTS",
@@ -85,8 +86,8 @@ func renderRows(
 	ctx tableContext,
 ) {
 	row := make([]string, len(fields))
-	for i, fields := range fields {
-		value := getTableValue(pkg, fields, ctx)
+	for i, field := range fields {
+		value := getTableValue(pkg, field, ctx)
 		if value == "" {
 			value = "-"
 		}
@@ -101,17 +102,18 @@ func getTableValue(pkg *pkgdata.PkgInfo, field consts.FieldType, ctx tableContex
 	switch field {
 	case consts.FieldDate, consts.FieldBuildDate:
 		return formatDate(pkg.GetInt(field), ctx)
+
 	case consts.FieldSize:
 		return formatSize(pkg.GetInt(field))
 
 	case consts.FieldName, consts.FieldReason, consts.FieldVersion,
-		consts.FieldArch, consts.FieldLicense, consts.FieldUrl,
-		consts.FieldDescription, consts.FieldPkgBase, consts.FieldValidation,
-		consts.FieldPackager, consts.FieldPkgType:
+		consts.FieldOrigin, consts.FieldArch, consts.FieldLicense,
+		consts.FieldUrl, consts.FieldDescription, consts.FieldValidation,
+		consts.FieldPkgType, consts.FieldPkgBase, consts.FieldPackager:
 		return pkg.GetString(field)
 
 	case consts.FieldGroups:
-		return strings.Join(pkg.Groups, ", ")
+		return strings.Join(pkg.GetStrArr(field), ", ")
 
 	case consts.FieldConflicts, consts.FieldReplaces, consts.FieldDepends,
 		consts.FieldOptDepends, consts.FieldRequiredBy, consts.FieldOptionalFor,

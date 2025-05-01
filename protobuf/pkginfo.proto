@@ -32,14 +32,15 @@ message PkgInfo {
   string name = 3;
   string reason = 4;
   string version = 5;
+  string origin = 25;
   string arch = 6;
   string license = 7;
   string url = 8;
   string description = 13;
-  string pkg_base = 14;
   string validation = 20;
-  string packager = 21;
   string pkg_type = 24;
+  string pkg_base = 14;
+  string packager = 21;
 
   repeated string groups = 19;
 
