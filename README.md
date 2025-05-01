@@ -118,8 +118,8 @@ learn about installation [here](#installation)
 | ✓ | packager field | ✓ | optional dependency field |
 | ✓ | sort by size on disk | - | conflicts sort |
 | - | optional-for sort | - | provides sort |
-| ✓ | validation field | - | validation sort |
-| ✓ | packager sort | - | architecture sort |
+| ✓ | validation field | ✓ | validation sort |
+| ✓ | packager sort | ✓ | architecture sort |
 | - | reason sort | - |version sort |
 | ✓ | reverse optional dependencies field (optional for) | - | optdepends installation indicator |
 | ✓ | optional-for query | - | separate field for optdepends reason |
@@ -304,13 +304,13 @@ qp w q has:depends or has:required-by p and not reason=explicit
 | name | string |
 | reason | string |
 | version | string |
-| pkgtype | string |
 | arch | string |
 | license | string |
 | pkgbase | string |
 | description | string |
 | url | string
 | validation | string |
+| pkgtype | string |
 | packager | string |
 | groups | string |
 | conflicts | relation |
@@ -355,6 +355,7 @@ qp w q has:depends or has:required-by p and not reason=explicit
 - `name`
 - `arch`
 - `license`
+- `validation`
 - `pkgtype`
 - `pkgbase`
 - `packager`
