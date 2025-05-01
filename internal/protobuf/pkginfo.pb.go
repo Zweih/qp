@@ -173,14 +173,15 @@ type PkgInfo struct {
 	Name             string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
 	Reason           string                 `protobuf:"bytes,4,opt,name=reason,proto3" json:"reason,omitempty"`
 	Version          string                 `protobuf:"bytes,5,opt,name=version,proto3" json:"version,omitempty"`
+	Origin           string                 `protobuf:"bytes,25,opt,name=origin,proto3" json:"origin,omitempty"`
 	Arch             string                 `protobuf:"bytes,6,opt,name=arch,proto3" json:"arch,omitempty"`
 	License          string                 `protobuf:"bytes,7,opt,name=license,proto3" json:"license,omitempty"`
 	Url              string                 `protobuf:"bytes,8,opt,name=url,proto3" json:"url,omitempty"`
 	Description      string                 `protobuf:"bytes,13,opt,name=description,proto3" json:"description,omitempty"`
-	PkgBase          string                 `protobuf:"bytes,14,opt,name=pkg_base,json=pkgBase,proto3" json:"pkg_base,omitempty"`
 	Validation       string                 `protobuf:"bytes,20,opt,name=validation,proto3" json:"validation,omitempty"`
-	Packager         string                 `protobuf:"bytes,21,opt,name=packager,proto3" json:"packager,omitempty"`
 	PkgType          string                 `protobuf:"bytes,24,opt,name=pkg_type,json=pkgType,proto3" json:"pkg_type,omitempty"`
+	PkgBase          string                 `protobuf:"bytes,14,opt,name=pkg_base,json=pkgBase,proto3" json:"pkg_base,omitempty"`
+	Packager         string                 `protobuf:"bytes,21,opt,name=packager,proto3" json:"packager,omitempty"`
 	Groups           []string               `protobuf:"bytes,19,rep,name=groups,proto3" json:"groups,omitempty"`
 	Conflicts        []*Relation            `protobuf:"bytes,12,rep,name=conflicts,proto3" json:"conflicts,omitempty"`
 	Replaces         []*Relation            `protobuf:"bytes,15,rep,name=replaces,proto3" json:"replaces,omitempty"`
@@ -265,6 +266,13 @@ func (x *PkgInfo) GetVersion() string {
 	return ""
 }
 
+func (x *PkgInfo) GetOrigin() string {
+	if x != nil {
+		return x.Origin
+	}
+	return ""
+}
+
 func (x *PkgInfo) GetArch() string {
 	if x != nil {
 		return x.Arch
@@ -293,13 +301,6 @@ func (x *PkgInfo) GetDescription() string {
 	return ""
 }
 
-func (x *PkgInfo) GetPkgBase() string {
-	if x != nil {
-		return x.PkgBase
-	}
-	return ""
-}
-
 func (x *PkgInfo) GetValidation() string {
 	if x != nil {
 		return x.Validation
@@ -307,16 +308,23 @@ func (x *PkgInfo) GetValidation() string {
 	return ""
 }
 
-func (x *PkgInfo) GetPackager() string {
+func (x *PkgInfo) GetPkgType() string {
 	if x != nil {
-		return x.Packager
+		return x.PkgType
 	}
 	return ""
 }
 
-func (x *PkgInfo) GetPkgType() string {
+func (x *PkgInfo) GetPkgBase() string {
 	if x != nil {
-		return x.PkgType
+		return x.PkgBase
+	}
+	return ""
+}
+
+func (x *PkgInfo) GetPackager() string {
+	if x != nil {
+		return x.Packager
 	}
 	return ""
 }
@@ -448,24 +456,25 @@ const file_protobuf_pkginfo_proto_rawDesc = "" +
 	"\boperator\x18\x03 \x01(\x0e2\x13.pkginfo.RelationOpR\boperator\x12\x14\n" +
 	"\x05depth\x18\x04 \x01(\x05R\x05depth\x12\"\n" +
 	"\fproviderName\x18\x05 \x01(\tR\fproviderName\x12\x10\n" +
-	"\x03why\x18\x06 \x01(\tR\x03why\"\x8b\x06\n" +
+	"\x03why\x18\x06 \x01(\tR\x03why\"\xa3\x06\n" +
 	"\aPkgInfo\x12+\n" +
 	"\x11install_timestamp\x18\x11 \x01(\x03R\x10installTimestamp\x12'\n" +
 	"\x0fbuild_timestamp\x18\x10 \x01(\x03R\x0ebuildTimestamp\x12\x12\n" +
 	"\x04size\x18\x02 \x01(\x03R\x04size\x12\x12\n" +
 	"\x04name\x18\x03 \x01(\tR\x04name\x12\x16\n" +
 	"\x06reason\x18\x04 \x01(\tR\x06reason\x12\x18\n" +
-	"\aversion\x18\x05 \x01(\tR\aversion\x12\x12\n" +
+	"\aversion\x18\x05 \x01(\tR\aversion\x12\x16\n" +
+	"\x06origin\x18\x19 \x01(\tR\x06origin\x12\x12\n" +
 	"\x04arch\x18\x06 \x01(\tR\x04arch\x12\x18\n" +
 	"\alicense\x18\a \x01(\tR\alicense\x12\x10\n" +
 	"\x03url\x18\b \x01(\tR\x03url\x12 \n" +
-	"\vdescription\x18\r \x01(\tR\vdescription\x12\x19\n" +
-	"\bpkg_base\x18\x0e \x01(\tR\apkgBase\x12\x1e\n" +
+	"\vdescription\x18\r \x01(\tR\vdescription\x12\x1e\n" +
 	"\n" +
 	"validation\x18\x14 \x01(\tR\n" +
-	"validation\x12\x1a\n" +
-	"\bpackager\x18\x15 \x01(\tR\bpackager\x12\x19\n" +
-	"\bpkg_type\x18\x18 \x01(\tR\apkgType\x12\x16\n" +
+	"validation\x12\x19\n" +
+	"\bpkg_type\x18\x18 \x01(\tR\apkgType\x12\x19\n" +
+	"\bpkg_base\x18\x0e \x01(\tR\apkgBase\x12\x1a\n" +
+	"\bpackager\x18\x15 \x01(\tR\bpackager\x12\x16\n" +
 	"\x06groups\x18\x13 \x03(\tR\x06groups\x12/\n" +
 	"\tconflicts\x18\f \x03(\v2\x11.pkginfo.RelationR\tconflicts\x12-\n" +
 	"\breplaces\x18\x0f \x03(\v2\x11.pkginfo.RelationR\breplaces\x12+\n" +

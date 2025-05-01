@@ -5,10 +5,11 @@ type FieldType int
 // ordered by filter efficiency
 const (
 	FieldReason FieldType = iota
-	FieldPkgType
 	FieldArch
-	FieldLicense
 	FieldName
+	FieldOrigin
+	FieldPkgType
+	FieldLicense
 	FieldPkgBase
 	FieldValidation
 	FieldPackager
@@ -35,13 +36,14 @@ const (
 	name        = "name"
 	reason      = "reason"
 	version     = "version"
-	pkgType     = "pkgtype"
+	origin      = "origin"
 	arch        = "arch"
 	license     = "license"
-	pkgBase     = "pkgbase"
 	description = "description"
 	url         = "url"
 	validation  = "validation"
+	pkgType     = "pkgtype"
+	pkgBase     = "pkgbase"
 	packager    = "packager"
 	groups      = "groups"
 	conflicts   = "conflicts"
@@ -70,16 +72,17 @@ var FieldTypeLookup = map[string]FieldType{
 	date:        FieldDate,
 	buildDate:   FieldBuildDate,
 	size:        FieldSize,
-	pkgType:     FieldPkgType,
 	name:        FieldName,
 	reason:      FieldReason,
 	version:     FieldVersion,
+	origin:      FieldOrigin,
 	arch:        FieldArch,
 	license:     FieldLicense,
-	pkgBase:     FieldPkgBase,
 	description: FieldDescription,
 	url:         FieldUrl,
 	validation:  FieldValidation,
+	pkgType:     FieldPkgType,
+	pkgBase:     FieldPkgBase,
 	packager:    FieldPackager,
 	groups:      FieldGroups,
 	conflicts:   FieldConflicts,
@@ -95,16 +98,17 @@ var FieldNameLookup = map[FieldType]string{
 	FieldDate:        date,
 	FieldBuildDate:   buildDate,
 	FieldSize:        size,
-	FieldPkgType:     pkgType,
 	FieldName:        name,
 	FieldReason:      reason,
 	FieldVersion:     version,
+	FieldOrigin:      origin,
 	FieldArch:        arch,
 	FieldLicense:     license,
-	FieldPkgBase:     pkgBase,
 	FieldDescription: description,
 	FieldUrl:         url,
 	FieldValidation:  validation,
+	FieldPkgType:     pkgType,
+	FieldPkgBase:     pkgBase,
 	FieldPackager:    packager,
 	FieldGroups:      groups,
 	FieldConflicts:   conflicts,
@@ -128,16 +132,17 @@ var (
 		FieldDate,
 		FieldBuildDate,
 		FieldSize,
-		FieldPkgType,
 		FieldName,
 		FieldReason,
 		FieldVersion,
+		FieldOrigin,
 		FieldArch,
 		FieldLicense,
-		FieldPkgBase,
 		FieldDescription,
 		FieldUrl,
 		FieldValidation,
+		FieldPkgType,
+		FieldPkgBase,
 		FieldPackager,
 		FieldGroups,
 		FieldConflicts,
@@ -151,16 +156,16 @@ var (
 )
 
 var StringFields = map[FieldType]struct{}{
-	FieldPkgType:     {},
 	FieldName:        {},
 	FieldReason:      {},
 	FieldVersion:     {},
 	FieldArch:        {},
 	FieldLicense:     {},
-	FieldPkgBase:     {},
 	FieldDescription: {},
 	FieldUrl:         {},
 	FieldValidation:  {},
+	FieldPkgType:     {},
+	FieldPkgBase:     {},
 	FieldPackager:    {},
 }
 

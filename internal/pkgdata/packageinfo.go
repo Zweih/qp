@@ -33,14 +33,15 @@ type PkgInfo struct {
 	Name        string
 	Reason      string
 	Version     string
+	Origin      string
 	Arch        string
 	License     string
-	PkgBase     string
 	Description string
 	Url         string
 	Validation  string
-	Packager    string
 	PkgType     string
+	PkgBase     string
+	Packager    string
 
 	Groups []string
 
@@ -74,22 +75,24 @@ func (pkg *PkgInfo) GetString(field consts.FieldType) string {
 		return pkg.Reason
 	case consts.FieldVersion:
 		return pkg.Version
+	case consts.FieldOrigin:
+		return pkg.Origin
 	case consts.FieldArch:
 		return pkg.Arch
 	case consts.FieldLicense:
 		return pkg.License
-	case consts.FieldPkgBase:
-		return pkg.PkgBase
 	case consts.FieldDescription:
 		return pkg.Description
 	case consts.FieldUrl:
 		return pkg.Url
 	case consts.FieldValidation:
 		return pkg.Validation
-	case consts.FieldPackager:
-		return pkg.Packager
 	case consts.FieldPkgType:
 		return pkg.PkgType
+	case consts.FieldPkgBase:
+		return pkg.PkgBase
+	case consts.FieldPackager:
+		return pkg.Packager
 	default:
 		panic("invalid field passed to GetString: " + consts.FieldNameLookup[field])
 	}

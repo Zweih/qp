@@ -15,13 +15,14 @@ type PkgInfoJSON struct {
 	Name             string   `json:"name,omitempty"`
 	Reason           string   `json:"reason,omitempty"`
 	Version          string   `json:"version,omitempty"`
-	PkgType          string   `json:"pkgtype,omitempty"`
+	Origin           string   `json:"origin,omitempty"`
 	Arch             string   `json:"arch,omitempty"`
 	License          string   `json:"license,omitempty"`
-	PkgBase          string   `json:"pkgbase,omitempty"`
 	Description      string   `json:"description,omitempty"`
 	Url              string   `json:"url,omitempty"`
 	Validation       string   `json:"validation,omitempty"`
+	PkgType          string   `json:"pkgtype,omitempty"`
+	PkgBase          string   `json:"pkgbase,omitempty"`
 	Packager         string   `json:"packager,omitempty"`
 	Groups           []string `json:"groups,omitempty"`
 	Conflicts        []string `json:"conflicts,omitempty"`
@@ -86,30 +87,32 @@ func getJsonValues(pkg *pkgdata.PkgInfo, fields []consts.FieldType) *PkgInfoJSON
 			filteredPackage.BuildTimestamp = pkg.GetInt(field)
 		case consts.FieldSize:
 			filteredPackage.Size = pkg.GetInt(field)
-		case consts.FieldPkgType:
-			filteredPackage.PkgType = pkg.GetString(field)
 		case consts.FieldName:
 			filteredPackage.Name = pkg.GetString(field)
 		case consts.FieldReason:
 			filteredPackage.Reason = pkg.GetString(field)
 		case consts.FieldVersion:
 			filteredPackage.Version = pkg.GetString(field)
+		case consts.FieldOrigin:
+			filteredPackage.Origin = pkg.GetString(field)
 		case consts.FieldArch:
 			filteredPackage.Arch = pkg.GetString(field)
 		case consts.FieldLicense:
 			filteredPackage.License = pkg.GetString(field)
-		case consts.FieldPkgBase:
-			filteredPackage.PkgBase = pkg.GetString(field)
 		case consts.FieldDescription:
 			filteredPackage.Description = pkg.GetString(field)
 		case consts.FieldUrl:
 			filteredPackage.Url = pkg.GetString(field)
-		case consts.FieldGroups:
-			filteredPackage.Groups = pkg.Groups
 		case consts.FieldValidation:
 			filteredPackage.Validation = pkg.GetString(field)
+		case consts.FieldPkgType:
+			filteredPackage.PkgType = pkg.GetString(field)
+		case consts.FieldPkgBase:
+			filteredPackage.PkgBase = pkg.GetString(field)
 		case consts.FieldPackager:
 			filteredPackage.Packager = pkg.GetString(field)
+		case consts.FieldGroups:
+			filteredPackage.Groups = pkg.Groups
 		case consts.FieldConflicts:
 			filteredPackage.Conflicts = flattenRelations(pkg.GetRelations(field))
 		case consts.FieldReplaces:
