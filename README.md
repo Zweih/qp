@@ -351,9 +351,10 @@ qp w q has:depends or has:required-by p and not reason=explicit
 
 - `date`
 - `build-date`
-- `name`
-- `license`
 - `size`
+- `name`
+- `arch`
+- `license`
 - `pkgtype`
 - `pkgbase`
 - `packager`
