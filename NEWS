@@ -1,8 +1,16 @@
 # qp Release Notes
 
+## v5.16.1
+### What's Changed
+* Feature: Add origin field by @Zweih in https://github.com/Zweih/qp/pull/266
+* Fix: Select macro expansion by @Zweih in https://github.com/Zweih/qp/pull/267
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.15.0...v5.16.1
+
 ## v5.15.0
 ### What's Changed
 * Feature: Add validation sort by @Zweih in https://github.com/Zweih/qp/pull/264
+
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v5.14.0...v5.15.0
 
