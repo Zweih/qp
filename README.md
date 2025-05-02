@@ -112,7 +112,7 @@ learn about installation [here](#installation)
 | ✓ | build-date sort | ✓ | pkgtype field |
 | ✓ | url query | ✓ | pkgtype sort |
 | ✓ | architecture query | ✓ | groups field |
-| ✓	| conflicts query | - | package description sort |
+| ✓	| conflicts query | ✓ | package description sort |
 | ✓	| regenerate cache option | ✓ | validation query |
 | - | url sort | - | groups sort |
 | ✓ | packager field | ✓ | optional dependency field |
@@ -332,12 +332,12 @@ qp w q has:depends or has:required-by p and not reason=explicit
 - `origin` - the package ecosystem or source the package belongs to (e.g., pacman); reflects which package manager or backend maintains it
 - `arch` - architecture the package was built for (e.g., x86_64, aarch64, any)
 - `license` - package software license
-- `pkgbase` - name of the base package used to group split packages; for non-split packages, it is the same as the package name. 
 - `description` - package description
 - `url` - the URL of the official site of the software being packaged
 - `validation` - package integrity validation method (e.g., sha256, pgp)
 - `pkgtype` - package type (pkg, split, debug, src)
     - ***note**: older packages may have no pkgtype if built before pacman introduced XDATA
+- `pkgbase` - name of the base package used to group split packages; for non-split packages, it is the same as the package name. 
 - `packager` - person/entity who built the package (if available)
 - `groups` - package groups or categories (e.g., base, gnome, xfce4)
 - `conflicts` - list of packages that conflict, or cause problems, with the package
@@ -356,6 +356,7 @@ qp w q has:depends or has:required-by p and not reason=explicit
 - `name`
 - `arch`
 - `license`
+- `description`
 - `validation`
 - `pkgtype`
 - `pkgbase`
