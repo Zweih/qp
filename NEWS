@@ -1,8 +1,15 @@
 # qp Release Notes
 
+## v5.19.0
+### What's Changed
+* Feature: Add URL sort by @Zweih in https://github.com/Zweih/qp/pull/270
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.18.0...v5.19.0
+
 ## v5.18.0
 ### What's Changed
 * Feature: Add reason sort by @Zweih in https://github.com/Zweih/qp/pull/269
+
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v5.17.0...v5.18.0
 
