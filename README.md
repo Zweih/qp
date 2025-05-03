@@ -114,7 +114,7 @@ learn about installation [here](#installation)
 | ✓ | architecture query | ✓ | groups field |
 | ✓	| conflicts query | ✓ | package description sort |
 | ✓	| regenerate cache option | ✓ | validation query |
-| - | url sort | - | groups sort |
+| ✓ | url sort | - | groups sort |
 | ✓ | packager field | ✓ | optional dependency field |
 | ✓ | sort by size on disk | - | conflicts sort |
 | - | optional-for sort | - | provides sort |
@@ -358,6 +358,7 @@ qp w q has:depends or has:required-by p and not reason=explicit
 - `arch`
 - `license`
 - `description`
+- `url`
 - `validation`
 - `pkgtype`
 - `pkgbase`
