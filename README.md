@@ -120,7 +120,7 @@ learn about installation [here](#installation)
 | - | optional-for sort | - | provides sort |
 | ✓ | validation field | ✓ | validation sort |
 | ✓ | packager sort | ✓ | architecture sort |
-| ✓ | reason sort | - |version sort |
+| ✓ | reason sort | ✓ |version sort |
 | ✓ | reverse optional dependencies field (optional for) | - | optdepends installation indicator |
 | ✓ | optional-for query | - | separate field for optdepends reason |
 | ✓ | fuzzy/strict querying | ✓ | existence querying |
@@ -355,6 +355,7 @@ qp w q has:depends or has:required-by p and not reason=explicit
 - `size`
 - `name`
 - `reason`
+- `version`
 - `arch`
 - `license`
 - `description`
