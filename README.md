@@ -127,7 +127,7 @@ learn about installation [here](#installation)
 | ✓ | existence querying | - | depth querying |
 | ✓ | pkgtype query | ✓ | optdepends query |
 | ✓ | packager query | ✓ | origin field |
-| - | origin sort | - | origin query |
+| ✓ | origin sort | - | origin query |
 | ✓ | command-based syntax | ✓ | full boolean logic |
 | ✓ | abstract syntax tree | ✓ | directed acyclical graph for filtering |
 | - | user-defined macros | ✓ | parentetical (grouping) logic |
@@ -356,6 +356,7 @@ qp w q has:depends or has:required-by p and not reason=explicit
 - `name`
 - `reason`
 - `version`
+- `origin`
 - `arch`
 - `license`
 - `description`
