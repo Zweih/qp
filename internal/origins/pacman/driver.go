@@ -13,7 +13,7 @@ func (d *PacmanDriver) Name() string {
 }
 
 func (d *PacmanDriver) Detect() bool {
-	_, err := os.Stat("/var/lib/pacman/local")
+	_, err := os.Stat(PacmanDbPath)
 	return err == nil
 }
 
@@ -22,7 +22,7 @@ func (d *PacmanDriver) Load() ([]*pkgdata.PkgInfo, error) {
 }
 
 func (d *PacmanDriver) ResolveDeps(pkgs []*pkgdata.PkgInfo) ([]*pkgdata.PkgInfo, error) {
-	return resolveDependencyGraph(pkgs, nil)
+	return pkgdata.ResolveDependencyGraph(pkgs, nil)
 }
 
 func (d *PacmanDriver) LoadCache(path string, modTime int64) ([]*pkgdata.PkgInfo, error) {
@@ -38,7 +38,7 @@ func (d *PacmanDriver) SaveCache(
 }
 
 func (d *PacmanDriver) SourceModified() (int64, error) {
-	dirInfo, err := os.Stat("/var/lib/pacman/local")
+	dirInfo, err := os.Stat(PacmanDbPath)
 	if err != nil {
 		return 0, fmt.Errorf("failed to read pacman DB mod time: %v", err)
 	}

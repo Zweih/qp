@@ -13,7 +13,7 @@ import (
 func parseDescFile(descPath string) (*pkgdata.PkgInfo, error) {
 	file, err := os.Open(descPath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to open file: %v", err)
+		return nil, fmt.Errorf("failed to open desc file: %v", err)
 	}
 
 	defer file.Close()
@@ -21,7 +21,7 @@ func parseDescFile(descPath string) (*pkgdata.PkgInfo, error) {
 	// the average desc file is 103.13 lines, reading the entire file into memory is more efficient than using bufio.Scanner
 	data, err := io.ReadAll(file)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read file: %w", err)
+		return nil, fmt.Errorf("failed to load desc file: %w", err)
 	}
 
 	var pkg pkgdata.PkgInfo
