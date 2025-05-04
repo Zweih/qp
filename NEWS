@@ -1,8 +1,15 @@
 # qp Release Notes
 
+## v5.21.0
+### What's Changed
+* Feature: Add origin sort by @Zweih in https://github.com/Zweih/qp/pull/273
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.20.0...v5.21.0
+
 ## v5.20.0
 ### What's Changed
 * Feature: Add version sort by @Zweih in https://github.com/Zweih/qp/pull/271
+
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v5.19.0...v5.20.0
 
