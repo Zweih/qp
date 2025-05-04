@@ -35,10 +35,10 @@ func GetComparator(field consts.FieldType, asc bool) (PkgComparator, error) {
 	case consts.FieldDate, consts.FieldBuildDate, consts.FieldSize:
 		return makeComparator(func(p *PkgInfo) int64 { return p.GetInt(field) }, asc), nil
 
-	case consts.FieldName, consts.FieldReason, consts.FieldArch,
-		consts.FieldLicense, consts.FieldDescription, consts.FieldUrl,
-		consts.FieldValidation, consts.FieldPkgType, consts.FieldPkgBase,
-		consts.FieldPackager:
+	case consts.FieldName, consts.FieldReason, consts.FieldVersion,
+		consts.FieldArch, consts.FieldLicense, consts.FieldDescription,
+		consts.FieldUrl, consts.FieldValidation, consts.FieldPkgType,
+		consts.FieldPkgBase, consts.FieldPackager:
 		return makeComparator(func(p *PkgInfo) string {
 			return strings.ToLower(p.GetString(field))
 		}, asc), nil
