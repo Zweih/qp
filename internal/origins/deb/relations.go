@@ -1,4 +1,4 @@
-package apt
+package deb
 
 import (
 	"qp/internal/pkgdata"

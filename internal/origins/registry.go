@@ -2,12 +2,12 @@ package origins
 
 import (
 	"qp/interfaces"
-	"qp/internal/origins/apt"
+	"qp/internal/origins/deb"
 	"qp/internal/origins/pacman"
 )
 
 var registeredDrivers = []interfaces.Driver{
-	&apt.AptDriver{},
+	&deb.DebDriver{},
 	&pacman.PacmanDriver{},
 }
 

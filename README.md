@@ -40,7 +40,7 @@ this package is compatible with the following distributions:
  - [artix linux](https://artixlinux.org/)
  - the 50 other arch-based distros, as long as it has pacman installed
 
-non-arch distros are planned!
+non-arch distros and non-linux platforms are planned!
 
 ## features
 
@@ -127,13 +127,14 @@ learn about installation [here](#installation)
 | ✓ | existence querying | - | depth querying |
 | ✓ | pkgtype query | ✓ | optdepends query |
 | ✓ | packager query | ✓ | origin field |
-| ✓ | origin sort | - | origin query |
+| ✓ | origin sort | ✓ | origin query |
 | ✓ | command-based syntax | ✓ | full boolean logic |
 | ✓ | abstract syntax tree | ✓ | directed acyclical graph for filtering |
 | - | user-defined macros | ✓ | parentetical (grouping) logic |
 | ✓ | limit from end | ✓ | limit from middle |
 | - | replaces sort | - | built-in macros |
 | - | query explaination | - | user configuration file |
+| ✓ | deb origin (apt/dpkg support) | - | apt packaging |
 
 ## installation
 
@@ -304,6 +305,7 @@ qp w q has:depends or has:required-by p and not reason=explicit
 | name | string |
 | reason | string |
 | version | string |
+| origin | string |
 | arch | string |
 | license | string |
 | pkgbase | string |

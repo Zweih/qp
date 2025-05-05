@@ -26,9 +26,9 @@ func QueriesToConditions(queries []query.FieldQuery) ([]*FilterCondition, error)
 			condition, err = parseRangeCondition(query)
 
 		case consts.FieldName, consts.FieldReason, consts.FieldVersion,
-			consts.FieldArch, consts.FieldLicense, consts.FieldDescription,
-			consts.FieldUrl, consts.FieldValidation, consts.FieldPkgType,
-			consts.FieldPkgBase, consts.FieldPackager:
+			consts.FieldOrigin, consts.FieldArch, consts.FieldLicense,
+			consts.FieldDescription, consts.FieldUrl, consts.FieldValidation,
+			consts.FieldPkgType, consts.FieldPkgBase, consts.FieldPackager:
 			condition, err = parseStringCondition(query)
 
 		case consts.FieldConflicts, consts.FieldReplaces,
