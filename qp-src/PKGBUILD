@@ -10,7 +10,7 @@ makedepends=("go>=1.24.1")
 conflicts=("qp-bin" "qp-git")
 replaces=("yaylog" "yaylog-bin" "yaylog-git")
 source=("${url}/releases/download/v${pkgver}/qp-v${pkgver}.tar.gz")
-sha256sums=("083257c9dfeaa9ad01bc31a5befb2837a476530ec58ce15b0a45c234d7bdce93")
+sha256sums=("dac4c8b3571bf66824220ce3d78816111feacd74c9f1d5d93e6225e045363765")
 
 build() {
   cd "${srcdir}/${pkgname}-v${pkgver}"

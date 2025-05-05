@@ -14,10 +14,10 @@ pkgbase = qp-bin
 	replaces = yaylog-bin
 	replaces = yaylog-git
 	source_x86_64 = https://github.com/Zweih/qp/releases/download/v5.24.1/qp-v5.24.1-x86_64.tar.gz
-	sha256sums_x86_64 = 0a4453f074ceefc043b5dc038b4a70264ff8b3da2df970101a4592a0e77a133c
+	sha256sums_x86_64 = 41f0d70ee05d526c3093658e3488403cf4ee8214d9ec36daa4a3843cff675add
 	source_aarch64 = https://github.com/Zweih/qp/releases/download/v5.24.1/qp-v5.24.1-aarch64.tar.gz
-	sha256sums_aarch64 = fc2ce3def088cbb20a95d31b5c51e3dea75417c54dcd1209baa7789b721117b4
+	sha256sums_aarch64 = 4450c5117c96af6390557947ef1cef2ad99f10f8df102c1aca421ca425fb5bcc
 	source_armv7h = https://github.com/Zweih/qp/releases/download/v5.24.1/qp-v5.24.1-armv7h.tar.gz
-	sha256sums_armv7h = 08b96aa3f96df80569d485ec208b8d132f31afcec6568f20e68021d330668f96
+	sha256sums_armv7h = 7668e4d996b1428c0c9a6f2f12c465c9a62d46a2ac559e66f77a3ec0357df524
 
 pkgname = qp-bin

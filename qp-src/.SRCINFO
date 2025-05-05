@@ -12,6 +12,6 @@ pkgbase = qp
 	replaces = yaylog-bin
 	replaces = yaylog-git
 	source = https://github.com/Zweih/qp/releases/download/v5.24.1/qp-v5.24.1.tar.gz
-	sha256sums = 083257c9dfeaa9ad01bc31a5befb2837a476530ec58ce15b0a45c234d7bdce93
+	sha256sums = dac4c8b3571bf66824220ce3d78816111feacd74c9f1d5d93e6225e045363765
 
 pkgname = qp
