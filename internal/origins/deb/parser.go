@@ -99,7 +99,7 @@ func parseStatusBlock(block []byte, reasonMap map[string]string, origin string) 
 		case fieldDepends, fieldPreDepends:
 			pkg.Depends = append(pkg.Depends, parseRelations(value)...)
 
-		case fieldReccommends, fieldSuggests:
+		case fieldRecommends, fieldSuggests:
 			pkg.OptDepends = append(pkg.OptDepends, parseRelations(value)...)
 
 		case fieldProvides:

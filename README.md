@@ -1,6 +1,6 @@
 # qp - query packages
 
-`qp` is a CLI util, written in **Go** / **Golang**, for [arch linux](https://archlinux.org) and arch-based linux distros to query installed packages.
+`qp` is a CLI util, written in **Go** / **Golang**, for arch-based and debian-based linux distros to query installed packages.
 
 you can find installation instructions [here](#installation).
 
@@ -32,15 +32,20 @@ graphs are generated daily with my other project, [repulse analytics](https://gi
 
 this package is compatible with the following distributions:
  - [arch linux](https://archlinux.org)
+ - [debian](https://debian.org)
+ - [linux mint](https://linuxmint.com)
  - [manjaro](https://manjaro.org/)
  - [steamOS](https://store.steampowered.com/steamos)
+ - [ubuntu](https://ubuntu.com)
+ - [pop!_os](https://system76.com/pop/)
  - [garuda linux](https://garudalinux.org/)
  - [endeavourOS](https://endeavouros.com/)
  - [mabox linux](https://maboxlinux.org/)
- - [artix linux](https://artixlinux.org/)
- - the 50 other arch-based distros, as long as it has pacman installed
+ - [zorin os](https://zorin.com/os/)
+ - [elementary os](https://elementary.io/)
+ - the 50 other arch and debian-based distros, as long as they have `pacman`, `apt`, or `dpkg` installed
 
-non-arch distros and non-linux platforms are planned!
+more distros and non-linux platforms are planned!
 
 ## features
 
@@ -105,7 +110,6 @@ learn about installation [here](#installation)
 | – | list possibly or confirmed stale/abandoned packages | – | self-referencing field |
 | ✓  | groups query | – | streaming pipeline |
 | – | short-args for queries | – | key/value output |
-| – | XML output | – | package description sort |
 | ✓ | package base query | – | required-by sort |
 | – | optdepends sort | – | depends sort |
 | ✓ | build-date field | ✓ | build-date query |
@@ -134,11 +138,12 @@ learn about installation [here](#installation)
 | ✓ | limit from end | ✓ | limit from middle |
 | - | replaces sort | - | built-in macros |
 | - | query explaination | - | user configuration file |
-| ✓ | deb origin (apt/dpkg support) | - | apt packaging |
+| ✓ | deb origin (apt/dpkg support) | ✓ | deb packaging |
+| - | replaced-by resolution | - | multi-license support | 
 
 ## installation
 
-### from AUR (**recommended**)
+### arch-based systems (AUR)
 
 install using an [AUR helper](https://wiki.archlinux.org/title/AUR_helpers) like `yay`, `paru`, `aura`, etc.:
 ```bash
@@ -155,9 +160,23 @@ for the latest (unstable) version from git w/ the AUR, use `qp-git`*.
 
 the cache is located under `/query-packages` at `$HOME/.cache/` or wherever you have `$XDG_HOME_CACHE` set to.
 
+### debian-based systems (e.g. ubuntu, mint, pop!_os)
+
+to install the latest `.deb` release for your system architecture:
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/zweih/qp/packaging/install-qp-deb.sh)
+```
+
+this script downloads the latest published release from github and installs it using `dpkg`.
+
+\***note**: you can inspect the script beforehand [here](https://github.com/Zweih/qp/packaging/install-qp-deb.sh). all binaries are built and signed by github CI on release tags.
+
+installation via `apt` is coming soon™!
+
 ### building from source + manual installation
 
-**note**: this packages is specific to arch-based linux distributions
+**note**: this packages is specific to arch-based and debian-based linux distributions
 
 1. clone the repo:
    ```bash

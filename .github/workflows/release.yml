@@ -143,7 +143,7 @@ jobs:
           DATE=$(date -u +'%B %Y')
           sed -e "s/@VERSION@/${VERSION}/g" -e "s/@DATE@/$DATE/g" qp.1 > ./release/qp.1
 
-      - name: Package binaries with manpage and NEWS
+      - name: Package AUR binaries with manpage and NEWS
         run: |
           for binary in ./release/qp-*; do
             arch=$(basename "$binary" | cut -d'-' -f2)
@@ -151,7 +151,7 @@ jobs:
             tar -czvf ./release/qp-${{ env.TAG_NAME }}-${arch}.tar.gz -C ./release "$(basename "$binary")" qp.1 NEWS
           done
 
-      - name: Package source tarball with NEWS
+      - name: Package AUR source tarball with NEWS
         run: |
           mkdir -p ./release/temp-qp/qp-${{ env.TAG_NAME }}
           git archive --format=tar HEAD | tar -x -C ./release/temp-qp/qp-${{ env.TAG_NAME }}
@@ -163,6 +163,24 @@ jobs:
           cp ./release/qp.1 ./release/temp-qp/qp-${{ env.TAG_NAME }}/qp.1
 
           tar -czf ./release/qp-${{ env.TAG_NAME }}.tar.gz -C ./release/temp-qp qp-${{ env.TAG_NAME }}
+
+      - name: Package .deb
+        run: |
+          git fetch origin packaging
+          git checkout packaging
+
+          chmod +x ./package_deb.sh
+
+          for binary in ./release/qp-*; do
+            name=$(basename "$binary")
+
+            if [[ "$name" =~ ^qp-(x86_64|aarch64|armv7h)$ ]]; then
+              echo "Packaging $binary"
+              ./package_deb.sh "${TAG_NAME#v}" "" "$binary" ./release/NEWS ./release/qp.1 ./debian/copyright ./release
+            else
+              echo "Skipping non-binary or unexpected file: $name"
+            fi
+          done
 
       - name: Generate SHA256 checksums
         run: |
@@ -234,7 +252,7 @@ jobs:
           git push origin packaging
       - name: Publish Release
         run: |
-          gh release upload "${{ env.TAG_NAME }}" ./release/qp-*.tar.gz --clobber
+          gh release upload "${{ env.TAG_NAME }}" ./release/qp-*.tar.gz ./release/qp-*.deb --clobber
         env:
           GH_TOKEN: ${{ github.token }}
 
