@@ -128,25 +128,17 @@ func (pkg *PkgInfo) GetRelations(field consts.FieldType) []Relation {
 	}
 }
 
-const (
-	equal        = "="
-	less         = "<"
-	greater      = ">"
-	lessEqual    = less + equal
-	greaterEqual = greater + equal
-)
-
 func StringToOperator(operatorInput string) RelationOp {
 	switch operatorInput {
-	case equal:
+	case "=", "==":
 		return OpEqual
-	case less:
+	case "<", "<<":
 		return OpLess
-	case greater:
-		return OpGreater
-	case lessEqual:
+	case "<=", "=<":
 		return OpLessEqual
-	case greaterEqual:
+	case ">", ">>":
+		return OpGreater
+	case ">=", "=>":
 		return OpGreaterEqual
 	default:
 		return OpNone
@@ -156,15 +148,15 @@ func StringToOperator(operatorInput string) RelationOp {
 func OperatorToString(op RelationOp) string {
 	switch op {
 	case OpEqual:
-		return equal
+		return "="
 	case OpLess:
-		return less
+		return "<"
 	case OpGreater:
-		return greater
+		return ">"
 	case OpLessEqual:
-		return lessEqual
+		return "<="
 	case OpGreaterEqual:
-		return greaterEqual
+		return ">="
 	default:
 		return ""
 	}
