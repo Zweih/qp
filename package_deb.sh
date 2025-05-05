@@ -31,6 +31,7 @@ mkdir -p "$PKGDIR/DEBIAN"
 mkdir -p "$PKGDIR/usr/bin"
 mkdir -p "$PKGDIR/usr/share/doc/qp"
 mkdir -p "$PKGDIR/usr/share/man/man1"
+SIZE_KB=$(du -sk --exclude=DEBIAN "$PKGDIR" | cut -f1)
 
 cat >"$PKGDIR/DEBIAN/control" <<EOF
 Package: qp
@@ -38,8 +39,10 @@ Version: ${VERSION}
 Section: utils
 Priority: optional
 Architecture: ${DEBARCH}
+Installed-Size: ${SIZE_KB}
 Maintainer: Fernando Nunez <me@fernandonunez.io>
 Description: qp - Query Packages. A CLI tool for querying installed packages.
+Homepage: https://github.com/Zweih/qp
 EOF
 
 install -m 755 "$BIN" "$PKGDIR/usr/bin/qp"
