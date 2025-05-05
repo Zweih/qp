@@ -13,7 +13,7 @@ const (
 	fieldReplaces      = "Replaces"
 	fieldDepends       = "Depends"
 	fieldPreDepends    = "Pre-Depends"
-	fieldReccommends   = "Reccommends"
+	fieldRecommends    = "Recommends"
 	fieldSuggests      = "Suggests"
 	fieldProvides      = "Provides"
 	fieldPriority      = "Priority"
