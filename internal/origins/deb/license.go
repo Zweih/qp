@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"qp/internal/pkgdata"
+	"sort"
 	"strings"
 )
 
@@ -29,16 +30,47 @@ var licenseHints = []struct {
 	{"lgpl", "LGPL", 2},
 }
 
+// TODO: this should be broken up
 func extractLicense(pkg *pkgdata.PkgInfo) error {
-	path := filepath.Join(licensePath, pkg.Name, licenseFileName)
-	file, err := os.Open(path)
+	basePath := filepath.Join(licensePath, pkg.Name, licenseFileName)
+	resolvedPath, err := filepath.EvalSymlinks(basePath)
+	if err != nil || !fileExists(resolvedPath) {
+		symlinkTarget, statErr := os.Readlink(basePath)
+		var fallbackPrefix string
+
+		if statErr == nil {
+			parts := strings.Split(symlinkTarget, string(filepath.Separator))
+			if len(parts) >= 2 {
+				fallbackPrefix = parts[len(parts)-2]
+			}
+		}
+
+		if fallbackPrefix == "" {
+			fallbackPrefix = pkg.Name
+		}
+
+		pattern := filepath.Join(licensePath, fallbackPrefix+"*/"+licenseFileName)
+		matches, _ := filepath.Glob(pattern)
+
+		if len(matches) == 0 {
+			pkg.License = "unknown"
+			return nil
+		}
+
+		sort.Strings(matches)
+		resolvedPath = matches[0]
+	}
+
+	file, err := os.Open(resolvedPath)
 	if err != nil {
-		return fmt.Errorf("failed to read license file for %s: %w", pkg.Name, err)
+		pkg.License = "unknown"
+		return fmt.Errorf("failed to open license file for %s: %w", pkg.Name, err)
 	}
 	defer file.Close()
 
 	data, err := io.ReadAll(file)
 	if err != nil {
+		pkg.License = "unknown"
 		return fmt.Errorf("failed to load license file for %s: %w", pkg.Name, err)
 	}
 
@@ -78,7 +110,13 @@ func extractLicense(pkg *pkgdata.PkgInfo) error {
 		return nil
 	}
 
-	return fmt.Errorf("no license found for %s", pkg.Name)
+	pkg.License = "custom"
+	return nil
+}
+
+func fileExists(path string) bool {
+	info, err := os.Stat(path)
+	return err == nil && !info.IsDir()
 }
 
 func matchLicenseText(data []byte) (string, bool) {

@@ -40,10 +40,10 @@ func (p *Pipeline) fetchStep(
 
 	pkgs, err := p.Origin.Load()
 	if err != nil {
-		out.WriteLine(fmt.Sprintf(
-			"Warning: failed to fetch packages for origin %s: %v",
+		err = fmt.Errorf(
+			"failed to fetch packages for origin: %v",
 			p.Origin.Name(), err,
-		))
+		)
 		return nil, err
 	}
 
