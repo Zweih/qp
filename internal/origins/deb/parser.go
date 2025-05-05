@@ -113,9 +113,7 @@ func parseStatusBlock(block []byte, reasonMap map[string]string, origin string) 
 	if err := getInstallTime(pkg); err != nil {
 		collected = append(collected, err)
 	}
-	if err := extractLicense(pkg); err != nil {
-		collected = append(collected, err)
-	}
+	_ = extractLicense(pkg)
 
 	pkg.Origin = origin
 

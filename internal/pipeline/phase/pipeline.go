@@ -29,7 +29,7 @@ func NewPipeline(
 ) *Pipeline {
 	modTime, err := origin.SourceModified()
 	if err != nil {
-		out.WriteLine(fmt.Sprintf("Warning: failed to get mod time for origin %s", origin.Name()))
+		out.WriteLine(fmt.Sprintf("WARNING: failed to get mod time for origin %s", origin.Name()))
 		modTime = time.Now().Unix()
 	}
 
