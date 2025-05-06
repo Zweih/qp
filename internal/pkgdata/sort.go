@@ -16,7 +16,7 @@ const ConcurrentSortThreshold = 500
 type PkgComparator func(a *PkgInfo, b *PkgInfo) bool
 
 type ordered interface {
-	~int64 | ~string
+	~int64 | ~string | ~int
 }
 
 func makeComparator[T ordered](
@@ -41,6 +41,11 @@ func GetComparator(field consts.FieldType, asc bool) (PkgComparator, error) {
 		consts.FieldPkgBase, consts.FieldPackager, consts.FieldOrigin:
 		return makeComparator(func(p *PkgInfo) string {
 			return strings.ToLower(p.GetString(field))
+		}, asc), nil
+
+	case consts.FieldConflicts:
+		return makeComparator(func(p *PkgInfo) int {
+			return len(p.GetRelations(field))
 		}, asc), nil
 
 	default:
