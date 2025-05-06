@@ -122,6 +122,7 @@ func markHiddenFlags() {
 
 	for _, flag := range hiddenFlags {
 		_ = pflag.CommandLine.MarkHidden(flag)
+		pflag.CommandLine.MarkDeprecated(flag, "please use command syntax instead. Run `man qp` for more info. Flag syntax will be removed in the future.")
 	}
 }
 
