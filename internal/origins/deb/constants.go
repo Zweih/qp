@@ -1,6 +1,7 @@
 package deb
 
 const (
+	fieldStatus        = "Status"
 	fieldInstalledSize = "Installed-Size"
 	fieldPackage       = "Package"
 	fieldVersion       = "Version"

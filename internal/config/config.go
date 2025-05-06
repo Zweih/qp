@@ -7,11 +7,6 @@ import (
 	"qp/internal/syntax"
 )
 
-const (
-	ReasonExplicit   = "explicit"
-	ReasonDependency = "dependency"
-)
-
 type Config struct {
 	Limit             int
 	ShowHelp          bool

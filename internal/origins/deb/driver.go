@@ -3,10 +3,13 @@ package deb
 import (
 	"fmt"
 	"os"
+	"qp/internal/consts"
 	"qp/internal/pkgdata"
 )
 
-type DebDriver struct{}
+type DebDriver struct {
+	fallbackNeeded bool
+}
 
 func (d *DebDriver) Name() string {
 	return "deb"
@@ -18,11 +21,27 @@ func (d *DebDriver) Detect() bool {
 }
 
 func (d *DebDriver) Load() ([]*pkgdata.PkgInfo, error) {
-	return fetchPackages(d.Name())
+	reasonMap, err := loadInstallReasons()
+	d.fallbackNeeded = err != nil
+
+	return fetchPackages(d.Name(), reasonMap)
 }
 
 func (d *DebDriver) ResolveDeps(pkgs []*pkgdata.PkgInfo) ([]*pkgdata.PkgInfo, error) {
-	return pkgdata.ResolveDependencyGraph(pkgs, nil)
+	resolvedPkgs, err := pkgdata.ResolveDependencyGraph(pkgs, nil)
+	if err != nil {
+		return resolvedPkgs, err
+	}
+
+	if d.fallbackNeeded {
+		for _, pkg := range resolvedPkgs {
+			if pkg.Reason == consts.ReasonExplicit && len(pkg.RequiredBy) > 0 {
+				pkg.Reason = consts.ReasonDependency
+			}
+		}
+	}
+
+	return resolvedPkgs, nil
 }
 
 func (d *DebDriver) LoadCache(path string, modTime int64) ([]*pkgdata.PkgInfo, error) {

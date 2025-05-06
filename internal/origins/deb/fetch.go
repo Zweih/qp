@@ -7,7 +7,7 @@ import (
 	"qp/internal/pkgdata"
 )
 
-func fetchPackages(origin string) ([]*pkgdata.PkgInfo, error) {
+func fetchPackages(origin string, reasonMap map[string]string) ([]*pkgdata.PkgInfo, error) {
 	file, err := os.Open(dpkgPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open status file: %w", err)
@@ -19,5 +19,5 @@ func fetchPackages(origin string) ([]*pkgdata.PkgInfo, error) {
 		return nil, fmt.Errorf("failed to read status file: %w", err)
 	}
 
-	return parseStatusFile(data, origin)
+	return parseStatusFile(data, origin, reasonMap)
 }

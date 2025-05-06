@@ -5,19 +5,24 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"qp/internal/consts"
 )
 
-// only works for APT systems, we'll need to add more heuristics to get reasons for dpkg only systems
+// for dpkg only systems and minimal ubuntu docker containers, this file does not exist or is empty. we use a fallback after dependency resolution in those cases to infer the reason
 func loadInstallReasons() (map[string]string, error) {
 	file, err := os.Open(installReasonPath)
 	if err != nil {
-		return map[string]string{}, nil
+		return map[string]string{}, fmt.Errorf("failed to read extended_states: %w", err)
 	}
 	defer file.Close()
 
 	data, err := io.ReadAll(file)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read install reason file: %w", err)
+		return map[string]string{}, fmt.Errorf("failed to load extended_states: %w", err)
+	}
+
+	if len(data) == 0 {
+		return map[string]string{}, fmt.Errorf("extended_states file is empty")
 	}
 
 	reasonMap := make(map[string]string)
@@ -36,7 +41,7 @@ func loadInstallReasons() (map[string]string, error) {
 		}
 
 		if name != "" && isAuto {
-			reasonMap[name] = "dependency"
+			reasonMap[name] = consts.ReasonDependency
 		}
 	}
 
