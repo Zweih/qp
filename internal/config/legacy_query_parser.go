@@ -97,7 +97,7 @@ func convertLegacyQueries(
 	if explicitOnly {
 		queries = append(queries, query.FieldQuery{
 			Field:  consts.FieldReason,
-			Target: ReasonExplicit,
+			Target: consts.ReasonExplicit,
 			Match:  consts.MatchFuzzy,
 		})
 	}
@@ -105,7 +105,7 @@ func convertLegacyQueries(
 	if dependenciesOnly {
 		queries = append(queries, query.FieldQuery{
 			Field:  consts.FieldReason,
-			Target: ReasonDependency,
+			Target: consts.ReasonDependency,
 			Match:  consts.MatchFuzzy,
 		})
 	}

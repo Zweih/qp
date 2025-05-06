@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"qp/internal/consts"
 	"qp/internal/pkgdata"
 	"strconv"
 	"strings"
@@ -115,9 +116,9 @@ func applySingleLineField(pkg *pkgdata.PkgInfo, field string, value string) erro
 		pkg.Name = value
 
 	case fieldReason:
-		pkg.Reason = "explicit"
+		pkg.Reason = consts.ReasonExplicit
 		if value == "1" {
-			pkg.Reason = "dependency"
+			pkg.Reason = consts.ReasonDependency
 		}
 
 	case fieldVersion:

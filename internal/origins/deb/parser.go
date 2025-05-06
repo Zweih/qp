@@ -10,12 +10,7 @@ import (
 	"strings"
 )
 
-func parseStatusFile(data []byte, origin string) ([]*pkgdata.PkgInfo, error) {
-	reasonMap, err := loadInstallReasons()
-	if err != nil {
-		return []*pkgdata.PkgInfo{}, err
-	}
-
+func parseStatusFile(data []byte, origin string, reasonMap map[string]string) ([]*pkgdata.PkgInfo, error) {
 	var collectedErrors []error
 	pkgs := []*pkgdata.PkgInfo{}
 
@@ -24,7 +19,12 @@ func parseStatusFile(data []byte, origin string) ([]*pkgdata.PkgInfo, error) {
 			continue
 		}
 
-		pkg, err := parseStatusBlock(block, reasonMap, origin)
+		fields := parseStatusFields(block)
+		if fields[fieldStatus] != "install ok installed" {
+			continue
+		}
+
+		pkg, err := parseStatusBlock(fields, reasonMap, origin)
 		if err != nil {
 			collectedErrors = append(collectedErrors, err)
 		}
@@ -43,6 +43,11 @@ func parseStatusFields(block []byte) map[string]string {
 	fields := make(map[string]string)
 
 	for line := range bytes.SplitSeq(block, []byte("\n")) {
+		// skip continuation lines
+		if len(line) > 0 && (line[0] == ' ' || line[0] == '\t') {
+			continue
+		}
+
 		parts := bytes.SplitN(line, []byte(":"), 2)
 		if len(parts) != 2 {
 			continue
@@ -56,8 +61,11 @@ func parseStatusFields(block []byte) map[string]string {
 	return fields
 }
 
-func parseStatusBlock(block []byte, reasonMap map[string]string, origin string) (*pkgdata.PkgInfo, error) {
-	fields := parseStatusFields(block)
+func parseStatusBlock(
+	fields map[string]string,
+	reasonMap map[string]string,
+	origin string,
+) (*pkgdata.PkgInfo, error) {
 	var collected []error
 	pkg := &pkgdata.PkgInfo{}
 	meta := map[string]string{}
@@ -117,13 +125,13 @@ func parseStatusBlock(block []byte, reasonMap map[string]string, origin string) 
 
 	pkg.Origin = origin
 
-	// TODO: for dpkg-only systems, perhaps return "unknown" for non-system packages
-	if isSystem(meta) {
-		pkg.Reason = "system"
-	} else if reasonMap[pkg.Name] == "dependency" {
-		pkg.Reason = "dependency"
-	} else {
-		pkg.Reason = "explicit"
+	switch {
+	case isSystem(meta):
+		pkg.Reason = consts.ReasonExplicit
+	case reasonMap[pkg.Name] == consts.ReasonDependency:
+		pkg.Reason = consts.ReasonDependency
+	default:
+		pkg.Reason = consts.ReasonExplicit
 	}
 
 	return pkg, errors.Join(collected...)
