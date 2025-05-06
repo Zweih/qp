@@ -1,9 +1,16 @@
 # qp Release Notes
 
+## v5.25.0
+### What's Changed
+* Feature: Add deprecation notice for flag syntax by @Zweih in https://github.com/Zweih/qp/pull/280
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.24.1...v5.25.0
+
 ## v5.24.1
 ### What's Changed
 * Fix: Deb origin symlink licensing by @Zweih in https://github.com/Zweih/qp/pull/278
 * Feature: .deb packaging by @Zweih in https://github.com/Zweih/qp/pull/279
+
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v5.23.0...v5.24.1
 
