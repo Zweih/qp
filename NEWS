@@ -1,8 +1,15 @@
 # qp Release Notes
 
+## v5.27.0
+### What's Changed
+* Feature: Add conflicts sort by @Zweih in https://github.com/Zweih/qp/pull/282
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.26.0...v5.27.0
+
 ## v5.26.0
 ### What's Changed
 * Feature: Improve reason resolution in minimal envs by @Zweih in https://github.com/Zweih/qp/pull/281
+
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v5.25.0...v5.26.0
 
