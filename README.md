@@ -37,12 +37,12 @@ this package is compatible with the following distributions:
  - [manjaro](https://manjaro.org/)
  - [steamOS](https://store.steampowered.com/steamos)
  - [ubuntu](https://ubuntu.com)
- - [pop!_os](https://system76.com/pop/)
+ - [pop!_OS](https://system76.com/pop/)
  - [garuda linux](https://garudalinux.org/)
  - [endeavourOS](https://endeavouros.com/)
  - [mabox linux](https://maboxlinux.org/)
- - [zorin os](https://zorin.com/os/)
- - [elementary os](https://elementary.io/)
+ - [zorin OS](https://zorin.com/os/)
+ - [elementary OS](https://elementary.io/)
  - the 50 other arch and debian-based distros, as long as they have `pacman`, `apt`, or `dpkg` installed
 
 more distros and non-linux platforms are planned!
