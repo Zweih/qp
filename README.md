@@ -10,13 +10,13 @@ check [features](#features) to find out more.
 
 check [usage](#usage) for all available commands + options.
 
-![qp logo | query packages logo](https://gistcdn.githack.com/Zweih/9009d5c74eab8a5515a8a64a0495df32/raw/ef8a8ac3655fd3dee24494a3403867919d806b63/qp-logo_clean.svg)
+![downloads-badge](https://zweih.github.io/repulse-analytics/downloads_badge.svg) ![clones-badge](https://zweih.github.io/repulse-analytics/clones_badge.svg)
+
+<img src="https://zweih.github.io/repulse-analytics/qp-logo-query-packages.svg" alt="qp logo - query packages CLI tool logo">
 
 [![AUR version - qp](https://img.shields.io/aur/version/qp?style=flat-square&logo=arch-linux&logoColor=1793d1&label=qp&color=1793d1)](https://aur.archlinux.org/packages/qp)
 [![AUR version - qp-bin](https://img.shields.io/aur/version/qp-bin?style=flat-square&logo=arch-linux&logoColor=1793d1&label=qp-bin&color=1793d1)](https://aur.archlinux.org/packages/qp-bin)
 [![AUR version - qp-git](https://img.shields.io/aur/version/qp-git?style=flat-square&logo=arch-linux&logoColor=1793d1&label=qp-git&color=1793d1)](https://aur.archlinux.org/packages/qp-git)
-
-![GitHub Downloads](https://img.shields.io/github/downloads/Zweih/qp/total?style=for-the-badge&logo=github&label=Downloads%20since%202%2F4%2F2025&color=1793d1)
 
 ![Alt](https://repobeats.axiom.co/api/embed/a13406d103a649d70641774ee85e7a9983ccf96b.svg "Repobeats analytics image")
 
@@ -26,7 +26,7 @@ check [usage](#usage) for all available commands + options.
  
 graphs are generated daily with my other project, [repulse analytics](https://github.com/Zweih/repulse-analytics)
 
-<img src="https://raw.githubusercontent.com/Zweih/repulse-analytics/refs/heads/repulse-traffic-graphs/total_downloads.png" alt="total downloads" width="400"/> <img src="https://raw.githubusercontent.com/Zweih/repulse-analytics/refs/heads/repulse-traffic-graphs/total_clones.png" alt="total clones" width="400"/>
+![repulse graphs for qp](https://zweih.github.io/repulse-analytics/combined_graphs.svg)
 
 </details>
 
@@ -107,7 +107,6 @@ learn about installation [here](#installation)
 | ✓ | depends query | ✓ | all-fields option |
 | ✓ | required-by query | ✓ | no cache option |
 | ✓ | optional full timestamp | ✓ | package description field |
-| – | list possibly or confirmed stale/abandoned packages | – | self-referencing field |
 | ✓  | groups query | – | streaming pipeline |
 | – | short-args for queries | – | key/value output |
 | ✓ | package base query | – | required-by sort |
@@ -120,7 +119,7 @@ learn about installation [here](#installation)
 | ✓	| regenerate cache option | ✓ | validation query |
 | ✓ | url sort | - | groups sort |
 | ✓ | packager field | ✓ | optional dependency field |
-| ✓ | sort by size on disk | - | conflicts sort |
+| ✓ | sort by size on disk | ✓ | conflicts sort |
 | - | optional-for sort | - | provides sort |
 | ✓ | validation field | ✓ | validation sort |
 | ✓ | packager sort | ✓ | architecture sort |
@@ -386,6 +385,7 @@ qp w q has:depends or has:required-by p and not reason=explicit
 - `pkgtype`
 - `pkgbase`
 - `packager`
+- `conflicts`
 
 ### JSON output
 
