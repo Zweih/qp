@@ -9,7 +9,7 @@ func ResolveDependencyGraph(
 	pkgs []*PkgInfo,
 	_ meta.ProgressReporter, // TODO: Add progress reporting
 ) ([]*PkgInfo, error) {
-	providesMap := buildProvidesMap(pkgs)
+	providesMap, installedMap := collectPkgData(pkgs)
 	forwardShallow, reverseShallow, optReverseShallow := buildShallowGraph(pkgs, providesMap)
 
 	var visited map[string]int32
@@ -27,6 +27,7 @@ func ResolveDependencyGraph(
 			walkFullGraph(name, forwardShallow, visited, ""),
 		)
 
+		pkg.OptionalFor = filterToKeys(pkg.OptionalFor, installedMap)
 		pkg.OptionalFor = collapseRelations(
 			walkFullOptGraph(name, optReverseShallow[name], reverseShallow),
 		)
@@ -39,17 +40,31 @@ func ResolveDependencyGraph(
 	return pkgs, nil
 }
 
-func buildProvidesMap(pkgs []*PkgInfo) map[string][]string {
+func filterToKeys(rels []Relation, keyset map[string]struct{}) []Relation {
+	var filtered []Relation
+	for _, rel := range rels {
+		if _, ok := keyset[rel.Name]; ok {
+			filtered = append(filtered, rel)
+		}
+	}
+
+	return filtered
+}
+
+func collectPkgData(pkgs []*PkgInfo) (map[string][]string, map[string]struct{}) {
 	// key: provided library/package, value: package that provides it (provider)
 	providesMap := make(map[string][]string)
+	installedMap := make(map[string]struct{}, len(pkgs))
 
 	for _, pkg := range pkgs {
 		for _, provided := range pkg.Provides {
 			providesMap[provided.Name] = append(providesMap[provided.Name], pkg.Name)
 		}
+
+		installedMap[pkg.Name] = struct{}{}
 	}
 
-	return providesMap
+	return providesMap, installedMap
 }
 
 func buildShallowGraph(
