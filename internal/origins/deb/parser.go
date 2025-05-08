@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"qp/internal/consts"
-	"qp/internal/origins/formats/debstyle"
 	"qp/internal/pkgdata"
 	"strconv"
 	"strings"
@@ -20,7 +19,7 @@ func parseStatusFile(data []byte, origin string, reasonMap map[string]string) ([
 			continue
 		}
 
-		fields := debstyle.ParseStatusFields(block)
+		fields := parseStatusFields(block)
 		if fields[fieldStatus] != "install ok installed" {
 			continue
 		}
@@ -40,6 +39,28 @@ func parseStatusFile(data []byte, origin string, reasonMap map[string]string) ([
 	return pkgs, nil
 }
 
+func parseStatusFields(block []byte) map[string]string {
+	fields := make(map[string]string)
+
+	for line := range bytes.SplitSeq(block, []byte("\n")) {
+		// skip continuation lines
+		if len(line) > 0 && (line[0] == ' ' || line[0] == '\t') {
+			continue
+		}
+
+		parts := bytes.SplitN(line, []byte(":"), 2)
+		if len(parts) != 2 {
+			continue
+		}
+
+		key := strings.TrimSpace(string(parts[0]))
+		value := strings.TrimSpace(string(parts[1]))
+		fields[key] = value
+	}
+
+	return fields
+}
+
 func parseStatusBlock(
 	fields map[string]string,
 	reasonMap map[string]string,
@@ -52,7 +73,7 @@ func parseStatusBlock(
 	for key, value := range fields {
 		switch key {
 		case fieldInstalledSize:
-			size, err := strconv.ParseInt(value, 10, 64)
+			size, err := strconv.Atoi(value)
 			if err != nil {
 				collected = append(collected, fmt.Errorf("invalid install size for %s: %v", pkg.Name, err))
 				continue
@@ -78,19 +99,19 @@ func parseStatusBlock(
 			pkg.Packager = value
 
 		case fieldConflicts, fieldBreaks:
-			pkg.Conflicts = append(pkg.Conflicts, debstyle.ParseRelations(value)...)
+			pkg.Conflicts = append(pkg.Conflicts, parseRelations(value)...)
 
 		case fieldReplaces:
-			pkg.Replaces = debstyle.ParseRelations(value)
+			pkg.Replaces = parseRelations(value)
 
 		case fieldDepends, fieldPreDepends:
-			pkg.Depends = append(pkg.Depends, debstyle.ParseRelations(value)...)
+			pkg.Depends = append(pkg.Depends, parseRelations(value)...)
 
 		case fieldRecommends, fieldSuggests:
-			pkg.OptDepends = append(pkg.OptDepends, debstyle.ParseRelations(value)...)
+			pkg.OptDepends = append(pkg.OptDepends, parseRelations(value)...)
 
 		case fieldProvides:
-			pkg.Provides = debstyle.ParseRelations(value)
+			pkg.Provides = parseRelations(value)
 
 		case fieldPriority, fieldEssential:
 			meta[key] = value

@@ -1,4 +1,4 @@
-package driver
+package interfaces
 
 import "qp/internal/pkgdata"
 
