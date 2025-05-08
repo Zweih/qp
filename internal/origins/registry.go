@@ -1,18 +1,20 @@
 package origins
 
 import (
-	"qp/interfaces"
-	"qp/internal/origins/deb"
-	"qp/internal/origins/pacman"
+	"qp/api/driver"
+	"qp/internal/origins/drivers/deb"
+	"qp/internal/origins/drivers/opkg"
+	"qp/internal/origins/drivers/pacman"
 )
 
-var registeredDrivers = []interfaces.Driver{
+var registeredDrivers = []driver.Driver{
+	&opkg.OpkgDriver{},
 	&deb.DebDriver{},
 	&pacman.PacmanDriver{},
 }
 
-func AvailableDrivers() []interfaces.Driver {
-	var detected []interfaces.Driver
+func AvailableDrivers() []driver.Driver {
+	var detected []driver.Driver
 	for _, driver := range registeredDrivers {
 		if driver.Detect() {
 			detected = append(detected, driver)
