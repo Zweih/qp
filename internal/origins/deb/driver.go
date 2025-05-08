@@ -8,7 +8,7 @@ import (
 )
 
 type DebDriver struct {
-	fallbackNeeded bool
+	reasonMap map[string]string
 }
 
 func (d *DebDriver) Name() string {
@@ -21,21 +21,36 @@ func (d *DebDriver) Detect() bool {
 }
 
 func (d *DebDriver) Load() ([]*pkgdata.PkgInfo, error) {
-	reasonMap, err := loadInstallReasons()
-	d.fallbackNeeded = err != nil
+	reasonMap, _ := loadInstallReasons()
+	d.reasonMap = reasonMap
 
 	return fetchPackages(d.Name(), reasonMap)
 }
 
 func (d *DebDriver) ResolveDeps(pkgs []*pkgdata.PkgInfo) ([]*pkgdata.PkgInfo, error) {
+	// won't be needed again, free memory
+	defer func() {
+		d.reasonMap = nil
+	}()
+
 	resolvedPkgs, err := pkgdata.ResolveDependencyGraph(pkgs, nil)
 	if err != nil {
 		return resolvedPkgs, err
 	}
 
-	if d.fallbackNeeded {
-		for _, pkg := range resolvedPkgs {
-			if pkg.Reason == consts.ReasonExplicit && len(pkg.RequiredBy) > 0 {
+	isFile := false
+	var modTime int64
+
+	if info, err := os.Stat(installReasonPath); err == nil {
+		isFile = true
+		modTime = info.ModTime().Unix()
+	}
+
+	for _, pkg := range resolvedPkgs {
+		_, hasReason := d.reasonMap[pkg.Name]
+
+		if !hasReason && pkg.Reason == consts.ReasonExplicit && len(pkg.RequiredBy) > 0 {
+			if isFile && modTime > pkg.InstallTimestamp {
 				pkg.Reason = consts.ReasonDependency
 			}
 		}
