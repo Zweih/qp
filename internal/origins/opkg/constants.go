@@ -14,7 +14,7 @@ const (
 	fieldAutoInstalled = "Auto-Installed"
 	fieldEssential     = "Essential"
 
-	opkgInfoRoot = "/var/lib/dpkg/info"
+	opkgInfoRoot = "/usr/lib/opkg/info"
 
 	fieldLicense         = "License"
 	fieldDescription     = "Description"

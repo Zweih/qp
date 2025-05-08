@@ -10,7 +10,6 @@ import (
 	"qp/internal/origins/formats/debstyle"
 	"qp/internal/pkgdata"
 	"strconv"
-	"strings"
 )
 
 func parseStatusFile(data []byte, origin string) ([]*pkgdata.PkgInfo, error) {
@@ -22,9 +21,8 @@ func parseStatusFile(data []byte, origin string) ([]*pkgdata.PkgInfo, error) {
 			continue
 		}
 
-		fields := parseStatusFields(block)
-		statusParts := strings.Fields(fields[fieldStatus])
-		if len(statusParts) != 3 || statusParts[2] != "installed" {
+		fields := debstyle.ParseStatusFields(block)
+		if fields[fieldStatus] == "install ok installed" {
 			continue
 		}
 
@@ -97,27 +95,6 @@ func parseStatusBlock(fields map[string]string, origin string) (*pkgdata.PkgInfo
 	return pkg, errors.Join(collected...)
 }
 
-func parseStatusFields(block []byte) map[string]string {
-	fields := make(map[string]string)
-
-	for line := range bytes.SplitSeq(block, []byte("\n")) {
-		if len(line) > 0 && (line[0] == ' ' || line[0] == '\t') {
-			continue
-		}
-
-		parts := bytes.SplitN(block, []byte(":"), 2)
-		if len(parts) != 2 {
-			continue
-		}
-
-		key := strings.TrimSpace(string(parts[0]))
-		value := strings.TrimSpace(string(parts[1]))
-		fields[key] = value
-	}
-
-	return fields
-}
-
 func extractMetadata(pkg *pkgdata.PkgInfo) error {
 	controlPath := filepath.Join(opkgInfoRoot, pkg.Name+".control")
 
@@ -127,7 +104,7 @@ func extractMetadata(pkg *pkgdata.PkgInfo) error {
 	}
 
 	var collected []error
-	fields := parseStatusFields(data)
+	fields := debstyle.ParseStatusFields(data)
 
 	for key, value := range fields {
 		switch key {
