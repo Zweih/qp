@@ -1,11 +1,11 @@
-package deb
+package debstyle
 
 import (
 	"qp/internal/pkgdata"
 	"strings"
 )
 
-func parseRelations(relStr string) []pkgdata.Relation {
+func ParseRelations(relStr string) []pkgdata.Relation {
 	var rels []pkgdata.Relation
 
 	for entry := range strings.SplitSeq(relStr, ",") {

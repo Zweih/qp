@@ -3,7 +3,7 @@ package phase
 import (
 	"fmt"
 	"path/filepath"
-	"qp/interfaces"
+	"qp/api/driver"
 	"qp/internal/config"
 	out "qp/internal/display"
 	"qp/internal/pkgdata"
@@ -12,7 +12,7 @@ import (
 )
 
 type Pipeline struct {
-	Origin        interfaces.Driver
+	Origin        driver.Driver
 	Config        *config.Config
 	Pkgs          []*pkgdata.PkgInfo
 	IsInteractive bool
@@ -22,7 +22,7 @@ type Pipeline struct {
 }
 
 func NewPipeline(
-	origin interfaces.Driver,
+	origin driver.Driver,
 	cfg *config.Config,
 	isInteractive bool,
 	baseCachePath string,
