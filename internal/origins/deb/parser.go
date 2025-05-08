@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"qp/internal/consts"
+	"qp/internal/origins/formats/debstyle"
 	"qp/internal/pkgdata"
 	"strconv"
 	"strings"
@@ -99,19 +100,19 @@ func parseStatusBlock(
 			pkg.Packager = value
 
 		case fieldConflicts, fieldBreaks:
-			pkg.Conflicts = append(pkg.Conflicts, parseRelations(value)...)
+			pkg.Conflicts = append(pkg.Conflicts, debstyle.ParseRelations(value)...)
 
 		case fieldReplaces:
-			pkg.Replaces = parseRelations(value)
+			pkg.Replaces = debstyle.ParseRelations(value)
 
 		case fieldDepends, fieldPreDepends:
-			pkg.Depends = append(pkg.Depends, parseRelations(value)...)
+			pkg.Depends = append(pkg.Depends, debstyle.ParseRelations(value)...)
 
 		case fieldRecommends, fieldSuggests:
-			pkg.OptDepends = append(pkg.OptDepends, parseRelations(value)...)
+			pkg.OptDepends = append(pkg.OptDepends, debstyle.ParseRelations(value)...)
 
 		case fieldProvides:
-			pkg.Provides = parseRelations(value)
+			pkg.Provides = debstyle.ParseRelations(value)
 
 		case fieldPriority, fieldEssential:
 			meta[key] = value
