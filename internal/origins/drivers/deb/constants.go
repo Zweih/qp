@@ -19,6 +19,7 @@ const (
 	fieldProvides      = "Provides"
 	fieldPriority      = "Priority"
 	fieldEssential     = "Essential"
+	fieldEnhances      = "Enhances"
 
 	dpkgPath = "/var/lib/dpkg/status"
 

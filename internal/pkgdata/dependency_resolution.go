@@ -10,6 +10,7 @@ func ResolveDependencyGraph(
 	_ meta.ProgressReporter, // TODO: Add progress reporting
 ) ([]*PkgInfo, error) {
 	providesMap, installedMap := collectPkgData(pkgs)
+	normalizeOptionalPkgs(pkgs, installedMap)
 	forwardShallow, reverseShallow, optReverseShallow := buildShallowGraph(pkgs, providesMap)
 
 	var visited map[string]int32
@@ -27,7 +28,6 @@ func ResolveDependencyGraph(
 			walkFullGraph(name, forwardShallow, visited, ""),
 		)
 
-		pkg.OptionalFor = filterToKeys(pkg.OptionalFor, installedMap)
 		pkg.OptionalFor = collapseRelations(
 			walkFullOptGraph(name, optReverseShallow[name], reverseShallow),
 		)
@@ -40,28 +40,43 @@ func ResolveDependencyGraph(
 	return pkgs, nil
 }
 
-func filterToKeys(rels []Relation, keyset map[string]struct{}) []Relation {
-	var filtered []Relation
+func normalizeOptionalPkgs(pkgs []*PkgInfo, installedMap map[string]*PkgInfo) {
+	for _, pkg := range pkgs {
+		optForRels := filterToInstalled(pkg.OptionalFor, installedMap)
+		for _, optForRel := range optForRels {
+			installedMap[optForRel.Name].OptDepends = append(
+				installedMap[optForRel.Name].OptDepends, Relation{
+					Name:  pkg.Name,
+					Depth: 1,
+				},
+			)
+		}
+	}
+}
+
+func filterToInstalled(rels []Relation, installedMap map[string]*PkgInfo) []Relation {
+	var filteredRels []Relation
+
 	for _, rel := range rels {
-		if _, ok := keyset[rel.Name]; ok {
-			filtered = append(filtered, rel)
+		if _, exists := installedMap[rel.Name]; exists {
+			filteredRels = append(filteredRels, rel)
 		}
 	}
 
-	return filtered
+	return filteredRels
 }
 
-func collectPkgData(pkgs []*PkgInfo) (map[string][]string, map[string]struct{}) {
+func collectPkgData(pkgs []*PkgInfo) (map[string][]string, map[string]*PkgInfo) {
 	// key: provided library/package, value: package that provides it (provider)
 	providesMap := make(map[string][]string)
-	installedMap := make(map[string]struct{}, len(pkgs))
+	installedMap := make(map[string]*PkgInfo, len(pkgs))
 
 	for _, pkg := range pkgs {
 		for _, provided := range pkg.Provides {
 			providesMap[provided.Name] = append(providesMap[provided.Name], pkg.Name)
 		}
 
-		installedMap[pkg.Name] = struct{}{}
+		installedMap[pkg.Name] = pkg
 	}
 
 	return providesMap, installedMap

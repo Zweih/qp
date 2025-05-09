@@ -109,7 +109,7 @@ learn about installation [here](#installation)
 | ✓ | optional full timestamp | ✓ | package description field |
 | ✓  | groups query | – | streaming pipeline |
 | – | short-args for queries | – | key/value output |
-| ✓ | package base query | – | required-by sort |
+| ✓ | package base query | ✓ | required-by sort |
 | – | optdepends sort | – | depends sort |
 | ✓ | build-date field | ✓ | build-date query |
 | ✓ | build-date sort | ✓ | pkgtype field |
@@ -386,6 +386,7 @@ qp w q has:depends or has:required-by p and not reason=explicit
 - `pkgbase`
 - `packager`
 - `conflicts`
+- `depends`
 
 ### JSON output
 

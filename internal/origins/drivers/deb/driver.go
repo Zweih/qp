@@ -63,11 +63,7 @@ func (d *DebDriver) LoadCache(path string, modTime int64) ([]*pkgdata.PkgInfo, e
 	return pkgdata.LoadProtoCache(path, modTime)
 }
 
-func (d *DebDriver) SaveCache(
-	path string,
-	pkgs []*pkgdata.PkgInfo,
-	modTime int64,
-) error {
+func (d *DebDriver) SaveCache(path string, pkgs []*pkgdata.PkgInfo, modTime int64) error {
 	return pkgdata.SaveProtoCache(pkgs, path, modTime)
 }
 
