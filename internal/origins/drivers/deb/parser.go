@@ -89,6 +89,9 @@ func parseStatusBlock(
 		case fieldRecommends, fieldSuggests:
 			pkg.OptDepends = append(pkg.OptDepends, debstyle.ParseRelations(value)...)
 
+		case fieldEnhances:
+			pkg.OptionalFor = append(pkg.OptionalFor, debstyle.ParseRelations(value)...)
+
 		case fieldProvides:
 			pkg.Provides = debstyle.ParseRelations(value)
 

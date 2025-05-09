@@ -1,6 +1,7 @@
 # qp - query packages
 
-`qp` is a CLI util, written in **Go** / **Golang**, for arch-based and debian-based linux distros to query installed packages.
+`qp` is a CLI util, written in **Go** / **Golang**, for arch-based, debian-based, and embedded linux distros to query installed packages.
+
 
 you can find installation instructions [here](#installation).
 
@@ -38,12 +39,16 @@ this package is compatible with the following distributions:
  - [steamOS](https://store.steampowered.com/steamos)
  - [ubuntu](https://ubuntu.com)
  - [pop!_OS](https://system76.com/pop/)
+ - [cachyOS](https://cachyos.org/)
+ - [openwrt](https://openwrt.org/)
  - [garuda linux](https://garudalinux.org/)
  - [endeavourOS](https://endeavouros.com/)
  - [mabox linux](https://maboxlinux.org/)
  - [zorin OS](https://zorin.com/os/)
  - [elementary OS](https://elementary.io/)
- - the 50 other arch and debian-based distros, as long as they have `pacman`, `apt`, or `dpkg` installed
+ - the 50 other arch and debian-based distros, as long as they have `pacman`, `apt`, `dpkg`, or `opkg` installed
+
+`qp` also runs on embedded linux systems, including meta-distributions like [yocto](https://www.yoctoproject.org/) that use `opkg` (`.ipk` pakcages) or `apt`/`dpkg` (`.deb` packages). `rpm` support is currently on the way! 
 
 more distros and non-linux platforms are planned!
 
