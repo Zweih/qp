@@ -1,10 +1,15 @@
 # qp Release Notes
 
+## v5.29.0
+### What's Changed
+* Feature: Add depends sort by @Zweih in https://github.com/Zweih/qp/pull/289
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.28.0...v5.29.0
+
 ## v5.28.0
 ### What's Changed
-* Feature: Add opkg by @Zweih in https://github.com/Zweih/qp/pull/285
-* Revert "Feature: Add opkg origin (embedded Yocto + OpenWrt support)" by @Zweih in https://github.com/Zweih/qp/pull/287
 * Feature: Add opkg origin (embedded Yocto + OpenWrt support) by @Zweih in https://github.com/Zweih/qp/pull/288
+
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v5.27.1...v5.28.0
 
