@@ -1,8 +1,15 @@
 # qp Release Notes
 
+## v5.30.0
+### What's Changed
+* Feature: Add "enhances" metadata to optdepends + optional-for fields by @Zweih in https://github.com/Zweih/qp/pull/291
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.29.0...v5.30.0
+
 ## v5.29.0
 ### What's Changed
 * Feature: Add depends sort by @Zweih in https://github.com/Zweih/qp/pull/289
+
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v5.28.0...v5.29.0
 
