@@ -1,8 +1,15 @@
 # qp Release Notes
 
+## v5.31.0
+### What's Changed
+* Refactor: Extract worker pool for all origins by @Zweih in https://github.com/Zweih/qp/pull/292
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.30.0...v5.31.0
+
 ## v5.30.0
 ### What's Changed
 * Feature: Add "enhances" metadata to optdepends + optional-for fields by @Zweih in https://github.com/Zweih/qp/pull/291
+
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v5.29.0...v5.30.0
 
