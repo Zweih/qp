@@ -1,23 +1,22 @@
 package brew
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
 	"qp/internal/consts"
 	"qp/internal/pkgdata"
 	"strings"
+
+	json "github.com/goccy/go-json"
 )
 
 type installReceipt struct {
-	Time                  int64  `json:"time"`
-	Compiler              string `json:"compiler"`
-	InstalledOnRequest    bool   `json:"installed_on_request"`
-	InstalledAsDependency bool   `json:"installed_as_dependency"`
-	BuiltAsBottle         bool   `json:"built_as_bottle"`
-	PouredFromBottle      bool   `json:"poured_from_bottle"`
-	Arch                  string `json:"arch"`
+	Time               int64  `json:"time"`
+	InstalledOnRequest bool   `json:"installed_on_request"`
+	BuiltAsBottle      bool   `json:"built_as_bottle"`
+	PouredFromBottle   bool   `json:"poured_from_bottle"`
+	Arch               string `json:"arch"`
 
 	RuntimeDependencies []struct {
 		FullName         string `json:"full_name"`
@@ -29,27 +28,14 @@ type installReceipt struct {
 		Versions struct {
 			Stable string `json:"stable"`
 		} `json:"versions"`
-		Path string `json:"path"`
-		Tap  string `json:"tap"`
 	} `json:"source"`
 }
 
 type FormulaMetadata struct {
-	Name      string `json:"name"`
-	Desc      string `json:"desc"`
-	License   string `json:"license"`
-	Homepage  string `json:"homepage"`
-	LinkedKeg string `json:"linked_keg"`
-	Versions  struct {
-		Stable string `json:"stable"`
-	} `json:"versions"`
-	Bottle struct {
-		Stable struct {
-			Files map[string]struct {
-				SHA256 string `json:"sha256"`
-			} `json:"files"`
-		} `json:"stable"`
-	} `json:"bottle"`
+	Name                    string   `json:"name"`
+	Desc                    string   `json:"desc"`
+	License                 string   `json:"license"`
+	Homepage                string   `json:"homepage"`
 	OptionalDependencies    []string `json:"optional_dependencies"`
 	RecommendedDependencies []string `json:"recommended_dependencies"`
 }
@@ -118,10 +104,8 @@ func inferInstallReason(receipt installReceipt) string {
 	switch {
 	case receipt.InstalledOnRequest:
 		return consts.ReasonExplicit
-	case receipt.InstalledAsDependency:
-		return consts.ReasonDependency
 	default:
-		return "unknown" // TODO: perhaps this should be blank
+		return consts.ReasonDependency // TODO: perhaps this should be blank
 	}
 }
 

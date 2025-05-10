@@ -1,75 +1,131 @@
 package brew
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
+	"qp/internal/origins/worker"
 	"qp/internal/pkgdata"
 	"strings"
+	"sync"
+
+	json "github.com/goccy/go-json"
 )
 
-func fetchPackages(origin string, prefix string) ([]*pkgdata.PkgInfo, error) {
-	formulaMeta, err := loadFormulaMetadata()
-	if err != nil {
-		return nil, err
-	}
-
-	binRoot := filepath.Join(prefix, binSubPath)
-	cellarRoot := filepath.Join(prefix, cellarSubPath)
-	installedNames, err := getInstalledPkgNames(cellarRoot)
-	if err != nil {
-		return nil, err
-	}
-
-	var pkgs []*pkgdata.PkgInfo
-	for _, name := range installedNames {
-		version, err := getLinkedVersion(name, cellarRoot, binRoot)
-		if err != nil {
-			return nil, err
-		}
-
-		receiptPath := filepath.Join(cellarRoot, name, version, "INSTALL_RECEIPT.json")
-		pkg, err := parseInstallReceipt(receiptPath)
-		if err != nil {
-			return nil, err
-		}
-
-		if meta, ok := formulaMeta[name]; ok {
-			mergeFormulaMetadata(pkg, meta)
-		}
-
-		versionPath := filepath.Join(prefix, cellarSubPath, pkg.Name, pkg.Version)
-		size, err := getInstallSize(versionPath)
-		if err == nil {
-			pkg.Size = size
-		}
-
-		pkg.Origin = origin
-		pkgs = append(pkgs, pkg)
-	}
-
-	return pkgs, nil
+type installedPkg struct {
+	Name        string
+	Version     string
+	ReceiptPath string
+	VersionPath string
 }
 
-func getInstalledPkgNames(cellarRoot string) ([]string, error) {
+func fetchPackages(
+	origin string,
+	prefix string,
+) ([]*pkgdata.PkgInfo, error) {
+	binRoot := filepath.Join(prefix, binSubPath)
+	cellarRoot := filepath.Join(prefix, cellarSubPath)
+	installedPkgs, err := getInstalledPkgs(cellarRoot, binRoot)
+	if err != nil {
+		return nil, err
+	}
+
+	wanted := make(map[string]struct{}, len(installedPkgs))
+	for _, iPkg := range installedPkgs {
+		wanted[iPkg.Name] = struct{}{}
+	}
+
+	var formulaMeta map[string]*FormulaMetadata
+	var metaErr error
+	var metaWg sync.WaitGroup
+
+	metaWg.Add(1)
+	go func() {
+		defer metaWg.Done()
+		formulaMeta, metaErr = loadFormulaMetadataSubset(wanted)
+	}()
+
+	inputChan := make(chan installedPkg, len(installedPkgs))
+	for _, iPkg := range installedPkgs {
+		inputChan <- iPkg
+	}
+
+	close(inputChan)
+
+	stage1Out, stage1Err := worker.RunWorkers(
+		inputChan,
+		func(iPkg installedPkg) (*pkgdata.PkgInfo, error) {
+			return parseInstallReceipt(iPkg.ReceiptPath)
+		},
+		0,
+		len(installedPkgs),
+	)
+
+	stage2Out, stage2Err := worker.RunWorkers(
+		stage1Out,
+		func(pkg *pkgdata.PkgInfo) (*pkgdata.PkgInfo, error) {
+			versionPath := filepath.Join(prefix, cellarSubPath, pkg.Name, pkg.Version)
+			if size, err := getInstallSize(versionPath); err == nil {
+				pkg.Size = size
+			}
+
+			return pkg, nil
+		},
+		0,
+		len(installedPkgs),
+	)
+
+	metaWg.Wait()
+	if metaErr != nil {
+		return nil, metaErr
+	}
+
+	stage3Out, stage3Err := worker.RunWorkers(
+		stage2Out,
+		func(pkg *pkgdata.PkgInfo) (*pkgdata.PkgInfo, error) {
+			if meta, ok := formulaMeta[pkg.Name]; ok {
+				mergeFormulaMetadata(pkg, meta)
+			}
+			pkg.Origin = origin
+			return pkg, nil
+		},
+		0,
+		len(installedPkgs),
+	)
+
+	allErrs := worker.MergeErrors(stage1Err, stage2Err, stage3Err)
+	return worker.CollectOutput(stage3Out, allErrs)
+}
+
+func getInstalledPkgs(cellarRoot, binRoot string) ([]installedPkg, error) {
 	entries, err := os.ReadDir(cellarRoot)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read Cellar directory: %w", err)
 	}
 
-	var names []string
+	var pkgs []installedPkg
 	for _, entry := range entries {
-		if entry.IsDir() {
-			names = append(names, entry.Name())
+		if !entry.IsDir() {
+			continue
 		}
+		name := entry.Name()
+		version, err := resolveLinkedVersion(name, cellarRoot, binRoot)
+		if err != nil {
+			continue
+		}
+		pkgs = append(pkgs, installedPkg{
+			Name:        name,
+			Version:     version,
+			ReceiptPath: filepath.Join(cellarRoot, name, version, receiptName),
+			VersionPath: filepath.Join(cellarRoot, name, version),
+		})
 	}
 
-	return names, nil
+	return pkgs, nil
 }
 
-func getLinkedVersion(pkgName string, cellarRoot string, binRoot string) (string, error) {
+func resolveLinkedVersion(pkgName string, cellarRoot string, binRoot string) (string, error) {
 	pkgPath := filepath.Join(cellarRoot, pkgName)
 
 	entries, err := os.ReadDir(pkgPath)
@@ -101,7 +157,7 @@ func getLinkedVersion(pkgName string, cellarRoot string, binRoot string) (string
 	return parts[len(parts)-3], nil
 }
 
-func loadFormulaMetadata() (map[string]*FormulaMetadata, error) {
+func loadFormulaMetadataSubset(wanted map[string]struct{}) (map[string]*FormulaMetadata, error) {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get home directory: %w", err)
@@ -116,19 +172,20 @@ func loadFormulaMetadata() (map[string]*FormulaMetadata, error) {
 	var container struct {
 		Payload string `json:"payload"`
 	}
-
 	if err := json.Unmarshal(data, &container); err != nil {
 		return nil, fmt.Errorf("failed to parse formula jws: %w", err)
 	}
 
-	var formulae []*FormulaMetadata
-	if err := json.Unmarshal([]byte(container.Payload), &formulae); err != nil {
+	var formulas []*FormulaMetadata
+	if err := json.Unmarshal([]byte(container.Payload), &formulas); err != nil {
 		return nil, fmt.Errorf("failed to parse formula payload: %w", err)
 	}
 
-	result := make(map[string]*FormulaMetadata)
-	for _, formula := range formulae {
-		result[formula.Name] = formula
+	result := make(map[string]*FormulaMetadata, len(wanted))
+	for _, f := range formulas {
+		if _, ok := wanted[f.Name]; ok {
+			result[f.Name] = f
+		}
 	}
 
 	return result, nil
