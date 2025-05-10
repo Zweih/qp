@@ -1,0 +1,167 @@
+package brew
+
+import (
+	"encoding/json"
+	"fmt"
+	"os"
+	"path/filepath"
+	"qp/internal/consts"
+	"qp/internal/pkgdata"
+	"strings"
+)
+
+type installReceipt struct {
+	Time                  int64  `json:"time"`
+	Compiler              string `json:"compiler"`
+	InstalledOnRequest    bool   `json:"installed_on_request"`
+	InstalledAsDependency bool   `json:"installed_as_dependency"`
+	BuiltAsBottle         bool   `json:"built_as_bottle"`
+	PouredFromBottle      bool   `json:"poured_from_bottle"`
+	Arch                  string `json:"arch"`
+
+	RuntimeDependencies []struct {
+		FullName         string `json:"full_name"`
+		PkgVersion       string `json:"pkg_version"`
+		DeclaredDirectly bool   `json:"declared_directly"`
+	} `json:"runtime_dependencies"`
+
+	Source struct {
+		Versions struct {
+			Stable string `json:"stable"`
+		} `json:"versions"`
+		Path string `json:"path"`
+		Tap  string `json:"tap"`
+	} `json:"source"`
+}
+
+type FormulaMetadata struct {
+	Name      string `json:"name"`
+	Desc      string `json:"desc"`
+	License   string `json:"license"`
+	Homepage  string `json:"homepage"`
+	LinkedKeg string `json:"linked_keg"`
+	Versions  struct {
+		Stable string `json:"stable"`
+	} `json:"versions"`
+	Bottle struct {
+		Stable struct {
+			Files map[string]struct {
+				SHA256 string `json:"sha256"`
+			} `json:"files"`
+		} `json:"stable"`
+	} `json:"bottle"`
+	OptionalDependencies    []string `json:"optional_dependencies"`
+	RecommendedDependencies []string `json:"recommended_dependencies"`
+}
+
+func mergeFormulaMetadata(pkg *pkgdata.PkgInfo, formula *FormulaMetadata) {
+	if formula == nil {
+		return
+	}
+
+	pkg.Description = formula.Desc
+	pkg.License = formula.License
+	pkg.Url = formula.Homepage
+	pkg.OptDepends = parseOptDepends(formula.OptionalDependencies, formula.RecommendedDependencies)
+}
+
+func parseInstallReceipt(path string) (*pkgdata.PkgInfo, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read receipt JSON: %v", err)
+	}
+
+	var receipt installReceipt
+	if err := json.Unmarshal(data, &receipt); err != nil {
+		return nil, fmt.Errorf("failed to parse receipt JSON: %v", err)
+	}
+
+	pkgName, err := getPkgNameFromPath(path)
+	if err != nil {
+		return nil, err
+	}
+
+	pkg := &pkgdata.PkgInfo{
+		InstallTimestamp: receipt.Time,
+		Name:             pkgName,
+		Version:          receipt.Source.Versions.Stable,
+		Reason:           inferInstallReason(receipt),
+		Arch:             receipt.Arch,
+		PkgType:          getPkgType(receipt),
+		Depends:          parseDepends(receipt),
+	}
+
+	inferBuildDate(pkg, receipt)
+
+	return pkg, nil
+}
+
+func getPkgType(receipt installReceipt) string {
+	if receipt.BuiltAsBottle && receipt.PouredFromBottle {
+		return "bottle"
+	}
+
+	if receipt.BuiltAsBottle {
+		return "local_bottle"
+	}
+
+	return "source"
+}
+
+func inferBuildDate(pkg *pkgdata.PkgInfo, receipt installReceipt) {
+	if !receipt.PouredFromBottle {
+		pkg.BuildTimestamp = receipt.Time
+	}
+}
+
+func inferInstallReason(receipt installReceipt) string {
+	switch {
+	case receipt.InstalledOnRequest:
+		return consts.ReasonExplicit
+	case receipt.InstalledAsDependency:
+		return consts.ReasonDependency
+	default:
+		return "unknown" // TODO: perhaps this should be blank
+	}
+}
+
+func getPkgNameFromPath(path string) (string, error) {
+	parts := strings.Split(filepath.Clean(path), string(os.PathSeparator))
+
+	if len(parts) >= 3 {
+		return parts[len(parts)-3], nil
+	}
+
+	return "", fmt.Errorf("unexpected receipt path format: %s", path)
+}
+
+func parseDepends(receipt installReceipt) []pkgdata.Relation {
+	rels := make([]pkgdata.Relation, 0, len(receipt.RuntimeDependencies))
+
+	for _, dep := range receipt.RuntimeDependencies {
+		if !dep.DeclaredDirectly {
+			continue
+		}
+
+		rels = append(rels, pkgdata.Relation{
+			Name:  dep.FullName,
+			Depth: 1,
+		})
+	}
+
+	return rels
+}
+
+func parseOptDepends(optDeps []string, recDeps []string) []pkgdata.Relation {
+	inputDeps := append(optDeps, recDeps...)
+	rels := make([]pkgdata.Relation, 0, len(inputDeps))
+
+	for _, dep := range inputDeps {
+		rels = append(rels, pkgdata.Relation{
+			Name:  dep,
+			Depth: 1,
+		})
+	}
+
+	return rels
+}
