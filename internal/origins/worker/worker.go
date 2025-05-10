@@ -2,22 +2,25 @@ package worker
 
 import (
 	"errors"
-	"fmt"
-	"qp/internal/pkgdata"
 	"runtime"
 	"sync"
 )
 
 const DefaultBufferSize = 64
 
-func RunWorkers[T any](
-	inputChan <-chan T,
-	workerFunc func(T) (*pkgdata.PkgInfo, error),
+func RunWorkers[I any, O any](
+	inputChan <-chan I,
+	workerFunc func(I) (O, error),
 	numWorkers int, // pass 0 unless testing or intentionally limiting
 	bufferSize int,
-) ([]*pkgdata.PkgInfo, error) {
-	if bufferSize < 1 {
-		return nil, fmt.Errorf("invalid buffer size: %d (must be >= 1)", bufferSize)
+) (<-chan O, <-chan error) {
+	outputChan := make(chan O, bufferSize)
+	errChan := make(chan error, DefaultBufferSize)
+
+	if bufferSize == 0 {
+		close(outputChan)
+		close(errChan)
+		return outputChan, errChan
 	}
 
 	if numWorkers <= 0 {
@@ -25,13 +28,11 @@ func RunWorkers[T any](
 		numWorkers = getWorkerCount(runtime.NumCPU())
 	}
 
-	outputChan := make(chan *pkgdata.PkgInfo, bufferSize)
-	errChan := make(chan error, DefaultBufferSize)
-
 	var wg sync.WaitGroup
 
 	for range numWorkers {
 		wg.Add(1)
+
 		go func() {
 			defer wg.Done()
 			for item := range inputChan {
@@ -52,22 +53,50 @@ func RunWorkers[T any](
 		close(errChan)
 	}()
 
-	var pkgs []*pkgdata.PkgInfo
+	return outputChan, errChan
+}
+
+func CollectOutput[O any](resultChan <-chan O, errChan <-chan error) ([]O, error) {
+	var results []O
 	var errs []error
 
-	for pkg := range outputChan {
-		pkgs = append(pkgs, pkg)
+	for result := range resultChan {
+		results = append(results, result)
 	}
 
 	for err := range errChan {
 		errs = append(errs, err)
 	}
 
+	var combinedErr error
 	if len(errs) > 0 {
-		return pkgs, errors.Join(errs...)
+		combinedErr = errors.Join(errs...)
 	}
 
-	return pkgs, nil
+	return results, combinedErr
+}
+
+func MergeErrors(errChans ...<-chan error) <-chan error {
+	out := make(chan error, DefaultBufferSize)
+	var wg sync.WaitGroup
+
+	for _, errChan := range errChans {
+		wg.Add(1)
+		go func(eChan <-chan error) {
+			defer wg.Done()
+
+			for err := range eChan {
+				out <- err
+			}
+		}(errChan)
+	}
+
+	go func() {
+		wg.Wait()
+		close(out)
+	}()
+
+	return out
 }
 
 func getWorkerCount(numCPUs int) int {

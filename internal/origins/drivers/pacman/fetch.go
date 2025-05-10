@@ -28,7 +28,7 @@ func fetchPackages(origin string) ([]*pkgdata.PkgInfo, error) {
 		close(descPathChan)
 	}()
 
-	return worker.RunWorkers(
+	outputChan, errChan := worker.RunWorkers(
 		descPathChan,
 		func(path string) (*pkgdata.PkgInfo, error) {
 			pkg, err := parseDescFile(path)
@@ -43,4 +43,6 @@ func fetchPackages(origin string) ([]*pkgdata.PkgInfo, error) {
 		0,
 		numPkgs,
 	)
+
+	return worker.CollectOutput(outputChan, errChan)
 }
