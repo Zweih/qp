@@ -56,7 +56,7 @@ func fetchPackages(
 	stage1Out, stage1Err := worker.RunWorkers(
 		inputChan,
 		func(iPkg installedPkg) (*pkgdata.PkgInfo, error) {
-			return parseInstallReceipt(iPkg.ReceiptPath)
+			return parseInstallReceipt(iPkg.ReceiptPath, iPkg.Version)
 		},
 		0,
 		len(installedPkgs),
@@ -172,6 +172,7 @@ func loadFormulaMetadataSubset(wanted map[string]struct{}) (map[string]*FormulaM
 	var container struct {
 		Payload string `json:"payload"`
 	}
+
 	if err := json.Unmarshal(data, &container); err != nil {
 		return nil, fmt.Errorf("failed to parse formula jws: %w", err)
 	}

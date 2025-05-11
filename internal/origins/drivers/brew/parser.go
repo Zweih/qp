@@ -23,12 +23,6 @@ type installReceipt struct {
 		PkgVersion       string `json:"pkg_version"`
 		DeclaredDirectly bool   `json:"declared_directly"`
 	} `json:"runtime_dependencies"`
-
-	Source struct {
-		Versions struct {
-			Stable string `json:"stable"`
-		} `json:"versions"`
-	} `json:"source"`
 }
 
 type FormulaMetadata struct {
@@ -51,7 +45,7 @@ func mergeFormulaMetadata(pkg *pkgdata.PkgInfo, formula *FormulaMetadata) {
 	pkg.OptDepends = parseOptDepends(formula.OptionalDependencies, formula.RecommendedDependencies)
 }
 
-func parseInstallReceipt(path string) (*pkgdata.PkgInfo, error) {
+func parseInstallReceipt(path string, version string) (*pkgdata.PkgInfo, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read receipt JSON: %v", err)
@@ -70,7 +64,6 @@ func parseInstallReceipt(path string) (*pkgdata.PkgInfo, error) {
 	pkg := &pkgdata.PkgInfo{
 		InstallTimestamp: receipt.Time,
 		Name:             pkgName,
-		Version:          receipt.Source.Versions.Stable,
 		Reason:           inferInstallReason(receipt),
 		Arch:             receipt.Arch,
 		PkgType:          getPkgType(receipt),
