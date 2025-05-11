@@ -48,7 +48,7 @@ this package is compatible with the following distributions:
  - [elementary OS](https://elementary.io/)
  - the 50 other arch and debian-based distros, as long as they have `pacman`, `apt`, `dpkg`, or `opkg` installed
 
-`qp` also runs on embedded linux systems, including meta-distributions like [yocto](https://www.yoctoproject.org/) that use `opkg` (`.ipk` pakcages) or `apt`/`dpkg` (`.deb` packages). `rpm` support is currently on the way! 
+`qp` also runs on embedded linux systems, including meta-distributions like [yocto](https://www.yoctoproject.org/) that use `opkg` (`.ipk` packages) or `apt`/`dpkg` (`.deb` packages). `rpm` support is currently on the way! 
 
 more distros and non-linux platforms are planned!
 
