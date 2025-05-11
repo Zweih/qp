@@ -115,7 +115,7 @@ learn about installation [here](#installation)
 | ✓  | groups query | – | streaming pipeline |
 | – | short-args for queries | – | key/value output |
 | ✓ | package base query | ✓ | required-by sort |
-| – | optdepends sort | – | depends sort |
+| ✓ | optdepends sort | – | depends sort |
 | ✓ | build-date field | ✓ | build-date query |
 | ✓ | build-date sort | ✓ | pkgtype field |
 | ✓ | url query | ✓ | pkgtype sort |
@@ -392,6 +392,7 @@ qp w q has:depends or has:required-by p and not reason=explicit
 - `packager`
 - `conflicts`
 - `depends`
+- `optdepends`
 - `required-by`
 
 ### JSON output
