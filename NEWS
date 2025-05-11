@@ -1,8 +1,16 @@
 # qp Release Notes
 
+## v5.34.0
+### What's Changed
+* Documentation: Doc typo by @Zweih in https://github.com/Zweih/qp/pull/296
+* Feature: Add optdepends sort by @Zweih in https://github.com/Zweih/qp/pull/298
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.33.0...v5.34.0
+
 ## v5.33.0
 ### What's Changed
 * Feature: Add required-by sort by @Zweih in https://github.com/Zweih/qp/pull/295
+
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v5.32.0...v5.33.0
 
