@@ -65,6 +65,7 @@ func parseInstallReceipt(path string, version string) (*pkgdata.PkgInfo, error) 
 		InstallTimestamp: receipt.Time,
 		Name:             pkgName,
 		Reason:           inferInstallReason(receipt),
+		Version:          version,
 		Arch:             receipt.Arch,
 		PkgType:          getPkgType(receipt),
 		Depends:          parseDepends(receipt),
