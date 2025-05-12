@@ -3,7 +3,7 @@ name: Build and Release qp
 on:
   push:
     tags:
-      - 'v*'  # trigger on version tags
+      - 'v*'
   workflow_dispatch:  # allow manual trigger from github UI
     inputs:
       ref:
@@ -17,14 +17,14 @@ permissions:
 jobs:
   build:
     name: Build qp for ${{ matrix.arch }}
-    runs-on: ubuntu-latest  # ubuntu includes cross-compilation toolchains
+    runs-on: ubuntu-latest
 
     env:
       TAG_NAME: ${{ github.ref_type == 'tag' && github.ref_name || inputs.ref }}
 
     strategy:
       matrix:
-        arch: [x86_64, armv7h, aarch64]
+        arch: [x86_64, armv7h, aarch64, mipsel]
         include:
           - arch: x86_64
             goarch: amd64
@@ -47,7 +47,7 @@ jobs:
       - name: Set up Go 1.24.1
         uses: actions/setup-go@v4
         with:
-          go-version: 1.24.1 # version from go.mod
+          go-version: 1.24.1
 
       - name: Build qp binary
         run: |
@@ -83,8 +83,8 @@ jobs:
       
       - name: Install dependencies for .SRCINFO and NEWS generation
         run: |
-          sudo apt update
-          sudo apt install -y pacman fakeroot makepkg gh
+          sudo apt-get update
+          sudo apt-get install -y pacman fakeroot makepkg gh git python3
 
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -105,11 +105,24 @@ jobs:
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
 
+      - name: Inject version and date into man page
+        run: |
+          VERSION="${TAG_NAME#v}"
+          DATE=$(date -u +'%B %Y')
+          sed -e "s/@VERSION@/${VERSION}/g" -e "s/@DATE@/$DATE/g" qp.1 > ./release/qp.1
+
+      - name: Checkout packaging branch
+        run: |
+          git fetch origin packaging
+          git checkout packaging
+
       - name: Create Draft Release
         run: |
           gh release create "${{ env.TAG_NAME }}" \
             --draft \
             --generate-notes
+
+          echo "created=true" >> $GITHUB_ENV
         env:
           GH_TOKEN: ${{ github.token }}
 
@@ -122,36 +135,28 @@ jobs:
           cut -f1 | \
           grep -E '^v[0-9]+\.' | \
           sort -Vr | \
-          awk -v min="v4.1.4" '{ if (system("dpkg --compare-versions " $1 " ge " min) == 0) print $1 }' | \
+          awk -v min="4.1.4" '{
+            ver = $1;
+            sub(/^v/, "", ver);
+            if (system("dpkg --compare-versions " ver " ge " min) == 0) print $1
+          }' | \
           while read tag; do
             echo "" >> ./release/NEWS
             echo "## $tag" >> ./release/NEWS
-            # demote all headings in generated notes to make NEWS readable
+ 
             gh release view "$tag" --json body --template '{{.body}}' | sed 's/^#/##/' >> ./release/NEWS
             echo "" >> ./release/NEWS
           done
 
-          # allow for only one blank between each section
-          awk 'BEGIN{blank=0} /^$/ {blank++; if (blank == 1) print ""; next} {blank=0; print}' ./release/NEWS > ./release/NEWS.cleaned
-          mv ./release/NEWS.cleaned ./release/NEWS
+          # clean up spacing between sections
+          sed -e 's/\r$//' -e '/^[[:space:]]*$/d' ./release/NEWS > ./release/NEWS.cleaned
+          awk -f ./normalize_news.awk ./release/NEWS.cleaned > ./release/NEWS.final
+          mv ./release/NEWS.final ./release/NEWS
+          rm -f ./release/NEWS.cleaned ./release/NEWS.final
         env:
           GH_TOKEN: ${{ github.token }}
 
-      - name: Inject version and date into man page
-        run: |
-          VERSION="${TAG_NAME#v}"
-          DATE=$(date -u +'%B %Y')
-          sed -e "s/@VERSION@/${VERSION}/g" -e "s/@DATE@/$DATE/g" qp.1 > ./release/qp.1
-
-      - name: Package AUR binaries with manpage and NEWS
-        run: |
-          for binary in ./release/qp-*; do
-            arch=$(basename "$binary" | cut -d'-' -f2)
-          
-            tar -czvf ./release/qp-${{ env.TAG_NAME }}-${arch}.tar.gz -C ./release "$(basename "$binary")" qp.1 NEWS
-          done
-
-      - name: Package AUR source tarball with NEWS
+      - name: Package AUR source tarball with manpage and NEWS
         run: |
           mkdir -p ./release/temp-qp/qp-${{ env.TAG_NAME }}
           git archive --format=tar HEAD | tar -x -C ./release/temp-qp/qp-${{ env.TAG_NAME }}
@@ -164,21 +169,51 @@ jobs:
 
           tar -czf ./release/qp-${{ env.TAG_NAME }}.tar.gz -C ./release/temp-qp qp-${{ env.TAG_NAME }}
 
+
+      - name: Package AUR binaries with manpage and NEWS
+        run: |
+          source ./packaging_targets.sh
+
+          for binary in ./release/qp-*; do
+            arch=$(basename "$binary" | cut -d'-' -f2)
+
+            if should_package aur_archs "$arch"; then
+              echo "Packaging $binary for AUR"
+              tar -czvf ./release/qp-${{ env.TAG_NAME }}-${arch}.tar.gz -C ./release "$(basename "$binary")" qp.1 NEWS
+            else
+              echo "Skipping $binary for AUR packaging"
+            fi
+          done
+
       - name: Package .deb
         run: |
-          git fetch origin packaging
-          git checkout packaging
-
+          source ./packaging_targets.sh
           chmod +x ./package_deb.sh
 
           for binary in ./release/qp-*; do
-            name=$(basename "$binary")
+           arch=$(basename "$binary" | cut -d'-' -f2)
 
-            if [[ "$name" =~ ^qp-(x86_64|aarch64|armv7h)$ ]]; then
-              echo "Packaging $binary"
+            if should_package deb_archs "$arch"; then
+              echo "Packaging $binary as .deb"
               ./package_deb.sh "${TAG_NAME#v}" "" "$binary" ./release/NEWS ./release/qp.1 ./debian/copyright ./release
             else
-              echo "Skipping non-binary or unexpected file: $name"
+             echo "Skipping $binary for .deb packaging"
+            fi
+          done
+
+      - name: Package .ipk for opkg
+        run: |
+          source ./packaging_targets.sh
+          chmod +x ./package_opkg.sh
+          
+          git clone https://git.yoctoproject.org/opkg-utils
+          cd opkg-utils && sudo make install && cd ..
+
+          for binary in ./release/qp-*; do
+            arch=$(basename "$binary" | cut -d'-' -f2)
+
+            if should_package opkg_archs "$arch"; then
+              ./package_opkg.sh "${TAG_NAME#v}" "$arch" "$binary" ./release/NEWS ./release/qp.1 ./release
             fi
           done
 
@@ -203,10 +238,10 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.QP_SIGNATURES_TOKEN }}
 
-      - name: Update qp-bin and qp-src PKGBUILDs with version and checksums  
+      - name: Update PKGBUILDs for qp-bin and qp-src
         run: |
-          git fetch origin packaging
-          git checkout packaging
+          source ./packaging_targets.sh
+          chmod +x ./update_checksums.sh
 
           VERSION="${TAG_NAME#v}"
           CHECKSUMS_FILE=./release/SHA256SUMS.txt
@@ -214,17 +249,19 @@ jobs:
           for pkg in qp-bin qp-src; do
             sed -i "s/^pkgver=.*/pkgver=${VERSION}/" $pkg/PKGBUILD
             sed -i "s/^pkgrel=.*/pkgrel=1/" $pkg/PKGBUILD
-          done
 
-          for pkg in qp-bin qp-src; do
-            chmod +x update_checksums.sh
-            ./update_checksums.sh $pkg/PKGBUILD $CHECKSUMS_FILE 
+            for binary in ./release/qp-*; do
+              arch=$(basename "$binary" | cut -d'-' -f2)
+              if should_package aur_archs "$arch"; then
+                ./update_checksums.sh $pkg/PKGBUILD $CHECKSUMS_FILE
+              fi
+            done
           done
 
       - name: Generate pkgver for qp-git
         run: |
           cd qp-git
-         
+
           makepkg --nobuild --nodeps --clean --cleanbuild --noconfirm
           echo "Updated qp-git/pkgver to $(grep '^pkgver=' PKGBUILD | cut -d'=' -f2)"
 
@@ -250,9 +287,20 @@ jobs:
           
           git commit -m "Update packaging for release ${{ env.TAG_NAME }}"
           git push origin packaging
+
       - name: Publish Release
         run: |
-          gh release upload "${{ env.TAG_NAME }}" ./release/qp-*.tar.gz ./release/qp-*.deb --clobber
+          cd ./release
+          gh release upload "${{ env.TAG_NAME }}" qp-*.tar.gz qp-*.deb qp-*.ipk --clobber
+          cd ..
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Delete Draft Release if Job Failed
+        if: ${{ (failure() || cancelled()) && env.created == 'true' }}
+        run: |
+          echo "Workflow failed. Deleting draft release ${TAG_NAME}..."
+          gh release delete "${TAG_NAME}" --yes || echo "No release found or already deleted."
         env:
           GH_TOKEN: ${{ github.token }}
 
