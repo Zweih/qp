@@ -11,10 +11,14 @@ OUTDIR="$6"
 PKG_NAME="qp"
 
 declare -A OPKG_ARCH_MAP
+
 OPKG_ARCH_MAP[x86_64]="x86_64"
-OPKG_ARCH_MAP[aarch64]="aarch64_generic aarch64_cortex-a53 aarch64_cortex-a72"
-OPKG_ARCH_MAP[armv7h]="arm_cortex-a7 arm_cortex-a7_neon-vfpv4 arm_cortex-a9 arm_cortex-a9_vfpv3-d16 arm_cortex-a8_vfpv3 arm_cortex-a15_neon-vfpv4 arm_cortex-a5_vfpv4"
-OPKG_ARCH_MAP[mipsle]="mipsel_24kc mipsel_74kc mipsel_24kf mipsel_74kf mipsel_mips32"
+
+OPKG_ARCH_MAP[aarch64]="aarch64_generic aarch64_cortex-a53 aarch64_cortex-a72 aarch64 cortexa53 cortexa72"
+
+OPKG_ARCH_MAP[armv7h]="arm_cortex-a7 arm_cortex-a7_neon-vfpv4 arm_cortex-a9 arm_cortex-a9_vfpv3-d16 arm_cortex-a8_vfpv3 arm_cortex-a15_neon-vfpv4 arm_cortex-a5_vfpv4 cortexa7t2hf-neon cortexa9t2hf-vfp armv7at2hf"
+
+OPKG_ARCH_MAP[mipsle]="mipsel_24kc mipsel"
 
 OPKGARCHES="${OPKG_ARCH_MAP[$ARCH]:-}"
 if [[ -z "$OPKGARCHES" ]]; then
@@ -37,7 +41,7 @@ for OPKGARCH in $OPKGARCHES; do
   install -m 644 "$MANPAGE_PATH" "$PKGDIR/usr/share/man/man1/qp.1"
   install -m 644 "$NEWS_PATH" "$PKGDIR/usr/share/doc/$PKG_NAME/NEWS"
 
-  SIZE_KB=$(du -sk --exclude=CONTROL "$PKGDIR" | cut -f1)
+  SIZE_KB=$(find "$PKGDIR" -type f ! -path "$CONTROL_DIR/*" -exec du -k {} + | awk '{sum += $1} END {print sum}')
 
   cat >"$CONTROL_DIR/control" <<EOF
 Package: $PKG_NAME
