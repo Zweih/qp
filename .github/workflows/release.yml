@@ -314,6 +314,14 @@ jobs:
           cd ./release-extra
 
           if ls *.ipk 1> /dev/null 2>&1; then
+            echo "Creating draft release in qp-extra-packages..."
+            gh release create "${{ env.TAG_NAME }}" \
+              --repo Zweih/qp-extra-packages \
+              --title "qp ${{ env.TAG_NAME }} extra packages" \
+              --notes "Extended architecture packages for qp ${{ env.TAG_NAME }}" \
+              --draft
+
+            echo "Uploading extra .ipk packages..."
             gh release upload "${{ env.TAG_NAME }}" *.ipk \
               --repo Zweih/qp-extra-packages \
               --clobber
