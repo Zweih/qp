@@ -11,6 +11,7 @@ OUTDIR="$7"
 
 if [[ -z "$ARCH" ]]; then
   name=$(basename "$BIN")
+
   if [[ "$name" =~ qp-(.+) ]]; then
     ARCH="${BASH_REMATCH[1]}"
   else
@@ -37,7 +38,7 @@ install -m 644 "$MANPAGE_PATH" "$PKGDIR/usr/share/man/man1/qp.1"
 install -m 644 "$NEWS_PATH" "$PKGDIR/usr/share/doc/qp/NEWS"
 install -m 644 "$COPYRIGHT_PATH" "$PKGDIR/usr/share/doc/qp/copyright"
 
-SIZE_KB=$(du -sk --exclude=DEBIAN "$PKGDIR" | cut -f1)
+SIZE_KB=$(find "$PKGDIR/usr" -type f -exec du -k {} + | awk '{sum+=$1} END {print sum}')
 
 cat >"$PKGDIR/DEBIAN/control" <<EOF
 Package: qp
