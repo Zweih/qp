@@ -66,5 +66,15 @@ func (d *BrewDriver) SourceModified() (int64, error) {
 		}
 	}
 
+	cellarInfo, err := os.Stat(cellarPath)
+	if err != nil {
+		return 0, fmt.Errorf("failed to stat Cellar: %w", err)
+	}
+
+	modTime := cellarInfo.ModTime().Unix()
+	if modTime > latest {
+		latest = modTime
+	}
+
 	return latest, nil
 }
