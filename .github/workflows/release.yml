@@ -241,7 +241,7 @@ jobs:
             --repo Zweih/query-packages-signatures \
             --title "Signatures for qp ${{ env.TAG_NAME }}" \
             --notes "Detached signatures for qp release ${{ env.TAG_NAME }}" \
-            ./release/qp-*.tar.gz.asc
+            ./release/qp-*.asc
         env:
           GH_TOKEN: ${{ secrets.QP_SIGNATURES_TOKEN }}
 
@@ -295,6 +295,11 @@ jobs:
           git commit -m "Update packaging for release ${{ env.TAG_NAME }}"
           git push origin packaging
 
+      - name: Filter .ipk packages to main vs extra repo
+        run: |
+          chmod +x ./filter_release_ipks.sh
+          ./filter_release_ipks.sh
+
       - name: Publish Release
         run: |
           cd ./release
@@ -302,6 +307,23 @@ jobs:
           cd ..
         env:
           GH_TOKEN: ${{ github.token }}
+
+      - name: Publish extra .ipk packages to qp-extra-packages
+        if: ${{ env.TAG_NAME != '' }}
+        run: |
+          cd ./release-extra
+
+          if ls *.ipk 1> /dev/null 2>&1; then
+            gh release upload "${{ env.TAG_NAME }}" *.ipk \
+              --repo Zweih/qp-extra-packages \
+              --clobber
+          else
+            echo "No extra .ipk packages to upload."
+          fi
+
+          cd ..
+        env:
+          GH_TOKEN: ${{ secrets.QP_EXTRA_PACKAGES_TOKEN }}
 
       - name: Delete Draft Release if Job Failed
         if: ${{ (failure() || cancelled()) && env.created == 'true' }}
