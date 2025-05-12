@@ -1,6 +1,7 @@
 package brew
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"qp/internal/pkgdata"
@@ -42,10 +43,28 @@ func (d *BrewDriver) SaveCache(
 }
 
 func (d *BrewDriver) SourceModified() (int64, error) {
-	info, err := os.Stat(filepath.Join(d.prefix, cellarSubPath))
+	cellarPath := filepath.Join(d.prefix, cellarSubPath)
+	entries, err := os.ReadDir(cellarPath)
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf("failed to read Cellar: %w", err)
 	}
 
-	return info.ModTime().Unix(), nil
+	var latest int64
+	for _, entry := range entries {
+		if !entry.IsDir() {
+			continue
+		}
+
+		info, err := os.Stat(filepath.Join(cellarPath, entry.Name()))
+		if err != nil {
+			continue
+		}
+
+		modTime := info.ModTime().Unix()
+		if modTime > latest {
+			latest = modTime
+		}
+	}
+
+	return latest, nil
 }
