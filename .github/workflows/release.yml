@@ -33,6 +33,9 @@ jobs:
             goarm: 7
           - arch: aarch64
             goarch: arm64
+          - arch: mipsel
+            goarch: mipsle
+            gomips: softfloat
 
     steps:
       - name: echo TAG_NAME
@@ -55,6 +58,10 @@ jobs:
           
           if [ -n "${{ matrix.goarm }}" ]; then
             export GOARM=${{ matrix.goarm }}
+          fi
+
+          if [ -n "${{ matrix.gomips }}" ]; then
+            export GOMIPS=${{ matrix.gomips }}
           fi
 
           go build -trimpath -ldflags="-s -w \
