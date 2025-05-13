@@ -394,6 +394,7 @@ qp w q has:depends or has:required-by p and not reason=explicit
 - `depends`
 - `optdepends`
 - `required-by`
+- `optional-for`
 - `provides`
 
 ### JSON output
