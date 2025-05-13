@@ -22,12 +22,12 @@ OPKG_ARCH_MAP[mipsle]="mipsel_24kc mipsel"
 
 OPKGARCHES="${OPKG_ARCH_MAP[$ARCH]:-}"
 if [[ -z "$OPKGARCHES" ]]; then
-  echo "No OpenWrt arch mappings defined for $ARCH"
+  echo "No arch mappings defined for $ARCH"
   exit 1
 fi
 
 for OPKGARCH in $OPKGARCHES; do
-  echo "Packaging $ARCH → $OPKGARCH"
+  echo "Packaging $ARCH -> $OPKGARCH"
 
   PKGDIR="$OUTDIR/opkg/${PKG_NAME}_${VERSION}_${OPKGARCH}"
   CONTROL_DIR="$PKGDIR/CONTROL"
