@@ -115,7 +115,7 @@ learn about installation [here](#installation)
 | ✓  | groups query | – | streaming pipeline |
 | – | short-args for queries | – | key/value output |
 | ✓ | package base query | ✓ | required-by sort |
-| ✓ | optdepends sort | – | depends sort |
+| ✓ | optdepends sort | ✓ | depends sort |
 | ✓ | build-date field | ✓ | build-date query |
 | ✓ | build-date sort | ✓ | pkgtype field |
 | ✓ | url query | ✓ | pkgtype sort |
@@ -125,10 +125,10 @@ learn about installation [here](#installation)
 | ✓ | url sort | - | groups sort |
 | ✓ | packager field | ✓ | optional dependency field |
 | ✓ | sort by size on disk | ✓ | conflicts sort |
-| - | optional-for sort | - | provides sort |
+| ✓ | optional-for sort | ✓ | provides sort |
 | ✓ | validation field | ✓ | validation sort |
 | ✓ | packager sort | ✓ | architecture sort |
-| ✓ | reason sort | ✓ |version sort |
+| ✓ | reason sort | ✓ | version sort |
 | ✓ | reverse optional dependencies field (optional for) | - | optdepends installation indicator |
 | ✓ | optional-for query | - | separate field for optdepends reason |
 | ✓ | fuzzy/strict querying | ✓ | existence querying |
@@ -140,7 +140,7 @@ learn about installation [here](#installation)
 | ✓ | abstract syntax tree | ✓ | directed acyclical graph for filtering |
 | - | user-defined macros | ✓ | parentetical (grouping) logic |
 | ✓ | limit from end | ✓ | limit from middle |
-| - | replaces sort | - | built-in macros |
+| ✓ | replaces sort | - | built-in macros |
 | - | query explaination | - | user configuration file |
 | ✓ | deb origin (apt/dpkg support) | ✓ | deb packaging |
 | - | replaced-by resolution | - | multi-license support | 
