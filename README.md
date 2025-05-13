@@ -48,7 +48,7 @@ this package is compatible with the following distributions:
  - [elementary OS](https://elementary.io/)
  - the 50 other arch and debian-based distros, as long as they have `pacman`, `apt`, `dpkg`, or `opkg` installed
 
-`qp` also runs on embedded linux systems, including meta-distributions like [yocto](https://www.yoctoproject.org/) that use `opkg` (`.ipk` pakcages) or `apt`/`dpkg` (`.deb` packages). `rpm` support is currently on the way! 
+`qp` also runs on embedded linux systems, including meta-distributions like [yocto](https://www.yoctoproject.org/) that use `opkg` (`.ipk` packages) or `apt`/`dpkg` (`.deb` packages). `rpm` support is currently on the way! 
 
 more distros and non-linux platforms are planned!
 
@@ -115,7 +115,7 @@ learn about installation [here](#installation)
 | ✓  | groups query | – | streaming pipeline |
 | – | short-args for queries | – | key/value output |
 | ✓ | package base query | ✓ | required-by sort |
-| – | optdepends sort | – | depends sort |
+| ✓ | optdepends sort | ✓ | depends sort |
 | ✓ | build-date field | ✓ | build-date query |
 | ✓ | build-date sort | ✓ | pkgtype field |
 | ✓ | url query | ✓ | pkgtype sort |
@@ -125,10 +125,10 @@ learn about installation [here](#installation)
 | ✓ | url sort | - | groups sort |
 | ✓ | packager field | ✓ | optional dependency field |
 | ✓ | sort by size on disk | ✓ | conflicts sort |
-| - | optional-for sort | - | provides sort |
+| ✓ | optional-for sort | ✓ | provides sort |
 | ✓ | validation field | ✓ | validation sort |
 | ✓ | packager sort | ✓ | architecture sort |
-| ✓ | reason sort | ✓ |version sort |
+| ✓ | reason sort | ✓ | version sort |
 | ✓ | reverse optional dependencies field (optional for) | - | optdepends installation indicator |
 | ✓ | optional-for query | - | separate field for optdepends reason |
 | ✓ | fuzzy/strict querying | ✓ | existence querying |
@@ -140,7 +140,7 @@ learn about installation [here](#installation)
 | ✓ | abstract syntax tree | ✓ | directed acyclical graph for filtering |
 | - | user-defined macros | ✓ | parentetical (grouping) logic |
 | ✓ | limit from end | ✓ | limit from middle |
-| - | replaces sort | - | built-in macros |
+| ✓ | replaces sort | - | built-in macros |
 | - | query explaination | - | user configuration file |
 | ✓ | deb origin (apt/dpkg support) | ✓ | deb packaging |
 | - | replaced-by resolution | - | multi-license support | 
@@ -392,6 +392,10 @@ qp w q has:depends or has:required-by p and not reason=explicit
 - `packager`
 - `conflicts`
 - `depends`
+- `optdepends`
+- `required-by`
+- `optional-for`
+- `provides`
 
 ### JSON output
 
