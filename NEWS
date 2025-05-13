@@ -1,4 +1,11 @@
 # qp Release Notes
+## v5.38.0
+### What's Changed
+* Feature: Add optional-for sort by @Zweih in https://github.com/Zweih/qp/pull/306
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.37.1...v5.38.0
+
+
 ## v5.36.0
 ### What's Changed
 * Feature: Add opkg packaging by @Zweih in https://github.com/Zweih/qp/pull/301
