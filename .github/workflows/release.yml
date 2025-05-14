@@ -118,11 +118,6 @@ jobs:
           DATE=$(date -u +'%B %Y')
           sed -e "s/@VERSION@/${VERSION}/g" -e "s/@DATE@/$DATE/g" qp.1 > ./release/qp.1
 
-      - name: Checkout packaging branch
-        run: |
-          git fetch origin packaging
-          git checkout packaging
-
       - name: Create Draft Release
         run: |
           gh release create "${{ env.TAG_NAME }}" \
@@ -183,6 +178,10 @@ jobs:
 
           tar -czf ./release/qp-${{ env.TAG_NAME }}.tar.gz -C ./release/temp-qp qp-${{ env.TAG_NAME }}
 
+      - name: Checkout packaging branch
+        run: |
+          git fetch origin packaging
+          git checkout packaging
 
       - name: Package AUR binaries with manpage and NEWS
         run: |
