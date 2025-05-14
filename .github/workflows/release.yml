@@ -165,7 +165,7 @@ jobs:
   
       - name: Checkout source branch
         run: |
-          git checkout  ${{ inputs.ref }}
+          git checkout ${{ env.TAG_NAME }}
 
       - name: Package AUR source tarball with manpage and NEWS
         run: |
