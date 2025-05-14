@@ -43,6 +43,11 @@ func GetComparator(field consts.FieldType, asc bool) (PkgComparator, error) {
 			return strings.ToLower(p.GetString(field))
 		}, asc), nil
 
+	case consts.FieldGroups:
+		return makeComparator(func(p *PkgInfo) int {
+			return len(p.GetStrArr(field))
+		}, asc), nil
+
 	case consts.FieldConflicts, consts.FieldReplaces,
 		consts.FieldDepends, consts.FieldOptDepends,
 		consts.FieldRequiredBy, consts.FieldOptionalFor,
