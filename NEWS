@@ -1,4 +1,11 @@
 # qp Release Notes
+## v5.40.0
+### What's Changed
+* Feature: Add groups sort by @Zweih in https://github.com/Zweih/qp/pull/310
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.39.0...v5.40.0
+
+
 ## v5.39.0
 ### What's Changed
 * Feature: Add replaces sort by @Zweih in https://github.com/Zweih/qp/pull/308
