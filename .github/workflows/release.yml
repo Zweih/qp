@@ -167,6 +167,13 @@ jobs:
         run: |
           mkdir -p ./release/temp-qp/qp-${{ env.TAG_NAME }}
           git archive --format=tar HEAD | tar -x -C ./release/temp-qp/qp-${{ env.TAG_NAME }}
+          
+          if [[ ! -f go.mod ]]; then
+            echo "go.mod not found. Generating it..."
+            go mod init qp
+            go mod tidy
+          fi
+
           cp ./release/NEWS ./release/temp-qp/qp-${{ env.TAG_NAME }}/
           echo "-s -w \
             -X qp/internal/about.Version=${TAG_NAME} \
