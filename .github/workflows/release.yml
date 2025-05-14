@@ -118,6 +118,11 @@ jobs:
           DATE=$(date -u +'%B %Y')
           sed -e "s/@VERSION@/${VERSION}/g" -e "s/@DATE@/$DATE/g" qp.1 > ./release/qp.1
 
+      - name: Checkout packaging branch
+        run: |
+          git fetch origin packaging
+          git checkout packaging
+
       - name: Create Draft Release
         run: |
           gh release create "${{ env.TAG_NAME }}" \
@@ -157,18 +162,16 @@ jobs:
           rm -f ./release/NEWS.cleaned ./release/NEWS.final
         env:
           GH_TOKEN: ${{ github.token }}
+  
+      - name: Checkout source branch
+        run: |
+          git checkout  ${{ inputs.ref }}
 
       - name: Package AUR source tarball with manpage and NEWS
         run: |
           mkdir -p ./release/temp-qp/qp-${{ env.TAG_NAME }}
           git archive --format=tar HEAD | tar -x -C ./release/temp-qp/qp-${{ env.TAG_NAME }}
           
-          if [[ ! -f go.mod ]]; then
-            echo "go.mod not found. Generating it..."
-            go mod init qp
-            go mod tidy
-          fi
-
           cp ./release/NEWS ./release/temp-qp/qp-${{ env.TAG_NAME }}/
           echo "-s -w \
             -X qp/internal/about.Version=${TAG_NAME} \
@@ -180,7 +183,6 @@ jobs:
 
       - name: Checkout packaging branch
         run: |
-          git fetch origin packaging
           git checkout packaging
 
       - name: Package AUR binaries with manpage and NEWS
