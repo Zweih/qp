@@ -1,9 +1,9 @@
 # qp Release Notes
-## v5.40.1
+## v5.40.4
 ### What's Changed
-* Fix: qp-src go.mod by @Zweih in https://github.com/Zweih/qp/pull/311
+* Fix: Release workflow by @Zweih in https://github.com/Zweih/qp/pull/314
 
-**Full Changelog**: https://github.com/Zweih/qp/compare/v5.40.0...v5.40.1
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.40.3...v5.40.4
 
 
 ## v5.40.0
