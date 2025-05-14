@@ -87,6 +87,10 @@ learn about installation [here](#installation)
 
 ## roadmap
 
+<details>
+<summary><strong>phase 1</strong></summary>
+
+
 | Status | Feature | Status | Feature |
 |--------|---------|--------|---------|
 | ✓ | remove expac as a dependency (300% speed boost) | ✓ | concurrent file reading (200% speed boost) |
@@ -112,8 +116,7 @@ learn about installation [here](#installation)
 | ✓ | depends query | ✓ | all-fields option |
 | ✓ | required-by query | ✓ | no cache option |
 | ✓ | optional full timestamp | ✓ | package description field |
-| ✓ | groups query | – | streaming pipeline |
-| – | short-args for queries | – | key/value output |
+| ✓ | groups query | ✓ | driver interface |
 | ✓ | package base query | ✓ | required-by sort |
 | ✓ | optdepends sort | ✓ | depends sort |
 | ✓ | build-date field | ✓ | build-date query |
@@ -129,21 +132,30 @@ learn about installation [here](#installation)
 | ✓ | validation field | ✓ | validation sort |
 | ✓ | packager sort | ✓ | architecture sort |
 | ✓ | reason sort | ✓ | version sort |
-| ✓ | reverse optional dependencies field (optional for) | - | optdepends installation indicator |
-| ✓ | optional-for query | - | separate field for optdepends reason |
-| ✓ | fuzzy/strict querying | ✓ | existence querying |
-| ✓ | existence querying | - | depth querying |
 | ✓ | pkgtype query | ✓ | optdepends query |
-| ✓ | packager query | ✓ | origin field |
 | ✓ | origin sort | ✓ | origin query |
+| ✓ | packager query | ✓ | origin field |
+| ✓ | replaces sort | ✓ | optional-for query 
+
+</details>
+
+<strong>phase 2</strong>
+
+| Status | Feature | Status | Feature |
+|--------|---------|--------|---------|
+| ✓ | reverse optional dependencies field (optional-for) | - | optdepends installation indicator |
+| - | separate field for optdepends reason | ✓ | fuzzy/strict querying |
+| ✓ | existence querying | - | depth querying |
 | ✓ | command-based syntax | ✓ | full boolean logic |
 | ✓ | abstract syntax tree | ✓ | directed acyclical graph for filtering |
 | - | user-defined macros | ✓ | parentetical (grouping) logic |
 | ✓ | limit from end | ✓ | limit from middle |
-| ✓ | replaces sort | - | built-in macros |
+| - | built-in macros | – | streaming pipeline |
 | - | query explaination | - | user configuration file |
 | ✓ | deb origin (apt/dpkg support) | ✓ | deb packaging |
-| - | replaced-by resolution | - | multi-license support | 
+| ✓ | opkg origin (openwrt support) | - | brew origin (homebrew support)|
+| - | replaced-by resolution | - | multi-license support |
+| – | short-args for queries | – | key/value output |
 
 ## installation
 
