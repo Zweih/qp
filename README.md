@@ -112,7 +112,7 @@ learn about installation [here](#installation)
 | ✓ | depends query | ✓ | all-fields option |
 | ✓ | required-by query | ✓ | no cache option |
 | ✓ | optional full timestamp | ✓ | package description field |
-| ✓  | groups query | – | streaming pipeline |
+| ✓ | groups query | – | streaming pipeline |
 | – | short-args for queries | – | key/value output |
 | ✓ | package base query | ✓ | required-by sort |
 | ✓ | optdepends sort | ✓ | depends sort |
@@ -122,7 +122,7 @@ learn about installation [here](#installation)
 | ✓ | architecture query | ✓ | groups field |
 | ✓	| conflicts query | ✓ | package description sort |
 | ✓	| regenerate cache option | ✓ | validation query |
-| ✓ | url sort | - | groups sort |
+| ✓ | url sort | ✓ | groups sort |
 | ✓ | packager field | ✓ | optional dependency field |
 | ✓ | sort by size on disk | ✓ | conflicts sort |
 | ✓ | optional-for sort | ✓ | provides sort |
@@ -390,6 +390,7 @@ qp w q has:depends or has:required-by p and not reason=explicit
 - `pkgtype`
 - `pkgbase`
 - `packager`
+- `groups`
 - `conflicts`
 - `depends`
 - `optdepends`
