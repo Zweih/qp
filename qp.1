@@ -121,6 +121,17 @@ Use to combine or negate queries:
 \fBq\fR ... \fBp\fR - group conditions (equivalent to parentheses)
 .RE
 
+.SH BUILT-IN MACROS
+Some common query patterns are available as macros.
+
+.TP
+.B orphan
+Matches orphaned packages - installed as dependencies but no longer required by any package.
+
+Equivalent to:
+.BR "qp where no:required-by and reason=dependency"
+
+
 .TP
 Group and combine logic:
 .B qp where q name=vim or name=nvim p and not has:conflicts
