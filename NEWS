@@ -1,7 +1,15 @@
 # qp Release Notes
+## v5.41.0
+### What's Changed
+* Documentation: Condense roadmap by @Zweih in https://github.com/Zweih/qp/pull/315
+* Feature: Add orphan macro by @Zweih in https://github.com/Zweih/qp/pull/316
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.40.4...v5.41.0
+
+
 ## v5.40.4
 ### What's Changed
-* Fix: Release workflow by @Zweih in https://github.com/Zweih/qp/pull/314
+* Fix: qp-src release workflow by @Zweih in https://github.com/Zweih/qp/pull/314
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v5.40.3...v5.40.4
 
