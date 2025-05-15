@@ -1,7 +1,13 @@
 # qp Release Notes
+## v5.42.0
+### What's Changed
+* Feature: Use concurrent workers for opkg by @Zweih in https://github.com/Zweih/qp/pull/317
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.41.0...v5.42.0
+
+
 ## v5.41.0
 ### What's Changed
-* Documentation: Condense roadmap by @Zweih in https://github.com/Zweih/qp/pull/315
 * Feature: Add orphan macro by @Zweih in https://github.com/Zweih/qp/pull/316
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v5.40.4...v5.41.0
