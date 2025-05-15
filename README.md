@@ -310,6 +310,27 @@ for example:
   - `name=gtk` matches `gtk3`, `libgtk`, etc. (fuzzy)
   - `name==gtk` only matches a package named exactly `gtk`
 
+#### built-in macros
+
+some frequently-used query patterns are available as built-in macros for convenience.
+
+* `orphan` - matches orphaned packages (dependencies no longer required by anything):
+  ```
+  qp where orphan
+  ```
+
+  this is equivalent to:
+  ```
+  qp where no:required-by and reason=dependency
+  ```
+
+these macros can be combined with other queries as usual:
+
+```
+qp w orphan and size=100KB:
+qp w orphan and not name=gtk
+```
+
 #### query examples
 
 ```
@@ -322,7 +343,7 @@ qp w not arch=x86_64
 qp w q has:depends or has:required-by p and not reason=explicit
 ```
 
-#### query types
+#### field types
 
 | field type | description |
 |------------|-------------|
