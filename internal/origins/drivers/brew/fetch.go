@@ -1,16 +1,11 @@
 package brew
 
 import (
-	"fmt"
 	"io/fs"
-	"os"
 	"path/filepath"
 	"qp/internal/origins/worker"
 	"qp/internal/pkgdata"
-	"strings"
 	"sync"
-
-	json "github.com/goccy/go-json"
 )
 
 type installedPkg struct {
@@ -43,7 +38,7 @@ func fetchPackages(
 	metaWg.Add(1)
 	go func() {
 		defer metaWg.Done()
-		formulaMeta, metaErr = loadFormulaMetadataSubset(wanted)
+		formulaMeta, metaErr = loadMetadata(formulaCachePath, getFormulaKey, wanted)
 	}()
 
 	inputChan := make(chan installedPkg, len(installedPkgs))
@@ -97,97 +92,6 @@ func fetchPackages(
 
 	allErrs := worker.MergeErrors(stage1Err, stage2Err, stage3Err)
 	return worker.CollectOutput(stage3Out, allErrs)
-}
-
-func getInstalledPkgs(cellarRoot, binRoot string) ([]installedPkg, error) {
-	entries, err := os.ReadDir(cellarRoot)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read Cellar directory: %w", err)
-	}
-
-	var pkgs []installedPkg
-	for _, entry := range entries {
-		if !entry.IsDir() {
-			continue
-		}
-
-		name := entry.Name()
-		version, err := resolveLinkedVersion(name, cellarRoot, binRoot)
-		if err != nil {
-			continue
-		}
-
-		pkgs = append(pkgs, installedPkg{
-			Name:        name,
-			Version:     version,
-			ReceiptPath: filepath.Join(cellarRoot, name, version, receiptName),
-			VersionPath: filepath.Join(cellarRoot, name, version),
-		})
-	}
-
-	return pkgs, nil
-}
-
-func resolveLinkedVersion(pkgName string, cellarRoot string, binRoot string) (string, error) {
-	pkgPath := filepath.Join(cellarRoot, pkgName)
-
-	entries, err := os.ReadDir(pkgPath)
-	if err != nil {
-		return "", fmt.Errorf("failed to read Cellar/%s: %w", pkgName, err)
-	}
-
-	// only check symlinks if there are multiple versions
-	if len(entries) == 1 {
-		return entries[0].Name(), nil
-	}
-
-	binPath := filepath.Join(binRoot, pkgName)
-	target, err := os.Readlink(binPath)
-	if err != nil {
-		return "", fmt.Errorf("no symlink found in /bin for %s", pkgName)
-	}
-
-	absPath, err := filepath.Abs(filepath.Join(filepath.Dir(binPath), target))
-	if err != nil {
-		return "", err
-	}
-
-	parts := strings.Split(filepath.Clean(absPath), string(os.PathSeparator))
-	if len(parts) < 3 {
-		return "", fmt.Errorf("unexpected symlink path: %s", absPath)
-	}
-
-	return parts[len(parts)-3], nil
-}
-
-func loadFormulaMetadataSubset(wanted map[string]struct{}) (map[string]*FormulaMetadata, error) {
-	fullPath := filepath.Join(pkgdata.GetBaseCachePath(), formulaCachePath)
-	data, err := os.ReadFile(fullPath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read formula cache: %w", err)
-	}
-
-	var container struct {
-		Payload string `json:"payload"`
-	}
-
-	if err := json.Unmarshal(data, &container); err != nil {
-		return nil, fmt.Errorf("failed to parse formula jws: %w", err)
-	}
-
-	var formulae []*FormulaMetadata
-	if err := json.Unmarshal([]byte(container.Payload), &formulae); err != nil {
-		return nil, fmt.Errorf("failed to parse formula payload: %w", err)
-	}
-
-	result := make(map[string]*FormulaMetadata, len(wanted))
-	for _, formula := range formulae {
-		if _, ok := wanted[formula.Name]; ok {
-			result[formula.Name] = formula
-		}
-	}
-
-	return result, nil
 }
 
 func getInstallSize(dir string) (int64, error) {
