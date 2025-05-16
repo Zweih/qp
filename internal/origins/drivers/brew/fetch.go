@@ -158,12 +158,7 @@ func resolveLinkedVersion(pkgName string, cellarRoot string, binRoot string) (st
 }
 
 func loadFormulaMetadataSubset(wanted map[string]struct{}) (map[string]*FormulaMetadata, error) {
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		return nil, fmt.Errorf("failed to get home directory: %w", err)
-	}
-
-	fullPath := filepath.Join(homeDir, formulaCachePath)
+	fullPath := filepath.Join(pkgdata.GetBaseCachePath(), formulaCachePath)
 	data, err := os.ReadFile(fullPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read formula cache: %w", err)

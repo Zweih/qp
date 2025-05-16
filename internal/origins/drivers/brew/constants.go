@@ -1,7 +1,7 @@
 package brew
 
 const (
-	formulaCachePath = ".cache/Homebrew/api/formula.jws.json"
+	formulaCachePath = "/Homebrew/api/formula.jws.json"
 	receiptName      = "INSTALL_RECEIPT.json"
 
 	armMacPrefix       = "/opt/homebrew"

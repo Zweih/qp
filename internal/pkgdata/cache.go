@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	pb "qp/internal/protobuf"
+	"runtime"
 
 	"google.golang.org/protobuf/proto"
 )
@@ -17,18 +18,26 @@ const (
 	qpCacheDir      = "query-packages"
 )
 
-func GetCacheBasePath() (string, error) {
-	userCacheDir := os.Getenv(xdgCacheHomeEnv)
-	if userCacheDir == "" {
-		userCacheDir = filepath.Join(os.Getenv(homeEnv), ".cache")
-	}
-
-	cachePath := filepath.Join(userCacheDir, qpCacheDir)
+func GetCachePath() (string, error) {
+	cachePath := filepath.Join(GetBaseCachePath(), qpCacheDir)
 	if err := os.MkdirAll(cachePath, 0755); err != nil {
 		return "", fmt.Errorf("failed to create cache directory: %w", err)
 	}
 
 	return cachePath, nil
+}
+
+func GetBaseCachePath() string {
+	if runtime.GOOS == "darwin" {
+		return filepath.Join(os.Getenv(homeEnv), "Library/Caches")
+	}
+
+	userCacheDir := os.Getenv(xdgCacheHomeEnv)
+	if userCacheDir == "" {
+		userCacheDir = filepath.Join(os.Getenv(homeEnv), ".cache")
+	}
+
+	return userCacheDir
 }
 
 func SaveProtoCache(pkgs []*PkgInfo, cachePath string, lastModified int64) error {
