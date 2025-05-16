@@ -32,7 +32,7 @@ func mainWithConfig(configProvider config.ConfigProvider) error {
 
 	isInteractive := isInteractive(cfg.DisableProgress)
 
-	cacheBasePath, err := pkgdata.GetCacheBasePath()
+	cacheBasePath, err := pkgdata.GetCachePath()
 	if err != nil {
 		out.WriteLine(fmt.Sprintf("WARNING: failed to set up cache dir: %v", err))
 	}

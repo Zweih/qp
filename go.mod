@@ -3,6 +3,7 @@ module qp
 go 1.24.1
 
 require (
+	github.com/goccy/go-json v0.10.5
 	github.com/spf13/pflag v1.0.5
 	golang.org/x/term v0.28.0
 	google.golang.org/protobuf v1.36.6

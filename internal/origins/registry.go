@@ -2,6 +2,7 @@ package origins
 
 import (
 	"qp/api/driver"
+	"qp/internal/origins/drivers/brew"
 	"qp/internal/origins/drivers/deb"
 	"qp/internal/origins/drivers/opkg"
 	"qp/internal/origins/drivers/pacman"
@@ -10,6 +11,7 @@ import (
 var registeredDrivers = []driver.Driver{
 	&opkg.OpkgDriver{},
 	&deb.DebDriver{},
+	&brew.BrewDriver{},
 	&pacman.PacmanDriver{},
 }
 
