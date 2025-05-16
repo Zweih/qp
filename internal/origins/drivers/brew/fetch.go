@@ -87,6 +87,7 @@ func fetchPackages(
 			if meta, ok := formulaMeta[pkg.Name]; ok {
 				mergeFormulaMetadata(pkg, meta)
 			}
+
 			pkg.Origin = origin
 			return pkg, nil
 		},
@@ -109,11 +110,13 @@ func getInstalledPkgs(cellarRoot, binRoot string) ([]installedPkg, error) {
 		if !entry.IsDir() {
 			continue
 		}
+
 		name := entry.Name()
 		version, err := resolveLinkedVersion(name, cellarRoot, binRoot)
 		if err != nil {
 			continue
 		}
+
 		pkgs = append(pkgs, installedPkg{
 			Name:        name,
 			Version:     version,
@@ -172,15 +175,15 @@ func loadFormulaMetadataSubset(wanted map[string]struct{}) (map[string]*FormulaM
 		return nil, fmt.Errorf("failed to parse formula jws: %w", err)
 	}
 
-	var formulas []*FormulaMetadata
-	if err := json.Unmarshal([]byte(container.Payload), &formulas); err != nil {
+	var formulae []*FormulaMetadata
+	if err := json.Unmarshal([]byte(container.Payload), &formulae); err != nil {
 		return nil, fmt.Errorf("failed to parse formula payload: %w", err)
 	}
 
 	result := make(map[string]*FormulaMetadata, len(wanted))
-	for _, f := range formulas {
-		if _, ok := wanted[f.Name]; ok {
-			result[f.Name] = f
+	for _, formula := range formulae {
+		if _, ok := wanted[formula.Name]; ok {
+			result[formula.Name] = formula
 		}
 	}
 
@@ -190,16 +193,17 @@ func loadFormulaMetadataSubset(wanted map[string]struct{}) (map[string]*FormulaM
 func getInstallSize(dir string) (int64, error) {
 	var total int64
 
-	err := filepath.WalkDir(dir, func(_ string, d fs.DirEntry, err error) error {
+	err := filepath.WalkDir(dir, func(_ string, dir fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
 
-		if !d.IsDir() {
-			info, err := d.Info()
+		if !dir.IsDir() {
+			info, err := dir.Info()
 			if err != nil {
 				return err
 			}
+
 			total += info.Size()
 		}
 
