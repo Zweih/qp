@@ -162,11 +162,16 @@ jobs:
           rm -f ./release/NEWS.cleaned ./release/NEWS.final
         env:
           GH_TOKEN: ${{ github.token }}
+  
+      - name: Checkout source branch
+        run: |
+          git checkout ${{ env.TAG_NAME }}
 
       - name: Package AUR source tarball with manpage and NEWS
         run: |
           mkdir -p ./release/temp-qp/qp-${{ env.TAG_NAME }}
           git archive --format=tar HEAD | tar -x -C ./release/temp-qp/qp-${{ env.TAG_NAME }}
+          
           cp ./release/NEWS ./release/temp-qp/qp-${{ env.TAG_NAME }}/
           echo "-s -w \
             -X qp/internal/about.Version=${TAG_NAME} \
@@ -176,6 +181,9 @@ jobs:
 
           tar -czf ./release/qp-${{ env.TAG_NAME }}.tar.gz -C ./release/temp-qp qp-${{ env.TAG_NAME }}
 
+      - name: Checkout packaging branch
+        run: |
+          git checkout packaging
 
       - name: Package AUR binaries with manpage and NEWS
         run: |
