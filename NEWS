@@ -1,4 +1,11 @@
 # qp Release Notes
+## v5.43.1
+### What's Changed
+* Refactor: Formula metadata parsing by @Zweih in https://github.com/Zweih/qp/pull/320
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.43.0...v5.43.1
+
+
 ## v5.43.0
 ### What's Changed
 * Feature: Add brew origin by @Zweih in https://github.com/Zweih/qp/pull/319
