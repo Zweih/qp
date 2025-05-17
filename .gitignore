@@ -35,6 +35,8 @@ src-bundle
 *.local
 *.bak
 
+notes.md
+
 /vendor/
 
 *.prof

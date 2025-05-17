@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	cacheVersion    = 19 // bump when updating structure of PkgInfo/Relation/pkginfo.proto OR when dependency resolution is updated
+	cacheVersion    = 20 // bump when updating structure of PkgInfo/Relation/pkginfo.proto OR when dependency resolution is updated
 	xdgCacheHomeEnv = "XDG_CACHE_HOME"
 	homeEnv         = "HOME"
 	qpCacheDir      = "query-packages"
