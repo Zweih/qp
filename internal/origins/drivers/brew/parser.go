@@ -67,25 +67,13 @@ func parseInstallReceipt(path string, version string) (*pkgdata.PkgInfo, error) 
 		Reason:           inferInstallReason(receipt),
 		Version:          version,
 		Arch:             receipt.Arch,
-		PkgType:          getPkgType(receipt),
+		PkgType:          "formula",
 		Depends:          parseDepends(receipt),
 	}
 
 	inferBuildDate(pkg, receipt)
 
 	return pkg, nil
-}
-
-func getPkgType(receipt installReceipt) string {
-	if receipt.BuiltAsBottle && receipt.PouredFromBottle {
-		return "bottle"
-	}
-
-	if receipt.BuiltAsBottle {
-		return "local_bottle"
-	}
-
-	return "source"
 }
 
 func inferBuildDate(pkg *pkgdata.PkgInfo, receipt installReceipt) {
