@@ -6,16 +6,17 @@ import (
 	"fmt"
 	"qp/internal/consts"
 	"qp/internal/origins/formats/debstyle"
+	"qp/internal/origins/worker"
 	"qp/internal/pkgdata"
 	"strconv"
 	"strings"
 )
 
 func parseStatusFile(data []byte, origin string, reasonMap map[string]string) ([]*pkgdata.PkgInfo, error) {
-	var collectedErrors []error
-	pkgs := []*pkgdata.PkgInfo{}
+	blocks := bytes.Split(data, []byte("\n\n"))
+	inputChan := make(chan map[string]string, len(blocks))
 
-	for block := range bytes.SplitSeq(data, []byte("\n\n")) {
+	for _, block := range blocks {
 		if len(block) < 1 {
 			continue
 		}
@@ -25,19 +26,21 @@ func parseStatusFile(data []byte, origin string, reasonMap map[string]string) ([
 			continue
 		}
 
-		pkg, err := parseStatusBlock(fields, reasonMap, origin)
-		if err != nil {
-			collectedErrors = append(collectedErrors, err)
-		}
-
-		pkgs = append(pkgs, pkg)
+		inputChan <- fields
 	}
+	close(inputChan)
 
-	if len(collectedErrors) > 0 {
-		return pkgs, errors.Join(collectedErrors...)
-	}
+	resultChan, errorChan := worker.RunWorkers(
+		inputChan,
+		func(fields map[string]string) (*pkgdata.PkgInfo, error) {
+			pkg, err := parseStatusBlock(fields, reasonMap, origin)
+			return pkg, err
+		},
+		0,
+		len(blocks),
+	)
 
-	return pkgs, nil
+	return worker.CollectOutput(resultChan, errorChan)
 }
 
 func parseStatusBlock(

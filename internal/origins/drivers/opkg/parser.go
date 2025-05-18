@@ -23,7 +23,7 @@ func parseStatusFile(data []byte, origin string) ([]*pkgdata.PkgInfo, error) {
 		}
 
 		fields := debstyle.ParseStatusFields(block)
-		if fields[fieldStatus] == "install ok installed" {
+		if fields[fieldStatus] != "install ok installed" {
 			continue
 		}
 
