@@ -1,4 +1,8 @@
 # qp Release Notes
+## v5.44.0
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.43.2...v5.44.0
+
+
 ## v5.43.2
 ### What's Changed
 * Refactor: Use "formula" instead of "bottle" as pkgtype by @Zweih in https://github.com/Zweih/qp/pull/321
