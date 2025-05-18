@@ -1,5 +1,8 @@
 # qp Release Notes
 ## v5.44.0
+### What's Changed
+* Feature: Use concurrent workers for deb driver by @Zweih in https://github.com/Zweih/qp/pull/322
+
 **Full Changelog**: https://github.com/Zweih/qp/compare/v5.43.2...v5.44.0
 
 
