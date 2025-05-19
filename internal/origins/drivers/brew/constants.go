@@ -9,6 +9,10 @@ const (
 	x86MacDetectPrefix = "/usr/local/Homebrew"
 	linuxPrefix        = "/home/linuxbrew/.linuxbrew"
 
-	cellarSubPath = "Cellar"
-	binSubPath    = "bin"
+	cellarSubPath   = "Cellar"
+	caskroomSubpath = "Caskroom"
+	binSubPath      = "bin"
+
+	typeFormula = "formula"
+	typeCasks   = "cask"
 )

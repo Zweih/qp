@@ -15,7 +15,7 @@ type installedPkg struct {
 	VersionPath string
 }
 
-func fetchPackages(
+func fetchFormulae(
 	origin string,
 	prefix string,
 ) ([]*pkgdata.PkgInfo, error) {

@@ -23,6 +23,7 @@ type Relation struct {
 	Version      string
 	ProviderName string
 	Why          string
+	PkgType      string
 }
 
 type PkgInfo struct {
