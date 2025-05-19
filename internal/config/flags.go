@@ -128,7 +128,7 @@ func markHiddenFlags() {
 
 func registerCommonFlags(cfg *Config) {
 	pflag.BoolVar(&cfg.HasNoHeaders, "no-headers", false, "Hide headers")
-	pflag.BoolVar(&cfg.OutputJSON, "json", false, "Output in JSON format")
+	pflag.StringVar(&cfg.OutputFormat, "output", "table", "Output format: \"table\" or \"json\"")
 	pflag.BoolVarP(&cfg.ShowHelp, "help", "h", false, "Show help")
 	pflag.BoolVar(&cfg.ShowVersion, "version", false, "Show version")
 	pflag.BoolVar(&cfg.ShowFullTimestamp, "full-timestamp", false, "Show full timestamp")
@@ -172,4 +172,12 @@ func registerLegacyFlags(
 	pflag.StringVar(sizeFilter, "size", "", "")
 	pflag.StringVar(nameFilter, "name", "", "")
 	pflag.StringVar(requiredByFilter, "required-by", "", "")
+
+	var legacyJSON bool
+	pflag.BoolVar(&legacyJSON, "json", false, "")
+	_ = pflag.CommandLine.MarkHidden("json")
+	_ = pflag.CommandLine.MarkDeprecated("json", "use \"--output json\" instead.")
+	if legacyJSON {
+		cfg.OutputFormat = consts.OutputJSON
+	}
 }

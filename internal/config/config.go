@@ -11,7 +11,7 @@ type Config struct {
 	Limit             int
 	ShowHelp          bool
 	ShowVersion       bool
-	OutputJSON        bool
+	OutputFormat      string
 	HasNoHeaders      bool
 	ShowFullTimestamp bool
 	DisableProgress   bool

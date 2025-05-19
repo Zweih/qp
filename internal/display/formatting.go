@@ -11,7 +11,7 @@ import (
 
 func formatRelations(relations []pkgdata.Relation) string {
 	if len(relations) == 0 {
-		return "-"
+		return ""
 	}
 
 	return strings.Join(flattenRelations(relations), ", ")

@@ -55,23 +55,9 @@ more distros and non-linux platforms are planned!
 ## features
 
 - list installed packages by numerous fields
-  - see all available fields for selection [here](#available-fields-for-selection)
-- query by:
-  - field existence
-  - explicitly installed packages
-  - packages installed as dependencies, required by specified packages, depend upon specified packages, provide specified packages, conflict with specific packages
-  - packages that contain specific licenses
-  - installation/build date or date range
-  - packages built with specified architectures
-  - package size or size range
-  - package names, descriptions, and packagers
+- query by those fields
   - learn more about querying [here](#querying-with-where)
-- sort by: 
-  - installation date and build date
-  - package name
-  - license
-  - size on disk
-  - package base, package type, and packager
+- sort by those fields
 - output as:
   - table
   - JSON
@@ -153,7 +139,8 @@ learn about installation [here](#installation)
 | ✓ | built-in macros | – | streaming pipeline |
 | - | query explaination | - | user configuration file |
 | ✓ | deb origin (apt/dpkg support) | ✓ | deb packaging |
-| ✓ | opkg origin (openwrt support) | - | brew origin (homebrew support)|
+| ✓ | opkg origin (openwrt support) | ✓ | brew origin (homebrew support)|
+| ✓ | bottles in brew | - | casks in brew |
 | - | replaced-by resolution | - | multi-license support |
 | – | short-args for queries | – | key/value output |
 
@@ -173,8 +160,6 @@ if you prefer to install a pre-compiled binary* using the AUR, use the `qp-bin` 
 for the latest (unstable) version from git w/ the AUR, use `qp-git`*.  
 
 ***note**: this is not recommended for most users
-
-the cache is located under `/query-packages` at `$HOME/.cache/` or wherever you have `$XDG_HOME_CACHE` set to.
 
 ### debian-based systems (e.g. ubuntu, mint, pop!_os)
 
@@ -212,6 +197,14 @@ installation via `apt` is coming soon™!
    sudo install -m644 qp.1 /usr/share/man/man1/qp.1
    ```
 
+### cache
+
+#### linux:
+the cache is located under `/query-packages` at `$HOME/.cache/` or wherever you have `$XDG_HOME_CACHE` set to.
+
+#### macOS:
+the cache is located under `/query-packages` at `$HOME/Library/Caches/`
+
 ## usage
 
 ```bash
@@ -247,11 +240,38 @@ qp [command] [args] [options]
 
 - `--no-headers`: omit column headers in table output (useful for scripting)
 - `--full-timestamp`: display the full timestamp (date and time) of package install/build instead of just the date
-- `--json`: output results in JSON format (overrides table output and `--full-timestamp`)
+- `--output`: output format, `table` or `json` (default:`table`)
 - `--no-progress`: force no progress bar outside of non-interactive environments
 - `--no-cache`: disable cache loading/saving and force fresh package data loading
 - `--regen-cache`: disable cache loading, force fresh package data loading, and save fresh cache
 - `-h` | `--help`: print help info
+
+### available fields
+
+- `date` - installation date of the package
+- `build-date` - date the package was built
+- `size` - package size on disk
+- `name` - package name
+- `reason` - installation reason (explicit/dependency)
+- `version` - installed package version
+- `origin` - the package ecosystem or source the package belongs to (e.g., pacman); reflects which package manager or backend maintains it
+- `arch` - architecture the package was built for (e.g., x86_64, aarch64, any)
+- `license` - package software license
+- `description` - package description
+- `url` - the URL of the official site of the software being packaged
+- `validation` - package integrity validation method (e.g., sha256, pgp)
+- `pkgtype` - package type (pkg, split, debug, src)
+    - ***note**: older packages may have no pkgtype if built before pacman introduced XDATA
+- `pkgbase` - name of the base package used to group split packages; for non-split packages, it is the same as the package name. 
+- `packager` - person/entity who built the package (if available)
+- `groups` - list of package groups or categories (e.g., base, gnome, xfce4)
+- `conflicts` - list of packages that conflict, or cause problems, with the package
+- `replaces` - list of packages that are replaced by the package
+- `depends` - list of dependencies
+- `optdepends` - list of optional dependencies
+- `required-by` - list of packages required by the package and are dependent
+- `optional-for` - list of packages that optionally depend on the package (optionally dependent)
+- `provides` - list of alternative package names or shared libraries provided by package
 
 ### querying with `where`
 
@@ -353,6 +373,7 @@ qp w not arch=x86_64
 qp w q has:depends or has:required-by p and not reason=explicit
 ```
 
+
 #### field types
 
 | field type | description |
@@ -361,7 +382,7 @@ qp w q has:depends or has:required-by p and not reason=explicit
 | range | matches numerical or time-based fields across a range. <br> supports full ranges (start:end), open-ended ranges (start: / :end), or exact values |
 | relation | matches fields that contain relationships to other packages (e.g., dependencies, conflicts, provides) <br> can take a comma-separated list |
 
-#### available queries
+#### fields and their types
 
 | field name | field type |
 |------------|------------|
@@ -389,65 +410,13 @@ qp w q has:depends or has:required-by p and not reason=explicit
 | optional-for | relation |
 | provides | relation |
 
-### available selectors
-
-- `date` - installation date of the package
-- `build-date` - date the package was built
-- `size` - package size on disk
-- `name` - package name
-- `reason` - installation reason (explicit/dependency)
-- `version` - installed package version
-- `origin` - the package ecosystem or source the package belongs to (e.g., pacman); reflects which package manager or backend maintains it
-- `arch` - architecture the package was built for (e.g., x86_64, aarch64, any)
-- `license` - package software license
-- `description` - package description
-- `url` - the URL of the official site of the software being packaged
-- `validation` - package integrity validation method (e.g., sha256, pgp)
-- `pkgtype` - package type (pkg, split, debug, src)
-    - ***note**: older packages may have no pkgtype if built before pacman introduced XDATA
-- `pkgbase` - name of the base package used to group split packages; for non-split packages, it is the same as the package name. 
-- `packager` - person/entity who built the package (if available)
-- `groups` - package groups or categories (e.g., base, gnome, xfce4)
-- `conflicts` - list of packages that conflict, or cause problems, with the package
-- `replaces` - list of packages that are replaced by the package
-- `depends` - list of dependencies
-- `optdepends` - list of optional dependencies
-- `required-by` - list of packages required by the package and are dependent
-- `optional-for` - list of packages that optionally depend on the package (optionally dependent)
-- `provides` - list of alternative package names or shared libraries provided by package
-
-### available sorts
-
-- `date`
-- `build-date`
-- `size`
-- `name`
-- `reason`
-- `version`
-- `origin`
-- `arch`
-- `license`
-- `description`
-- `url`
-- `validation`
-- `pkgtype`
-- `pkgbase`
-- `packager`
-- `groups`
-- `conflicts`
-- `depends`
-- `optdepends`
-- `required-by`
-- `optional-for`
-- `provides`
-
 ### JSON output
 
-the `--json` flag outputs the package data as structured JSON instead of a table. this can be useful for scripts or automation.
+`--output json` outputs the package data as structured JSON instead of a table. this can be useful for scripts or automation.
 
 example:
 ```
-qp select all where name=gtk3 --json
+qp select all where name=gtk3 --output json
 ```
 
 `gtk3` is one of the few packages that actually has all the fields populated.
@@ -664,22 +633,22 @@ output format:
 
 17. output package data in JSON format
    ```
-   qp --json
+   qp --output json
    ```
 
 18. save all explicitly installed packages to a JSON file
    ```
-   qp where reason=explicit --json > explicit-packages.json
+   qp where reason=explicit --output json > explicit-packages.json
    ```
 
 19. output all packages sorted by size (descending) in JSON
    ```
-   qp order size:desc limit all --json
+   qp order size:desc limit all --output json
    ```
 
 20. output JSON with specific fields
    ```
-   qp select name,version,size --json
+   qp select name,version,size --output json
    ```
 
 21. show all available package details for all packages
@@ -689,7 +658,7 @@ output format:
 
 22. output all packages with all fields in JSON format
    ```
-   qp select all limit all --json
+   qp select all limit all --output json
    ```
 
 23. show package names and sizes without headers for scripting
