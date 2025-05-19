@@ -128,7 +128,7 @@ func markHiddenFlags() {
 
 func registerCommonFlags(cfg *Config) {
 	pflag.BoolVar(&cfg.HasNoHeaders, "no-headers", false, "Hide headers")
-	pflag.StringVar(&cfg.OutputFormat, "output", "table", "Output format: \"table\" or \"json\"")
+	pflag.StringVar(&cfg.OutputFormat, "output", "table", "Output format: \"table\", \"json\", or \"kv\" (key-value)")
 	pflag.BoolVarP(&cfg.ShowHelp, "help", "h", false, "Show help")
 	pflag.BoolVar(&cfg.ShowVersion, "version", false, "Show version")
 	pflag.BoolVar(&cfg.ShowFullTimestamp, "full-timestamp", false, "Show full timestamp")
