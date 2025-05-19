@@ -2,7 +2,9 @@ package brew
 
 const (
 	formulaCachePath = "/Homebrew/api/formula.jws.json"
-	receiptName      = "INSTALL_RECEIPT.json"
+	caskCachePath    = "/Homebrew/api/cask.jws.json"
+
+	receiptName = "INSTALL_RECEIPT.json"
 
 	armMacPrefix       = "/opt/homebrew"
 	x86MacPrefix       = "/usr/local"
@@ -14,5 +16,5 @@ const (
 	binSubPath      = "bin"
 
 	typeFormula = "formula"
-	typeCasks   = "cask"
+	typeCask    = "cask"
 )
