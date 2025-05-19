@@ -176,7 +176,7 @@ func registerLegacyFlags(
 	var legacyJSON bool
 	pflag.BoolVar(&legacyJSON, "json", false, "")
 	_ = pflag.CommandLine.MarkHidden("json")
-	_ = pflag.CommandLine.MarkDeprecated("json", "use --output json instead")
+	_ = pflag.CommandLine.MarkDeprecated("json", "use \"--output json\" instead")
 	if legacyJSON {
 		cfg.OutputFormat = consts.OutputJSON
 	}
