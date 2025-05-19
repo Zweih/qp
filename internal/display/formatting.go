@@ -45,6 +45,10 @@ func flattenRelations(relations []pkgdata.Relation) []string {
 }
 
 func formatDate(timestamp int64, ctx tableContext) string {
+	if timestamp < 1 {
+		return ""
+	}
+
 	unixTimestamp := time.Unix(timestamp, 0)
 	return unixTimestamp.Format(ctx.DateFormat)
 }
