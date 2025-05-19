@@ -23,7 +23,17 @@ func (d *BrewDriver) Detect() bool {
 }
 
 func (d *BrewDriver) Load() ([]*pkgdata.PkgInfo, error) {
-	return fetchPackages(d.Name(), d.prefix)
+	formulae, err := fetchFormulae(d.Name(), d.prefix)
+	if err != nil {
+		return []*pkgdata.PkgInfo{}, err
+	}
+
+	casks, err := fetchCasks(d.Name(), d.prefix)
+	if err != nil {
+		return []*pkgdata.PkgInfo{}, err
+	}
+
+	return append(formulae, casks...), nil
 }
 
 func (d *BrewDriver) ResolveDeps(pkgs []*pkgdata.PkgInfo) ([]*pkgdata.PkgInfo, error) {
