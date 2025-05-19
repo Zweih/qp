@@ -142,7 +142,7 @@ learn about installation [here](#installation)
 | ✓ | opkg origin (openwrt support) | ✓ | brew origin (homebrew support)|
 | ✓ | bottles in brew | - | casks in brew |
 | - | replaced-by resolution | - | multi-license support |
-| – | short-args for queries | – | key/value output |
+| – | short-args for queries | ✓ | key/value output |
 
 ## installation
 
@@ -240,7 +240,7 @@ qp [command] [args] [options]
 
 - `--no-headers`: omit column headers in table output (useful for scripting)
 - `--full-timestamp`: display the full timestamp (date and time) of package install/build instead of just the date
-- `--output`: output format, `table` or `json` (default:`table`)
+- `--output`: format output as `table`, `kv` (key-value), `json` (default:`table`)
 - `--no-progress`: force no progress bar outside of non-interactive environments
 - `--no-cache`: disable cache loading/saving and force fresh package data loading
 - `--regen-cache`: disable cache loading, force fresh package data loading, and save fresh cache
