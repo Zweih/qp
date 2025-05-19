@@ -161,8 +161,6 @@ for the latest (unstable) version from git w/ the AUR, use `qp-git`*.
 
 ***note**: this is not recommended for most users
 
-the cache is located under `/query-packages` at `$HOME/.cache/` or wherever you have `$XDG_HOME_CACHE` set to.
-
 ### debian-based systems (e.g. ubuntu, mint, pop!_os)
 
 to install the latest `.deb` release for your system architecture:
@@ -199,6 +197,14 @@ installation via `apt` is coming soon™!
    sudo install -m644 qp.1 /usr/share/man/man1/qp.1
    ```
 
+### cache
+
+#### linux:
+the cache is located under `/query-packages` at `$HOME/.cache/` or wherever you have `$XDG_HOME_CACHE` set to.
+
+#### macOS:
+the cache is located under `/query-packages` at `$HOME/Library/Caches/`
+
 ## usage
 
 ```bash
@@ -234,7 +240,7 @@ qp [command] [args] [options]
 
 - `--no-headers`: omit column headers in table output (useful for scripting)
 - `--full-timestamp`: display the full timestamp (date and time) of package install/build instead of just the date
-- `--json`: output results in JSON format (overrides table output and `--full-timestamp`)
+- `--output`: output format, `table` or `json` (default:`table`)
 - `--no-progress`: force no progress bar outside of non-interactive environments
 - `--no-cache`: disable cache loading/saving and force fresh package data loading
 - `--regen-cache`: disable cache loading, force fresh package data loading, and save fresh cache
@@ -406,11 +412,11 @@ qp w q has:depends or has:required-by p and not reason=explicit
 
 ### JSON output
 
-the `--json` flag outputs the package data as structured JSON instead of a table. this can be useful for scripts or automation.
+`--output json` outputs the package data as structured JSON instead of a table. this can be useful for scripts or automation.
 
 example:
 ```
-qp select all where name=gtk3 --json
+qp select all where name=gtk3 --output json
 ```
 
 `gtk3` is one of the few packages that actually has all the fields populated.
@@ -627,22 +633,22 @@ output format:
 
 17. output package data in JSON format
    ```
-   qp --json
+   qp --output json
    ```
 
 18. save all explicitly installed packages to a JSON file
    ```
-   qp where reason=explicit --json > explicit-packages.json
+   qp where reason=explicit --output json > explicit-packages.json
    ```
 
 19. output all packages sorted by size (descending) in JSON
    ```
-   qp order size:desc limit all --json
+   qp order size:desc limit all --output json
    ```
 
 20. output JSON with specific fields
    ```
-   qp select name,version,size --json
+   qp select name,version,size --output json
    ```
 
 21. show all available package details for all packages
@@ -652,7 +658,7 @@ output format:
 
 22. output all packages with all fields in JSON format
    ```
-   qp select all limit all --json
+   qp select all limit all --output json
    ```
 
 23. show package names and sizes without headers for scripting
