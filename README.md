@@ -214,8 +214,8 @@ qp [command] [args] [options]
 ### commands
 
 - `select <list>` | `s <list>`: comma-separated list of fields to display
-  - `select all | s all` will act as a list of all available fields
-  - `select default | s default` will act as a list of all default fields
+  - `select all` | `s all` will act as a list of all available fields
+  - `select default` | `s default` will act as a list of all default fields
   - use `select default,version` to list default fields + version
   - use `select all,version` to list default fields + version
   - [see fields available for selection](#available-selectors)
@@ -232,7 +232,7 @@ qp [command] [args] [options]
   - default sort is `date:asc`:
   - [see fields avaialble for sorting](#available-sorts)
 - `limit <number>` | `l <number>`: limit the amount of packages to display (default: 20)
-  - `limit all | l all`: display all packages
+  - `limit all` | `l all`: display all packages
   - `limit end:<number>`: display last `n` packages
   - `limit mid:<number>`: display middle `n` packages
 
