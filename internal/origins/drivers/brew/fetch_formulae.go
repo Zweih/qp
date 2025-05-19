@@ -1,7 +1,6 @@
 package brew
 
 import (
-	"io/fs"
 	"path/filepath"
 	"qp/internal/origins/worker"
 	"qp/internal/pkgdata"
@@ -13,6 +12,7 @@ type installedPkg struct {
 	Version     string
 	ReceiptPath string
 	VersionPath string
+	ModTime     int64
 }
 
 func fetchFormulae(
@@ -92,27 +92,4 @@ func fetchFormulae(
 
 	allErrs := worker.MergeErrors(stage1Err, stage2Err, stage3Err)
 	return worker.CollectOutput(stage3Out, allErrs)
-}
-
-func getInstallSize(dir string) (int64, error) {
-	var total int64
-
-	err := filepath.WalkDir(dir, func(_ string, dir fs.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
-
-		if !dir.IsDir() {
-			info, err := dir.Info()
-			if err != nil {
-				return err
-			}
-
-			total += info.Size()
-		}
-
-		return nil
-	})
-
-	return total, err
 }
