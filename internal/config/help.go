@@ -82,6 +82,10 @@ Short Command Examples:
   qp w reason=explicit and size=50MB:
   qp w q size=10MB:1GB or size==20MB p and not has:depends
 
+Build-in Macros:
+  - 'qp w orphan' is equivalent to 'qp where no:required-by and reason=dependency'
+  - 'qp w superorphan' is equivalent to 'qp where no:required-by and reason=dependency and no:optional-for'
+
 Tips:
   - Queries can include comma-separated values, these act a shorthand for 'or' logic:
       arch=aarch64,any
