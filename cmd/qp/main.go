@@ -138,6 +138,8 @@ func renderOutput(pkgs []*pkgdata.PkgInfo, cfg *config.Config) error {
 	switch cfg.OutputFormat {
 	case consts.OutputTable:
 		out.RenderTable(pkgs, cfg.Fields, cfg.ShowFullTimestamp, cfg.HasNoHeaders)
+	case consts.OutputKeyValue:
+		out.RenderKeyValue(pkgs, cfg.Fields)
 	case consts.OutputJSON:
 		out.RenderJSON(pkgs, cfg.Fields)
 	default:

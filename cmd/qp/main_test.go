@@ -21,10 +21,10 @@ func (m *MockConfigProvider) GetConfig() (*config.Config, error) {
 // TODO: more testing, this is just validating if the depenendency injection works for testing
 func TestMainWithConfig(t *testing.T) {
 	mockCfg := config.Config{
-		Limit:      5,
-		SortOption: syntax.SortOption{Field: consts.FieldSize, Asc: false},
-		OutputJSON: true,
-		Fields:     []consts.FieldType{consts.FieldName, consts.FieldSize},
+		Limit:        5,
+		SortOption:   syntax.SortOption{Field: consts.FieldSize, Asc: false},
+		OutputFormat: consts.OutputJSON,
+		Fields:       []consts.FieldType{consts.FieldName, consts.FieldSize},
 	}
 
 	var buf bytes.Buffer
@@ -44,7 +44,7 @@ func TestMainWithConfig(t *testing.T) {
 	}
 
 	expectedSubstring := "{"
-	if mockCfg.OutputJSON && !strings.Contains(output, expectedSubstring) {
+	if mockCfg.OutputFormat == consts.OutputJSON && !strings.Contains(output, expectedSubstring) {
 		t.Errorf("Expected JSON output but did not find JSON structure")
 	}
 }

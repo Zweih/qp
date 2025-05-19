@@ -142,7 +142,7 @@ learn about installation [here](#installation)
 | ✓ | opkg origin (openwrt support) | ✓ | brew origin (homebrew support)|
 | ✓ | bottles in brew | - | casks in brew |
 | - | replaced-by resolution | - | multi-license support |
-| – | short-args for queries | – | key/value output |
+| – | short-args for queries | ✓ | key/value output |
 
 ## installation
 
@@ -214,11 +214,11 @@ qp [command] [args] [options]
 ### commands
 
 - `select <list>` | `s <list>`: comma-separated list of fields to display
-  - `select all | s all` will act as a list of all available fields
-  - `select default | s default` will act as a list of all default fields
+  - `select all` | `s all` will act as a list of all available fields
+  - `select default` | `s default` will act as a list of all default fields
   - use `select default,version` to list default fields + version
   - use `select all,version` to list default fields + version
-  - [see fields available for selection](#available-selectors)
+  - [see fields available for selection](#available-fields)
 - `where <query>` | `w <query>`: apply one or more queries to refine package results.
   - supported query types:
     - **string match** -> `field=value` (fuzzy) or `field==value` (strict)
@@ -230,9 +230,8 @@ qp [command] [args] [options]
   - learn more about querying [here](#querying-with-where)
 - `order <field>:<direction>` | `o <field>:<direction>`: sort results ascending or descending
   - default sort is `date:asc`:
-  - [see fields avaialble for sorting](#available-sorts)
 - `limit <number>` | `l <number>`: limit the amount of packages to display (default: 20)
-  - `limit all | l all`: display all packages
+  - `limit all` | `l all`: display all packages
   - `limit end:<number>`: display last `n` packages
   - `limit mid:<number>`: display middle `n` packages
 
@@ -240,7 +239,7 @@ qp [command] [args] [options]
 
 - `--no-headers`: omit column headers in table output (useful for scripting)
 - `--full-timestamp`: display the full timestamp (date and time) of package install/build instead of just the date
-- `--output`: output format, `table` or `json` (default:`table`)
+- `--output`: format output as `table`, `kv` (key-value), `json` (default:`table`)
 - `--no-progress`: force no progress bar outside of non-interactive environments
 - `--no-cache`: disable cache loading/saving and force fresh package data loading
 - `--regen-cache`: disable cache loading, force fresh package data loading, and save fresh cache

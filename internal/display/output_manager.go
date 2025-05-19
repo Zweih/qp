@@ -63,6 +63,10 @@ func RenderJSON(pkgPtrs []*pkgdata.PkgInfo, fields []consts.FieldType) {
 	manager.renderJSON(pkgPtrs, fields)
 }
 
+func RenderKeyValue(pkgs []*pkgdata.PkgInfo, fields []consts.FieldType) {
+	manager.renderKeyValue(pkgs, fields)
+}
+
 func (o *OutputManager) write(msg string) {
 	o.mu.Lock()
 	defer o.mu.Unlock()
