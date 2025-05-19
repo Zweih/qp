@@ -1,9 +1,11 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"qp/internal/config"
+	"qp/internal/consts"
 	out "qp/internal/display"
 	"qp/internal/origins"
 	"qp/internal/pipeline/phase"
@@ -85,7 +87,10 @@ func mainWithConfig(configProvider config.ConfigProvider) error {
 	}
 
 	allPkgs = trimPackagesLen(allPkgs, cfg)
-	renderOutput(allPkgs, cfg)
+	err = renderOutput(allPkgs, cfg)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -129,13 +134,17 @@ func trimPackagesLen(
 	}
 }
 
-func renderOutput(pkgs []*pkgdata.PkgInfo, cfg *config.Config) {
-	if cfg.OutputJSON {
+func renderOutput(pkgs []*pkgdata.PkgInfo, cfg *config.Config) error {
+	switch cfg.OutputFormat {
+	case consts.OutputTable:
+		out.RenderTable(pkgs, cfg.Fields, cfg.ShowFullTimestamp, cfg.HasNoHeaders)
+	case consts.OutputJSON:
 		out.RenderJSON(pkgs, cfg.Fields)
-		return
+	default:
+		return errors.New("invalid output format")
 	}
 
-	out.RenderTable(pkgs, cfg.Fields, cfg.ShowFullTimestamp, cfg.HasNoHeaders)
+	return nil
 }
 
 func isInteractive(disableProgress bool) bool {
