@@ -150,7 +150,7 @@ learn about installation [here](#installation)
 | ✓ | abstract syntax tree | ✓ | directed acyclical graph for filtering |
 | - | user-defined macros | ✓ | parentetical (grouping) logic |
 | ✓ | limit from end | ✓ | limit from middle |
-| - | built-in macros | – | streaming pipeline |
+| ✓ | built-in macros | – | streaming pipeline |
 | - | query explaination | - | user configuration file |
 | ✓ | deb origin (apt/dpkg support) | ✓ | deb packaging |
 | ✓ | opkg origin (openwrt support) | - | brew origin (homebrew support)|
@@ -319,16 +319,26 @@ some frequently-used query patterns are available as built-in macros for conveni
   qp where orphan
   ```
 
-  this is equivalent to:
+  is equivalent to:
   ```
   qp where no:required-by and reason=dependency
+  ```
+
+* `superorphan` - matches "super" orphaned packages (dependencies no longer required by anything AND optional for nothing)
+  ```
+  qp w superorphan
+  ```
+
+  is equivalent to:
+  ```
+  qp where no:required-by and reason=dependency and no:optional-for
   ```
 
 these macros can be combined with other queries as usual:
 
 ```
 qp w orphan and size=100KB:
-qp w orphan and not name=gtk
+qp w superorphan and not name=gtk
 ```
 
 #### query examples
