@@ -218,7 +218,7 @@ qp [command] [args] [options]
   - `select default` | `s default` will act as a list of all default fields
   - use `select default,version` to list default fields + version
   - use `select all,version` to list default fields + version
-  - [see fields available for selection](#available-selectors)
+  - [see fields available for selection](#available-fields)
 - `where <query>` | `w <query>`: apply one or more queries to refine package results.
   - supported query types:
     - **string match** -> `field=value` (fuzzy) or `field==value` (strict)
@@ -230,7 +230,6 @@ qp [command] [args] [options]
   - learn more about querying [here](#querying-with-where)
 - `order <field>:<direction>` | `o <field>:<direction>`: sort results ascending or descending
   - default sort is `date:asc`:
-  - [see fields avaialble for sorting](#available-sorts)
 - `limit <number>` | `l <number>`: limit the amount of packages to display (default: 20)
   - `limit all` | `l all`: display all packages
   - `limit end:<number>`: display last `n` packages
