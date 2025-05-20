@@ -1,4 +1,11 @@
 # qp Release Notes
+## v5.47.0
+### What's Changed
+* Feature: Add key-value output (`kv`) by @Zweih in https://github.com/Zweih/qp/pull/326
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.46.0...v5.47.0
+
+
 ## v5.46.0
 ### What's Changed
 * Feature: Add `--output` flag (deprecate `--json`) by @Zweih in https://github.com/Zweih/qp/pull/324
