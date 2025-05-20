@@ -12,11 +12,19 @@ import (
 func fetchCasks(
 	origin string,
 	prefix string,
-) ([]*pkgdata.PkgInfo, error) {
+	outChan chan<- *pkgdata.PkgInfo,
+	errChan chan<- error,
+	errGroup *sync.WaitGroup,
+) {
 	caskroomRoot := filepath.Join(prefix, caskroomSubpath)
 	installedNames, err := getInstalledCasks(caskroomRoot)
 	if err != nil {
-		return []*pkgdata.PkgInfo{}, err
+		errChan <- err
+		return
+	}
+
+	if len(installedNames) < 1 {
+		return
 	}
 
 	wanted := make(map[string]struct{}, len(installedNames))
@@ -41,8 +49,10 @@ func fetchCasks(
 
 	close(inputChan)
 
-	stage1Out, stage1Err := worker.RunWorkers(
+	stage1Out := worker.RunWorkers(
 		inputChan,
+		errChan,
+		errGroup,
 		func(name string) (*pkgdata.PkgInfo, error) {
 			receiptPath := filepath.Join(caskroomRoot, name, ".metadata", receiptName)
 			return parseCaskReceipt(name, receiptPath)
@@ -51,8 +61,10 @@ func fetchCasks(
 		len(installedNames),
 	)
 
-	stage2Out, stage2Err := worker.RunWorkers(
+	stage2Out := worker.RunWorkers(
 		stage1Out,
+		errChan,
+		errGroup,
 		func(pkg *pkgdata.PkgInfo) (*pkgdata.PkgInfo, error) {
 			size, err := getInstallSize(filepath.Join(caskroomRoot, pkg.Name, pkg.Version))
 			if err == nil {
@@ -67,11 +79,14 @@ func fetchCasks(
 
 	metaWg.Wait()
 	if metaErr != nil {
-		return []*pkgdata.PkgInfo{}, metaErr
+		errChan <- metaErr
+		return
 	}
 
-	stage3Out, stage3Err := worker.RunWorkers(
+	stage3Out := worker.RunWorkers(
 		stage2Out,
+		errChan,
+		errGroup,
 		func(pkg *pkgdata.PkgInfo) (*pkgdata.PkgInfo, error) {
 			if meta, ok := caskMeta[pkg.Name]; ok {
 				mergeCaskMetadata(pkg, meta)
@@ -85,8 +100,9 @@ func fetchCasks(
 		len(installedNames),
 	)
 
-	allErrs := worker.MergeErrors(stage1Err, stage2Err, stage3Err)
-	return worker.CollectOutput(stage3Out, allErrs)
+	for pkg := range stage3Out {
+		outChan <- pkg
+	}
 }
 
 func getInstalledCasks(caskroomRoot string) ([]string, error) {

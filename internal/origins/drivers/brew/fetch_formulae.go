@@ -18,12 +18,20 @@ type installedPkg struct {
 func fetchFormulae(
 	origin string,
 	prefix string,
-) ([]*pkgdata.PkgInfo, error) {
+	outChan chan<- *pkgdata.PkgInfo,
+	errChan chan<- error,
+	errGroup *sync.WaitGroup,
+) {
 	binRoot := filepath.Join(prefix, binSubPath)
 	cellarRoot := filepath.Join(prefix, cellarSubPath)
 	installedPkgs, err := getInstalledPkgs(cellarRoot, binRoot)
 	if err != nil {
-		return nil, err
+		errChan <- err
+		return
+	}
+
+	if len(installedPkgs) < 1 {
+		return
 	}
 
 	wanted := make(map[string]struct{}, len(installedPkgs))
@@ -48,8 +56,10 @@ func fetchFormulae(
 
 	close(inputChan)
 
-	stage1Out, stage1Err := worker.RunWorkers(
+	stage1Out := worker.RunWorkers(
 		inputChan,
+		errChan,
+		errGroup,
 		func(iPkg installedPkg) (*pkgdata.PkgInfo, error) {
 			return parseFormulaReceipt(iPkg.ReceiptPath, iPkg.Version)
 		},
@@ -57,8 +67,10 @@ func fetchFormulae(
 		len(installedPkgs),
 	)
 
-	stage2Out, stage2Err := worker.RunWorkers(
+	stage2Out := worker.RunWorkers(
 		stage1Out,
+		errChan,
+		errGroup,
 		func(pkg *pkgdata.PkgInfo) (*pkgdata.PkgInfo, error) {
 			versionPath := filepath.Join(prefix, cellarSubPath, pkg.Name, pkg.Version)
 			if size, err := getInstallSize(versionPath); err == nil {
@@ -73,11 +85,14 @@ func fetchFormulae(
 
 	metaWg.Wait()
 	if metaErr != nil {
-		return nil, metaErr
+		errChan <- metaErr
+		return
 	}
 
-	stage3Out, stage3Err := worker.RunWorkers(
+	stage3Out := worker.RunWorkers(
 		stage2Out,
+		errChan,
+		errGroup,
 		func(pkg *pkgdata.PkgInfo) (*pkgdata.PkgInfo, error) {
 			if meta, ok := formulaMeta[pkg.Name]; ok {
 				mergeFormulaMetadata(pkg, meta)
@@ -90,6 +105,7 @@ func fetchFormulae(
 		len(installedPkgs),
 	)
 
-	allErrs := worker.MergeErrors(stage1Err, stage2Err, stage3Err)
-	return worker.CollectOutput(stage3Out, allErrs)
+	for pkg := range stage3Out {
+		outChan <- pkg
+	}
 }
