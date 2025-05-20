@@ -10,17 +10,17 @@ const DefaultBufferSize = 64
 
 func RunWorkers[I any, O any](
 	inputChan <-chan I,
+	errChan chan<- error,
+	errGroup *sync.WaitGroup,
 	workerFunc func(I) (O, error),
 	numWorkers int, // pass 0 unless testing or intentionally limiting
 	bufferSize int,
-) (<-chan O, <-chan error) {
+) <-chan O {
 	outputChan := make(chan O, bufferSize)
-	errChan := make(chan error, DefaultBufferSize)
 
 	if bufferSize == 0 {
 		close(outputChan)
-		close(errChan)
-		return outputChan, errChan
+		return outputChan
 	}
 
 	if numWorkers <= 0 {
@@ -28,13 +28,16 @@ func RunWorkers[I any, O any](
 		numWorkers = getWorkerCount(runtime.NumCPU())
 	}
 
-	var wg sync.WaitGroup
+	var stageGroup sync.WaitGroup
 
 	for range numWorkers {
-		wg.Add(1)
+		stageGroup.Add(1)
+		errGroup.Add(1)
 
 		go func() {
-			defer wg.Done()
+			defer stageGroup.Done()
+			defer errGroup.Done()
+
 			for item := range inputChan {
 				pkg, err := workerFunc(item)
 				if err != nil {
@@ -48,12 +51,11 @@ func RunWorkers[I any, O any](
 	}
 
 	go func() {
-		wg.Wait()
+		stageGroup.Wait()
 		close(outputChan)
-		close(errChan)
 	}()
 
-	return outputChan, errChan
+	return outputChan
 }
 
 func CollectOutput[O any](resultChan <-chan O, errChan <-chan error) ([]O, error) {
@@ -74,29 +76,6 @@ func CollectOutput[O any](resultChan <-chan O, errChan <-chan error) ([]O, error
 	}
 
 	return results, combinedErr
-}
-
-func MergeErrors(errChans ...<-chan error) <-chan error {
-	out := make(chan error, DefaultBufferSize)
-	var wg sync.WaitGroup
-
-	for _, errChan := range errChans {
-		wg.Add(1)
-		go func(eChan <-chan error) {
-			defer wg.Done()
-
-			for err := range eChan {
-				out <- err
-			}
-		}(errChan)
-	}
-
-	go func() {
-		wg.Wait()
-		close(out)
-	}()
-
-	return out
 }
 
 func getWorkerCount(numCPUs int) int {

@@ -23,6 +23,27 @@ type Relation struct {
 	Version      string
 	ProviderName string
 	Why          string
+	PkgType      string
+}
+
+func (rel *Relation) Key() string {
+	if rel.PkgType != "" {
+		return rel.PkgType + ":" + rel.Name
+	}
+
+	return rel.Name
+}
+
+func (rel Relation) ProviderKey() string {
+	if rel.ProviderName == "" {
+		return ""
+	}
+
+	if rel.PkgType != "" {
+		return rel.PkgType + ":" + rel.ProviderName
+	}
+
+	return rel.ProviderName
 }
 
 type PkgInfo struct {
@@ -52,6 +73,14 @@ type PkgInfo struct {
 	Provides    []Relation
 	Conflicts   []Relation
 	Replaces    []Relation
+}
+
+func (pkg *PkgInfo) Key() string {
+	if pkg.Origin == consts.OriginBrew {
+		return pkg.PkgType + ":" + pkg.Name
+	}
+
+	return pkg.Name
 }
 
 func (pkg *PkgInfo) GetInt(field consts.FieldType) int64 {

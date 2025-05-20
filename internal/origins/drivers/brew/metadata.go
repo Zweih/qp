@@ -13,6 +13,10 @@ func getFormulaKey(formula *FormulaMetadata) string {
 	return formula.Name
 }
 
+func getCaskKey(cask *CaskMetadata) string {
+	return cask.Token
+}
+
 func loadMetadata[T any](
 	filePath string,
 	keyFunc func(*T) string,

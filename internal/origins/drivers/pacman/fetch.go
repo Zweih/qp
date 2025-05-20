@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"qp/internal/origins/worker"
 	"qp/internal/pkgdata"
+	"sync"
 )
 
 func fetchPackages(origin string) ([]*pkgdata.PkgInfo, error) {
@@ -28,8 +29,13 @@ func fetchPackages(origin string) ([]*pkgdata.PkgInfo, error) {
 		close(descPathChan)
 	}()
 
-	outputChan, errChan := worker.RunWorkers(
+	errChan := make(chan error, worker.DefaultBufferSize)
+	var errGroup sync.WaitGroup
+
+	outputChan := worker.RunWorkers(
 		descPathChan,
+		errChan,
+		&errGroup,
 		func(path string) (*pkgdata.PkgInfo, error) {
 			pkg, err := parseDescFile(path)
 			if err != nil {
@@ -43,6 +49,11 @@ func fetchPackages(origin string) ([]*pkgdata.PkgInfo, error) {
 		0,
 		numPkgs,
 	)
+
+	go func() {
+		errGroup.Wait()
+		close(errChan)
+	}()
 
 	return worker.CollectOutput(outputChan, errChan)
 }

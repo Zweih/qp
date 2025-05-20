@@ -10,11 +10,15 @@ import (
 	"qp/internal/pkgdata"
 	"strconv"
 	"strings"
+	"sync"
 )
 
 func parseStatusFile(data []byte, origin string, reasonMap map[string]string) ([]*pkgdata.PkgInfo, error) {
 	blocks := bytes.Split(data, []byte("\n\n"))
+
 	inputChan := make(chan map[string]string, len(blocks))
+	errChan := make(chan error, worker.DefaultBufferSize)
+	var errGroup sync.WaitGroup
 
 	for _, block := range blocks {
 		if len(block) < 1 {
@@ -30,8 +34,10 @@ func parseStatusFile(data []byte, origin string, reasonMap map[string]string) ([
 	}
 	close(inputChan)
 
-	resultChan, errorChan := worker.RunWorkers(
+	resultChan := worker.RunWorkers(
 		inputChan,
+		errChan,
+		&errGroup,
 		func(fields map[string]string) (*pkgdata.PkgInfo, error) {
 			pkg, err := parseStatusBlock(fields, reasonMap, origin)
 			return pkg, err
@@ -40,7 +46,12 @@ func parseStatusFile(data []byte, origin string, reasonMap map[string]string) ([
 		len(blocks),
 	)
 
-	return worker.CollectOutput(resultChan, errorChan)
+	go func() {
+		errGroup.Wait()
+		close(errChan)
+	}()
+
+	return worker.CollectOutput(resultChan, errChan)
 }
 
 func parseStatusBlock(
