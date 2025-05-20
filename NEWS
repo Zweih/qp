@@ -1,4 +1,11 @@
 # qp Release Notes
+## v5.47.1
+### What's Changed
+* Refactor: Clean-up version output by @Zweih in https://github.com/Zweih/qp/pull/327
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.47.0...v5.47.1
+
+
 ## v5.47.0
 ### What's Changed
 * Feature: Add key-value output (`kv`) by @Zweih in https://github.com/Zweih/qp/pull/326
