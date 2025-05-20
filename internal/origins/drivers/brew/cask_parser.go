@@ -33,7 +33,7 @@ type CaskMetadata struct {
 	ConflictsWith map[string][]string `json:"conflicts_with"`
 }
 
-func parseCaskReceipt(path string) (*pkgdata.PkgInfo, error) {
+func parseCaskReceipt(name string, path string) (*pkgdata.PkgInfo, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read receipt JSON: %v", err)
@@ -53,6 +53,7 @@ func parseCaskReceipt(path string) (*pkgdata.PkgInfo, error) {
 	caskRels := parseCaskDeps(typeCask, receipt.RuntimeDependencies[typeCask])
 
 	pkg := &pkgdata.PkgInfo{
+		Name:             name,
 		Version:          receipt.Source.Version,
 		InstallTimestamp: receipt.Time,
 		Arch:             receipt.Arch,

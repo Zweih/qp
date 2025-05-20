@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"qp/internal/origins/worker"
 	"qp/internal/pkgdata"
+	"sync"
 )
 
 func fetchCasks(
@@ -12,47 +14,79 @@ func fetchCasks(
 	prefix string,
 ) ([]*pkgdata.PkgInfo, error) {
 	caskroomRoot := filepath.Join(prefix, caskroomSubpath)
-	installed, err := getInstalledCasks(caskroomRoot)
+	installedNames, err := getInstalledCasks(caskroomRoot)
 	if err != nil {
 		return []*pkgdata.PkgInfo{}, err
 	}
 
-	wanted := make(map[string]struct{}, len(installed))
-	for _, name := range installed {
+	wanted := make(map[string]struct{}, len(installedNames))
+	for _, name := range installedNames {
 		wanted[name] = struct{}{}
 	}
 
-	metadata, err := loadMetadata(caskCachePath, getCaskKey, wanted)
-	if err != nil {
-		return []*pkgdata.PkgInfo{}, err
+	var caskMeta map[string]*CaskMetadata
+	var metaErr error
+	var metaWg sync.WaitGroup
+
+	metaWg.Add(1)
+	go func() {
+		defer metaWg.Done()
+		caskMeta, metaErr = loadMetadata(caskCachePath, getCaskKey, wanted)
+	}()
+
+	inputChan := make(chan string, len(installedNames))
+	for _, name := range installedNames {
+		inputChan <- name
 	}
 
-	result := make([]*pkgdata.PkgInfo, 0, len(installed))
-	for _, name := range installed {
-		receiptPath := filepath.Join(caskroomRoot, name, ".metadata", receiptName)
-		pkg, err := parseCaskReceipt(receiptPath)
-		if err != nil {
-			continue
-		}
+	close(inputChan)
 
-		pkg.Name = name
-		pkg.Origin = origin
+	stage1Out, stage1Err := worker.RunWorkers(
+		inputChan,
+		func(name string) (*pkgdata.PkgInfo, error) {
+			receiptPath := filepath.Join(caskroomRoot, name, ".metadata", receiptName)
+			return parseCaskReceipt(name, receiptPath)
+		},
+		0,
+		len(installedNames),
+	)
 
-		size, err := getInstallSize(filepath.Join(caskroomRoot, name, pkg.Version))
-		if err == nil {
-			pkg.Size = size
-		}
+	stage2Out, stage2Err := worker.RunWorkers(
+		stage1Out,
+		func(pkg *pkgdata.PkgInfo) (*pkgdata.PkgInfo, error) {
+			size, err := getInstallSize(filepath.Join(caskroomRoot, pkg.Name, pkg.Version))
+			if err == nil {
+				pkg.Size = size
+			}
 
-		fmt.Println(pkg.Depends)
+			return pkg, nil
+		},
+		0,
+		len(installedNames),
+	)
 
-		if meta, ok := metadata[pkg.Name]; ok {
-			mergeCaskMetadata(pkg, meta)
-		}
-
-		result = append(result, pkg)
+	metaWg.Wait()
+	if metaErr != nil {
+		return []*pkgdata.PkgInfo{}, metaErr
 	}
 
-	return result, nil
+	stage3Out, stage3Err := worker.RunWorkers(
+		stage2Out,
+		func(pkg *pkgdata.PkgInfo) (*pkgdata.PkgInfo, error) {
+			if meta, ok := caskMeta[pkg.Name]; ok {
+				mergeCaskMetadata(pkg, meta)
+			}
+
+			pkg.Origin = origin
+
+			return pkg, nil
+		},
+		0,
+		len(installedNames),
+	)
+
+	allErrs := worker.MergeErrors(stage1Err, stage2Err, stage3Err)
+	return worker.CollectOutput(stage3Out, allErrs)
 }
 
 func getInstalledCasks(caskroomRoot string) ([]string, error) {
