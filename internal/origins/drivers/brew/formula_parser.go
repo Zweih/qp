@@ -20,7 +20,6 @@ type FormulaReceipt struct {
 
 	RuntimeDependencies []struct {
 		FullName         string `json:"full_name"`
-		PkgVersion       string `json:"pkg_version"`
 		DeclaredDirectly bool   `json:"declared_directly"`
 	} `json:"runtime_dependencies"`
 }
@@ -96,11 +95,9 @@ func parseDepends(receipt FormulaReceipt) []pkgdata.Relation {
 		}
 
 		rels = append(rels, pkgdata.Relation{
-			Name:     dep.FullName,
-			Version:  dep.PkgVersion,
-			Operator: pkgdata.OpEqual,
-			PkgType:  typeFormula,
-			Depth:    1,
+			Name:    dep.FullName,
+			PkgType: typeFormula,
+			Depth:   1,
 		})
 	}
 

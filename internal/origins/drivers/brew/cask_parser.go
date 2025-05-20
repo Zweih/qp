@@ -11,7 +11,6 @@ import (
 
 type RuntimeDependency struct {
 	FullName         string `json:"full_name"`
-	Version          string `json:"version"`
 	DeclaredDirectly bool   `json:"declared_directly"`
 }
 
@@ -75,11 +74,9 @@ func parseCaskDeps(pkgType string, deps []RuntimeDependency) []pkgdata.Relation 
 	for _, dep := range deps {
 		if dep.DeclaredDirectly {
 			rels = append(rels, pkgdata.Relation{
-				Name:     dep.FullName,
-				Depth:    1,
-				Version:  dep.Version,
-				Operator: pkgdata.OpEqual,
-				PkgType:  pkgType,
+				Name:    dep.FullName,
+				Depth:   1,
+				PkgType: pkgType,
 			})
 		}
 	}
