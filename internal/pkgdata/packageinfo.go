@@ -26,6 +26,26 @@ type Relation struct {
 	PkgType      string
 }
 
+func (rel *Relation) GetKey() string {
+	if rel.PkgType != "" {
+		return rel.PkgType + ":" + rel.Name
+	}
+
+	return rel.Name
+}
+
+func (rel Relation) ProviderKey() string {
+	if rel.ProviderName == "" {
+		return ""
+	}
+
+	if rel.PkgType != "" {
+		return rel.PkgType + ":" + rel.ProviderName
+	}
+
+	return rel.ProviderName
+}
+
 type PkgInfo struct {
 	InstallTimestamp int64
 	BuildTimestamp   int64
@@ -53,6 +73,14 @@ type PkgInfo struct {
 	Provides    []Relation
 	Conflicts   []Relation
 	Replaces    []Relation
+}
+
+func (pkg *PkgInfo) GetKey() string {
+	if pkg.Origin == "brew" {
+		return pkg.PkgType + ":" + pkg.Name
+	}
+
+	return pkg.Name
 }
 
 func (pkg *PkgInfo) GetInt(field consts.FieldType) int64 {

@@ -99,6 +99,7 @@ func parseDepends(receipt FormulaReceipt) []pkgdata.Relation {
 			Name:     dep.FullName,
 			Version:  dep.PkgVersion,
 			Operator: pkgdata.OpEqual,
+			PkgType:  typeFormula,
 			Depth:    1,
 		})
 	}
