@@ -11,7 +11,7 @@ import (
 	json "github.com/goccy/go-json"
 )
 
-type installReceipt struct {
+type InstallReceipt struct {
 	Time               int64  `json:"time"`
 	InstalledOnRequest bool   `json:"installed_on_request"`
 	BuiltAsBottle      bool   `json:"built_as_bottle"`
@@ -53,7 +53,7 @@ func parseInstallReceipt(path string, version string) (*pkgdata.PkgInfo, error) 
 		return nil, fmt.Errorf("failed to read receipt JSON: %v", err)
 	}
 
-	var receipt installReceipt
+	var receipt InstallReceipt
 	if err := json.Unmarshal(data, &receipt); err != nil {
 		return nil, fmt.Errorf("failed to parse receipt JSON: %v", err)
 	}
@@ -78,13 +78,13 @@ func parseInstallReceipt(path string, version string) (*pkgdata.PkgInfo, error) 
 	return pkg, nil
 }
 
-func inferBuildDate(pkg *pkgdata.PkgInfo, receipt installReceipt) {
+func inferBuildDate(pkg *pkgdata.PkgInfo, receipt InstallReceipt) {
 	if !receipt.PouredFromBottle {
 		pkg.BuildTimestamp = receipt.Time
 	}
 }
 
-func inferInstallReason(receipt installReceipt) string {
+func inferInstallReason(receipt InstallReceipt) string {
 	switch {
 	case receipt.InstalledOnRequest:
 		return consts.ReasonExplicit
@@ -103,7 +103,7 @@ func getPkgNameFromPath(path string) (string, error) {
 	return "", fmt.Errorf("unexpected receipt path format: %s", path)
 }
 
-func parseDepends(receipt installReceipt) []pkgdata.Relation {
+func parseDepends(receipt InstallReceipt) []pkgdata.Relation {
 	rels := make([]pkgdata.Relation, 0, len(receipt.RuntimeDependencies))
 
 	for _, dep := range receipt.RuntimeDependencies {
@@ -112,8 +112,10 @@ func parseDepends(receipt installReceipt) []pkgdata.Relation {
 		}
 
 		rels = append(rels, pkgdata.Relation{
-			Name:  dep.FullName,
-			Depth: 1,
+			Name:     dep.FullName,
+			Version:  dep.PkgVersion,
+			Operator: pkgdata.OpEqual,
+			Depth:    1,
 		})
 	}
 
