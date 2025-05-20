@@ -3,13 +3,14 @@ package pacman
 import (
 	"fmt"
 	"os"
+	"qp/internal/consts"
 	"qp/internal/pkgdata"
 )
 
 type PacmanDriver struct{}
 
 func (d *PacmanDriver) Name() string {
-	return "pacman"
+	return consts.OriginPacman
 }
 
 func (d *PacmanDriver) Detect() bool {

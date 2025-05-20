@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"qp/internal/consts"
 	"qp/internal/pkgdata"
 )
 
@@ -12,7 +13,7 @@ type BrewDriver struct {
 }
 
 func (d *BrewDriver) Name() string {
-	return "brew"
+	return consts.OriginBrew
 }
 
 func (d *BrewDriver) Detect() bool {

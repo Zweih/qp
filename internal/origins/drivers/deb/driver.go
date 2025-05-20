@@ -12,7 +12,7 @@ type DebDriver struct {
 }
 
 func (d *DebDriver) Name() string {
-	return "deb"
+	return consts.OriginDeb
 }
 
 func (d *DebDriver) Detect() bool {

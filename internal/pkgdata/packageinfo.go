@@ -26,7 +26,7 @@ type Relation struct {
 	PkgType      string
 }
 
-func (rel *Relation) GetKey() string {
+func (rel *Relation) Key() string {
 	if rel.PkgType != "" {
 		return rel.PkgType + ":" + rel.Name
 	}
@@ -75,8 +75,8 @@ type PkgInfo struct {
 	Replaces    []Relation
 }
 
-func (pkg *PkgInfo) GetKey() string {
-	if pkg.Origin == "brew" {
+func (pkg *PkgInfo) Key() string {
+	if pkg.Origin == consts.OriginBrew {
 		return pkg.PkgType + ":" + pkg.Name
 	}
 

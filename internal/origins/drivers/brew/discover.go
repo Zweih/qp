@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func getInstalledPkgs(cellarRoot, binRoot string) ([]installedPkg, error) {
+func getInstalledFormulae(cellarRoot, binRoot string) ([]installedPkg, error) {
 	entries, err := os.ReadDir(cellarRoot)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read Cellar directory: %w", err)

@@ -24,7 +24,7 @@ func fetchFormulae(
 ) {
 	binRoot := filepath.Join(prefix, binSubPath)
 	cellarRoot := filepath.Join(prefix, cellarSubPath)
-	installedPkgs, err := getInstalledPkgs(cellarRoot, binRoot)
+	installedPkgs, err := getInstalledFormulae(cellarRoot, binRoot)
 	if err != nil {
 		errChan <- err
 		return

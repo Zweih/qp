@@ -3,13 +3,14 @@ package opkg
 import (
 	"fmt"
 	"os"
+	"qp/internal/consts"
 	"qp/internal/pkgdata"
 )
 
 type OpkgDriver struct{}
 
 func (d *OpkgDriver) Name() string {
-	return "opkg"
+	return consts.OriginOpkg
 }
 
 func (d *OpkgDriver) Detect() bool {
