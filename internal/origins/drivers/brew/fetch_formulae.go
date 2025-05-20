@@ -51,7 +51,7 @@ func fetchFormulae(
 	stage1Out, stage1Err := worker.RunWorkers(
 		inputChan,
 		func(iPkg installedPkg) (*pkgdata.PkgInfo, error) {
-			return parseInstallReceipt(iPkg.ReceiptPath, iPkg.Version)
+			return parseFormulaReceipt(iPkg.ReceiptPath, iPkg.Version)
 		},
 		0,
 		len(installedPkgs),

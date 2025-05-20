@@ -95,26 +95,8 @@ func mergeCaskMetadata(pkg *pkgdata.PkgInfo, cask *CaskMetadata) {
 	pkg.Description = cask.Desc
 	pkg.Url = cask.Homepage
 
-	formulaRels := parseRawCaskRels(typeFormula, cask.ConflictsWith[typeFormula])
-	caskRels := parseRawCaskRels(typeCask, cask.ConflictsWith[typeCask])
+	formulaRels := parseRawRels(cask.ConflictsWith[typeFormula])
+	caskRels := parseRawRels(cask.ConflictsWith[typeCask])
 
 	pkg.Conflicts = append(formulaRels, caskRels...)
-}
-
-func parseRawCaskRels(pkgType string, rawRels []string) []pkgdata.Relation {
-	if len(rawRels) < 1 {
-		return []pkgdata.Relation{}
-	}
-
-	rels := make([]pkgdata.Relation, 0, len(rawRels))
-
-	for _, rawRel := range rawRels {
-		rels = append(rels, pkgdata.Relation{
-			Name:    rawRel,
-			Depth:   1,
-			PkgType: pkgType,
-		})
-	}
-
-	return rels
 }
