@@ -1,8 +1,6 @@
 # qp - query packages
 
-`qp` is a CLI util, written in **Go** / **Golang**, for arch-based, debian-based, and embedded linux distros to query installed packages.
-
-- `qp` is a CLI util, written in **Go** / **Golang**, for  linux and macOS (via homebrew) to query installed packages.
+`qp` is a command-line program for linux and macOS to query installed packages from any ecosystem.
 
 you can find installation instructions [here](#installation).
 
@@ -145,6 +143,7 @@ learn about installation [here](#installation)
 | ✓ | bottles in brew | ✓ | casks in brew |
 | - | replaced-by resolution | - | multi-license support |
 | – | short-args for queries | ✓ | key/value output |
+| - | rpm origin (dnf/yum support) | - | homebrew packaging |
 
 ## installation
 
