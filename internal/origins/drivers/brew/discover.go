@@ -7,13 +7,13 @@ import (
 	"strings"
 )
 
-func getInstalledFormulae(cellarRoot, binRoot string) ([]installedPkg, error) {
+func getInstalledFormulae(cellarRoot, binRoot string) ([]*installedPkg, error) {
 	entries, err := os.ReadDir(cellarRoot)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read Cellar directory: %w", err)
 	}
 
-	var pkgs []installedPkg
+	var iPkgs []*installedPkg
 	for _, entry := range entries {
 		if !entry.IsDir() {
 			continue
@@ -25,15 +25,15 @@ func getInstalledFormulae(cellarRoot, binRoot string) ([]installedPkg, error) {
 			continue
 		}
 
-		pkgs = append(pkgs, installedPkg{
+		iPkgs = append(iPkgs, &installedPkg{
 			Name:        name,
 			Version:     version,
-			ReceiptPath: filepath.Join(cellarRoot, name, version, receiptName),
 			VersionPath: filepath.Join(cellarRoot, name, version),
+			IsTap:       true,
 		})
 	}
 
-	return pkgs, nil
+	return iPkgs, nil
 }
 
 func resolveLinkedVersion(pkgName string, cellarRoot string, binRoot string) (string, error) {
@@ -66,4 +66,61 @@ func resolveLinkedVersion(pkgName string, cellarRoot string, binRoot string) (st
 	}
 
 	return parts[len(parts)-3], nil
+}
+
+func getTapPackageNames(prefix string, pkgType string) (map[string]struct{}, error) {
+	tapsRoot := filepath.Join(prefix, "Homebrew/Library/Taps")
+	result := make(map[string]struct{})
+
+	users, err := os.ReadDir(tapsRoot)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, user := range users {
+		userPath := filepath.Join(tapsRoot, user.Name())
+		repos, err := os.ReadDir(userPath)
+		if err != nil {
+			continue
+		}
+
+		for _, repo := range repos {
+			if !repo.IsDir() {
+				continue
+			}
+
+			repoPath := filepath.Join(userPath, repo.Name())
+			var searchDirs []string
+
+			switch pkgType {
+			case typeFormula:
+				searchDirs = []string{
+					filepath.Join(repoPath, "Formula"),
+					filepath.Join(repoPath, "HomebrewFormula"),
+					repoPath,
+				}
+			case typeCask:
+				searchDirs = []string{filepath.Join(repoPath, "Casks")}
+			default:
+				continue
+			}
+
+			for _, dir := range searchDirs {
+				entries, err := os.ReadDir(dir)
+				if err != nil {
+					continue
+				}
+
+				for _, entry := range entries {
+					if !entry.IsDir() && strings.HasSuffix(entry.Name(), ".rb") {
+						name := strings.TrimSuffix(entry.Name(), ".rb")
+						result[name] = struct{}{}
+					}
+				}
+				break
+			}
+		}
+	}
+
+	return result, nil
 }
