@@ -1,4 +1,11 @@
 # qp Release Notes
+## v5.49.0
+### What's Changed
+* Feature: Add Homebrew packaging by @Zweih in https://github.com/Zweih/qp/pull/331
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.48.1...v5.49.0
+
+
 ## v5.48.1
 ### What's Changed
 * Feature: Add cask support for brew by @Zweih in https://github.com/Zweih/qp/pull/329
