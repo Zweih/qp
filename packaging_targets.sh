@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 deb_archs=(x86_64 armv7h aarch64)
+brew_archs=(darwin_amd64 darwin_arm64)
 aur_archs=(x86_64 armv7h aarch64)
 opkg_archs=(x86_64 armv7h aarch64 mipsle)
 
