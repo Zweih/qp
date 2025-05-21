@@ -13,25 +13,35 @@ func fetchPackages(venvRoot string, origin string) ([]*pkgdata.PkgInfo, error) {
 		return []*pkgdata.PkgInfo{}, fmt.Errorf("failed to read pipx venv root: %w", err)
 	}
 
-	// var pkgs []*pkgdata.PkgInfo
+	var pkgs []*pkgdata.PkgInfo
 
 	for _, dir := range dirs {
 		if !dir.IsDir() {
 			continue
 		}
 
-		metaPath := filepath.Join(venvRoot, dir.Name(), "lib")
-		versionRoot, err := findVersionedPython(metaPath)
+		libPath := filepath.Join(venvRoot, dir.Name(), "lib")
+		versionRoot, err := findVersionedPython(libPath)
 		if err != nil {
-			return []*pkgdata.PkgInfo{}, fmt.Errorf("can't find versioned root for %s: %v", dir.Name(), err)
+			return []*pkgdata.PkgInfo{}, fmt.Errorf("couldn't locate versioned root for %s: %v", dir.Name(), err)
 		}
 
 		sitePkgsPath := filepath.Join(versionRoot, "site-packages")
+		metadataPath, err := findMetadataFile(sitePkgsPath, dir.Name())
+		if err != nil {
+			return []*pkgdata.PkgInfo{}, fmt.Errorf("couldn't locate metadata file for %s: %v", dir.Name(), err)
+		}
 
-		fmt.Println(sitePkgsPath)
+		pkg, err := parseMetadataFile(metadataPath)
+		if err != nil {
+			return []*pkgdata.PkgInfo{}, fmt.Errorf("metadata parsing failed for %s: %v", dir.Name(), err)
+		}
+
+		pkg.Origin = origin
+		pkgs = append(pkgs, pkg)
 	}
 
-	return []*pkgdata.PkgInfo{}, nil
+	return pkgs, nil
 }
 
 func findVersionedPython(libRoot string) (string, error) {
@@ -54,5 +64,5 @@ func findMetadataFile(sitePkgsPath string, name string) (string, error) {
 		return matches[0], nil
 	}
 
-	return "", error
+	return "", nil
 }
