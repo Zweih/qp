@@ -9,6 +9,12 @@ import (
 	"unicode"
 )
 
+const (
+	spaceAnd = " AND "
+	trimAnd  = "AND"
+	trimOr   = "OR"
+)
+
 // TODO: let's remove the magic strings
 // TODO: let's do byte operations here like we do in pacman/parser.go, we can beat the performance of strings.HasPrefix
 func inferTapMetadata(pkg *pkgdata.PkgInfo, path string) {
@@ -106,36 +112,36 @@ func tokenizeLicenseBlock(input string) []string {
 
 	inString := false
 
-	for _, r := range input {
+	for _, rune := range input {
 		switch {
-		case r == '"' && !inString:
+		case rune == '"' && !inString:
 			inString = true
-			current.WriteRune(r)
+			current.WriteRune(rune)
 
-		case r == '"' && inString:
-			current.WriteRune(r)
+		case rune == '"' && inString:
+			current.WriteRune(rune)
 			tokens = append(tokens, current.String())
 			current.Reset()
 			inString = false
 
 		case inString:
-			current.WriteRune(r)
+			current.WriteRune(rune)
 
-		case unicode.IsSpace(r) || r == ',':
+		case unicode.IsSpace(rune) || rune == ',':
 			if current.Len() > 0 {
 				tokens = append(tokens, current.String())
 				current.Reset()
 			}
 
-		case strings.ContainsRune("[]{}:", r):
+		case strings.ContainsRune("[]{}:", rune):
 			if current.Len() > 0 {
 				tokens = append(tokens, current.String())
 				current.Reset()
 			}
-			tokens = append(tokens, string(r))
+			tokens = append(tokens, string(rune))
 
 		default:
-			current.WriteRune(r)
+			current.WriteRune(rune)
 		}
 	}
 
@@ -148,17 +154,17 @@ func tokenizeLicenseBlock(input string) []string {
 
 func parseLicenseTokens(tokens []string) (string, int) {
 	var parts []string
-	i := 0
 
+	i := 0
 	for i < len(tokens) {
 		switch tokens[i] {
 		case "all_of":
-			inner, offset := parseLicenseGroup(tokens[i+2:], "AND")
+			inner, offset := parseLicenseGroup(tokens[i+2:], trimAnd)
 			parts = append(parts, "("+inner+")")
 			i += offset + 2
 
 		case "any_of":
-			inner, offset := parseLicenseGroup(tokens[i+2:], "OR")
+			inner, offset := parseLicenseGroup(tokens[i+2:], trimOr)
 			parts = append(parts, "("+inner+")")
 			i += offset + 2
 
@@ -171,7 +177,7 @@ func parseLicenseTokens(tokens []string) (string, int) {
 			i++
 
 		case "]", "}", ":":
-			return strings.Join(parts, " AND "), i
+			return strings.Join(parts, spaceAnd), i
 
 		default:
 			if strings.HasPrefix(tokens[i], "\"") {
@@ -181,11 +187,12 @@ func parseLicenseTokens(tokens []string) (string, int) {
 		}
 	}
 
-	return strings.Join(parts, " AND "), i
+	return strings.Join(parts, spaceAnd), i
 }
 
 func parseLicenseGroup(tokens []string, joiner string) (string, int) {
 	var items []string
+
 	i := 0
 	for i < len(tokens) {
 		switch tokens[i] {
