@@ -143,9 +143,21 @@ learn about installation [here](#installation)
 | ✓ | bottles in brew | ✓ | casks in brew |
 | - | replaced-by resolution | - | multi-license support |
 | – | short-args for queries | ✓ | key/value output |
-| - | rpm origin (dnf/yum support) | - | homebrew packaging |
+| - | rpm origin (dnf/yum support) | ✓ | homebrew packaging |
+| - | pip origin (python packaging) | - | formulae from taps (brew) |
+| - | casks from taps (brew) | - | dependencies for casks |
 
 ## installation
+
+### homebrew (macOS or linuxbrew)
+
+if you have [homebrew](https://brew.sh/) (`brew`), install via `qp`'s cask repo:
+```bash
+brew tap zweih/qp
+brew install zweih/qp/qp
+```
+
+**note**: until we are added to the official `homebrew/core` repo, ensure that the package you install is `zweih/qp/qp`
 
 ### arch-based systems (AUR)
 

@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 	"qp/internal/consts"
 	"qp/internal/pkgdata"
-	"strings"
 
 	json "github.com/goccy/go-json"
 )
@@ -34,8 +33,8 @@ type FormulaMetadata struct {
 	RecommendedDependencies []string `json:"recommended_dependencies"`
 }
 
-func parseFormulaReceipt(path string, version string) (*pkgdata.PkgInfo, error) {
-	data, err := os.ReadFile(path)
+func parseFormulaReceipt(iPkg *installedPkg) (*pkgdata.PkgInfo, error) {
+	data, err := os.ReadFile(filepath.Join(iPkg.VersionPath, receiptName))
 	if err != nil {
 		return nil, fmt.Errorf("failed to read receipt JSON: %v", err)
 	}
@@ -45,11 +44,6 @@ func parseFormulaReceipt(path string, version string) (*pkgdata.PkgInfo, error) 
 		return nil, fmt.Errorf("failed to parse receipt JSON: %v", err)
 	}
 
-	pkgName, err := getPkgNameFromPath(path)
-	if err != nil {
-		return nil, err
-	}
-
 	reason := consts.ReasonExplicit
 	if !receipt.InstalledOnRequest {
 		reason = consts.ReasonDependency
@@ -57,12 +51,16 @@ func parseFormulaReceipt(path string, version string) (*pkgdata.PkgInfo, error) 
 
 	pkg := &pkgdata.PkgInfo{
 		InstallTimestamp: receipt.Time,
-		Name:             pkgName,
+		Name:             iPkg.Name,
 		Reason:           reason,
-		Version:          version,
+		Version:          iPkg.Version,
 		Arch:             receipt.Arch,
 		PkgType:          typeFormula,
 		Depends:          parseDepends(receipt),
+	}
+
+	if iPkg.IsTap {
+		inferTapMetadata(pkg, iPkg.VersionPath)
 	}
 
 	inferBuildDate(pkg, receipt)
@@ -74,16 +72,6 @@ func inferBuildDate(pkg *pkgdata.PkgInfo, receipt FormulaReceipt) {
 	if !receipt.PouredFromBottle {
 		pkg.BuildTimestamp = receipt.Time
 	}
-}
-
-func getPkgNameFromPath(path string) (string, error) {
-	parts := strings.Split(filepath.Clean(path), string(os.PathSeparator))
-
-	if len(parts) >= 3 {
-		return parts[len(parts)-3], nil
-	}
-
-	return "", fmt.Errorf("unexpected receipt path format: %s", path)
 }
 
 func parseDepends(receipt FormulaReceipt) []pkgdata.Relation {

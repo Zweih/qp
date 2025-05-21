@@ -10,9 +10,8 @@ import (
 type installedPkg struct {
 	Name        string
 	Version     string
-	ReceiptPath string
 	VersionPath string
-	ModTime     int64
+	IsTap       bool
 }
 
 func fetchFormulae(
@@ -34,9 +33,13 @@ func fetchFormulae(
 		return
 	}
 
-	wanted := make(map[string]struct{}, len(installedPkgs))
+	tapPkgs, _ := getTapPackageNames(prefix, typeFormula)
+	wanted := make(map[string]struct{})
 	for _, iPkg := range installedPkgs {
-		wanted[iPkg.Name] = struct{}{}
+		if _, fromTap := tapPkgs[iPkg.Name]; !fromTap {
+			wanted[iPkg.Name] = struct{}{}
+			iPkg.IsTap = false
+		}
 	}
 
 	var formulaMeta map[string]*FormulaMetadata
@@ -49,7 +52,7 @@ func fetchFormulae(
 		formulaMeta, metaErr = loadMetadata(formulaCachePath, getFormulaKey, wanted)
 	}()
 
-	inputChan := make(chan installedPkg, len(installedPkgs))
+	inputChan := make(chan *installedPkg, len(installedPkgs))
 	for _, iPkg := range installedPkgs {
 		inputChan <- iPkg
 	}
@@ -60,8 +63,8 @@ func fetchFormulae(
 		inputChan,
 		errChan,
 		errGroup,
-		func(iPkg installedPkg) (*pkgdata.PkgInfo, error) {
-			return parseFormulaReceipt(iPkg.ReceiptPath, iPkg.Version)
+		func(iPkg *installedPkg) (*pkgdata.PkgInfo, error) {
+			return parseFormulaReceipt(iPkg)
 		},
 		0,
 		len(installedPkgs),
