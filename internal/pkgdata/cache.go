@@ -28,13 +28,18 @@ func GetCachePath() (string, error) {
 }
 
 func GetBaseCachePath() string {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		home = os.Getenv(homeEnv)
+	}
+
 	if runtime.GOOS == "darwin" {
-		return filepath.Join(os.Getenv(homeEnv), "Library/Caches")
+		return filepath.Join(home, "Library/Caches")
 	}
 
 	userCacheDir := os.Getenv(xdgCacheHomeEnv)
 	if userCacheDir == "" {
-		userCacheDir = filepath.Join(os.Getenv(homeEnv), ".cache")
+		userCacheDir = filepath.Join(homeEnv, ".cache")
 	}
 
 	return userCacheDir
