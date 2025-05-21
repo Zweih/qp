@@ -24,13 +24,19 @@ jobs:
 
     strategy:
       matrix:
-        arch: [x86_64, armv7h, aarch64, mipsel]
+        arch: [x86_64, armv7h, aarch64, darwin_amd64, darwin_arm64, mipsel]
         include:
           - arch: x86_64
             goarch: amd64
           - arch: armv7h
             goarch: arm
             goarm: 7
+          - arch: darwin_amd64
+            goarch: amd64
+            goos: darwin
+          - arch: darwin_arm64
+            goarch: arm64
+            goos: darwin
           - arch: aarch64
             goarch: arm64
           - arch: mipsel
@@ -54,7 +60,8 @@ jobs:
 
       - name: Build qp binary
         run: |
-          export GOOS=linux GOARCH=${{ matrix.goarch }}
+          export GOOS=${{ matrix.goos || 'linux' }}
+          export GOARCH=${{ matrix.goarch }}
           
           if [ -n "${{ matrix.goarm }}" ]; then
             export GOARM=${{ matrix.goarm }}
@@ -200,6 +207,27 @@ jobs:
             fi
           done
 
+      - name: Package Homebrew tarballs
+        run: |
+          source ./packaging_targets.sh
+
+          for binary in ./release/qp-*; do
+            arch=$(basename "$binary" | cut -d'-' -f2)
+
+            mkdir -p ./release/homebrew-tmp
+            cp "$binary" ./release/homebrew-tmp/qp
+            cp ./release/qp.1 ./release/homebrew-tmp/
+            cp ./release/NEWS ./release/homebrew-tmp/
+
+            if should_package brew_archs "$arch"; then
+              echo "Packaging $binary for Homebrew"
+              tar -czvf ./release/qp-${{ env.TAG_NAME }}-brew-${arch}.tar.gz -C ./release/homebrew-tmp qp qp.1 NEWS
+              rm -rf ./release/homebrew-tmp
+            else
+              echo "Skipping $binary for Homebrew packaging"
+            fi
+          done
+
       - name: Package .deb
         run: |
           source ./packaging_targets.sh
@@ -252,6 +280,36 @@ jobs:
             ./release/qp-*.asc
         env:
           GH_TOKEN: ${{ secrets.QP_SIGNATURES_TOKEN }}
+
+      - name: Update Homebrew Tap Formula
+        run: |
+          git clone https://${HOMEBREW_QP_TOKEN}@github.com/Zweih/homebrew-qp.git
+          cd homebrew-qp
+
+          FORMULA="Formula/qp.rb"
+          VERSION="${TAG_NAME#v}"
+
+          CHECKSUM_FILE="../release/SHA256SUMS.txt"
+          SHA256_AMD64=$(grep "qp-${TAG_NAME}-brew-darwin_amd64.tar.gz" "$CHECKSUM_FILE" | cut -d ' ' -f1)
+          SHA256_ARM64=$(grep "qp-${TAG_NAME}-brew-darwin_arm64.tar.gz" "$CHECKSUM_FILE" | cut -d ' ' -f1)
+          SHA256_LINUX_X86_64=$(grep "qp-${TAG_NAME}-brew-x86_64.tar.gz" "$CHECKSUM_FILE" | cut -d ' ' -f1)
+          SHA256_LINUX_AARCH64=$(grep "qp-${TAG_NAME}-brew-aarch64.tar.gz" "$CHECKSUM_FILE" | cut -d ' ' -f1)
+
+          sed -i "s/^  version \".*\"/  version \"${VERSION}\"/" "$FORMULA"
+          sed -i "s/^  sha256_amd64 = \".*\"/  sha256_amd64 = \"${SHA256_AMD64}\"/" "$FORMULA"
+          sed -i "s/^  sha256_arm64 = \".*\"/  sha256_arm64 = \"${SHA256_ARM64}\"/" "$FORMULA"
+          sed -i "s/^  sha256_linux_x86_64 = \".*\"/  sha256_linux_x86_64 = \"${SHA256_LINUX_X86_64}\"/" "$FORMULA"
+          sed -i "s/^  sha256_linux_aarch64 = \".*\"/  sha256_linux_aarch64 = \"${SHA256_LINUX_AARCH64}\"/" "$FORMULA"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add $FORMULA
+          git commit -m "Update qp formula to v${VERSION}"
+          git push origin master
+        env:
+          TAG_NAME: ${{ env.TAG_NAME }}
+          HOMEBREW_QP_TOKEN: ${{ secrets.HOMEBREW_QP_TOKEN }}
 
       - name: Update PKGBUILDs for qp-bin and qp-src
         run: |
