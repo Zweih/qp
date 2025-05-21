@@ -1,4 +1,12 @@
 # qp Release Notes
+## v5.48.1
+### What's Changed
+* Feature: Add cask support for brew by @Zweih in https://github.com/Zweih/qp/pull/329
+* Refactor: Cask modtime by @Zweih in https://github.com/Zweih/qp/pull/330
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.47.1...v5.48.1
+
+
 ## v5.47.1
 ### What's Changed
 * Refactor: Clean-up version output by @Zweih in https://github.com/Zweih/qp/pull/327
