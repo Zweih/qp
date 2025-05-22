@@ -39,9 +39,9 @@ func parseSizeFilter(sizeFilterInput string) (RangeSelector, error) {
 	}
 
 	return RangeSelector{
-		start,
-		end,
-		isExact,
+		Start:   start,
+		End:     end,
+		IsExact: isExact,
 	}, nil
 }
 
