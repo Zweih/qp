@@ -39,7 +39,7 @@ func GetBaseCachePath() string {
 
 	userCacheDir := os.Getenv(xdgCacheHomeEnv)
 	if userCacheDir == "" {
-		userCacheDir = filepath.Join(homeEnv, ".cache")
+		userCacheDir = filepath.Join(home, ".cache")
 	}
 
 	return userCacheDir
