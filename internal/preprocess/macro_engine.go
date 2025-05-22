@@ -56,9 +56,15 @@ func expandWhereMacro(token string) ([]string, bool) {
 }
 
 func expandLimitMacro(token string) ([]string, bool) {
+	var prefix string
+	if strings.ContainsRune(token, ':') {
+		parts := strings.SplitAfter(token, ":")
+		prefix, token = parts[0], parts[1]
+	}
+
 	switch token {
 	case "all":
-		return []string{"0"}, true
+		return []string{prefix + "0"}, true
 	default:
 		return nil, false
 	}
