@@ -58,7 +58,7 @@ func (p *Pipeline) Run() ([]*pkgdata.PkgInfo, error) {
 	for _, ph := range phases {
 		pkgs, err = ph.Run(p.Config, pkgs, p.IsInteractive)
 		if err != nil {
-			return nil, fmt.Errorf("[%s:%s] %w", p.Origin.Name(), ph.name, err)
+			return nil, fmt.Errorf("[%s] %w", ph.name, err)
 		}
 	}
 

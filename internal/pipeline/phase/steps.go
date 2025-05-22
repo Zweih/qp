@@ -41,8 +41,7 @@ func (p *Pipeline) fetchStep(
 	pkgs, err := p.Origin.Load()
 	if err != nil {
 		err = fmt.Errorf(
-			"failed to fetch packages for origin: %v",
-			p.Origin.Name(), err,
+			"failed to fetch packages: %v", err,
 		)
 		return nil, err
 	}
@@ -61,7 +60,7 @@ func (p *Pipeline) resolveStep(
 
 	pkgs, err := p.Origin.ResolveDeps(pkgs)
 	if err != nil {
-		return nil, fmt.Errorf("dependency resolution failed for origin %s: %w", p.Origin.Name(), err)
+		return nil, fmt.Errorf("dependency resolution failed: %w", err)
 	}
 
 	return pkgs, nil
@@ -79,7 +78,7 @@ func (p *Pipeline) saveCacheStep(
 	cachePath := filepath.Join(p.CachePath)
 	err := p.Origin.SaveCache(cachePath, pkgs, p.ModTime)
 	if err != nil {
-		out.WriteLine(fmt.Sprintf("Warning: failed to save cache for origin %s: %v", p.Origin.Name(), err))
+		out.WriteLine(fmt.Sprintf("Warning: failed to save cache:", err))
 	}
 
 	return pkgs, nil

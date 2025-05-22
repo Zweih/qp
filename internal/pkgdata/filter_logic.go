@@ -1,6 +1,7 @@
 package pkgdata
 
 import (
+	"math"
 	"slices"
 	"strings"
 	"time"
@@ -53,9 +54,13 @@ func FuzzySize(value int64, targetSize int64) bool {
 	return max(result, -result) <= tolerance
 }
 
-func FuzzySizeRange(value, start int64, end int64) bool {
+func FuzzySizeRange(value int64, start int64, end int64) bool {
 	toleranceStart := FuzzySizeTolerance(start)
 	toleranceEnd := FuzzySizeTolerance(end)
+
+	if end == math.MaxInt64 {
+		toleranceEnd = 0
+	}
 
 	return value >= (start-toleranceStart) && value <= (end+toleranceEnd)
 }
