@@ -1,4 +1,11 @@
 # qp Release Notes
+## v5.51.0
+### What's Changed
+* Feature: Improve cache discovery by @Zweih in https://github.com/Zweih/qp/pull/335
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.50.1...v5.51.0
+
+
 ## v5.50.1
 ### What's Changed
 * Fix: Open ended greater-than size range (e.g. size=:100MB) by @Zweih in https://github.com/Zweih/qp/pull/334
