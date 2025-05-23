@@ -26,12 +26,12 @@ func (d *OpkgDriver) ResolveDeps(pkgs []*pkgdata.PkgInfo) ([]*pkgdata.PkgInfo, e
 	return pkgdata.ResolveDependencyGraph(pkgs, nil)
 }
 
-func (d *OpkgDriver) LoadCache(path string, modTime int64) ([]*pkgdata.PkgInfo, error) {
-	return pkgdata.LoadProtoCache(path, modTime)
+func (d *OpkgDriver) LoadCache(path string) ([]*pkgdata.PkgInfo, error) {
+	return pkgdata.LoadProtoCache(path)
 }
 
-func (d *OpkgDriver) SaveCache(path string, pkgs []*pkgdata.PkgInfo, modTime int64) error {
-	return pkgdata.SaveProtoCache(pkgs, path, modTime)
+func (d *OpkgDriver) SaveCache(cacheRoot string, pkgs []*pkgdata.PkgInfo) error {
+	return pkgdata.SaveProtoCache(cacheRoot, pkgs)
 }
 
 func (d *OpkgDriver) SourceModified() (int64, error) {
@@ -41,4 +41,13 @@ func (d *OpkgDriver) SourceModified() (int64, error) {
 	}
 
 	return dirInfo.ModTime().Unix(), nil
+}
+
+func (d *OpkgDriver) IsCacheStale(cacheModTime int64) (bool, error) {
+	dirInfo, err := os.Stat(opkgStatusPath)
+	if err != nil {
+		return false, fmt.Errorf("failed to read %s DB mod time: %v", d.Name(), err)
+	}
+
+	return dirInfo.ModTime().Unix() > cacheModTime, nil
 }

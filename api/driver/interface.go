@@ -7,7 +7,8 @@ type Driver interface {
 	Detect() bool
 	Load() ([]*pkgdata.PkgInfo, error)
 	ResolveDeps(pkgs []*pkgdata.PkgInfo) ([]*pkgdata.PkgInfo, error)
-	LoadCache(path string, modTime int64) ([]*pkgdata.PkgInfo, error)
-	SaveCache(path string, pkgs []*pkgdata.PkgInfo, modTime int64) error
+	LoadCache(cacheRoot string) ([]*pkgdata.PkgInfo, error)
+	SaveCache(cacheRoot string, pkgs []*pkgdata.PkgInfo) error
 	SourceModified() (int64, error)
+	IsCacheStale(cacheModTime int64) (bool, error)
 }

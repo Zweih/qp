@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	pb "qp/internal/protobuf"
 	"runtime"
+	"strconv"
+	"strings"
 
 	"google.golang.org/protobuf/proto"
 )
@@ -16,6 +18,9 @@ const (
 	xdgCacheHomeEnv = "XDG_CACHE_HOME"
 	homeEnv         = "HOME"
 	qpCacheDir      = "query-packages"
+	dotCache        = ".cache"
+	dotModTime      = ".modtime"
+	darwinCacheDir  = "Library/Caches"
 )
 
 func GetCachePath() (string, error) {
@@ -34,37 +39,34 @@ func GetBaseCachePath() string {
 	}
 
 	if runtime.GOOS == "darwin" {
-		return filepath.Join(home, "Library/Caches")
+		return filepath.Join(home, darwinCacheDir)
 	}
 
 	userCacheDir := os.Getenv(xdgCacheHomeEnv)
 	if userCacheDir == "" {
-		userCacheDir = filepath.Join(home, ".cache")
+		userCacheDir = filepath.Join(home, dotCache)
 	}
 
 	return userCacheDir
 }
 
-func SaveProtoCache(pkgs []*PkgInfo, cachePath string, lastModified int64) error {
-	if cachePath == "" {
-		return errors.New("invalid cache path, skipping cache save")
-	}
-
-	cachedPkgs := &pb.CachedPkgs{
-		Pkgs:         pkgsToProtos(pkgs),
-		LastModified: lastModified,
-		Version:      cacheVersion,
-	}
-
-	byteData, err := proto.Marshal(cachedPkgs)
-	if err != nil {
-		return fmt.Errorf("failed to marshal cache: %v", cachedPkgs)
-	}
-
-	return os.WriteFile(cachePath, byteData, 0644)
+func SaveCacheModTime(cacheRoot string, modTime int64) error {
+	modPath := cacheRoot + dotModTime
+	return os.WriteFile(modPath, []byte(strconv.FormatInt(modTime, 10)), 0644)
 }
 
-func LoadProtoCache(cachePath string, sourceModTime int64) ([]*PkgInfo, error) {
+func LoadCacheModTime(cacheRoot string) (int64, error) {
+	modPath := cacheRoot + dotModTime
+	data, err := os.ReadFile(modPath)
+	if err != nil {
+		return 0, err
+	}
+
+	return strconv.ParseInt(strings.TrimSpace(string(data)), 10, 64)
+}
+
+func LoadProtoCache(cacheRoot string) ([]*PkgInfo, error) {
+	cachePath := cacheRoot + dotCache
 	if cachePath == "" {
 		return nil, errors.New("invalid cache path, skipping cache load")
 	}
@@ -84,13 +86,24 @@ func LoadProtoCache(cachePath string, sourceModTime int64) ([]*PkgInfo, error) {
 		return nil, errors.New("cache version mismatch, regenerating fresh cache")
 	}
 
-	if sourceModTime > cachedPkgs.LastModified {
-		return nil, errors.New("cache is stale")
+	pkgs := protosToPkgs(cachedPkgs.Pkgs)
+	return pkgs, nil
+}
+
+func SaveProtoCache(cacheRoot string, pkgs []*PkgInfo) error {
+	cachePath := cacheRoot + dotCache
+
+	cachedPkgs := &pb.CachedPkgs{
+		Pkgs:    pkgsToProtos(pkgs),
+		Version: cacheVersion,
 	}
 
-	pkgs := protosToPkgs(cachedPkgs.Pkgs)
+	byteData, err := proto.Marshal(cachedPkgs)
+	if err != nil {
+		return fmt.Errorf("failed to marshal cache: %v", cachedPkgs)
+	}
 
-	return pkgs, nil
+	return os.WriteFile(cachePath, byteData, 0644)
 }
 
 func relationsToProtos(rels []Relation) []*pb.Relation {

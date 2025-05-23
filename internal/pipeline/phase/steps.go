@@ -9,6 +9,7 @@ import (
 	"qp/internal/pipeline/filtering"
 	"qp/internal/pipeline/meta"
 	"qp/internal/pkgdata"
+	"time"
 )
 
 func (p *Pipeline) loadCacheStep(
@@ -16,15 +17,35 @@ func (p *Pipeline) loadCacheStep(
 	_ []*pkgdata.PkgInfo,
 	_ meta.ProgressReporter,
 ) ([]*pkgdata.PkgInfo, error) {
+	now := time.Now().Unix()
+	if cfg.RegenCache {
+		p.ModTime = now
+	}
+
 	if cfg.RegenCache || cfg.NoCache {
 		return nil, nil
 	}
 
-	cachePath := filepath.Join(p.CachePath)
-	pkgs, err := p.Origin.LoadCache(cachePath, p.ModTime)
-	if err == nil {
-		p.UsedCache = true
+	cacheRoot := filepath.Join(p.CachePath, p.Origin.Name())
+	cacheMtime, err := pkgdata.LoadCacheModTime(cacheRoot)
+	if err != nil {
+		return nil, nil
 	}
+
+	isStale, err := p.Origin.IsCacheStale(cacheMtime)
+	if isStale {
+		p.ModTime = now
+		return nil, err
+	}
+
+	pkgs, err := p.Origin.LoadCache(cacheRoot)
+	if err != nil {
+		p.ModTime = now
+		return nil, nil
+	}
+
+	p.UsedCache = true
+	p.ModTime = cacheMtime
 
 	return pkgs, nil
 }
@@ -75,10 +96,17 @@ func (p *Pipeline) saveCacheStep(
 		return pkgs, nil
 	}
 
-	cachePath := filepath.Join(p.CachePath)
-	err := p.Origin.SaveCache(cachePath, pkgs, p.ModTime)
+	cacheRoot := filepath.Join(p.CachePath, p.Origin.Name())
+	err := p.Origin.SaveCache(cacheRoot, pkgs)
 	if err != nil {
 		out.WriteLine(fmt.Sprintf("Warning: failed to save cache:", err))
+		return pkgs, nil
+	}
+
+	err = pkgdata.SaveCacheModTime(cacheRoot, p.ModTime)
+	if err != nil {
+		out.WriteLine(fmt.Sprintf("Warning: failed to save cache modtime:", err))
+		return pkgs, nil
 	}
 
 	return pkgs, nil
