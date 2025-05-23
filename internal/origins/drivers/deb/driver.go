@@ -59,12 +59,12 @@ func (d *DebDriver) ResolveDeps(pkgs []*pkgdata.PkgInfo) ([]*pkgdata.PkgInfo, er
 	return resolvedPkgs, nil
 }
 
-func (d *DebDriver) LoadCache(path string, modTime int64) ([]*pkgdata.PkgInfo, error) {
-	return pkgdata.LoadProtoCache(path, modTime)
+func (d *DebDriver) LoadCache(path string) ([]*pkgdata.PkgInfo, error) {
+	return pkgdata.LoadProtoCache(path)
 }
 
-func (d *DebDriver) SaveCache(path string, pkgs []*pkgdata.PkgInfo, modTime int64) error {
-	return pkgdata.SaveProtoCache(pkgs, path, modTime)
+func (d *DebDriver) SaveCache(cacheRoot string, pkgs []*pkgdata.PkgInfo) error {
+	return pkgdata.SaveProtoCache(cacheRoot, pkgs)
 }
 
 func (d *DebDriver) SourceModified() (int64, error) {
@@ -74,4 +74,13 @@ func (d *DebDriver) SourceModified() (int64, error) {
 	}
 
 	return dirInfo.ModTime().Unix(), nil
+}
+
+func (d *DebDriver) IsCacheStale(cacheModTime int64) (bool, error) {
+	dirInfo, err := os.Stat(dpkgPath)
+	if err != nil {
+		return false, fmt.Errorf("failed to read %s DB mod time: %v", d.Name(), err)
+	}
+
+	return dirInfo.ModTime().Unix() > cacheModTime, nil
 }

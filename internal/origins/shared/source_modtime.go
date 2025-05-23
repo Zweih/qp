@@ -1,4 +1,4 @@
-package brew
+package shared
 
 import (
 	"fmt"
@@ -6,11 +6,10 @@ import (
 	"path/filepath"
 )
 
-func getModTime(prefix string, subPath string) (int64, error) {
-	path := filepath.Join(prefix, subPath)
+func GetModTime(path string) (int64, error) {
 	entries, err := os.ReadDir(path)
 	if err != nil {
-		return 0, fmt.Errorf("failed to read Cellar: %w", err)
+		return 0, fmt.Errorf("failed to read %s: %w", path, err)
 	}
 
 	var latest int64
@@ -30,12 +29,12 @@ func getModTime(prefix string, subPath string) (int64, error) {
 		}
 	}
 
-	cellarInfo, err := os.Stat(path)
+	parentInfo, err := os.Stat(path)
 	if err != nil {
-		return 0, fmt.Errorf("failed to stat Cellar: %w", err)
+		return 0, fmt.Errorf("failed to stat %s: %w", path, err)
 	}
 
-	modTime := cellarInfo.ModTime().Unix()
+	modTime := parentInfo.ModTime().Unix()
 	if modTime > latest {
 		latest = modTime
 	}

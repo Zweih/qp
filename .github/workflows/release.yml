@@ -286,6 +286,9 @@ jobs:
           git clone https://${HOMEBREW_QP_TOKEN}@github.com/Zweih/homebrew-qp.git
           cd homebrew-qp
 
+          BRANCH_NAME="update-qp-${TAG_NAME#v}"
+          git checkout -b "$BRANCH_NAME"
+
           FORMULA="Formula/qp.rb"
           VERSION="${TAG_NAME#v}"
 
@@ -306,10 +309,18 @@ jobs:
 
           git add $FORMULA
           git commit -m "Update qp formula to v${VERSION}"
-          git push origin master
+          git push origin "$BRANCH_NAME"
+
+          gh pr create \
+            --title "Update qp formula to v${VERSION}" \
+            --body "Automated update of qp formula to version ${VERSION}" \
+            --head "$BRANCH_NAME" \
+            --base master
+          cd ..
         env:
           TAG_NAME: ${{ env.TAG_NAME }}
           HOMEBREW_QP_TOKEN: ${{ secrets.HOMEBREW_QP_TOKEN }}
+          GH_TOKEN: ${{ secrets.HOMEBREW_QP_TOKEN }}
 
       - name: Update PKGBUILDs for qp-bin and qp-src
         run: |

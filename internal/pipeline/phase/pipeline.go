@@ -2,13 +2,10 @@ package phase
 
 import (
 	"fmt"
-	"path/filepath"
 	"qp/api/driver"
 	"qp/internal/config"
-	out "qp/internal/display"
 	"qp/internal/pkgdata"
 	"sync"
-	"time"
 )
 
 type Pipeline struct {
@@ -27,18 +24,18 @@ func NewPipeline(
 	isInteractive bool,
 	baseCachePath string,
 ) *Pipeline {
-	modTime, err := origin.SourceModified()
-	if err != nil {
-		out.WriteLine(fmt.Sprintf("WARNING: failed to get mod time for origin %s: %v", origin.Name(), err))
-		modTime = time.Now().Unix()
-	}
+	// modTime, err := origin.SourceModified()
+	// if err != nil {
+	// 	out.WriteLine(fmt.Sprintf("WARNING: failed to get mod time for origin %s: %v", origin.Name(), err))
+	// 	modTime = time.Now().Unix()
+	// }
 
 	return &Pipeline{
 		Origin:        origin,
 		Config:        cfg,
 		IsInteractive: isInteractive,
-		CachePath:     filepath.Join(baseCachePath, origin.Name()+".cache"),
-		ModTime:       modTime,
+		CachePath:     baseCachePath,
+		// ModTime:       modTime,
 	}
 }
 
