@@ -1,12 +1,10 @@
 package pipx
 
 import (
-	"errors"
-	"os"
-	"path/filepath"
+	"fmt"
 	"qp/internal/consts"
+	"qp/internal/origins/shared"
 	"qp/internal/pkgdata"
-	"time"
 )
 
 type PipxDriver struct {
@@ -18,41 +16,13 @@ func (d *PipxDriver) Name() string {
 }
 
 func (d *PipxDriver) Detect() bool {
-	venvRoot, err := getVenvRoot()
+	venvRoot, err := findVenvRoot()
 	if err != nil {
 		return false
 	}
 
 	d.venvRoot = venvRoot
 	return true
-}
-
-func getVenvRoot() (string, error) {
-	var venvRootPath string
-
-	if custom := os.Getenv("PIPX_HOME"); custom != "" {
-		venvRootPath = filepath.Join(custom, "venvs")
-		_, err := os.Stat(venvRootPath)
-		if err == nil {
-			return venvRootPath, nil
-		}
-	}
-
-	home, err := os.UserHomeDir()
-	if err != nil {
-		home = os.Getenv("HOME")
-	}
-
-	possibleRoots := []string{defaultVenvRoot, otherVenvRoot}
-	for _, root := range possibleRoots {
-		venvRootPath = filepath.Join(home, root)
-		_, err := os.Stat(venvRootPath)
-		if err == nil {
-			return venvRootPath, nil
-		}
-	}
-
-	return "", errors.New("no pipx venv root found")
 }
 
 func (d *PipxDriver) Load() ([]*pkgdata.PkgInfo, error) {
@@ -63,14 +33,28 @@ func (d *PipxDriver) ResolveDeps(pkgs []*pkgdata.PkgInfo) ([]*pkgdata.PkgInfo, e
 	return pkgs, nil
 }
 
-func (d *PipxDriver) LoadCache(path string, modTime int64) ([]*pkgdata.PkgInfo, error) {
-	return pkgdata.LoadProtoCache(path, modTime)
+func (d *PipxDriver) LoadCache(path string) ([]*pkgdata.PkgInfo, error) {
+	return pkgdata.LoadProtoCache(path)
 }
 
-func (d *PipxDriver) SaveCache(path string, pkgs []*pkgdata.PkgInfo, modTime int64) error {
-	return nil
+func (d *PipxDriver) SaveCache(cacheRoot string, pkgs []*pkgdata.PkgInfo) error {
+	return pkgdata.SaveProtoCache(cacheRoot, pkgs)
 }
 
 func (d *PipxDriver) SourceModified() (int64, error) {
-	return time.Now().Unix() + 200, nil
+	modTime, err := shared.GetModTime(d.venvRoot)
+	if err != nil {
+		return 0, fmt.Errorf("failed to read %s DB mod time: %v", d.Name(), err)
+	}
+
+	return modTime, nil
+}
+
+func (d *PipxDriver) IsCacheStale(cacheModTime int64) (bool, error) {
+	mtime, err := shared.GetModTime(d.venvRoot)
+	if err != nil {
+		return false, fmt.Errorf("failed to read %s DB mod time: %v", d.Name(), err)
+	}
+
+	return mtime > cacheModTime, nil
 }
