@@ -7,8 +7,10 @@ import (
 	"path/filepath"
 	"qp/internal/consts"
 	"qp/internal/origins/shared"
+	"qp/internal/origins/worker"
 	"qp/internal/pkgdata"
 	"strings"
+	"sync"
 )
 
 func fetchPackages(venvRoot string, origin string) ([]*pkgdata.PkgInfo, error) {
@@ -17,56 +19,108 @@ func fetchPackages(venvRoot string, origin string) ([]*pkgdata.PkgInfo, error) {
 		return []*pkgdata.PkgInfo{}, fmt.Errorf("failed to read pipx venv root: %w", err)
 	}
 
-	var pkgs []*pkgdata.PkgInfo
+	inputChan := make(chan os.DirEntry, len(dirs))
+	errChan := make(chan error, worker.DefaultBufferSize)
+	var errGroup sync.WaitGroup
 
 	for _, dir := range dirs {
 		if !dir.IsDir() {
 			continue
 		}
 
-		dirPath := filepath.Join(venvRoot, dir.Name())
-		libPath := filepath.Join(dirPath, "lib")
-		versionRoot, err := findVersionPath(libPath)
-		if err != nil {
-			return []*pkgdata.PkgInfo{}, fmt.Errorf("couldn't locate versioned root for %s: %v", dir.Name(), err)
-		}
-
-		sitePkgsPath := filepath.Join(versionRoot, "site-packages")
-		metadataPath, err := findDistPath(sitePkgsPath, dir.Name())
-		if err != nil {
-			return []*pkgdata.PkgInfo{}, fmt.Errorf("couldn't locate metadata file for %s: %v", dir.Name(), err)
-		}
-
-		pkg, err := parseMetadataFile(metadataPath)
-		if err != nil {
-			return []*pkgdata.PkgInfo{}, fmt.Errorf("metadata parsing failed for %s: %v", dir.Name(), err)
-		}
-
-		dirInfo, err := dir.Info()
-		if err != nil {
-			return []*pkgdata.PkgInfo{}, err
-		}
-
-		arch, err := findArchitecture(sitePkgsPath)
-		if err != nil {
-			return []*pkgdata.PkgInfo{}, err
-		}
-
-		size, err := shared.GetInstallSize(dirPath)
-		if err != nil {
-			return []*pkgdata.PkgInfo{}, err
-		}
-
-		pkg.Arch = arch
-		pkg.Size = size
-		pkg.InstallTimestamp = dirInfo.ModTime().Unix()
-
-		pkg.Origin = origin
-		pkg.Reason = consts.ReasonExplicit
-		pkgs = append(pkgs, pkg)
+		inputChan <- dir
 	}
 
-	return pkgs, nil
+	close(inputChan)
+
+	type PkgMeta struct {
+		Pkg          *pkgdata.PkgInfo
+		DirPath      string
+		SitePkgsPath string
+	}
+
+	stage1 := worker.RunWorkers(
+		inputChan,
+		errChan,
+		&errGroup,
+		func(dir os.DirEntry) (*PkgMeta, error) {
+			dirPath := filepath.Join(venvRoot, dir.Name())
+			libPath := filepath.Join(dirPath, "lib")
+			versionRoot, err := findVersionPath(libPath)
+			if err != nil {
+				return nil, fmt.Errorf("couldn't locate versioned root for %s: %v", dir.Name(), err)
+			}
+
+			sitePkgsPath := filepath.Join(versionRoot, "site-packages")
+			metadataPath, err := findDistPath(sitePkgsPath, dir.Name())
+			if err != nil {
+				return nil, fmt.Errorf("couldn't locate metadata file for %s: %v", dir.Name(), err)
+			}
+
+			dirInfo, err := dir.Info()
+			if err != nil {
+				return nil, err
+			}
+
+			pkg, err := parseMetadataFile(metadataPath)
+			if err != nil {
+				return nil, fmt.Errorf("metadata parsing failed for %s: %v", metadataPath, err)
+			}
+
+			pkg.InstallTimestamp = dirInfo.ModTime().Unix()
+			pkg.Origin = origin
+			pkg.Reason = consts.ReasonExplicit
+
+			return &PkgMeta{
+				Pkg:          pkg,
+				DirPath:      dirPath,
+				SitePkgsPath: sitePkgsPath,
+			}, nil
+		},
+		0,
+		len(dirs),
+	)
+
+	stage2 := worker.RunWorkers(
+		stage1,
+		errChan,
+		&errGroup,
+		func(pMeta *PkgMeta) (*PkgMeta, error) {
+			size, err := shared.GetInstallSize(pMeta.DirPath)
+			if err != nil {
+				return nil, err
+			}
+
+			pMeta.Pkg.Size = size
+			return pMeta, nil
+		},
+		0,
+		len(dirs),
+	)
+
+	stage3 := worker.RunWorkers(
+		stage2,
+		errChan,
+		&errGroup,
+		func(pMeta *PkgMeta) (*pkgdata.PkgInfo, error) {
+			arch, err := findArchitecture(pMeta.SitePkgsPath)
+			if err != nil {
+				return nil, err
+			}
+
+			pMeta.Pkg.Arch = arch
+			return pMeta.Pkg, nil
+		},
+		0,
+		len(dirs),
+	)
+
+	go func() {
+		errGroup.Wait()
+		close(errChan)
+	}()
+
+	return worker.CollectOutput(stage3, errChan)
 }
 
 func findVersionPath(libRoot string) (string, error) {

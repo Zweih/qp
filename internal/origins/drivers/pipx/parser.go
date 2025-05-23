@@ -19,6 +19,8 @@ func parseMetadataFile(metadataPath string) (*pkgdata.PkgInfo, error) {
 	pkg := &pkgdata.PkgInfo{}
 	scanner := bufio.NewScanner(file)
 
+	var homepage string
+
 	for scanner.Scan() {
 		line := scanner.Text()
 		if line == "" {
@@ -43,9 +45,22 @@ func parseMetadataFile(metadataPath string) (*pkgdata.PkgInfo, error) {
 		case "License":
 			pkg.License = value
 		case "Home-page":
-			pkg.Url = value
+			if homepage == "" {
+				homepage = value
+			}
+		case "Project-URL":
+			fieldParts := strings.SplitN(value, ",", 2)
+			if len(fieldParts) != 2 {
+				continue
+			}
+
+			if strings.TrimSpace(fieldParts[0]) == "Homepage" {
+				homepage = strings.TrimSpace(fieldParts[1])
+			}
 		}
 	}
+
+	pkg.Url = homepage
 
 	return pkg, nil
 }
