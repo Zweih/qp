@@ -39,24 +39,24 @@ var DateMatchers = RangeMatcher{
 
 var SizeMatchers = RangeMatcher{
 	true: {
-		consts.MatchFuzzy: func(start, _ int64) RangeFilter {
+		consts.MatchFuzzy: func(start int64, _ int64) RangeFilter {
 			return func(value int64) bool {
 				return pkgdata.FuzzySize(value, start)
 			}
 		},
-		consts.MatchStrict: func(start, _ int64) RangeFilter {
+		consts.MatchStrict: func(start int64, _ int64) RangeFilter {
 			return func(value int64) bool {
 				return pkgdata.StrictSize(value, start)
 			}
 		},
 	},
 	false: {
-		consts.MatchFuzzy: func(start, end int64) RangeFilter {
+		consts.MatchFuzzy: func(start int64, end int64) RangeFilter {
 			return func(value int64) bool {
 				return pkgdata.FuzzySizeRange(value, start, end)
 			}
 		},
-		consts.MatchStrict: func(start, end int64) RangeFilter {
+		consts.MatchStrict: func(start int64, end int64) RangeFilter {
 			return func(value int64) bool {
 				return pkgdata.StrictSizeRange(value, start, end)
 			}
