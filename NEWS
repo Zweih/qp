@@ -1,4 +1,11 @@
 # qp Release Notes
+## v5.52.0
+### What's Changed
+* Feature: Prefixes with limit macros (e.g. `limit end:all`) by @Zweih in https://github.com/Zweih/qp/pull/336
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.51.0...v5.52.0
+
+
 ## v5.51.0
 ### What's Changed
 * Feature: Improve cache discovery by @Zweih in https://github.com/Zweih/qp/pull/335
