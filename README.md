@@ -54,14 +54,39 @@ more distros and non-linux platforms are planned!
 
 ## features
 
-- list installed packages by numerous fields
-- query by those fields
-  - learn more about querying [here](#querying-with-where)
-- sort by those fields
-- output as:
-  - table
-  - JSON
-
+* list installed packages across supported systems
+* compatible with macOS, arch, debian, openwrt, and over 60 distros
+* * supports multiple ecosystems:
+  * pacman, dpkg/apt, opkg, brew (formulae, bottles, casks)
+* query packages using an expressive query language
+  * supports full boolean logic (`and`, `or`, `not`, grouping)
+  * supports fuzzy and strict matching
+  * supports range queries for `size`, `date`, and `build-date`
+  * supports presence/absence checks (`has:`, `no:`)
+  * learn more about querying [here](#querying-with-where)
+* sort results by any field
+* output formats:
+  * table (default)
+  * key/value
+  * JSON
+* query by:
+  * name, version, origin, architecture, license
+  * size on disk
+  * install or build date
+  * package base or groups
+  * dependencies, optional dependencies, reverse dependencies
+  * package provisions, conflicts, replacements
+  * installation reason (explicit or dependency)
+  * package validation method (e.g., sha256, pgp)
+  * packager, URL, description
+  * package type (debug, split, etc.)
+* complex queries via grouping (`q ... p`) and built-in macros
+  * includes `orphan` and `superorphan` filters
+* customizable field selection for output
+* cache system for fast repeated queries
+* lightweight, fast, concurrent architecture
+* CLI designed for both scripting and interactive use
+* extensive roadmap with frequent improvements and optimizations
 
 learn about usage [here](#usage)
 

@@ -1,7 +1,9 @@
 package brew
 
 import (
+	"path/filepath"
 	"qp/internal/consts"
+	"qp/internal/origins/shared"
 	"qp/internal/pkgdata"
 )
 
@@ -28,28 +30,39 @@ func (d *BrewDriver) ResolveDeps(pkgs []*pkgdata.PkgInfo) ([]*pkgdata.PkgInfo, e
 	return pkgdata.ResolveDependencyGraph(pkgs, nil)
 }
 
-func (d *BrewDriver) LoadCache(path string, modTime int64) ([]*pkgdata.PkgInfo, error) {
-	return pkgdata.LoadProtoCache(path, modTime)
+func (d *BrewDriver) LoadCache(path string) ([]*pkgdata.PkgInfo, error) {
+	return pkgdata.LoadProtoCache(path)
 }
 
-func (d *BrewDriver) SaveCache(
-	path string,
-	pkgs []*pkgdata.PkgInfo,
-	modTime int64,
-) error {
-	return pkgdata.SaveProtoCache(pkgs, path, modTime)
+func (d *BrewDriver) SaveCache(cacheRoot string, pkgs []*pkgdata.PkgInfo) error {
+	return pkgdata.SaveProtoCache(cacheRoot, pkgs)
 }
 
 func (d *BrewDriver) SourceModified() (int64, error) {
-	cellarTime, err := getModTime(d.prefix, cellarSubPath)
+	cellarTime, err := shared.GetModTime(filepath.Join(d.prefix, cellarSubPath))
 	if err != nil {
 		return 0, err
 	}
 
-	caskroomTime, err := getModTime(d.prefix, caskroomSubpath)
+	caskroomTime, err := shared.GetModTime(filepath.Join(d.prefix, caskroomSubpath))
 	if err != nil {
 		return 0, err
 	}
 
 	return max(cellarTime, caskroomTime), nil
+}
+
+// TODO: add early return
+func (d *BrewDriver) IsCacheStale(cacheModTime int64) (bool, error) {
+	cellarTime, err := shared.GetModTime(filepath.Join(d.prefix, cellarSubPath))
+	if err != nil {
+		return false, err
+	}
+
+	caskroomTime, err := shared.GetModTime(filepath.Join(d.prefix, caskroomSubpath))
+	if err != nil {
+		return false, err
+	}
+
+	return max(cellarTime, caskroomTime) > cacheModTime, nil
 }

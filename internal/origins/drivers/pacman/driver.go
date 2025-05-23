@@ -26,16 +26,12 @@ func (d *PacmanDriver) ResolveDeps(pkgs []*pkgdata.PkgInfo) ([]*pkgdata.PkgInfo,
 	return pkgdata.ResolveDependencyGraph(pkgs, nil)
 }
 
-func (d *PacmanDriver) LoadCache(path string, modTime int64) ([]*pkgdata.PkgInfo, error) {
-	return pkgdata.LoadProtoCache(path, modTime)
+func (d *PacmanDriver) LoadCache(path string) ([]*pkgdata.PkgInfo, error) {
+	return pkgdata.LoadProtoCache(path)
 }
 
-func (d *PacmanDriver) SaveCache(
-	path string,
-	pkgs []*pkgdata.PkgInfo,
-	modTime int64,
-) error {
-	return pkgdata.SaveProtoCache(pkgs, path, modTime)
+func (d *PacmanDriver) SaveCache(cacheRoot string, pkgs []*pkgdata.PkgInfo) error {
+	return pkgdata.SaveProtoCache(cacheRoot, pkgs)
 }
 
 func (d *PacmanDriver) SourceModified() (int64, error) {
@@ -45,4 +41,13 @@ func (d *PacmanDriver) SourceModified() (int64, error) {
 	}
 
 	return dirInfo.ModTime().Unix(), nil
+}
+
+func (d *PacmanDriver) IsCacheStale(cacheModTime int64) (bool, error) {
+	dirInfo, err := os.Stat(PacmanDbPath)
+	if err != nil {
+		return false, fmt.Errorf("failed to read %s DB mod time: %v", d.Name(), err)
+	}
+
+	return dirInfo.ModTime().Unix() > cacheModTime, nil
 }
