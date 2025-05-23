@@ -320,6 +320,7 @@ jobs:
         env:
           TAG_NAME: ${{ env.TAG_NAME }}
           HOMEBREW_QP_TOKEN: ${{ secrets.HOMEBREW_QP_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.HOMEBREW_QP_TOKEN }}
 
       - name: Update PKGBUILDs for qp-bin and qp-src
         run: |
