@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"qp/internal/origins/shared"
 	"qp/internal/origins/worker"
 	"qp/internal/pkgdata"
 	"sync"
@@ -66,7 +67,7 @@ func fetchCasks(
 		errChan,
 		errGroup,
 		func(pkg *pkgdata.PkgInfo) (*pkgdata.PkgInfo, error) {
-			size, err := getInstallSize(filepath.Join(caskroomRoot, pkg.Name, pkg.Version))
+			size, err := shared.GetInstallSize(filepath.Join(caskroomRoot, pkg.Name, pkg.Version))
 			if err == nil {
 				pkg.Size = size
 			}

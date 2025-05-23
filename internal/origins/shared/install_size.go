@@ -1,11 +1,11 @@
-package brew
+package shared
 
 import (
 	"io/fs"
 	"path/filepath"
 )
 
-func getInstallSize(dir string) (int64, error) {
+func GetInstallSize(dir string) (int64, error) {
 	var total int64
 
 	err := filepath.WalkDir(dir, func(_ string, dir fs.DirEntry, err error) error {
