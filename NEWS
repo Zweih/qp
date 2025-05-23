@@ -1,4 +1,11 @@
 # qp Release Notes
+## v5.53.2
+### What's Changed
+* Fix: Release workflow by @Zweih in https://github.com/Zweih/qp/pull/339
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.53.1...v5.53.2
+
+
 ## v5.52.0
 ### What's Changed
 * Feature: Prefixes with limit macros (e.g. `limit end:all`) by @Zweih in https://github.com/Zweih/qp/pull/336
