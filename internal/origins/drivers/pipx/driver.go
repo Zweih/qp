@@ -1,7 +1,6 @@
 package pipx
 
 import (
-	"fmt"
 	"qp/internal/consts"
 	"qp/internal/origins/shared"
 	"qp/internal/pkgdata"
@@ -41,20 +40,6 @@ func (d *PipxDriver) SaveCache(cacheRoot string, pkgs []*pkgdata.PkgInfo) error 
 	return pkgdata.SaveProtoCache(cacheRoot, pkgs)
 }
 
-func (d *PipxDriver) SourceModified() (int64, error) {
-	modTime, err := shared.GetModTime(d.venvRoot)
-	if err != nil {
-		return 0, fmt.Errorf("failed to read %s DB mod time: %v", d.Name(), err)
-	}
-
-	return modTime, nil
-}
-
-func (d *PipxDriver) IsCacheStale(cacheModTime int64) (bool, error) {
-	mtime, err := shared.GetModTime(d.venvRoot)
-	if err != nil {
-		return false, fmt.Errorf("failed to read %s DB mod time: %v", d.Name(), err)
-	}
-
-	return mtime > cacheModTime, nil
+func (d *PipxDriver) IsCacheStale(cacheMtime int64) (bool, error) {
+	return shared.BfsStale(d.venvRoot, cacheMtime, 2)
 }
