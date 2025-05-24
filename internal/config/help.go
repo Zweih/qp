@@ -98,7 +98,10 @@ Tips:
       qp --no-headers select name,size
 
   - JSON output:
-      qp select name,version,size --json
+      qp select name,version,size --output=json
+
+  - Key-Value output (ideal for selecting all fields):
+     qp s all --output=kv
 
   - Quote arguments with spaces or special characters:
       qp where description="for tree-sitter"
