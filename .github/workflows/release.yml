@@ -271,57 +271,6 @@ jobs:
             gpg --batch --yes --armor --detach-sign "$file"
           done
 
-      - name: Upload signatures to query-packages-signatures release
-        run: |
-          gh release create "${{ env.TAG_NAME }}" \
-            --repo Zweih/query-packages-signatures \
-            --title "Signatures for qp ${{ env.TAG_NAME }}" \
-            --notes "Detached signatures for qp release ${{ env.TAG_NAME }}" \
-            ./release/qp-*.asc
-        env:
-          GH_TOKEN: ${{ secrets.QP_SIGNATURES_TOKEN }}
-
-      - name: Update Homebrew Tap Formula
-        run: |
-          git clone https://${HOMEBREW_QP_TOKEN}@github.com/Zweih/homebrew-qp.git
-          cd homebrew-qp
-
-          BRANCH_NAME="update-qp-${TAG_NAME#v}"
-          git checkout -b "$BRANCH_NAME"
-
-          FORMULA="Formula/qp.rb"
-          VERSION="${TAG_NAME#v}"
-
-          CHECKSUM_FILE="../release/SHA256SUMS.txt"
-          SHA256_AMD64=$(grep "qp-${TAG_NAME}-brew-darwin_amd64.tar.gz" "$CHECKSUM_FILE" | cut -d ' ' -f1)
-          SHA256_ARM64=$(grep "qp-${TAG_NAME}-brew-darwin_arm64.tar.gz" "$CHECKSUM_FILE" | cut -d ' ' -f1)
-          SHA256_LINUX_X86_64=$(grep "qp-${TAG_NAME}-brew-x86_64.tar.gz" "$CHECKSUM_FILE" | cut -d ' ' -f1)
-          SHA256_LINUX_AARCH64=$(grep "qp-${TAG_NAME}-brew-aarch64.tar.gz" "$CHECKSUM_FILE" | cut -d ' ' -f1)
-
-          sed -i "s/^  version \".*\"/  version \"${VERSION}\"/" "$FORMULA"
-          sed -i "s/^  sha256_amd64 = \".*\"/  sha256_amd64 = \"${SHA256_AMD64}\"/" "$FORMULA"
-          sed -i "s/^  sha256_arm64 = \".*\"/  sha256_arm64 = \"${SHA256_ARM64}\"/" "$FORMULA"
-          sed -i "s/^  sha256_linux_x86_64 = \".*\"/  sha256_linux_x86_64 = \"${SHA256_LINUX_X86_64}\"/" "$FORMULA"
-          sed -i "s/^  sha256_linux_aarch64 = \".*\"/  sha256_linux_aarch64 = \"${SHA256_LINUX_AARCH64}\"/" "$FORMULA"
-
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          git add $FORMULA
-          git commit -m "Update qp formula to v${VERSION}"
-          git push origin "$BRANCH_NAME"
-
-          gh pr create \
-            --title "Update qp formula to v${VERSION}" \
-            --body "Automated update of qp formula to version ${VERSION}" \
-            --head "$BRANCH_NAME" \
-            --base master
-          cd ..
-        env:
-          TAG_NAME: ${{ env.TAG_NAME }}
-          HOMEBREW_QP_TOKEN: ${{ secrets.HOMEBREW_QP_TOKEN }}
-          GH_TOKEN: ${{ secrets.HOMEBREW_QP_TOKEN }}
-
       - name: Update PKGBUILDs for qp-bin and qp-src
         run: |
           source ./packaging_targets.sh
@@ -377,7 +326,7 @@ jobs:
           chmod +x ./filter_release_ipks.sh
           ./filter_release_ipks.sh
 
-      - name: Publish Release
+      - name: Upload Artifacts to qp Release
         run: |
           cd ./release
           gh release upload "${{ env.TAG_NAME }}" qp-*.tar.gz qp-*.deb qp-*.ipk --clobber
@@ -410,11 +359,63 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.QP_EXTRA_PACKAGES_TOKEN }}
 
-      - name: Delete Draft Release if Job Failed
+      - name: Update Homebrew Tap Formula
+        run: |
+          git clone https://${HOMEBREW_QP_TOKEN}@github.com/Zweih/homebrew-qp.git
+          cd homebrew-qp
+
+          BRANCH_NAME="update-qp-${TAG_NAME#v}"
+          git checkout -b "$BRANCH_NAME"
+
+          FORMULA="Formula/qp.rb"
+          VERSION="${TAG_NAME#v}"
+
+          CHECKSUM_FILE="../release/SHA256SUMS.txt"
+          SHA256_AMD64=$(grep "qp-${TAG_NAME}-brew-darwin_amd64.tar.gz" "$CHECKSUM_FILE" | cut -d ' ' -f1)
+          SHA256_ARM64=$(grep "qp-${TAG_NAME}-brew-darwin_arm64.tar.gz" "$CHECKSUM_FILE" | cut -d ' ' -f1)
+          SHA256_LINUX_X86_64=$(grep "qp-${TAG_NAME}-brew-x86_64.tar.gz" "$CHECKSUM_FILE" | cut -d ' ' -f1)
+          SHA256_LINUX_AARCH64=$(grep "qp-${TAG_NAME}-brew-aarch64.tar.gz" "$CHECKSUM_FILE" | cut -d ' ' -f1)
+
+          sed -i "s/^  version \".*\"/  version \"${VERSION}\"/" "$FORMULA"
+          sed -i "s/^  sha256_amd64 = \".*\"/  sha256_amd64 = \"${SHA256_AMD64}\"/" "$FORMULA"
+          sed -i "s/^  sha256_arm64 = \".*\"/  sha256_arm64 = \"${SHA256_ARM64}\"/" "$FORMULA"
+          sed -i "s/^  sha256_linux_x86_64 = \".*\"/  sha256_linux_x86_64 = \"${SHA256_LINUX_X86_64}\"/" "$FORMULA"
+          sed -i "s/^  sha256_linux_aarch64 = \".*\"/  sha256_linux_aarch64 = \"${SHA256_LINUX_AARCH64}\"/" "$FORMULA"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add $FORMULA
+          git commit -m "Update qp formula to v${VERSION}"
+          git push origin "$BRANCH_NAME"
+
+          gh pr create \
+            --title "Update qp formula to v${VERSION}" \
+            --body "Automated update of qp formula to version ${VERSION}" \
+            --head "$BRANCH_NAME" \
+            --base master
+ 
+          cd ..
+        env:
+          TAG_NAME: ${{ env.TAG_NAME }}
+          HOMEBREW_QP_TOKEN: ${{ secrets.HOMEBREW_QP_TOKEN }}
+          GH_TOKEN: ${{ secrets.HOMEBREW_QP_TOKEN }}
+      
+      - name: Upload signatures to query-packages-signatures release
+        run: |
+          gh release create "${{ env.TAG_NAME }}" \
+            --repo Zweih/query-packages-signatures \
+            --draft \
+            --title "Signatures for qp ${{ env.TAG_NAME }}" \
+            --notes "Detached signatures for qp release ${{ env.TAG_NAME }}" \
+            ./release/qp-*.asc
+        env:
+          GH_TOKEN: ${{ secrets.QP_SIGNATURES_TOKEN }}
+
+      - name: Delete qp Draft Release if Job Failed
         if: ${{ (failure() || cancelled()) && env.created == 'true' }}
         run: |
-          echo "Workflow failed. Deleting draft release ${TAG_NAME}..."
+          echo "Workflow failed. Deleting draft releases for ${TAG_NAME}..."
           gh release delete "${TAG_NAME}" --yes || echo "No release found or already deleted."
         env:
           GH_TOKEN: ${{ github.token }}
-
