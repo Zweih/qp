@@ -10,7 +10,7 @@ import (
 )
 
 func fetchPackages(origin string) ([]*pkgdata.PkgInfo, error) {
-	pkgPaths, err := os.ReadDir(PacmanDbPath)
+	pkgPaths, err := os.ReadDir(pacmanDbPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read pacman database: %v", err)
 	}
@@ -21,7 +21,7 @@ func fetchPackages(origin string) ([]*pkgdata.PkgInfo, error) {
 	go func() {
 		for _, packagePath := range pkgPaths {
 			if packagePath.IsDir() {
-				descPath := filepath.Join(PacmanDbPath, packagePath.Name(), "desc")
+				descPath := filepath.Join(pacmanDbPath, packagePath.Name(), "desc")
 				descPathChan <- descPath
 			}
 		}

@@ -1,9 +1,9 @@
 package deb
 
 import (
-	"fmt"
 	"os"
 	"qp/internal/consts"
+	"qp/internal/origins/shared"
 	"qp/internal/pkgdata"
 )
 
@@ -67,20 +67,6 @@ func (d *DebDriver) SaveCache(cacheRoot string, pkgs []*pkgdata.PkgInfo) error {
 	return pkgdata.SaveProtoCache(cacheRoot, pkgs)
 }
 
-func (d *DebDriver) SourceModified() (int64, error) {
-	dirInfo, err := os.Stat(dpkgPath)
-	if err != nil {
-		return 0, fmt.Errorf("failed to read %s DB mod time: %v", d.Name(), err)
-	}
-
-	return dirInfo.ModTime().Unix(), nil
-}
-
-func (d *DebDriver) IsCacheStale(cacheModTime int64) (bool, error) {
-	dirInfo, err := os.Stat(dpkgPath)
-	if err != nil {
-		return false, fmt.Errorf("failed to read %s DB mod time: %v", d.Name(), err)
-	}
-
-	return dirInfo.ModTime().Unix() > cacheModTime, nil
+func (d *DebDriver) IsCacheStale(cacheMtime int64) (bool, error) {
+	return shared.IsDirStale(d.Name(), dpkgPath, cacheMtime)
 }

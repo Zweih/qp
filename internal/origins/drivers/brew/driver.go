@@ -38,31 +38,22 @@ func (d *BrewDriver) SaveCache(cacheRoot string, pkgs []*pkgdata.PkgInfo) error 
 	return pkgdata.SaveProtoCache(cacheRoot, pkgs)
 }
 
-func (d *BrewDriver) SourceModified() (int64, error) {
-	cellarTime, err := shared.GetModTime(filepath.Join(d.prefix, cellarSubPath))
-	if err != nil {
-		return 0, err
-	}
-
-	caskroomTime, err := shared.GetModTime(filepath.Join(d.prefix, caskroomSubpath))
-	if err != nil {
-		return 0, err
-	}
-
-	return max(cellarTime, caskroomTime), nil
-}
-
-// TODO: add early return
 func (d *BrewDriver) IsCacheStale(cacheModTime int64) (bool, error) {
-	cellarTime, err := shared.GetModTime(filepath.Join(d.prefix, cellarSubPath))
+	cellarPath := filepath.Join(d.prefix, cellarSubPath)
+	isCellarStale, err := shared.BfsStale(cellarPath, cacheModTime, 1)
 	if err != nil {
 		return false, err
 	}
 
-	caskroomTime, err := shared.GetModTime(filepath.Join(d.prefix, caskroomSubpath))
+	if isCellarStale {
+		return true, nil
+	}
+
+	caskroomPath := filepath.Join(d.prefix, caskroomSubpath)
+	isCaskroomStale, err := shared.BfsStale(caskroomPath, cacheModTime, 1)
 	if err != nil {
 		return false, err
 	}
 
-	return max(cellarTime, caskroomTime) > cacheModTime, nil
+	return isCaskroomStale, nil
 }
