@@ -48,7 +48,7 @@ func BfsStale(path string, cacheMtime int64, maxDepth int) (bool, error) {
 			continue
 		}
 
-		info, err := os.Stat(node.Path)
+		info, err := node.Entry.Info()
 		if err != nil {
 			continue
 		}

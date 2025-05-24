@@ -11,4 +11,13 @@ const (
 	fieldHomepage    = "Home-page"
 	fieldProjectUrl  = "Project-Url"
 	subfieldHomepage = "Homepage"
+	fieldTag         = "Tag"
+
+	anyArch       = "any"
+	universalArch = "universal"
+
+	dotDistInfo = ".dist-info"
+
+	pipxHomeEnv = "PIPX_HOME"
+	homeEnv     = "HOME"
 )

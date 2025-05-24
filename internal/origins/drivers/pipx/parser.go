@@ -90,9 +90,13 @@ func parseWheelFile(wheelPath string) (string, error) {
 		}
 
 		key := strings.TrimSpace(parts[0])
-		if key == "Tag" {
+		if key == fieldTag {
 			return strings.TrimSpace(parts[1]), nil
 		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		return "", fmt.Errorf("error reading wheel file %s: %w", wheelPath, err)
 	}
 
 	return "", fmt.Errorf("no tag field in wheel file for %s", wheelPath)

@@ -11,7 +11,7 @@ import (
 func findVenvRoot() (string, error) {
 	var venvRootPath string
 
-	if custom := os.Getenv("PIPX_HOME"); custom != "" {
+	if custom := os.Getenv(pipxHomeEnv); custom != "" {
 		venvRootPath = filepath.Join(custom, "venvs")
 		_, err := os.Stat(venvRootPath)
 		if err == nil {
@@ -21,7 +21,7 @@ func findVenvRoot() (string, error) {
 
 	home, err := os.UserHomeDir()
 	if err != nil {
-		home = os.Getenv("HOME")
+		home = os.Getenv(homeEnv)
 	}
 
 	possibleRoots := []string{defaultVenvRoot, otherVenvRoot}
@@ -42,30 +42,33 @@ func findVersionPath(libRoot string) (string, error) {
 		return "", err
 	}
 
-	for _, e := range entries {
-		if e.IsDir() && e.Name()[:6] == "python" {
-			return filepath.Join(libRoot, e.Name()), nil
+	for _, entry := range entries {
+		if entry.IsDir() && len(entry.Name()) > 6 && entry.Name()[:6] == "python" {
+			return filepath.Join(libRoot, entry.Name()), nil
 		}
 	}
+
 	return "", fmt.Errorf("no pythonX.Y found under %s", libRoot)
 }
 
 func findDistPath(sitePkgsPath string, name string) (string, error) {
-	matches, _ := filepath.Glob(filepath.Join(sitePkgsPath, name+"-*.dist-info", "METADATA"))
+	distInfoMatcher := name + "-*" + dotDistInfo
+	matches, _ := filepath.Glob(filepath.Join(sitePkgsPath, distInfoMatcher, "METADATA"))
 	if len(matches) > 0 {
 		return matches[0], nil
 	}
 
-	return "", nil
+	return "", fmt.Errorf("no .dist-info/METADATA found for: %s", name)
 }
 
 func inferArchitecture(sitePkgsPath string) (string, error) {
-	matches, err := filepath.Glob(filepath.Join(sitePkgsPath, "*.dist-info", "WHEEL"))
+	distInfoMatcher := "*" + dotDistInfo
+	matches, err := filepath.Glob(filepath.Join(sitePkgsPath, distInfoMatcher, "WHEEL"))
 	if err != nil {
 		return "", fmt.Errorf("found no .dist-info directories in %s: %v", sitePkgsPath, err)
 	}
 
-	bestMatch := "any"
+	bestMatch := anyArch
 
 	for _, match := range matches {
 		arch, err := parseWheelFile(match)
@@ -76,8 +79,8 @@ func inferArchitecture(sitePkgsPath string) (string, error) {
 		parts := strings.Split(arch, "-")
 		suffix := parts[len(parts)-1]
 
-		if suffix != "any" {
-			if !strings.Contains(suffix, "universal") {
+		if suffix != anyArch {
+			if !strings.Contains(suffix, universalArch) {
 				return suffix, nil
 			}
 
