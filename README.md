@@ -48,7 +48,9 @@ this package is compatible with the following plaforms and distributions:
  - [elementary OS](https://elementary.io/)
  - the 50 other arch and debian-based distros, as long as they have `pacman`, `apt`, `brew`,`dpkg`, or `opkg` installed
 
-`qp` also runs on embedded linux systems, including meta-distributions like [yocto](https://www.yoctoproject.org/) that use `opkg` (`.ipk` packages) or `apt`/`dpkg` (`.deb` packages). `rpm` support is currently on the way! 
+`qp` also detects and queries application-specific package managers like `pipx` for isolated python applications, expanding package discovery beyond traditional system package management.
+
+`qp` supports embedded linux systems, including meta-distributions like [yocto](https://www.yoctoproject.org/) that use `opkg` (`.ipk` packages) or `apt`/`dpkg` (`.deb` packages). `rpm` support is currently on the way! 
 
 more distros and non-linux platforms are planned!
 
@@ -57,7 +59,10 @@ more distros and non-linux platforms are planned!
 * list installed packages across supported systems
 * compatible with macOS, arch, debian, openwrt, and over 60 distros
 * * supports multiple ecosystems:
-  * pacman, dpkg/apt, opkg, brew (formulae, bottles, casks)
+  * system package managers:
+    * pacman, apt/dpkg, opkg, brew
+* * application package managers:
+    * pipx
 * query packages using an expressive query language
   * supports full boolean logic (`and`, `or`, `not`, grouping)
   * supports fuzzy and strict matching
@@ -291,14 +296,13 @@ qp [command] [args] [options]
 - `name` - package name
 - `reason` - installation reason (explicit/dependency)
 - `version` - installed package version
-- `origin` - the package ecosystem or source the package belongs to (e.g., pacman); reflects which package manager or backend maintains it
+- `origin` - the package ecosystem or source the package belongs to (e.g., brew, pipx); reflects which package manager or backend maintains it
 - `arch` - architecture the package was built for (e.g., x86_64, aarch64, any)
 - `license` - package software license
 - `description` - package description
 - `url` - the URL of the official site of the software being packaged
 - `validation` - package integrity validation method (e.g., sha256, pgp)
-- `pkgtype` - package type (pkg, split, debug, src)
-    - ***note**: older packages may have no pkgtype if built before pacman introduced XDATA
+- `pkgtype` - package type (specific to each origin, some origins have no pkgtype)
 - `pkgbase` - name of the base package used to group split packages; for non-split packages, it is the same as the package name. 
 - `packager` - person/entity who built the package (if available)
 - `groups` - list of package groups or categories (e.g., base, gnome, xfce4)
@@ -309,6 +313,24 @@ qp [command] [args] [options]
 - `required-by` - list of packages required by the package and are dependent
 - `optional-for` - list of packages that optionally depend on the package (optionally dependent)
 - `provides` - list of alternative package names or shared libraries provided by package
+
+## package types by origin
+
+the `pkgtype` field indicates the type or category of package within each ecosystem. different origins use different package type classifications:
+
+| origin | supported package types | description |
+|--------|------------------------|-------------|
+| pacman | `pkg`, `split`, `debug`, `src` | package build type |
+| brew | `formula`, `cask` | formulae are command-line tools, casks are GUI applications |
+| deb | none | debian packages do not have a pkgtype classification |
+| opkg | none | openwrt packages do not have a pkgtype classification |
+| pipx | none | pipx packages do not have a pkgtype classification |
+
+**notes:**
+- pacman's pkgtype comes from the package's XDATA field introduced in newer pacman versions
+    - older packages may not have this field populated
+- brew distinguishes between formulae (CLI tools/libraries) and casks (GUI applications)
+- deb, opkg, and pipx origins do not implement package type classifications and will show empty pkgtype values
 
 ### querying with `where`
 
@@ -409,7 +431,6 @@ qp where q name=vim or name=nvim p and not has:conflicts
 qp w not arch=x86_64
 qp w q has:depends or has:required-by p and not reason=explicit
 ```
-
 
 #### field types
 
@@ -776,6 +797,11 @@ output format:
 38. show packages that have no dependencies
    ```
    qp where no:depends
+   ```
+
+39. show all packages installed via pipx
+   ```
+   qp where origin=pipx
    ```
 
 ## license

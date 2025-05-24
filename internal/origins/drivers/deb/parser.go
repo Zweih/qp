@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"qp/internal/consts"
-	"qp/internal/origins/formats/debstyle"
+	"qp/internal/origins/shared/debstyle"
 	"qp/internal/origins/worker"
 	"qp/internal/pkgdata"
 	"strconv"

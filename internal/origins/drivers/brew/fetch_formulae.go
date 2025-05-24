@@ -2,6 +2,7 @@ package brew
 
 import (
 	"path/filepath"
+	"qp/internal/origins/shared"
 	"qp/internal/origins/worker"
 	"qp/internal/pkgdata"
 	"sync"
@@ -76,7 +77,7 @@ func fetchFormulae(
 		errGroup,
 		func(pkg *pkgdata.PkgInfo) (*pkgdata.PkgInfo, error) {
 			versionPath := filepath.Join(prefix, cellarSubPath, pkg.Name, pkg.Version)
-			if size, err := getInstallSize(versionPath); err == nil {
+			if size, err := shared.GetInstallSize(versionPath); err == nil {
 				pkg.Size = size
 			}
 

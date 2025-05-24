@@ -5,4 +5,5 @@ const (
 	OriginPacman = "pacman"
 	OriginDeb    = "deb"
 	OriginOpkg   = "opkg"
+	OriginPipx   = "pipx"
 )
