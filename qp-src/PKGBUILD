@@ -2,7 +2,7 @@
 pkgname=qp
 pkgver=5.56.0
 pkgrel=1
-pkgdesc="qp - Query Packages. A CLI utility for querying installed packages, written in Go."
+pkgdesc="qp - query packages. A CLI utility for querying installed packages across multiple package ecosystems."
 arch=("any")
 url="https://github.com/Zweih/qp"
 license=("GPL3")
