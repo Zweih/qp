@@ -24,18 +24,11 @@ func NewPipeline(
 	isInteractive bool,
 	baseCachePath string,
 ) *Pipeline {
-	// modTime, err := origin.SourceModified()
-	// if err != nil {
-	// 	out.WriteLine(fmt.Sprintf("WARNING: failed to get mod time for origin %s: %v", origin.Name(), err))
-	// 	modTime = time.Now().Unix()
-	// }
-
 	return &Pipeline{
 		Origin:        origin,
 		Config:        cfg,
 		IsInteractive: isInteractive,
 		CachePath:     baseCachePath,
-		// ModTime:       modTime,
 	}
 }
 

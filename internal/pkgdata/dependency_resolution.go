@@ -1,18 +1,29 @@
 package pkgdata
 
 import (
-	"qp/internal/pipeline/meta"
 	"strings"
 )
 
 // TODO: we can do this concurrently. let's get on that.
 func ResolveDependencyGraph(
 	pkgs []*PkgInfo,
-	_ meta.ProgressReporter, // TODO: Add progress reporting
+	complexEvaluator func(Relation, map[string][]string, map[string]*PkgInfo) []Relation,
 ) ([]*PkgInfo, error) {
 	providesMap, installedMap := collectPkgData(pkgs)
 	normalizeOptionalPkgs(pkgs, installedMap)
-	forwardShallow, reverseShallow, optReverseShallow := buildShallowGraph(pkgs, providesMap)
+
+	var curriedEval func(Relation) []Relation
+	if complexEvaluator != nil {
+		curriedEval = func(rel Relation) []Relation {
+			return complexEvaluator(rel, providesMap, installedMap)
+		}
+	}
+
+	forwardShallow, reverseShallow, optReverseShallow := buildShallowGraph(
+		pkgs,
+		providesMap,
+		curriedEval,
+	)
 
 	var visited map[string]int32
 
@@ -90,6 +101,7 @@ func collectPkgData(pkgs []*PkgInfo) (map[string][]string, map[string]*PkgInfo) 
 func buildShallowGraph(
 	pkgs []*PkgInfo,
 	providesMap map[string][]string,
+	complexEvaluator func(Relation) []Relation,
 ) (
 	forwardShallow map[string][]Relation,
 	reverseShallow map[string][]Relation,
@@ -100,8 +112,15 @@ func buildShallowGraph(
 	optReverseShallow = make(map[string][]Relation)
 
 	for _, pkg := range pkgs {
-		buildShallowTrees(pkg, pkg.Depends, providesMap, forwardShallow, reverseShallow)
-		buildShallowTrees(pkg, pkg.OptDepends, providesMap, nil, optReverseShallow)
+		buildShallowTrees(
+			pkg,
+			pkg.Depends,
+			providesMap,
+			forwardShallow,
+			reverseShallow,
+			complexEvaluator,
+		)
+		buildShallowTrees(pkg, pkg.OptDepends, providesMap, nil, optReverseShallow, nil)
 	}
 
 	return forwardShallow, reverseShallow, optReverseShallow
@@ -113,44 +132,55 @@ func buildShallowTrees(
 	providesMap map[string][]string,
 	forwardTree map[string][]Relation,
 	reverseTree map[string][]Relation,
+	complexEvaluator func(Relation) []Relation,
 ) {
 	pkgKey := pkg.Key()
-
 	for _, dep := range deps {
 		depKey := dep.Key()
 		if depKey == pkgKey {
 			continue // prevent checking self-referencing packages
 		}
 
-		targets := resolveProvisions(depKey, dep.Version, dep.Operator, providesMap)
+		var depsToProcess []Relation
 
-		for _, target := range targets {
-			if target.Name == pkg.Name {
-				continue
+		if dep.IsComplex && complexEvaluator != nil {
+			evaluatedDeps := complexEvaluator(dep)
+			depsToProcess = evaluatedDeps
+		} else {
+			depsToProcess = []Relation{dep}
+		}
+
+		for _, processedDep := range depsToProcess {
+			targets := resolveProvisions(processedDep.Key(), processedDep.Version, processedDep.Operator, providesMap)
+
+			for _, target := range targets {
+				if target.Name == pkg.Name {
+					continue
+				}
+
+				targetCopy := target
+				targetCopy.PkgType = processedDep.PkgType
+
+				if forwardTree != nil {
+					addToDependencyTree(pkgKey, forwardTree, targetCopy)
+				}
+
+				reverseKey := targetCopy.ProviderKey()
+				if reverseKey == "" {
+					reverseKey = targetCopy.Key()
+				}
+
+				reverseRelation := Relation{
+					Name:     pkg.Name,
+					Version:  processedDep.Version,
+					Operator: processedDep.Operator,
+					Depth:    1,
+					Why:      processedDep.Why,
+					PkgType:  pkg.PkgType,
+				}
+
+				addToDependencyTree(reverseKey, reverseTree, reverseRelation)
 			}
-
-			targetCopy := target
-			targetCopy.PkgType = dep.PkgType
-
-			if forwardTree != nil {
-				addToDependencyTree(pkgKey, forwardTree, targetCopy)
-			}
-
-			reverseKey := targetCopy.ProviderKey()
-			if reverseKey == "" {
-				reverseKey = targetCopy.Key()
-			}
-
-			reverseRelation := Relation{
-				Name:     pkg.Name,
-				Version:  dep.Version,
-				Operator: dep.Operator,
-				Depth:    1,
-				Why:      dep.Why,
-				PkgType:  pkg.PkgType,
-			}
-
-			addToDependencyTree(reverseKey, reverseTree, reverseRelation)
 		}
 	}
 }
