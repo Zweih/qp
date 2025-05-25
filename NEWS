@@ -1,4 +1,12 @@
 # qp Release Notes
+## v5.57.0
+### What's Changed
+* Documentation: Update readme by @Zweih in https://github.com/Zweih/qp/pull/343
+* Feature: Depth querying by @Zweih in https://github.com/Zweih/qp/pull/344
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.56.0...v5.57.0
+
+
 ## v5.56.0
 ### What's Changed
 * Feature: Speed up JSON output by @Zweih in https://github.com/Zweih/qp/pull/342
