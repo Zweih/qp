@@ -161,7 +161,7 @@ learn about installation [here](#installation)
 |--------|---------|--------|---------|
 | ✓ | reverse optional dependencies field (optional-for) | - | optdepends installation indicator |
 | - | separate field for optdepends reason | ✓ | fuzzy/strict querying |
-| ✓ | existence querying | - | depth querying |
+| ✓ | existence querying | ✓ | depth querying |
 | ✓ | command-based syntax | ✓ | full boolean logic |
 | ✓ | abstract syntax tree | ✓ | directed acyclical graph for filtering |
 | - | user-defined macros | ✓ | parentetical (grouping) logic |
@@ -272,7 +272,7 @@ qp [command] [args] [options]
   - use `and`, `or`, `not`, `q ... p` to build complex filters
   - learn more about querying [here](#querying-with-where)
 - `order <field>:<direction>` | `o <field>:<direction>`: sort results ascending or descending
-  - default sort is `date:asc`:
+  - default sort is `date:asc`
 - `limit <number>` | `l <number>`: limit the amount of packages to display (default: 20)
   - `limit all` | `l all`: display all packages
   - `limit end:<number>`: display last `n` packages
@@ -388,6 +388,49 @@ each `where` query supports one of the following:
 for example:
   - `name=gtk` matches `gtk3`, `libgtk`, etc. (fuzzy)
   - `name==gtk` only matches a package named exactly `gtk`
+
+#### depth querying
+
+for relation fields, you can specify the depth level to query using the `@` syntax:
+
+```bash
+qp w depends=glibc@2    # packages that depend on glibc at depth 2
+qp w required-by=gtk3@1 # packages directly required by gtk3 (depth 1)
+qp w provides=libssl@3  # packages that provide libssl at depth 3
+```
+
+**depth levels:**
+- no `@` specified: depth 1 (direct relations only)
+- `@1`: direct relations only (same as default)
+- `@2`: second-level relations (relations of relations)
+- `@3`, `@4`, etc.: deeper levels in the dependency tree
+
+**special behavior for optional dependencies:**
+- `optdepends` and `optional-for` return the optional relationships at the depth 1
+- after depth 1, the dependency resolution includes hard dependencies from those optional packages in the final results. this is intentional.
+
+**examples:**
+```bash
+# show packages with direct dependencies on python (depth 1 implied)
+qp w depends=python
+
+# show packages with direct dependencies on python (explicit depth 1)
+qp w depends=python@1
+
+# show packages that indirectly depend on openssl at depth 2
+qp w depends=openssl@2
+
+# show direct optional dependencies of vlc
+qp w optdepends=vlc@1
+
+# show optional dependencies of vlc at depth 2
+qp w optdepends=vlc@2
+
+# show packages that directly optionally depend on ffmpeg
+qp w optional-for=ffmpeg@1
+```
+
+**note:** depth querying works with all relation fields: `depends`, `optdepends`, `required-by`, `optional-for`, `provides`, `conflicts`, and `replaces`.
 
 #### built-in macros
 

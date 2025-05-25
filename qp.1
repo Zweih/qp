@@ -1,21 +1,23 @@
 .\" Man page for qp
 .TH qp 1 "@DATE@" "qp @VERSION@" "User Commands"
 .SH NAME
-qp \- query packages. A CLI utility for querying installed packages.
+qp \- query packages. A CLI utility for querying installed packages across multiple package ecosystems.
 
 .SH SYNOPSIS
 .B qp [command] [args] [options]
 
 .SH DESCRIPTION
 .B qp
-is a fast, flexible, and standalone CLI utility for querying installed packages on Arch Linux and Arch-based distributions. It supports advanced querying, sorting, and formatting features including:
+is a fast, flexible, and standalone CLI utility for querying installed packages across multiple package ecosystems and operating systems. It supports Arch Linux (pacman), Debian/Ubuntu (apt/dpkg), Homebrew (brew), OpenWrt (opkg), and application ecosystems like pipx. Features include:
 
-- Existence checks
-- Field filtering
+- Cross-platform package discovery
+- Advanced querying with boolean logic
+- Field filtering and existence checks
 - Date and size range queries
+- Dependency graph traversal with depth control
 - Reverse dependencies and provisions
 - Conflicts, optional dependencies, and groups
-- Sorting and output as table or JSON
+- Sorting by any field and multiple output formats
 
 .SH COMMANDS
 .TP
@@ -40,27 +42,29 @@ String match — \fIfield=value\fR (fuzzy), \fIfield==value\fR (strict)
 Range match — \fIfield=start:end\fR or \fIfield==start:end\fR (works with \fBdate\fR, \fBsize\fR)
 .IP \[bu] 
 Existence check — \fBhas:field\fR or \fBno:field\fR
+.IP \[bu]
+Depth querying — \fIfield=value@depth\fR (for relation fields)
 .RE
 
 .TP
 .B order <field>:<direction>, o <..>
-Sort results. Fields: \fBdate\fR, \fBbuild-date\fR, \fBsize\fR, \fBname\fR, \fBreason\fR, \fBversion\fR, \fBorigin\fR, \fBarch\fR, \fBlicense\fR, \fBdescription\fR, \fBurl\fR, \fBpkgbase\fR, \fBpkgtype\fR, \fBvalidation\fR, \fBpackager\fR, \fBgroups\fR, \fBconflicts\fR, \fBreplaces\fR, \fBdepends\fR,\fBoptdepends\fR, \fBrequired-by\fR, \fBoptional-for\fR, \fBprovides\fR
+Sort results by any available field in ascending (\fBasc\fR) or descending (\fBdesc\fR) order.
 
 .TP
 .B limit <number>, l <number>
 Limit number of displayed results. Use \fBlimit all\fR to show all.
-Numbers can be prefixed with end:<number> or mid:<number> to display X amount from a specific part of the output.
+Numbers can be prefixed with \fBend:\fR or \fBmid:\fR to display from specific parts of the output.
 
 .SH OPTIONS
 .TP
 .B \-\-no-headers
 Omit column headers (useful in scripts).
 .TP
-.B \-\-json
-Output results in JSON format.
+.B \-\-output <format>
+Output format: \fBtable\fR (default), \fBjson\fR, or \fBkv\fR (key-value).
 .TP
 .B \-\-full-timestamp
-Show full date+time for install/build.
+Show full date+time for install/build timestamps.
 .TP
 .B \-\-no-progress
 Disable progress bar.
@@ -95,6 +99,20 @@ Supports full (e.g., 1GB:5GB), open-ended (e.g., 1GB:, :5GB), or exact values.
 \fBno:field\fR — must be empty or missing
 
 .TP
+.B Depth Querying
+\fIfield=value@depth\fR — query relation fields at specific depths
+.RS
+.IP \[bu]
+\fB@1\fR or no \fB@\fR — direct relations (default)
+.IP \[bu]
+\fB@2\fR — second-level relations
+.IP \[bu]
+\fB@3\fR, \fB@4\fR, etc. — deeper levels
+.IP \[bu]
+Note: \fBoptdepends\fR and \fBoptional-for\fR include hard dependencies in results after depth 1
+.RE
+
+.TP
 .B Match Behavior Summary:
 .TS
 box, tab(:);
@@ -111,13 +129,13 @@ Size:±0.3% tolerance:exact byte size
 .B Logical Operators
 Use to combine or negate queries:
 .RS
-.IP \[bu] 
+.IP \[bu]
 \fBand\fR - require all conditions to match
-.IP \[bu] 
+.IP \[bu]
 \fBor\fR - match if any condition matches
-.IP \[bu] 
+.IP \[bu]
 \fBnot\fR - invert a single condition
-.IP \[bu] 
+.IP \[bu]
 \fBq\fR ... \fBp\fR - group conditions (equivalent to parentheses)
 .RE
 
@@ -142,6 +160,26 @@ Matches super-orphaned packages - installed as dependencies but are required by 
 "qp where superorphan" is equivalent to:
 .BR "qp where no:required-by and reason=dependency and no:optional-for"
 
+.SH SUPPORTED PACKAGE ECOSYSTEMS
+.B qp
+automatically detects and queries packages from:
+
+.TP
+.B pacman
+Arch Linux and derivatives (Manjaro, EndeavourOS, etc.)
+.TP
+.B deb
+Debian, Ubuntu, and derivatives (Mint, Pop!_OS, etc.) via apt/dpkg
+.TP
+.B brew
+Homebrew on macOS and Linux (formulae and casks)
+.TP
+.B opkg
+OpenWrt and embedded systems using ipkg packages
+.TP
+.B pipx
+Python applications installed in isolated environments
+
 .SH SUPPORTED QUERY FIELDS
 .TP
 .B Range:
@@ -154,7 +192,7 @@ name, reason, version, origin, arch, license, pkgbase, description, url, groups,
 conflicts, replaces, depends, optdepends, required-by, optional-for, provides
 
 .SH AVAILABLE FIELDS
-Available for use with \fBselect\fR, \fBselect all\fR, etc:
+Available for use with \fBselect\fR, \fBorder\fR, and \fBwhere\fR:
 
 date, build-date, size, name, reason, version, origin, arch, license, 
 description, url, validation, pkgbase, pkgtype, packager, groups, conflicts,
@@ -165,21 +203,29 @@ List 10 smallest explicitly installed packages:
 .br
 \fBqp w reason=explicit o size:asc l 10\fR
 
-Query packages larger than 500MB:
+Query packages larger than 500MB from Homebrew:
 .br
-\fBqp w size=500MB:\fR
+\fBqp w size=500MB: and origin=brew\fR
 
-Search packages that depend on \fBgtk3\fR:
+Search packages that depend on \fBgtk3\fR at depth 2:
 .br
-\fBqp w required-by=gtk3\fR
+\fBqp w depends=gtk3@2\fR
 
 Get all fields for \fBgtk3\fR in JSON:
 .br
-\fBqp s all w name==gtk3 --json\fR
+\fBqp s all w name==gtk3 --output json\fR
 
 Group and filter multiple conditions:
 .br
 \fBqp w q name=zoxide or name=yazi p and optdepends=fzf\fR
+
+Show packages that directly require \fBpython\fR:
+.br
+\fBqp w required-by=python@1\fR
+
+Find orphaned packages larger than 100MB:
+.br
+\fBqp w orphan and size=100MB:\fR
 
 .SH TIPS
 - Pipe long outputs:
@@ -190,13 +236,16 @@ Group and filter multiple conditions:
 .br
 - Omit headers for scripts:
   \fBqp --no-headers s name,size\fR
+.br
+- Query across package ecosystems:
+  \fBqp w origin=brew,pacman\fR
 
 .SH FILES
 Cache is stored in:
 .br
-\fB$XDG_CACHE_HOME/query-packages\fR or \fB~/.cache/query-packages\fR
+Linux: \fB$XDG_CACHE_HOME/query-packages\fR or \fB~/.cache/query-packages\fR
 .br
-If \fBXDG_CACHE_HOME\fR is not set, fallback is \fB~/.cache/query-packages\fR
+macOS: \fB~/Library/Caches/query-packages\fR
 
 .SH AUTHOR
 Written by Fernando Nunez <me@fernandonunez.io>
@@ -211,6 +260,7 @@ Report issues at:
 
 .SH SEE ALSO
 .BR pacman(8),
-.BR yay(1),
-.BR paru(1)
-
+.BR apt(8),
+.BR brew(1),
+.BR opkg(1),
+.BR pipx(1)
