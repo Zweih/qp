@@ -30,7 +30,7 @@ graphs are generated daily with my other project, [repulse analytics](https://gi
 
 </details>
 
-this package is compatible with the following plaforms and distributions:
+this package is compatible with the following platforms and distributions:
  - [arch linux](https://archlinux.org)
  - [macOS](https://www.apple.com/macos/)
  - [debian](https://debian.org)
@@ -174,7 +174,7 @@ learn about installation [here](#installation)
 | - | replaced-by resolution | - | multi-license support |
 | – | short-args for queries | ✓ | key/value output |
 | - | rpm origin (dnf/yum support) | ✓ | homebrew packaging |
-| - | pip origin (python packaging) | - | formulae from taps (brew) |
+| ✓ | pipx origin (python global packages) | - | formulae from taps (brew) |
 | - | casks from taps (brew) | - | dependencies for casks |
 
 ## installation
@@ -314,7 +314,7 @@ qp [command] [args] [options]
 - `optional-for` - list of packages that optionally depend on the package (optionally dependent)
 - `provides` - list of alternative package names or shared libraries provided by package
 
-## package types by origin
+### package types by origin
 
 the `pkgtype` field indicates the type or category of package within each ecosystem. different origins use different package type classifications:
 
