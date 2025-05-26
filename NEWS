@@ -1,4 +1,13 @@
 # qp Release Notes
+## v5.60.0
+### What's Changed
+* Feature: Add rpm origin (dnf/yum support) by @Zweih in https://github.com/Zweih/qp/pull/346
+* Fix: Update libs for mipsel compilation by @Zweih in https://github.com/Zweih/qp/pull/347
+* Feature: Add build tags by @Zweih in https://github.com/Zweih/qp/pull/348
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.58.0...v5.60.0
+
+
 ## v5.58.0
 ### What's Changed
 * Feature: Add heavy macro by @Zweih in https://github.com/Zweih/qp/pull/345
@@ -8,7 +17,6 @@
 
 ## v5.57.0
 ### What's Changed
-* Documentation: Update readme by @Zweih in https://github.com/Zweih/qp/pull/343
 * Feature: Depth querying by @Zweih in https://github.com/Zweih/qp/pull/344
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v5.56.0...v5.57.0
