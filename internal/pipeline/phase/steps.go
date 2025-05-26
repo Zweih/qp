@@ -61,9 +61,7 @@ func (p *Pipeline) fetchStep(
 
 	pkgs, err := p.Origin.Load()
 	if err != nil {
-		err = fmt.Errorf(
-			"failed to fetch packages: %v", err,
-		)
+		err = fmt.Errorf("failed to fetch packages: %v", err)
 		return nil, err
 	}
 

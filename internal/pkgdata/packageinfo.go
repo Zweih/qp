@@ -19,6 +19,8 @@ type Relation struct {
 	Depth    int32
 	Operator RelationOp
 
+	IsComplex bool
+
 	Name         string
 	Version      string
 	ProviderName string

@@ -1,9 +1,10 @@
 package consts
 
 const (
-	OriginBrew   = "brew"
 	OriginPacman = "pacman"
+	OriginBrew   = "brew"
 	OriginDeb    = "deb"
 	OriginOpkg   = "opkg"
 	OriginPipx   = "pipx"
+	OriginRpm    = "rpm"
 )
