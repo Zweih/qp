@@ -6,7 +6,6 @@ import (
 	"qp/internal/pkgdata"
 
 	rpmdb "github.com/Zweih/go-rpmdb/pkg"
-	_ "github.com/glebarez/sqlite"
 )
 
 func fetchPackages(origin string, path string) ([]*pkgdata.PkgInfo, error) {

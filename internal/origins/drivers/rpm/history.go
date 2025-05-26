@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"os"
 	"qp/internal/consts"
-
-	_ "github.com/glebarez/go-sqlite"
 )
 
 const permissionError = "failed to open history database (may need root permissions): %w\n rpm install reasons will incorrectly display as 'explicit'"

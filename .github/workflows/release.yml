@@ -62,16 +62,19 @@ jobs:
         run: |
           export GOOS=${{ matrix.goos || 'linux' }}
           export GOARCH=${{ matrix.goarch }}
+          BUILD_TAGS="-tags noextradeps"
           
           if [ -n "${{ matrix.goarm }}" ]; then
             export GOARM=${{ matrix.goarm }}
           fi
 
           if [ -n "${{ matrix.gomips }}" ]; then
+            BUILD_TAGS="${BUILD_TAGS},nosqlite"
             export GOMIPS=${{ matrix.gomips }}
+            echo "Building for MIPS architecture without SQLite support"
           fi
 
-          go build -trimpath -ldflags="-s -w \
+          go build -trimpath $BUILD_TAGS -ldflags="-s -w \
             -X qp/internal/about.Version=${{ env.TAG_NAME }} \
             -X qp/internal/about.Commit=$(git rev-parse HEAD) \
             -X qp/internal/about.Date=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
