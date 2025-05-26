@@ -92,6 +92,7 @@ Short Command Examples:
 Built-in Macros:
   - 'qp w orphan' is equivalent to 'qp where no:required-by and reason=dependency'
   - 'qp w superorphan' is equivalent to 'qp where no:required-by and reason=dependency and no:optional-for'
+  - 'qp w heavy' is equivalent to 'qp where size=100MB:'
 
 Tips:
   - Queries can include comma-separated values, these act a shorthand for 'or' logic:

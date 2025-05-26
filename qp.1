@@ -160,6 +160,13 @@ Matches super-orphaned packages - installed as dependencies but are required by 
 "qp where superorphan" is equivalent to:
 .BR "qp where no:required-by and reason=dependency and no:optional-for"
 
+.TP
+.B heavy
+Matches heavy packages - 100MB and larger.
+
+"qp where heavy" is equivalent to:
+.BR "qp where size=100MB:"
+
 .SH SUPPORTED PACKAGE ECOSYSTEMS
 .B qp
 automatically detects and queries packages from:

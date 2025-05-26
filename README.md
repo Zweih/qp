@@ -1,6 +1,6 @@
 # qp - query packages
 
-`qp` is a command-line program for linux and macOS to query installed packages from any ecosystem.
+`qp` is a command-line program for linux and macOS to query installed packages across ecosystems.
 
 you can find installation instructions [here](#installation).
 
@@ -52,7 +52,7 @@ this package is compatible with the following platforms and distributions:
 
 `qp` supports embedded linux systems, including meta-distributions like [yocto](https://www.yoctoproject.org/) that use `opkg` (`.ipk` packages) or `apt`/`dpkg` (`.deb` packages). `rpm` support is currently on the way! 
 
-more distros and non-linux platforms are planned!
+more distros and non-unix platforms are planned!
 
 ## features
 
@@ -405,29 +405,17 @@ qp w provides=libssl@3  # packages that provide libssl at depth 3
 - `@2`: second-level relations (relations of relations)
 - `@3`, `@4`, etc.: deeper levels in the dependency tree
 
-**special behavior for optional dependencies:**
+**spefor optional dependencies:**
 - `optdepends` and `optional-for` return the optional relationships at the depth 1
-- after depth 1, the dependency resolution includes hard dependencies from those optional packages in the final results. this is intentional.
+- after epth 1, the dependency resolution includes hard dependencies from those optional packages in the final results. this is intentional.
 
 **examples:**
 ```bash
 # show packages with direct dependencies on python (depth 1 implied)
 qp w depends=python
 
-# show packages with direct dependencies on python (explicit depth 1)
-qp w depends=python@1
-
 # show packages that indirectly depend on openssl at depth 2
 qp w depends=openssl@2
-
-# show direct optional dependencies of vlc
-qp w optdepends=vlc@1
-
-# show optional dependencies of vlc at depth 2
-qp w optdepends=vlc@2
-
-# show packages that directly optionally depend on ffmpeg
-qp w optional-for=ffmpeg@1
 ```
 
 **note:** depth querying works with all relation fields: `depends`, `optdepends`, `required-by`, `optional-for`, `provides`, `conflicts`, and `replaces`.
@@ -456,11 +444,21 @@ some frequently-used query patterns are available as built-in macros for conveni
   qp where no:required-by and reason=dependency and no:optional-for
   ```
 
+* `heavy` - matches packages 100MB and larger
+  ```
+  qp w superorphan
+  ```
+
+  is equivalent to:
+  ```
+  qp where size=100MB:
+  ```
+
 these macros can be combined with other queries as usual:
 
 ```
 qp w orphan and size=100KB:
-qp w superorphan and not name=gtk
+qp w not superorphan and not name=gtk
 ```
 
 #### query examples
