@@ -1,6 +1,6 @@
 # qp - query packages
 
-`qp` is a command-line program for linux and macOS to query installed packages from any ecosystem.
+`qp` is a command-line program for linux and macOS to query installed packages across ecosystems.
 
 you can find installation instructions [here](#installation).
 
@@ -30,7 +30,7 @@ graphs are generated daily with my other project, [repulse analytics](https://gi
 
 </details>
 
-this package is compatible with the following plaforms and distributions:
+this package is compatible with the following platforms and distributions:
  - [arch linux](https://archlinux.org)
  - [macOS](https://www.apple.com/macos/)
  - [debian](https://debian.org)
@@ -52,7 +52,7 @@ this package is compatible with the following plaforms and distributions:
 
 `qp` supports embedded linux systems, including meta-distributions like [yocto](https://www.yoctoproject.org/) that use `opkg` (`.ipk` packages) or `apt`/`dpkg` (`.deb` packages). `rpm` support is currently on the way! 
 
-more distros and non-linux platforms are planned!
+more distros and non-unix platforms are planned!
 
 ## features
 
@@ -161,7 +161,7 @@ learn about installation [here](#installation)
 |--------|---------|--------|---------|
 | ✓ | reverse optional dependencies field (optional-for) | - | optdepends installation indicator |
 | - | separate field for optdepends reason | ✓ | fuzzy/strict querying |
-| ✓ | existence querying | - | depth querying |
+| ✓ | existence querying | ✓ | depth querying |
 | ✓ | command-based syntax | ✓ | full boolean logic |
 | ✓ | abstract syntax tree | ✓ | directed acyclical graph for filtering |
 | - | user-defined macros | ✓ | parentetical (grouping) logic |
@@ -174,7 +174,7 @@ learn about installation [here](#installation)
 | - | replaced-by resolution | - | multi-license support |
 | – | short-args for queries | ✓ | key/value output |
 | - | rpm origin (dnf/yum support) | ✓ | homebrew packaging |
-| - | pip origin (python packaging) | - | formulae from taps (brew) |
+| ✓ | pipx origin (python global packages) | - | formulae from taps (brew) |
 | - | casks from taps (brew) | - | dependencies for casks |
 
 ## installation
@@ -272,7 +272,7 @@ qp [command] [args] [options]
   - use `and`, `or`, `not`, `q ... p` to build complex filters
   - learn more about querying [here](#querying-with-where)
 - `order <field>:<direction>` | `o <field>:<direction>`: sort results ascending or descending
-  - default sort is `date:asc`:
+  - default sort is `date:asc`
 - `limit <number>` | `l <number>`: limit the amount of packages to display (default: 20)
   - `limit all` | `l all`: display all packages
   - `limit end:<number>`: display last `n` packages
@@ -314,7 +314,7 @@ qp [command] [args] [options]
 - `optional-for` - list of packages that optionally depend on the package (optionally dependent)
 - `provides` - list of alternative package names or shared libraries provided by package
 
-## package types by origin
+### package types by origin
 
 the `pkgtype` field indicates the type or category of package within each ecosystem. different origins use different package type classifications:
 
@@ -389,6 +389,37 @@ for example:
   - `name=gtk` matches `gtk3`, `libgtk`, etc. (fuzzy)
   - `name==gtk` only matches a package named exactly `gtk`
 
+#### depth querying
+
+for relation fields, you can specify the depth level to query using the `@` syntax:
+
+```bash
+qp w depends=glibc@2    # packages that depend on glibc at depth 2
+qp w required-by=gtk3@1 # packages directly required by gtk3 (depth 1)
+qp w provides=libssl@3  # packages that provide libssl at depth 3
+```
+
+**depth levels:**
+- no `@` specified: depth 1 (direct relations only)
+- `@1`: direct relations only (same as default)
+- `@2`: second-level relations (relations of relations)
+- `@3`, `@4`, etc.: deeper levels in the dependency tree
+
+**spefor optional dependencies:**
+- `optdepends` and `optional-for` return the optional relationships at the depth 1
+- after epth 1, the dependency resolution includes hard dependencies from those optional packages in the final results. this is intentional.
+
+**examples:**
+```bash
+# show packages with direct dependencies on python (depth 1 implied)
+qp w depends=python
+
+# show packages that indirectly depend on openssl at depth 2
+qp w depends=openssl@2
+```
+
+**note:** depth querying works with all relation fields: `depends`, `optdepends`, `required-by`, `optional-for`, `provides`, `conflicts`, and `replaces`.
+
 #### built-in macros
 
 some frequently-used query patterns are available as built-in macros for convenience.
@@ -413,11 +444,21 @@ some frequently-used query patterns are available as built-in macros for conveni
   qp where no:required-by and reason=dependency and no:optional-for
   ```
 
+* `heavy` - matches packages 100MB and larger
+  ```
+  qp w superorphan
+  ```
+
+  is equivalent to:
+  ```
+  qp where size=100MB:
+  ```
+
 these macros can be combined with other queries as usual:
 
 ```
 qp w orphan and size=100KB:
-qp w superorphan and not name=gtk
+qp w not superorphan and not name=gtk
 ```
 
 #### query examples

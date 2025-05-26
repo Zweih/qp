@@ -2,10 +2,11 @@ package display
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"qp/internal/consts"
 	"qp/internal/pkgdata"
+
+	json "github.com/goccy/go-json"
 )
 
 type PkgInfoJSON struct {

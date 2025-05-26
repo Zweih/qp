@@ -20,14 +20,13 @@ Commands:
                                 - Supports: field=value, field==value
                                 - Range: date=2024-01-01:2024-01-10
                                 - Existence: has:depends, no:conflicts
-                                - You can use multiple where clauses
+                                - Depth: depends=package@2, required-by=pkg@3
 
   order <field>:<dir> | o <..>  Sort by field in asc/desc order
-                                - Fields: date, build-date, name, size, license, pkgbase
 
   limit <num> | l <num>         Limit number of results (default: 20)
                                 - Use 'limit all' to show everything
-                                - Use end:<num> / mid:<num> modifier to display from
+                                - Use end:<num> / mid:<num> prefix to display from
                                     different parts of the output
 Options:
 `
@@ -50,6 +49,13 @@ Query Types:
       has:field         -> field must exist or be non-empty
       no:field          -> field must not exist or be empty
 
+  - Depth querying (relation fields):
+      field=value@1     -> direct relations (default)
+      field=value@2     -> second-level relations
+      field=value@3     -> third-level relations, etc.
+        Note: optdepends and optional-for include hard dependencies
+              after depth 1
+
   - Logical operators
       and   -> both must match
       or    -> either can match
@@ -65,6 +71,7 @@ Query Types:
     qp w name=gtk or name=qt
     qp w not name==vim
     qp w reason=explicit and size=50MB:
+    qp w depends=python@2
     qp w q name=vim or name=emacs p and not has:depends
 
 Match Behavior:
@@ -82,9 +89,10 @@ Short Command Examples:
   qp w reason=explicit and size=50MB:
   qp w q size=10MB:1GB or size==20MB p and not has:depends
 
-Build-in Macros:
+Built-in Macros:
   - 'qp w orphan' is equivalent to 'qp where no:required-by and reason=dependency'
   - 'qp w superorphan' is equivalent to 'qp where no:required-by and reason=dependency and no:optional-for'
+  - 'qp w heavy' is equivalent to 'qp where size=100MB:'
 
 Tips:
   - Queries can include comma-separated values, these act a shorthand for 'or' logic:
@@ -98,15 +106,15 @@ Tips:
       qp --no-headers select name,size
 
   - JSON output:
-      qp select name,version,size --output=json
+      qp select name,version,size --output json
 
   - Key-Value output (ideal for selecting all fields):
-     qp s all --output=kv
+     qp s all --output kv
 
   - Quote arguments with spaces or special characters:
       qp where description="for tree-sitter"
 
-  - To group conditions, use q and p (like brackets):
+  - To group conditions, use q and p as grouping parentheses:
     qp where q name=curl or name=openssl and no:depends
       -> matches packages named curl or openssl but only if they have no dependencies
 
@@ -117,7 +125,7 @@ Default Behavior:
 Use 'man qp' to see all available fields
     for select, where, and order.
 
-See full docs for:
+See full docs at https://github.com/Zweih/qp for:
   - Available fields
   - Query examples
   - JSON schema
