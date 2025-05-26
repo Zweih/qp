@@ -3,8 +3,7 @@ module qp
 go 1.24.1
 
 require (
-	github.com/Zweih/go-rpmdb v0.1.3
-	github.com/glebarez/go-sqlite v1.22.0
+	github.com/Zweih/go-rpmdb v0.1.5
 	github.com/glebarez/sqlite v1.11.0
 	github.com/goccy/go-json v0.10.5
 	github.com/spf13/pflag v1.0.5
@@ -14,6 +13,7 @@ require (
 
 require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
+	github.com/glebarez/go-sqlite v1.22.0 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/google/uuid v1.5.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect

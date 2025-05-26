@@ -49,20 +49,14 @@ func (o *OrExpr) Evaluate(installedMap map[string]*pkgdata.PkgInfo) []pkgdata.Re
 	var result []pkgdata.Relation
 	result = append(result, o.Left.Evaluate(installedMap)...)
 	result = append(result, o.Right.Evaluate(installedMap)...)
+
 	return result
 }
 
 func (cond *CondExpr) Evaluate(installedMap map[string]*pkgdata.PkgInfo) []pkgdata.Relation {
 	conditionMet := cond.evaluateCond(installedMap)
-
-	if cond.IsUnless {
-		if !conditionMet {
-			return cond.MainExpr.Evaluate(installedMap)
-		}
-	} else {
-		if conditionMet {
-			return cond.MainExpr.Evaluate(installedMap)
-		}
+	if (cond.IsUnless && !conditionMet) || (!cond.IsUnless && conditionMet) {
+		return cond.MainExpr.Evaluate(installedMap)
 	}
 
 	return nil
@@ -76,10 +70,8 @@ func (cond *CondExpr) evaluateCond(installedMap map[string]*pkgdata.PkgInfo) boo
 			continue
 		}
 
-		if rel.Version != "" {
-			if !versionSatisfies(installedPkg.Version, rel.Operator, rel.Version) {
-				continue
-			}
+		if rel.Version != "" && !isValidVersion(installedPkg.Version, rel.Version, rel.Operator) {
+			continue
 		}
 
 		return true
@@ -88,10 +80,10 @@ func (cond *CondExpr) evaluateCond(installedMap map[string]*pkgdata.PkgInfo) boo
 	return false
 }
 
-func versionSatisfies(
+func isValidVersion(
 	installedVersion string,
-	operator pkgdata.RelationOp,
 	requiredVersion string,
+	operator pkgdata.RelationOp,
 ) bool {
 	comparison := compareVersions(installedVersion, requiredVersion)
 
