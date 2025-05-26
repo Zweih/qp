@@ -64,7 +64,7 @@ func fetchPackages(venvRoot string, origin string) ([]*pkgdata.PkgInfo, error) {
 				return nil, fmt.Errorf("metadata parsing failed for %s: %v", metadataPath, err)
 			}
 
-			pkg.InstallTimestamp = dirInfo.ModTime().Unix()
+			pkg.UpdateTimestamp = dirInfo.ModTime().Unix()
 			pkg.Origin = origin
 			pkg.Reason = consts.ReasonExplicit
 

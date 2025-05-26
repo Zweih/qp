@@ -10,7 +10,7 @@ import (
 func getInstallTime(pkg *pkgdata.PkgInfo) error {
 	installDate, buildDate, ok := getModTime(pkg.Name)
 	if ok {
-		pkg.InstallTimestamp = installDate
+		pkg.UpdateTimestamp = installDate
 		pkg.BuildTimestamp = buildDate
 		return nil
 	}
@@ -19,7 +19,7 @@ func getInstallTime(pkg *pkgdata.PkgInfo) error {
 
 	installDate, buildDate, ok = getModTime(pkg.Name + suffix)
 	if ok {
-		pkg.InstallTimestamp = installDate
+		pkg.UpdateTimestamp = installDate
 		pkg.BuildTimestamp = buildDate
 		return nil
 	}

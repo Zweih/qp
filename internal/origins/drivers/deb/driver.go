@@ -50,7 +50,7 @@ func (d *DebDriver) ResolveDeps(pkgs []*pkgdata.PkgInfo) ([]*pkgdata.PkgInfo, er
 		_, hasReason := d.reasonMap[pkg.Name]
 
 		if !hasReason && pkg.Reason == consts.ReasonExplicit && len(pkg.RequiredBy) > 0 {
-			if isFile && modTime > pkg.InstallTimestamp {
+			if isFile && modTime > pkg.UpdateTimestamp {
 				pkg.Reason = consts.ReasonDependency
 			}
 		}

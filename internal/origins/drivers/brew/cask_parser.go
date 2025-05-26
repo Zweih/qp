@@ -52,13 +52,13 @@ func parseCaskReceipt(name string, path string) (*pkgdata.PkgInfo, error) {
 	caskRels := parseCaskDeps(typeCask, receipt.RuntimeDependencies[typeCask])
 
 	pkg := &pkgdata.PkgInfo{
-		Name:             name,
-		Version:          receipt.Source.Version,
-		InstallTimestamp: receipt.Time,
-		Arch:             receipt.Arch,
-		Depends:          append(formulaRels, caskRels...),
-		Reason:           reason,
-		PkgType:          typeCask,
+		Name:            name,
+		Version:         receipt.Source.Version,
+		UpdateTimestamp: receipt.Time,
+		Arch:            receipt.Arch,
+		Depends:         append(formulaRels, caskRels...),
+		Reason:          reason,
+		PkgType:         typeCask,
 	}
 
 	return pkg, nil

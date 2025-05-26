@@ -163,7 +163,7 @@ func applyIntField(pkg *pkgdata.PkgInfo, field string, value string) error {
 
 	switch field {
 	case fieldInstallDate:
-		pkg.InstallTimestamp = parsedValue
+		pkg.UpdateTimestamp = parsedValue
 	case fieldBuildDate:
 		pkg.BuildTimestamp = parsedValue
 	case fieldSize:

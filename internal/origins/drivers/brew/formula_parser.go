@@ -50,13 +50,13 @@ func parseFormulaReceipt(iPkg *installedPkg) (*pkgdata.PkgInfo, error) {
 	}
 
 	pkg := &pkgdata.PkgInfo{
-		InstallTimestamp: receipt.Time,
-		Name:             iPkg.Name,
-		Reason:           reason,
-		Version:          iPkg.Version,
-		Arch:             receipt.Arch,
-		PkgType:          typeFormula,
-		Depends:          parseDepends(receipt),
+		UpdateTimestamp: receipt.Time,
+		Name:            iPkg.Name,
+		Reason:          reason,
+		Version:         iPkg.Version,
+		Arch:            receipt.Arch,
+		PkgType:         typeFormula,
+		Depends:         parseDepends(receipt),
 	}
 
 	if iPkg.IsTap {

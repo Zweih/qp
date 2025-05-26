@@ -18,7 +18,7 @@ Commands:
 
   where <query> | w <query>     Refine package results using one or more queries
                                 - Supports: field=value, field==value
-                                - Range: date=2024-01-01:2024-01-10
+                                - Range: updated=2024-01-01:2024-01-10
                                 - Existence: has:depends, no:conflicts
                                 - Depth: depends=package@2, required-by=pkg@3
 
@@ -37,13 +37,13 @@ Query Types:
       field=value       -> fuzzy match (e.g., name=gtk)
       field==value      -> exact match (e.g., name==bash)
 
-  - Range match (date, size):
+  - Range match (dates, sizes):
       field=start:end   -> fuzzy match
       field==start:end  -> exact match
       Examples:
         size=10MB:1GB
-        date==2024-01-01
-        date=2024-01-01: (open-ended range)
+        updated==2024-01-01
+        updated=2024-01-01: (open-ended range)
 
   - Existence check:
       has:field         -> field must exist or be non-empty
@@ -83,7 +83,7 @@ Match Behavior:
              strict = exact byte size
 
 Short Command Examples:
-  qp s name,size w name=vim o date:asc l 10
+  qp s name,size w name=vim o updated:asc l 10
   qp where name=gtk
   qp w name==bash
   qp w reason=explicit and size=50MB:

@@ -32,7 +32,7 @@ func makeComparator[T ordered](
 
 func GetComparator(field consts.FieldType, asc bool) (PkgComparator, error) {
 	switch field {
-	case consts.FieldDate, consts.FieldBuildDate, consts.FieldSize:
+	case consts.FieldUpdated, consts.FieldBuilt, consts.FieldSize:
 		return makeComparator(func(p *PkgInfo) int64 { return p.GetInt(field) }, asc), nil
 
 	case consts.FieldName, consts.FieldReason, consts.FieldVersion,

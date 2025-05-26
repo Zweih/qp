@@ -22,7 +22,7 @@ func QueriesToConditions(queries []query.FieldQuery) ([]*FilterCondition, error)
 		var err error
 
 		switch query.Field {
-		case consts.FieldDate, consts.FieldBuildDate, consts.FieldSize:
+		case consts.FieldUpdated, consts.FieldBuilt, consts.FieldSize:
 			condition, err = parseRangeCondition(query)
 
 		case consts.FieldName, consts.FieldReason, consts.FieldVersion,
@@ -111,7 +111,7 @@ func parseRangeCondition(query query.FieldQuery) (*FilterCondition, error) {
 	var validator func(RangeSelector) error
 
 	switch query.Field {
-	case consts.FieldDate, consts.FieldBuildDate:
+	case consts.FieldUpdated, consts.FieldBuilt:
 		parser = parseDateFilter
 		validator = validateDateFilter
 	case consts.FieldSize:

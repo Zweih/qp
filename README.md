@@ -68,7 +68,7 @@ more ecosystems are added every week!
 * query packages using an expressive query language
   * supports full boolean logic (`and`, `or`, `not`, grouping)
   * supports fuzzy and strict matching
-  * supports range queries for `size`, `date`, and `build-date`
+  * supports range queries for `size`, `updated`, and `built`
   * supports presence/absence checks (`has:`, `no:`)
   * learn more about querying [here](#querying-with-where)
 * sort results by any field
@@ -79,7 +79,7 @@ more ecosystems are added every week!
 * query by:
   * name, version, origin, architecture, license
   * size on disk
-  * install or build date
+  * update or build time/date
   * package base or groups
   * dependencies, optional dependencies, reverse dependencies
   * package provisions, conflicts, replacements
@@ -266,16 +266,9 @@ qp [command] [args] [options]
   - use `select all,version` to list default fields + version
   - [see fields available for selection](#available-fields)
 - `where <query>` | `w <query>`: apply one or more queries to refine package results.
-  - supported query types:
-    - **string match** -> `field=value` (fuzzy) or `field==value` (strict)
-    - **range match** -> `field=start:end` (fuzzy) or `field==start:end` (strict)
-        - supports full ranges (`start:end`), open-ended ranges (`start:` or `:end`), and exact values (`value`)
-        - works with `date` and `size`
-    - **existence check** -> `has:field` or `no:field`
-  - use `and`, `or`, `not`, `q ... p` to build complex filters
   - learn more about querying [here](#querying-with-where)
 - `order <field>:<direction>` | `o <field>:<direction>`: sort results ascending or descending
-  - default sort is `date:asc`
+  - default sort is `updated:asc`
 - `limit <number>` | `l <number>`: limit the amount of packages to display (default: 20)
   - `limit all` | `l all`: display all packages
   - `limit end:<number>`: display last `n` packages
@@ -284,7 +277,7 @@ qp [command] [args] [options]
 ### options
 
 - `--no-headers`: omit column headers in table output (useful for scripting)
-- `--full-timestamp`: display the full timestamp (date and time) of package install/build instead of just the date
+- `--full-timestamp`: display the full timestamp (date and time) of package update/build instead of just the date
 - `--output`: format output as `table`, `kv` (key-value), `json` (default:`table`)
 - `--no-progress`: force no progress bar outside of non-interactive environments
 - `--no-cache`: disable cache loading/saving and force fresh package data loading
@@ -293,8 +286,8 @@ qp [command] [args] [options]
 
 ### available fields
 
-- `date` - installation date of the package
-- `build-date` - date the package was built
+- `updated` - when the package was last updated
+- `built` - when the package was built
 - `size` - package size on disk
 - `name` - package name
 - `reason` - installation reason (explicit/dependency)
@@ -372,7 +365,7 @@ each `where` query supports one of the following:
 - **range match**
   - `field=start:end` -> fuzzy match
   - `field==start:end` -> strict match
-  - works with `date` and `size`
+  - works with `updated`, `built`, and `size`
   - supports:
     - full ranges: `start:end`
     - open-ended ranges: `start:` or `:end`
@@ -471,7 +464,7 @@ qp w not superorphan and not name=gtk
 qp w name==bash and has:depends
 qp where size=100MB:2GB
 qp w name=python,cmake,yazi
-qp w date==2024-01-01
+qp w updated==2024-01-01
 qp where q name=vim or name=nvim p and not has:conflicts
 qp w not arch=x86_64
 qp w q has:depends or has:required-by p and not reason=explicit
@@ -489,8 +482,8 @@ qp w q has:depends or has:required-by p and not reason=explicit
 
 | field name | field type |
 |------------|------------|
-| date | range |
-| build-date | range |
+| updated | range |
+| built | range |
 | size | range |
 | name | string |
 | reason | string |
@@ -614,7 +607,7 @@ output format:
 - multiple short commands are supported using space separation (e.g. `s`, `w`, `l`, `o`), but **cannot** be combined as `swo` or `-swo`. use them like this:
   ```
   qp w name yay
-  qp s name,size w name=vim o date:asc l 10 # full query with shorthand
+  qp s name,size w name=vim o updated:asc l 10 # full query with shorthand
   ```
 
 - group queries with `q ... p` to clarify order of operations:
@@ -630,8 +623,8 @@ output format:
 
 - options that take arguments can be used in the `--<option>=<value>` form:
   ```
-  qp select name,date --limit=100
-  qp s name,date o name
+  qp select name,updated --limit=100
+  qp s name,updated o name
   ```
 
   boolean flags can be explicitly set using `--<option>=true` or `--<option>=false`:
@@ -664,9 +657,9 @@ output format:
    qp where reason=explicit limit all
    ```
 
- 3. show only dependencies installed on a specific date  
+ 3. show only dependencies updated on a specific date  
    ```
-   qp where reason=dependency and date=2025-03-01
+   qp where reason=dependency and update=2025-03-01
    ```
 
  4. show all packages sorted alphabetically by name
@@ -681,7 +674,7 @@ output format:
 
  6. show packages installed between January 1, 2025, and January 5, 2025  
    ```
-   qp where date=2025-01-01:2025-01-05
+   qp where updated=2025-01-01:2025-01-05
    ```
 
  7. sort all packages by their license, displaying name and license  
@@ -696,12 +689,12 @@ output format:
 
  9. show packages between 100MB and 1GB installed up to February 27, 2025
    ```
-   qp where size=100MB:1GB and date=:2025-02-27
+   qp where size=100MB:1GB and updated=:2025-02-27
    ```
 
 10. show all packages sorted by size in descending order, installed after January 1, 2025
    ```
-   qp where date=2025-01-01: order size:desc limit all
+   qp where updated=2025-01-01: order size:desc limit all
    ```
 
 11. search for installed packages containing "python"  
@@ -716,12 +709,12 @@ output format:
 
 13. search for packages with names containing "linux" installed between January 1 and March 30, 2025
    ```
-   qp where name=linux and date=2025-01-01:2025-03-30
+   qp where name=linux and updated=2025-01-01:2025-03-30
    ```
 
 14. search for packages containing "gtk" installed after January 1, 2025, and at least 5MB in size
    ```
-   qp where name=gtk and date=2025-01-01: and size=5MB:
+   qp where name=gtk and updated=2025-01-01: and size=5MB:
    ```
 
 15. show packages with name, version, and size
@@ -781,7 +774,7 @@ output format:
 
 26. show packages required by `vlc` and installed after January 1, 2025
    ```
-   qp where required-by=vlc and date=2025-01-01:
+   qp where required-by=vlc and updated=2025-01-01:
    ```
 
 27. show all packages that have `glibc` as a dependency and are required by `ffmpeg`

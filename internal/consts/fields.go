@@ -17,8 +17,8 @@ const (
 	FieldUrl
 	FieldGroups
 	FieldSize
-	FieldDate
-	FieldBuildDate
+	FieldUpdated
+	FieldBuilt
 	FieldVersion
 	FieldDepends
 	FieldOptDepends
@@ -30,8 +30,8 @@ const (
 )
 
 const (
-	date        = "date"
-	buildDate   = "build-date"
+	updated     = "updated"
+	built       = "built"
 	size        = "size"
 	name        = "name"
 	reason      = "reason"
@@ -56,7 +56,7 @@ const (
 )
 
 var FieldTypeLookup = map[string]FieldType{
-	"d":    FieldDate,
+	"u":    FieldUpdated,
 	"n":    FieldName,
 	"r":    FieldReason,
 	"s":    FieldSize,
@@ -64,13 +64,15 @@ var FieldTypeLookup = map[string]FieldType{
 	"D":    FieldDepends,
 	"R":    FieldRequiredBy,
 	"p":    FieldProvides,
-	"bd":   FieldBuildDate,
+	"bd":   FieldBuilt,
 	"type": FieldPkgType,
 
-	"alphabetical": FieldName, // legacy flag, to be deprecated
+	"date":         FieldUpdated, // legacy field
+	"build-date":   FieldBuilt,   // legacy field
+	"alphabetical": FieldName,    // legacy flag, to be deprecated
 
-	date:        FieldDate,
-	buildDate:   FieldBuildDate,
+	updated:     FieldUpdated,
+	built:       FieldBuilt,
 	size:        FieldSize,
 	name:        FieldName,
 	reason:      FieldReason,
@@ -95,8 +97,8 @@ var FieldTypeLookup = map[string]FieldType{
 }
 
 var FieldNameLookup = map[FieldType]string{
-	FieldDate:        date,
-	FieldBuildDate:   buildDate,
+	FieldUpdated:     updated,
+	FieldBuilt:       built,
 	FieldSize:        size,
 	FieldName:        name,
 	FieldReason:      reason,
@@ -122,15 +124,15 @@ var FieldNameLookup = map[FieldType]string{
 
 var (
 	DefaultFields = []FieldType{
-		FieldDate,
+		FieldUpdated,
 		FieldName,
 		FieldReason,
 		FieldSize,
 	}
 	// note: this is also the order the columns will be displayed in table output
 	ValidFields = []FieldType{
-		FieldDate,
-		FieldBuildDate,
+		FieldUpdated,
+		FieldBuilt,
 		FieldSize,
 		FieldName,
 		FieldReason,
@@ -180,7 +182,7 @@ var RelationFields = map[FieldType]struct{}{
 }
 
 var RangeFields = map[FieldType]struct{}{
-	FieldDate:      {},
-	FieldBuildDate: {},
-	FieldSize:      {},
+	FieldUpdated: {},
+	FieldBuilt:   {},
+	FieldSize:    {},
 }
