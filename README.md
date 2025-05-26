@@ -35,6 +35,8 @@ this package is compatible with the following platforms and distributions:
  - [macOS](https://www.apple.com/macos/)
  - [debian](https://debian.org)
  - [steamOS](https://store.steampowered.com/steamos)
+ - [red hat enterprise linux (RHEL)](https://www.redhat.com/en/technologies/linux-platforms/enterprise-linux)
+ - [fedora](https://fedoraproject.org/)
  - [linux mint](https://linuxmint.com)
  - [manjaro](https://manjaro.org/)
  - [ubuntu](https://ubuntu.com)
@@ -46,13 +48,13 @@ this package is compatible with the following platforms and distributions:
  - [mabox linux](https://maboxlinux.org/)
  - [zorin OS](https://zorin.com/os/)
  - [elementary OS](https://elementary.io/)
- - the 50 other arch and debian-based distros, as long as they have `pacman`, `apt`, `brew`,`dpkg`, or `opkg` installed
+ - the 50 other arch and debian-based distros, as long as they have `apt`/`dpkg`, `brew`, `pacman`, `dnf`/`yum`, or `opkg` installed
 
 `qp` also detects and queries application-specific package managers like `pipx` for isolated python applications, expanding package discovery beyond traditional system package management.
 
 `qp` supports embedded linux systems, including meta-distributions like [yocto](https://www.yoctoproject.org/) that use `opkg` (`.ipk` packages) or `apt`/`dpkg` (`.deb` packages). `rpm` support is currently on the way! 
 
-more distros and non-unix platforms are planned!
+more ecosystems are added every week!
 
 ## features
 
@@ -173,9 +175,10 @@ learn about installation [here](#installation)
 | ✓ | bottles in brew | ✓ | casks in brew |
 | - | replaced-by resolution | - | multi-license support |
 | – | short-args for queries | ✓ | key/value output |
-| - | rpm origin (dnf/yum support) | ✓ | homebrew packaging |
+| ✓ | rpm origin (dnf/yum support) | ✓ | homebrew packaging |
 | ✓ | pipx origin (python global packages) | - | formulae from taps (brew) |
 | - | casks from taps (brew) | - | dependencies for casks |
+| - | rpm packaging | - | zypper (openSUSE support) |
 
 ## installation
 
@@ -322,15 +325,16 @@ the `pkgtype` field indicates the type or category of package within each ecosys
 |--------|------------------------|-------------|
 | pacman | `pkg`, `split`, `debug`, `src` | package build type |
 | brew | `formula`, `cask` | formulae are command-line tools, casks are GUI applications |
-| deb | none | debian packages do not have a pkgtype classification |
-| opkg | none | openwrt packages do not have a pkgtype classification |
-| pipx | none | pipx packages do not have a pkgtype classification |
+| deb | none | - |
+| rpm | none | - |
+| opkg | none | - |
+| pipx | none | - |
 
 **notes:**
 - pacman's pkgtype comes from the package's XDATA field introduced in newer pacman versions
     - older packages may not have this field populated
 - brew distinguishes between formulae (CLI tools/libraries) and casks (GUI applications)
-- deb, opkg, and pipx origins do not implement package type classifications and will show empty pkgtype values
+- deb, rpm, opkg, and pipx origins do not implement package type classifications and will show empty pkgtype values
 
 ### querying with `where`
 
