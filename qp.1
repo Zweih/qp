@@ -8,7 +8,7 @@ qp \- query packages. A CLI utility for querying installed packages across multi
 
 .SH DESCRIPTION
 .B qp
-is a fast, flexible, and standalone CLI utility for querying installed packages across multiple package ecosystems and operating systems. It supports Arch Linux (pacman), Debian/Ubuntu (apt/dpkg), Homebrew (brew), OpenWrt (opkg), and application ecosystems like pipx. Features include:
+is a fast, flexible, and standalone CLI utility for querying installed packages across multiple package ecosystems and operating systems. It supports Arch Linux (pacman), Debian/Ubuntu (apt/dpkg), Homebrew (brew), OpenWrt (opkg), Fedora/RHEL (dnf/yum), and application ecosystems like pipx. Features include:
 
 - Cross-platform package discovery
 - Advanced querying with boolean logic
@@ -39,8 +39,8 @@ Apply one or more queries. Supported:
 .IP \[bu] 
 String match — \fIfield=value\fR (fuzzy), \fIfield==value\fR (strict)
 .IP \[bu] 
-Range match — \fIfield=start:end\fR or \fIfield==start:end\fR (works with \fBdate\fR, \fBsize\fR)
-.IP \[bu] 
+Range match — \fIfield=start:end\fR or \fIfield==start:end\fR (works with \fBdates\fR and \fBsizes\fR)
+.IP \[bu]
 Existence check — \fBhas:field\fR or \fBno:field\fR
 .IP \[bu]
 Depth querying — \fIfield=value@depth\fR (for relation fields)
@@ -90,7 +90,7 @@ Use \fBwhere\fR (or \fBw\fR) one or more times to filter results.
 .B Range Match
 \fIfield=start:end\fR — fuzzy  
 \fIfield==start:end\fR — strict  
-Applies to \fBdate\fR and \fBsize\fR.  
+Applies to \fBdates\fR and \fBsizes\fR.
 Supports full (e.g., 1GB:5GB), open-ended (e.g., 1GB:, :5GB), or exact values.
 
 .TP
@@ -179,18 +179,21 @@ Arch Linux and derivatives (Manjaro, EndeavourOS, etc.)
 Debian, Ubuntu, and derivatives (Mint, Pop!_OS, etc.) via apt/dpkg
 .TP
 .B brew
-Homebrew on macOS and Linux (formulae and casks)
+Homebrew on macOS and Linux (formulae and casks) via brew
+.TP
+.B rpm
+Fedora and RHEL via dnf/yum
 .TP
 .B opkg
-OpenWrt and embedded systems using ipkg packages
+OpenWrt and embedded systems using ipkg packages via opkg
 .TP
 .B pipx
-Python applications installed in isolated environments
+Python applications installed in isolated environments via pipx
 
 .SH SUPPORTED QUERY FIELDS
 .TP
 .B Range:
-date, build-date, size
+updated, built, size
 .TP
 .B String:
 name, reason, version, origin, arch, license, pkgbase, description, url, groups, validation, pkgtype, packager
@@ -201,7 +204,7 @@ conflicts, replaces, depends, optdepends, required-by, optional-for, provides
 .SH AVAILABLE FIELDS
 Available for use with \fBselect\fR, \fBorder\fR, and \fBwhere\fR:
 
-date, build-date, size, name, reason, version, origin, arch, license, 
+updated, built, size, name, reason, version, origin, arch, license,
 description, url, validation, pkgbase, pkgtype, packager, groups, conflicts,
 replaces, depends, optdepends, required-by, optional-for, provides
 
