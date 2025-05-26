@@ -1,9 +1,5 @@
-github.com/Zweih/go-rpmdb v0.0.0-20250525184934-9e773c267c64 h1:8FEwf77L4GTqfRjYMtVVybO4mzB60JySKtxNRElcH+o=
-github.com/Zweih/go-rpmdb v0.0.0-20250525184934-9e773c267c64/go.mod h1:khf3UrwNPly5A9WbP0ssGs/z919WKNQiS+KfRhTEHsU=
-github.com/Zweih/go-rpmdb v0.0.0-20250525223229-b48b5e89db3b h1:kP6GKI+WJbUhp4cCCgwuj05nEOfBfuXwFq8Ma6JyvQk=
-github.com/Zweih/go-rpmdb v0.0.0-20250525223229-b48b5e89db3b/go.mod h1:khf3UrwNPly5A9WbP0ssGs/z919WKNQiS+KfRhTEHsU=
-github.com/Zweih/go-rpmdb v0.0.0-20250525233405-90d720e89a13 h1:lFuUuChshbT64v7XJbvKZLQ7o0Er9kzQBU8RZT6EVC0=
-github.com/Zweih/go-rpmdb v0.0.0-20250525233405-90d720e89a13/go.mod h1:khf3UrwNPly5A9WbP0ssGs/z919WKNQiS+KfRhTEHsU=
+github.com/Zweih/go-rpmdb v0.1.2 h1:U6btqhRX2ysqf5kkPuC21TUp3hm2VWB4dzy5rnKvO4I=
+github.com/Zweih/go-rpmdb v0.1.2/go.mod h1:khf3UrwNPly5A9WbP0ssGs/z919WKNQiS+KfRhTEHsU=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/dustin/go-humanize v1.0.1 h1:GzkhY7T5VNhEkwH0PVJgjz+fX1rhBrR7pRT3mDkpeCY=
