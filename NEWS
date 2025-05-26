@@ -1,4 +1,11 @@
 # qp Release Notes
+## v5.58.0
+### What's Changed
+* Feature: Add heavy macro by @Zweih in https://github.com/Zweih/qp/pull/345
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.57.0...v5.58.0
+
+
 ## v5.57.0
 ### What's Changed
 * Documentation: Update readme by @Zweih in https://github.com/Zweih/qp/pull/343
