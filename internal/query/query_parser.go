@@ -76,7 +76,7 @@ func ParseQueryInput(input string) (
 
 	target := strings.TrimSpace(input[opEnd:])
 
-	if _, exists := consts.RelationFields[field]; exists {
+	if consts.GetFieldPrim(field) == consts.FieldPrimRel {
 		target, depth = extractDepth(target)
 	}
 

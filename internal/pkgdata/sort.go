@@ -31,27 +31,21 @@ func makeComparator[T ordered](
 }
 
 func GetComparator(field consts.FieldType, asc bool) (PkgComparator, error) {
-	switch field {
-	case consts.FieldUpdated, consts.FieldBuilt, consts.FieldSize:
+	switch consts.GetFieldPrim(field) {
+	case consts.FieldPrimDate, consts.FieldPrimSize:
 		return makeComparator(func(p *PkgInfo) int64 { return p.GetInt(field) }, asc), nil
 
-	case consts.FieldName, consts.FieldReason, consts.FieldVersion,
-		consts.FieldArch, consts.FieldLicense, consts.FieldDescription,
-		consts.FieldUrl, consts.FieldValidation, consts.FieldPkgType,
-		consts.FieldPkgBase, consts.FieldPackager, consts.FieldOrigin:
+	case consts.FieldPrimStr:
 		return makeComparator(func(p *PkgInfo) string {
 			return strings.ToLower(p.GetString(field))
 		}, asc), nil
 
-	case consts.FieldGroups:
+	case consts.FieldPrimStrArr:
 		return makeComparator(func(p *PkgInfo) int {
 			return len(p.GetStrArr(field))
 		}, asc), nil
 
-	case consts.FieldConflicts, consts.FieldReplaces,
-		consts.FieldDepends, consts.FieldOptDepends,
-		consts.FieldRequiredBy, consts.FieldOptionalFor,
-		consts.FieldProvides:
+	case consts.FieldPrimRel:
 		return makeComparator(func(p *PkgInfo) int {
 			return len(GetRelationsByDepth(p.GetRelations(field), 1))
 		}, asc), nil

@@ -17,6 +17,7 @@ const (
 	FieldUrl
 	FieldGroups
 	FieldSize
+	FieldInstalled
 	FieldUpdated
 	FieldBuilt
 	FieldVersion
@@ -29,7 +30,45 @@ const (
 	FieldReplaces
 )
 
+type FieldPrim int32
+
 const (
+	FieldPrimDate = iota
+	FieldPrimSize
+	FieldPrimStr
+	FieldPrimStrArr
+	FieldPrimRel
+)
+
+func GetFieldPrim(field FieldType) FieldPrim {
+	switch field {
+	case FieldUpdated, FieldBuilt, FieldInstalled:
+		return FieldPrimDate
+
+	case FieldSize:
+		return FieldPrimSize
+
+	case FieldName, FieldReason, FieldVersion,
+		FieldOrigin, FieldArch, FieldLicense,
+		FieldUrl, FieldDescription, FieldValidation,
+		FieldPkgType, FieldPkgBase, FieldPackager:
+		return FieldPrimStr
+
+	case FieldGroups:
+		return FieldPrimStrArr
+
+	case FieldConflicts, FieldReplaces, FieldDepends,
+		FieldOptDepends, FieldRequiredBy, FieldOptionalFor,
+		FieldProvides:
+		return FieldPrimRel
+
+	default:
+		panic("invalid field passed to GetFieldPrim")
+	}
+}
+
+const (
+	installed   = "installed"
 	updated     = "updated"
 	built       = "built"
 	size        = "size"
@@ -67,10 +106,11 @@ var FieldTypeLookup = map[string]FieldType{
 	"bd":   FieldBuilt,
 	"type": FieldPkgType,
 
-	"date":         FieldUpdated, // legacy field
-	"build-date":   FieldBuilt,   // legacy field
-	"alphabetical": FieldName,    // legacy flag, to be deprecated
+	"date":         FieldInstalled, // legacy field
+	"build-date":   FieldBuilt,     // legacy field
+	"alphabetical": FieldName,      // legacy flag, to be deprecated
 
+	installed:   FieldInstalled,
 	updated:     FieldUpdated,
 	built:       FieldBuilt,
 	size:        FieldSize,
@@ -97,6 +137,7 @@ var FieldTypeLookup = map[string]FieldType{
 }
 
 var FieldNameLookup = map[FieldType]string{
+	FieldInstalled:   installed,
 	FieldUpdated:     updated,
 	FieldBuilt:       built,
 	FieldSize:        size,
@@ -156,33 +197,3 @@ var (
 		FieldProvides,
 	}
 )
-
-var StringFields = map[FieldType]struct{}{
-	FieldName:        {},
-	FieldReason:      {},
-	FieldVersion:     {},
-	FieldArch:        {},
-	FieldLicense:     {},
-	FieldDescription: {},
-	FieldUrl:         {},
-	FieldValidation:  {},
-	FieldPkgType:     {},
-	FieldPkgBase:     {},
-	FieldPackager:    {},
-}
-
-var RelationFields = map[FieldType]struct{}{
-	FieldDepends:     {},
-	FieldOptDepends:  {},
-	FieldRequiredBy:  {},
-	FieldOptionalFor: {},
-	FieldProvides:    {},
-	FieldConflicts:   {},
-	FieldReplaces:    {},
-}
-
-var RangeFields = map[FieldType]struct{}{
-	FieldUpdated: {},
-	FieldBuilt:   {},
-	FieldSize:    {},
-}

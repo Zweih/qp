@@ -14,6 +14,7 @@ type tableContext struct {
 }
 
 var columnHeaders = map[consts.FieldType]string{
+	consts.FieldInstalled:   "INSTALLED",
 	consts.FieldUpdated:     "UPDATED",
 	consts.FieldBuilt:       "BUILT",
 	consts.FieldName:        "NAME",
@@ -99,25 +100,20 @@ func renderRows(
 }
 
 func getTableValue(pkg *pkgdata.PkgInfo, field consts.FieldType, ctx tableContext) string {
-	switch field {
-	case consts.FieldUpdated, consts.FieldBuilt:
+	switch consts.GetFieldPrim(field) {
+	case consts.FieldPrimDate:
 		return formatDate(pkg.GetInt(field), ctx)
 
-	case consts.FieldSize:
+	case consts.FieldPrimSize:
 		return formatSize(pkg.GetInt(field))
 
-	case consts.FieldName, consts.FieldReason, consts.FieldVersion,
-		consts.FieldOrigin, consts.FieldArch, consts.FieldLicense,
-		consts.FieldUrl, consts.FieldDescription, consts.FieldValidation,
-		consts.FieldPkgType, consts.FieldPkgBase, consts.FieldPackager:
+	case consts.FieldPrimStr:
 		return pkg.GetString(field)
 
-	case consts.FieldGroups:
+	case consts.FieldPrimStrArr:
 		return strings.Join(pkg.GetStrArr(field), ", ")
 
-	case consts.FieldConflicts, consts.FieldReplaces, consts.FieldDepends,
-		consts.FieldOptDepends, consts.FieldRequiredBy, consts.FieldOptionalFor,
-		consts.FieldProvides:
+	case consts.FieldPrimRel:
 		relations := pkg.GetRelations(field)
 		return formatRelations(relations)
 	}

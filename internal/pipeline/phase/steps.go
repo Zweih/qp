@@ -90,11 +90,13 @@ func (p *Pipeline) saveCacheStep(
 	pkgs []*pkgdata.PkgInfo,
 	_ meta.ProgressReporter,
 ) ([]*pkgdata.PkgInfo, error) {
+	cacheRoot := filepath.Join(p.CachePath, p.Origin.Name())
+	pkgdata.UpdateInstallHistory(cacheRoot, pkgs)
+
 	if cfg.NoCache || p.UsedCache {
 		return pkgs, nil
 	}
 
-	cacheRoot := filepath.Join(p.CachePath, p.Origin.Name())
 	err := p.Origin.SaveCache(cacheRoot, pkgs)
 	if err != nil {
 		out.WriteLine(fmt.Sprintf("Warning: failed to save cache:", err))
