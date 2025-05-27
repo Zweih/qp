@@ -3,7 +3,7 @@ module qp
 go 1.24.1
 
 require (
-	github.com/Zweih/go-rpmdb v0.1.5
+	github.com/Zweih/go-rpmdb v0.1.6
 	github.com/glebarez/sqlite v1.11.0
 	github.com/goccy/go-json v0.10.5
 	github.com/spf13/pflag v1.0.5
@@ -21,7 +21,6 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	golang.org/x/sys v0.33.0 // indirect
-	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
 	gorm.io/gorm v1.25.7 // indirect
 	modernc.org/libc v1.37.6 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
