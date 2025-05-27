@@ -33,7 +33,7 @@ build() {
 
   sed -i -e "s/@VERSION@/${pkgver}/g" -e "s/@DATE@/${_monthYearDate}/g" "${_binaryname}.1"
 
-  go build -trimpath -ldflags="-s -w \
+  go build -trimpath -tags noextradeps -ldflags="-s -w \
   -X qp/internal/about.Version=${pkgver} \
   -X qp/internal/about.Commit=${_commit} \
   -X qp/internal/about.Date=${_fulldate}" \

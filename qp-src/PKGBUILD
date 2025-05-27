@@ -20,7 +20,7 @@ build() {
     ldflags=$(<.ldflags)
   fi
 
-  go build -trimpath -ldflags "${ldflags}" -o "${pkgname}" ./cmd/${pkgname}
+  go build -trimpath -tags=noextradeps -ldflags "${ldflags}" -o "${pkgname}" ./cmd/${pkgname}
 }
 
 package() {
