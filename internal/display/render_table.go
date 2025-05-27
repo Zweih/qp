@@ -14,8 +14,8 @@ type tableContext struct {
 }
 
 var columnHeaders = map[consts.FieldType]string{
-	consts.FieldDate:        "DATE",
-	consts.FieldBuildDate:   "BUILD DATE",
+	consts.FieldUpdated:     "UPDATED",
+	consts.FieldBuilt:       "BUILT",
 	consts.FieldName:        "NAME",
 	consts.FieldReason:      "REASON",
 	consts.FieldSize:        "SIZE",
@@ -100,7 +100,7 @@ func renderRows(
 
 func getTableValue(pkg *pkgdata.PkgInfo, field consts.FieldType, ctx tableContext) string {
 	switch field {
-	case consts.FieldDate, consts.FieldBuildDate:
+	case consts.FieldUpdated, consts.FieldBuilt:
 		return formatDate(pkg.GetInt(field), ctx)
 
 	case consts.FieldSize:

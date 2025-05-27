@@ -10,29 +10,29 @@ import (
 )
 
 type PkgInfoJSON struct {
-	InstallTimestamp int64    `json:"installTimestamp,omitempty"`
-	BuildTimestamp   int64    `json:"buildTimestamp,omitempty"`
-	Size             int64    `json:"size,omitempty"`
-	Name             string   `json:"name,omitempty"`
-	Reason           string   `json:"reason,omitempty"`
-	Version          string   `json:"version,omitempty"`
-	Origin           string   `json:"origin,omitempty"`
-	Arch             string   `json:"arch,omitempty"`
-	License          string   `json:"license,omitempty"`
-	Description      string   `json:"description,omitempty"`
-	Url              string   `json:"url,omitempty"`
-	Validation       string   `json:"validation,omitempty"`
-	PkgType          string   `json:"pkgtype,omitempty"`
-	PkgBase          string   `json:"pkgbase,omitempty"`
-	Packager         string   `json:"packager,omitempty"`
-	Groups           []string `json:"groups,omitempty"`
-	Conflicts        []string `json:"conflicts,omitempty"`
-	Replaces         []string `json:"replaces,omitempty"`
-	Depends          []string `json:"depends,omitempty"`
-	OptDepends       []string `json:"optDepends,omitempty"`
-	RequiredBy       []string `json:"requiredBy,omitempty"`
-	OptionalFor      []string `json:"optionalFor,omitempty"`
-	Provides         []string `json:"provides,omitempty"`
+	UpdateTimestamp int64    `json:"updateTimestamp,omitempty"`
+	BuildTimestamp  int64    `json:"buildTimestamp,omitempty"`
+	Size            int64    `json:"size,omitempty"`
+	Name            string   `json:"name,omitempty"`
+	Reason          string   `json:"reason,omitempty"`
+	Version         string   `json:"version,omitempty"`
+	Origin          string   `json:"origin,omitempty"`
+	Arch            string   `json:"arch,omitempty"`
+	License         string   `json:"license,omitempty"`
+	Description     string   `json:"description,omitempty"`
+	Url             string   `json:"url,omitempty"`
+	Validation      string   `json:"validation,omitempty"`
+	PkgType         string   `json:"pkgtype,omitempty"`
+	PkgBase         string   `json:"pkgbase,omitempty"`
+	Packager        string   `json:"packager,omitempty"`
+	Groups          []string `json:"groups,omitempty"`
+	Conflicts       []string `json:"conflicts,omitempty"`
+	Replaces        []string `json:"replaces,omitempty"`
+	Depends         []string `json:"depends,omitempty"`
+	OptDepends      []string `json:"optDepends,omitempty"`
+	RequiredBy      []string `json:"requiredBy,omitempty"`
+	OptionalFor     []string `json:"optionalFor,omitempty"`
+	Provides        []string `json:"provides,omitempty"`
 }
 
 func (o *OutputManager) renderJSON(pkgPtrs []*pkgdata.PkgInfo, fields []consts.FieldType) {
@@ -82,9 +82,9 @@ func getJsonValues(pkg *pkgdata.PkgInfo, fields []consts.FieldType) *PkgInfoJSON
 
 	for _, field := range fields {
 		switch field {
-		case consts.FieldDate:
-			filteredPackage.InstallTimestamp = pkg.GetInt(field)
-		case consts.FieldBuildDate:
+		case consts.FieldUpdated:
+			filteredPackage.UpdateTimestamp = pkg.GetInt(field)
+		case consts.FieldBuilt:
 			filteredPackage.BuildTimestamp = pkg.GetInt(field)
 		case consts.FieldSize:
 			filteredPackage.Size = pkg.GetInt(field)

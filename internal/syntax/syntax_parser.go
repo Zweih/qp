@@ -96,7 +96,7 @@ func ParseSyntax(args []string) (ParsedInput, error) {
 
 	if sortOption == (SortOption{}) {
 		sortOption = SortOption{
-			Field: consts.FieldDate,
+			Field: consts.FieldUpdated,
 			Asc:   true,
 		}
 	}

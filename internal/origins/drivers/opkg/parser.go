@@ -70,7 +70,7 @@ func parseStatusBlock(fields map[string]string, origin string) (*pkgdata.PkgInfo
 				continue
 			}
 
-			pkg.InstallTimestamp = time
+			pkg.UpdateTimestamp = time
 
 		case fieldPackage:
 			pkg.Name = value

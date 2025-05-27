@@ -63,7 +63,7 @@ func convertLegacyQueries(
 ) []query.FieldQuery {
 	if dateFilter != "" {
 		queries = append(queries, query.FieldQuery{
-			Field:  consts.FieldDate,
+			Field:  consts.FieldUpdated,
 			Target: dateFilter,
 			Match:  consts.MatchFuzzy,
 		})
