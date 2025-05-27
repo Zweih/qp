@@ -1,5 +1,5 @@
-github.com/Zweih/go-rpmdb v0.1.6 h1:nBbGTHKJRzcgDpigMiAAkPe8HEUmzuxMR4sESU7V+AA=
-github.com/Zweih/go-rpmdb v0.1.6/go.mod h1:0G9sGXbUaLB1IjXq7Hcedme14yVvLzM4h69XzahjK08=
+github.com/Zweih/go-rpmdb v0.1.7 h1:jopgxMGbdRxYnCCuOQ7i1qx2xqATHanbMiWODEY6Wqw=
+github.com/Zweih/go-rpmdb v0.1.7/go.mod h1:fcdtx8wlBvbzFobijOgEGDlJvVMhUvL6NJ7QzfmP9b0=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/dustin/go-humanize v1.0.1 h1:GzkhY7T5VNhEkwH0PVJgjz+fX1rhBrR7pRT3mDkpeCY=
