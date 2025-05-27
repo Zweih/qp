@@ -11,6 +11,8 @@ import (
 	"golang.org/x/term"
 )
 
+const DefaultTerminalWidth = 80
+
 type OutputManager struct {
 	mu            sync.Mutex
 	lastMsgLength int
@@ -28,7 +30,7 @@ func newOutputManager() *OutputManager {
 func getTerminalWidth() int {
 	width, _, err := term.GetSize(int(os.Stdout.Fd()))
 	if err != nil {
-		return consts.DefaultTerminalWidth // default width if unable to detect
+		return DefaultTerminalWidth // default width if unable to detect
 	}
 
 	return width
