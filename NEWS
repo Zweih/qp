@@ -1,4 +1,11 @@
 # qp Release Notes
+## v5.62.2
+### What's Changed
+* Refactor: Further reduce dependencies by @Zweih in https://github.com/Zweih/qp/pull/352
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.62.1...v5.62.2
+
+
 ## v5.62.1
 ### What's Changed
 * Refactor: Remove xerror dependency by @Zweih in https://github.com/Zweih/qp/pull/351
@@ -706,10 +713,3 @@
 * Feature: Add pkgbase sort by @Zweih in https://github.com/Zweih/qp/pull/157
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v4.3.0...v4.4.0
-
-
-## v4.3.0
-### What's Changed
-* Feature: Change cache location and improve caching by @Zweih in https://github.com/Zweih/qp/pull/155
-
-**Full Changelog**: https://github.com/Zweih/qp/compare/v4.2.1...v4.3.0
