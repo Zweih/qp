@@ -1,9 +1,9 @@
 module qp
 
-go 1.24.1
+go 1.24.3
 
 require (
-	github.com/Zweih/go-rpmdb v0.1.7
+	github.com/Zweih/go-rpmdb/pkg v0.0.0-20250527211040-4c3890b9c4d2
 	github.com/glebarez/sqlite v1.11.0
 	github.com/goccy/go-json v0.10.5
 	github.com/spf13/pflag v1.0.5
