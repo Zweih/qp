@@ -179,6 +179,7 @@ learn about installation [here](#installation)
 | ✓ | pipx origin (python global packages) | - | formulae from taps (brew) |
 | - | casks from taps (brew) | - | dependencies for casks |
 | - | rpm packaging | - | zypper (openSUSE support) |
+| ✓ | cache-only option | - | package manager hooks |
 
 ## installation
 
@@ -282,6 +283,7 @@ qp [command] [args] [options]
 - `--no-progress`: force no progress bar outside of non-interactive environments
 - `--no-cache`: disable cache loading/saving and force fresh package data loading
 - `--regen-cache`: disable cache loading, force fresh package data loading, and save fresh cache
+- `--cache-only`: update cache only and nothing else. specify origin ('pacman', 'brew', 'deb', etc.) or all.
 - `-h` | `--help`: print help info
 
 ### available fields
