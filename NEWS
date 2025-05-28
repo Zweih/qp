@@ -1,4 +1,11 @@
 # qp Release Notes
+## v5.65.1
+### What's Changed
+* Revert "Feature: Daemonize pacman hook to batch cache rebuilds" by @Zweih in https://github.com/Zweih/qp/pull/358
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.65.0...v5.65.1
+
+
 ## v5.65.0
 ### What's Changed
 * Feature: Daemonize pacman hook to batch cache rebuilds by @Zweih in https://github.com/Zweih/qp/pull/357
@@ -708,11 +715,3 @@
 * Refactor: Split config package by @Zweih in https://github.com/Zweih/qp/pull/163
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v4.6.1...v4.6.2
-
-
-## v4.6.1
-### What's Changed
-* Feature: Add replaces field by @Zweih in https://github.com/Zweih/qp/pull/161
-* Documentation: Update replaces by @Zweih in https://github.com/Zweih/qp/pull/162
-
-**Full Changelog**: https://github.com/Zweih/qp/compare/v4.5.0...v4.6.1
