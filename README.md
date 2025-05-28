@@ -6,6 +6,8 @@ you can find installation instructions [here](#installation).
 
 `qp` supports querying with full boolean logic for package metadata, dependency relations, and more.
 
+query packages from `brew`, `pacman`, `apt`, `dpkg`, `pipx`, `dnf`, and `yum`. ecosystems are added frequently!
+
 check [features](#features) to find out more.
 
 check [usage](#usage) for all available commands + options.
@@ -48,13 +50,11 @@ this package is compatible with the following platforms and distributions:
  - [mabox linux](https://maboxlinux.org/)
  - [zorin OS](https://zorin.com/os/)
  - [elementary OS](https://elementary.io/)
- - the 50 other arch and debian-based distros, as long as they have `apt`/`dpkg`, `brew`, `pacman`, `dnf`/`yum`, or `opkg` installed
+ - the 50 other arch, debian, and fedora-based distros, as long as they have `apt`/`dpkg`, `brew`, `pacman`, `dnf`/`yum`, or `opkg` installed
 
 `qp` also detects and queries application-specific package managers like `pipx` for isolated python applications, expanding package discovery beyond traditional system package management.
 
-`qp` supports embedded linux systems, including meta-distributions like [yocto](https://www.yoctoproject.org/) that use `opkg` (`.ipk` packages) or `apt`/`dpkg` (`.deb` packages). `rpm` support is currently on the way! 
-
-more ecosystems are added every week!
+`qp` supports embedded linux systems, including meta-distributions like [yocto](https://www.yoctoproject.org/) that use `opkg` (`.ipk` packages) or `apt`/`dpkg` (`.deb` packages) or `.rpm` packages!
 
 ## features
 
@@ -179,7 +179,8 @@ learn about installation [here](#installation)
 | ✓ | pipx origin (python global packages) | - | formulae from taps (brew) |
 | - | casks from taps (brew) | - | dependencies for casks |
 | - | rpm packaging | - | zypper (openSUSE support) |
-| ✓ | cache-only option | - | package manager hooks |
+| ✓ | cache-only option | ✓ | pacman hook |
+| - | brew hook | - | deb hook |
 
 ## installation
 
@@ -218,7 +219,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/zweih/qp/packaging/install-q
 
 this script downloads the latest published release from github and installs it using `dpkg`.
 
-\***note**: you can inspect the script beforehand [here](https://github.com/Zweih/qp/packaging/install-qp-deb.sh). all binaries are built and signed by github CI on release tags.
+\***note**: you can inspect the script beforehand [here](https://github.com/zweih/qp/packaging/install-qp-deb.sh). all binaries are built and signed by github CI on release tags.
 
 installation via `apt` is coming soon™!
 
