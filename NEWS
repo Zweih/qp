@@ -1,4 +1,11 @@
 # qp Release Notes
+## v5.64.0
+### What's Changed
+* Feature: Add pacman hook for caching by @Zweih in https://github.com/Zweih/qp/pull/356
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.63.2...v5.64.0
+
+
 ## v5.63.2
 ### What's Changed
 * Fix: Timezone format by @Zweih in https://github.com/Zweih/qp/pull/355
@@ -709,10 +716,3 @@
 * Feature: Comprehensive dependency resolution by @Zweih in https://github.com/Zweih/qp/pull/158
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v4.4.0...v4.5.0
-
-
-## v4.4.0
-### What's Changed
-* Feature: Add pkgbase sort by @Zweih in https://github.com/Zweih/qp/pull/157
-
-**Full Changelog**: https://github.com/Zweih/qp/compare/v4.3.0...v4.4.0
