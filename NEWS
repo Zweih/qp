@@ -1,6 +1,16 @@
 # qp Release Notes
+## v5.65.3
+### What's Changed
+* Feature: Daemonize pacman hook to batch cache rebuilds by @Zweih in https://github.com/Zweih/qp/pull/359
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.65.1...v5.65.3
+
+
 ## v5.65.2
-**Full Changelog**: https://github.com/Zweih/qp/compare/v5.65.1...v5.65.2
+### What's Changed
+* Feature: Add pacman hook for caching by @Zweih in https://github.com/Zweih/qp/pull/359
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.65.1..v5.65.2
 
 
 ## v5.65.1
@@ -705,10 +715,3 @@
 * Feature: Change table column order by @Zweih in https://github.com/Zweih/qp/pull/164
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v4.6.2...v4.7.0
-
-
-## v4.6.2
-### What's Changed
-* Refactor: Split config package by @Zweih in https://github.com/Zweih/qp/pull/163
-
-**Full Changelog**: https://github.com/Zweih/qp/compare/v4.6.1...v4.6.2
