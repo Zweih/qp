@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"qp/api/driver"
 	"qp/internal/config"
 	"qp/internal/consts"
 	out "qp/internal/display"
@@ -32,8 +33,11 @@ func mainWithConfig(configProvider config.ConfigProvider) error {
 		return err
 	}
 
-	isInteractive := isInteractive(cfg.DisableProgress)
+	if cfg.CacheOnly != "" {
+		return rebuildCache(cfg.CacheOnly)
+	}
 
+	isInteractive := isInteractive(cfg.DisableProgress)
 	cacheBasePath, err := pkgdata.GetCachePath()
 	if err != nil {
 		out.WriteLine(fmt.Sprintf("WARNING: failed to set up cache dir: %v", err))
@@ -151,4 +155,42 @@ func renderOutput(pkgs []*pkgdata.PkgInfo, cfg *config.Config) error {
 
 func isInteractive(disableProgress bool) bool {
 	return term.IsTerminal(int(os.Stdout.Fd())) && !disableProgress
+}
+
+func rebuildCache(originName string) error {
+	cacheBasePath, err := pkgdata.GetCachePath()
+	if err != nil {
+		return fmt.Errorf("failed to set up cache dir: %v", err)
+	}
+
+	drivers := origins.AvailableDrivers()
+	if len(drivers) == 0 {
+		return fmt.Errorf("no supported package origins detected")
+	}
+
+	var wg sync.WaitGroup
+	cfg := &config.Config{
+		NoCache:    false,
+		RegenCache: false,
+	}
+
+	for _, d := range drivers {
+		if originName != "all" && originName != d.Name() {
+			continue
+		}
+
+		wg.Add(1)
+		go func(targetDriver driver.Driver) {
+			defer wg.Done()
+
+			pipeline := phase.NewPipeline(targetDriver, cfg, false, cacheBasePath)
+			_, err := pipeline.RunCacheOnly()
+			if err != nil {
+				return
+			}
+		}(d)
+	}
+
+	wg.Wait()
+	return nil
 }

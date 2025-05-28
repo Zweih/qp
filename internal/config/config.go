@@ -11,12 +11,13 @@ type Config struct {
 	Limit             int
 	ShowHelp          bool
 	ShowVersion       bool
-	OutputFormat      string
 	HasNoHeaders      bool
 	ShowFullTimestamp bool
 	DisableProgress   bool
 	NoCache           bool
 	RegenCache        bool
+	CacheOnly         string
+	OutputFormat      string
 	LimitMode         syntax.LimitMode
 	SortOption        syntax.SortOption
 	Fields            []consts.FieldType
