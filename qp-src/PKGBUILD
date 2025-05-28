@@ -28,4 +28,9 @@ package() {
   install -Dm755 "${pkgname}" "${pkgdir}/usr/bin/${pkgname}"
   install -Dm644 "${pkgname}.1" "${pkgdir}/usr/share/man/man1/${pkgname}.1"
   install -Dm644 "NEWS" "${pkgdir}/usr/share/doc/qp/NEWS"
+
+  install -Dm644 "$srcdir/update-qp-cache.hook" \
+    "$pkgdir/usr/share/libalpm/hooks/update-qp-cache.hook"
+  install -Dm755 "$srcdir/update-qp-cache" \
+    "$pkgdir/usr/share/libalpm/scripts/update-qp-cache"
 }

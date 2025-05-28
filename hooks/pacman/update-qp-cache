@@ -1,0 +1,2 @@
+#!/bin/bash
+/usr/bin/qp --cache-only=pacman > /dev/null 2>&1 || true

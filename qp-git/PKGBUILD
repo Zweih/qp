@@ -12,7 +12,7 @@ conflicts=("qp" "qp-bin")
 replaces=("yaylog" "yaylog-bin" "yaylog-git")
 source=(
   "qp::git+https://github.com/Zweih/qp.git"
-  "news::git+https://github.com/Zweih/qp.git#branch=packaging"
+  "packaging::git+https://github.com/Zweih/qp.git#branch=packaging"
 )
 sha256sums=("SKIP" "SKIP")
 
@@ -44,5 +44,10 @@ package() {
   cd "$srcdir/qp"
   install -Dm755 "${_binaryname}" "${pkgdir}/usr/bin/${_binaryname}"
   install -Dm644 "${_binaryname}.1" "${pkgdir}/usr/share/man/man1/${_binaryname}.1"
-  install -Dm644 "${srcdir}/news/NEWS" "${pkgdir}/usr/share/doc/qp/NEWS"
+  install -Dm644 "${srcdir}/packaging/NEWS" "${pkgdir}/usr/share/doc/qp/NEWS"
+
+  install -Dm644 "${srcdir}/packaging/hooks/pacman/update-qp-cache.hook" \
+    "$pkgdir/usr/share/libalpm/hooks/update-qp-cache.hook"
+  install -Dm755 "${srcdir}/packaging/hooks/pacman/update-qp-cache" \
+    "$pkgdir/usr/share/libalpm/scripts/update-qp-cache"
 }
