@@ -143,6 +143,12 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
 
+      - name: Copy hooks from packaging branch
+        run: |
+          if [ -d hooks ]; then
+            cp -r hooks ./release/
+          fi
+
       - name: Generate NEWS file
         run: |
           touch ./release/NEWS
@@ -177,7 +183,7 @@ jobs:
         run: |
           git checkout ${{ env.TAG_NAME }}
 
-      - name: Package AUR source tarball with manpage and NEWS
+      - name: Package AUR source tarball
         run: |
           mkdir -p ./release/temp-qp/qp-${{ env.TAG_NAME }}
           git archive --format=tar HEAD | tar -x -C ./release/temp-qp/qp-${{ env.TAG_NAME }}
@@ -188,6 +194,7 @@ jobs:
             -X qp/internal/about.Commit=$(git rev-parse HEAD) \
             -X qp/internal/about.Date=$(date -u +%Y-%m-%dT%H:%M:%SZ)" > ./release/temp-qp/qp-${TAG_NAME}/.ldflags
           cp ./release/qp.1 ./release/temp-qp/qp-${{ env.TAG_NAME }}/qp.1
+          cp ./release/hooks/pacman/* ./release/temp-qp/qp-${{ env.TAG_NAME }}/
 
           tar -czf ./release/qp-${{ env.TAG_NAME }}.tar.gz -C ./release/temp-qp qp-${{ env.TAG_NAME }}
 
@@ -204,7 +211,9 @@ jobs:
 
             if should_package aur_archs "$arch"; then
               echo "Packaging $binary for AUR"
-              tar -czvf ./release/qp-${{ env.TAG_NAME }}-${arch}.tar.gz -C ./release "$(basename "$binary")" qp.1 NEWS
+              tar -czvf ./release/qp-${{ env.TAG_NAME }}-${arch}.tar.gz \
+                -C ./release "$(basename "$binary")" qp.1 NEWS \
+                -C ./hooks/pacman update-qp-cache.hook update-qp-cache
             else
               echo "Skipping $binary for AUR packaging"
             fi
@@ -397,7 +406,7 @@ jobs:
             --body "Automated update of qp formula to version ${VERSION}" \
             --head "$BRANCH_NAME" \
             --base master
- 
+
           cd ..
         env:
           TAG_NAME: ${{ env.TAG_NAME }}
