@@ -1,2 +1,28 @@
 #!/bin/bash
-/usr/bin/qp --cache-only=pacman >/dev/null 2>&1 || true
+CACHE_MARKER="/tmp/update-qp-cache-needed"
+LOCK_FILE="/tmp/update-qp-cache.lock"
+
+if [ ! -f "$LOCK_FILE" ]; then
+  touch "$CACHE_MARKER"
+
+  setsid bash -c '
+        touch /tmp/update-qp-cache.lock
+        cycles=0
+        max_cycles=6
+
+        while [ "$cycles" -lt "$max_cycles" ]; do
+            sleep 5
+            cycles=$((cycles + 1))
+
+            if [ -f /tmp/update-qp-cache-needed ]; then
+                rm -f /tmp/update-qp-cache-needed
+                qp --cache-only=pacman >/dev/null 2>&1
+            fi
+        done
+
+        rm -f /tmp/update-qp-cache.lock
+    ' </dev/null >/dev/null 2>&1 &
+
+else
+  touch "$CACHE_MARKER"
+fi
