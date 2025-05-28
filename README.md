@@ -179,8 +179,7 @@ learn about installation [here](#installation)
 | ✓ | pipx origin (python global packages) | - | formulae from taps (brew) |
 | - | casks from taps (brew) | - | dependencies for casks |
 | - | rpm packaging | - | zypper (openSUSE support) |
-| ✓ | cache-only option | ✓ | pacman hook |
-| - | brew hook | - | deb hook |
+| ✓ | cache-only option | - | package manager hooks |
 
 ## installation
 
