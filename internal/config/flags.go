@@ -35,6 +35,11 @@ func ParseFlags(args []string) (Config, error) {
 		return Config{}, fmt.Errorf("error parsing flags: %v", err)
 	}
 
+	// exit asap, we don't need user syntax
+	if flagCfg.CacheOnly != "" {
+		return flagCfg, nil
+	}
+
 	remainingArgs := pflag.Args()
 	newSyntaxParser := func() (syntax.ParsedInput, error) {
 		return syntax.ParseSyntax(remainingArgs)
@@ -135,6 +140,7 @@ func registerCommonFlags(cfg *Config) {
 	pflag.BoolVar(&cfg.DisableProgress, "no-progress", false, "Disable progress bar")
 	pflag.BoolVar(&cfg.NoCache, "no-cache", false, "Disable cache")
 	pflag.BoolVar(&cfg.RegenCache, "regen-cache", false, "Force fresh cache")
+	pflag.StringVar(&cfg.CacheOnly, "cache-only", "", "Update cache only and nothing else. Specify origin ('pacman', 'brew', 'deb') or 'all'.")
 }
 
 func registerLegacyFlags(

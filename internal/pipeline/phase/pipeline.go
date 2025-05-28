@@ -54,3 +54,24 @@ func (p *Pipeline) Run() ([]*pkgdata.PkgInfo, error) {
 
 	return pkgs, nil
 }
+
+func (p *Pipeline) RunCacheOnly() ([]*pkgdata.PkgInfo, error) {
+	var wg sync.WaitGroup
+	phases := []PipelinePhase{
+		NewPhase("Fetch packages", p.fetchStep, &wg),
+		NewPhase("Resolve dependencies", p.resolveStep, &wg),
+		NewPhase("Save cache", p.saveCacheStep, &wg),
+	}
+
+	pkgs := []*PkgInfo{}
+	var err error
+
+	for _, ph := range phases {
+		pkgs, err = ph.Run(p.Config, pkgs, p.IsInteractive)
+		if err != nil {
+			return nil, fmt.Errorf("[%s] %w", ph.name, err)
+		}
+	}
+
+	return pkgs, nil
+}
