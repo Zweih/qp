@@ -1,4 +1,11 @@
 # qp Release Notes
+## v5.66.0
+### What's Changed
+* Feature: Cache install time by @Zweih in https://github.com/Zweih/qp/pull/360
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.65.3...v5.66.0
+
+
 ## v5.65.3
 ### What's Changed
 * Feature: Daemonize pacman hook to batch cache rebuilds by @Zweih in https://github.com/Zweih/qp/pull/359
@@ -708,10 +715,3 @@
 * Feature: Add `--no-cache` option by @Zweih in https://github.com/Zweih/qp/pull/165
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v4.7.0...v4.8.0
-
-
-## v4.7.0
-### What's Changed
-* Feature: Change table column order by @Zweih in https://github.com/Zweih/qp/pull/164
-
-**Full Changelog**: https://github.com/Zweih/qp/compare/v4.6.2...v4.7.0
