@@ -99,13 +99,13 @@ func (p *Pipeline) saveCacheStep(
 
 	err := p.Origin.SaveCache(cacheRoot, pkgs)
 	if err != nil {
-		out.WriteLine(fmt.Sprintf("Warning: failed to save cache:", err))
+		out.WriteLine(fmt.Sprintf("Warning: failed to save cache: %v", err))
 		return pkgs, nil
 	}
 
 	err = pkgdata.SaveCacheModTime(cacheRoot, p.ModTime)
 	if err != nil {
-		out.WriteLine(fmt.Sprintf("Warning: failed to save cache modtime:", err))
+		out.WriteLine(fmt.Sprintf("Warning: failed to save cache modtime: %v", err))
 		return pkgs, nil
 	}
 
