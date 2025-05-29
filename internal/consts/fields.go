@@ -106,9 +106,9 @@ var FieldTypeLookup = map[string]FieldType{
 	"bd":   FieldBuilt,
 	"type": FieldPkgType,
 
-	"date":         FieldInstalled, // legacy field
-	"build-date":   FieldBuilt,     // legacy field
-	"alphabetical": FieldName,      // legacy flag, to be deprecated
+	"date":         FieldUpdated, // legacy field
+	"build-date":   FieldBuilt,   // legacy field
+	"alphabetical": FieldName,    // legacy flag, to be deprecated
 
 	installed:   FieldInstalled,
 	updated:     FieldUpdated,
