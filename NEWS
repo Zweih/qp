@@ -1,4 +1,11 @@
 # qp Release Notes
+## v5.66.2
+### What's Changed
+* Fix: Alias legacy "date" to "updated" by @Zweih in https://github.com/Zweih/qp/pull/362
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.66.1...v5.66.2
+
+
 ## v5.66.1
 ### What's Changed
 * Fix: Save step warning format by @Zweih in https://github.com/Zweih/qp/pull/361
@@ -708,10 +715,3 @@
 * Feature: Add `--no-cache` option by @Zweih in https://github.com/Zweih/qp/pull/165
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v4.7.0...v4.8.0
-
-
-## v4.7.0
-### What's Changed
-* Feature: Change table column order by @Zweih in https://github.com/Zweih/qp/pull/164
-
-**Full Changelog**: https://github.com/Zweih/qp/compare/v4.6.2...v4.7.0
