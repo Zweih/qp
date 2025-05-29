@@ -1,0 +1,13 @@
+// go:generate protoc --go_out=. protobuf/history.proto
+
+syntax = "proto3";
+
+package pkginfo;
+
+option go_package = "internal/protobuf;protobuf";
+
+message InstallHistory {
+  int32 version = 1;
+  map<string, int64> install_timestamps = 2;
+  map<string, int64> seen_timestamps = 3;
+}
