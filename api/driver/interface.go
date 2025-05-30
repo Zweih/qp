@@ -5,7 +5,7 @@ import "qp/internal/pkgdata"
 type Driver interface {
 	Name() string
 	Detect() bool
-	Load() ([]*pkgdata.PkgInfo, error)
+	Load(cacheRoot string) ([]*pkgdata.PkgInfo, error)
 	ResolveDeps(pkgs []*pkgdata.PkgInfo) ([]*pkgdata.PkgInfo, error)
 	LoadCache(cacheRoot string) ([]*pkgdata.PkgInfo, error)
 	UpdateHistory(cacheRoot string, pkgs []*pkgdata.PkgInfo) error

@@ -10,6 +10,8 @@ import (
 	"github.com/spf13/pflag"
 )
 
+const internalCacheWorker = "internal-cache-worker"
+
 func ParseFlags(args []string) (Config, error) {
 	var flagCfg Config
 	var legacyFieldInput, legacyAddFieldInput string
@@ -140,7 +142,10 @@ func registerCommonFlags(cfg *Config) {
 	pflag.BoolVar(&cfg.DisableProgress, "no-progress", false, "Disable progress bar")
 	pflag.BoolVar(&cfg.NoCache, "no-cache", false, "Disable cache")
 	pflag.BoolVar(&cfg.RegenCache, "regen-cache", false, "Force fresh cache")
-	pflag.StringVar(&cfg.CacheOnly, "cache-only", "", "Update cache only and nothing else. Specify origin ('pacman', 'brew', 'deb') or 'all'.")
+	pflag.StringVar(&cfg.CacheOnly, "cache-only", "", "Update cache only and nothing else. Specify origin ('pacman', 'brew', 'deb') or 'all'")
+	pflag.StringVar(&cfg.CacheWorker, internalCacheWorker, "", "Internal flag for background cache operations - do not use directly")
+
+	_ = pflag.CommandLine.MarkHidden(internalCacheWorker)
 }
 
 func registerLegacyFlags(
