@@ -62,7 +62,7 @@ this package is compatible with the following platforms and distributions:
 * compatible with macOS, arch, debian, openwrt, and over 60 distros
 * * supports multiple ecosystems:
   * system package managers:
-    * pacman, apt/dpkg, opkg, brew
+    * pacman, brew, apt/dpkg, dnf/yum, opkg
 * * application package managers:
     * pipx
 * query packages using an expressive query language
