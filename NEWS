@@ -1,4 +1,12 @@
 # qp Release Notes
+## v5.67.1
+### What's Changed
+* Feature: Add pipx install history by @Zweih in https://github.com/Zweih/qp/pull/363
+* Refactor: Remove dead history by @Zweih in https://github.com/Zweih/qp/pull/364
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.66.2...v5.67.1
+
+
 ## v5.66.2
 ### What's Changed
 * Fix: Alias legacy "date" to "updated" by @Zweih in https://github.com/Zweih/qp/pull/362
@@ -708,10 +716,3 @@
 * Feature: Improve provision resolution by @Zweih in https://github.com/Zweih/qp/pull/166
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v4.8.0...v4.9.0
-
-
-## v4.8.0
-### What's Changed
-* Feature: Add `--no-cache` option by @Zweih in https://github.com/Zweih/qp/pull/165
-
-**Full Changelog**: https://github.com/Zweih/qp/compare/v4.7.0...v4.8.0
