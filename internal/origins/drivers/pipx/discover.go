@@ -43,7 +43,7 @@ func findVersionPath(libRoot string) (string, error) {
 	}
 
 	for _, entry := range entries {
-		if entry.IsDir() && len(entry.Name()) > 6 && entry.Name()[:6] == "python" {
+		if entry.IsDir() && len(entry.Name()) > 6 && entry.Name()[:6] == pythonEntry {
 			return filepath.Join(libRoot, entry.Name()), nil
 		}
 	}
@@ -53,7 +53,7 @@ func findVersionPath(libRoot string) (string, error) {
 
 func findDistPath(sitePkgsPath string, name string) (string, error) {
 	distInfoMatcher := name + "-*" + dotDistInfo
-	matches, _ := filepath.Glob(filepath.Join(sitePkgsPath, distInfoMatcher, "METADATA"))
+	matches, _ := filepath.Glob(filepath.Join(sitePkgsPath, distInfoMatcher, metadataFile))
 	if len(matches) > 0 {
 		return matches[0], nil
 	}
@@ -63,7 +63,7 @@ func findDistPath(sitePkgsPath string, name string) (string, error) {
 
 func inferArchitecture(sitePkgsPath string) (string, error) {
 	distInfoMatcher := "*" + dotDistInfo
-	matches, err := filepath.Glob(filepath.Join(sitePkgsPath, distInfoMatcher, "WHEEL"))
+	matches, err := filepath.Glob(filepath.Join(sitePkgsPath, distInfoMatcher, wheelFile))
 	if err != nil {
 		return "", fmt.Errorf("found no .dist-info directories in %s: %v", sitePkgsPath, err)
 	}

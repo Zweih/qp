@@ -20,4 +20,8 @@ const (
 
 	pipxHomeEnv = "PIPX_HOME"
 	homeEnv     = "HOME"
+
+	pythonEntry  = "python"
+	metadataFile = "METADATA"
+	wheelFile    = "WHEEL"
 )
