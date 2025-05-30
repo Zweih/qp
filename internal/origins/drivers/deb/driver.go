@@ -63,10 +63,6 @@ func (d *DebDriver) LoadCache(path string) ([]*pkgdata.PkgInfo, error) {
 	return pkgdata.LoadProtoCache(path)
 }
 
-func (d *DebDriver) UpdateHistory(_ string, _ []*pkgdata.PkgInfo) error {
-	return nil
-}
-
 func (d *DebDriver) SaveCache(cacheRoot string, pkgs []*pkgdata.PkgInfo) error {
 	return pkgdata.SaveProtoCache(cacheRoot, pkgs)
 }

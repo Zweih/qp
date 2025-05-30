@@ -36,10 +36,6 @@ func (d *PipxDriver) LoadCache(path string) ([]*pkgdata.PkgInfo, error) {
 	return pkgdata.LoadProtoCache(path)
 }
 
-func (d *PipxDriver) UpdateHistory(_ string, _ []*pkgdata.PkgInfo) error {
-	return nil
-}
-
 func (d *PipxDriver) SaveCache(cacheRoot string, pkgs []*pkgdata.PkgInfo) error {
 	return pkgdata.SaveProtoCache(cacheRoot, pkgs)
 }
