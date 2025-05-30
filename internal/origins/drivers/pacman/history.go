@@ -10,9 +10,7 @@ import (
 const bufferSize = 8192
 
 func parseLogHistory(latestLogTime int64) (map[string]int64, int64, error) {
-	path := "/var/log/pacman.log"
-
-	file, err := os.Open(path)
+	file, err := os.Open(pacmanLogPath)
 	if err != nil {
 		return nil, latestLogTime, err
 	}

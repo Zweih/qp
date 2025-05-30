@@ -12,7 +12,7 @@ import (
 )
 
 func fetchPackages(origin string, cacheRoot string) ([]*pkgdata.PkgInfo, error) {
-	pkgPaths, err := os.ReadDir(pacmanDbPath)
+	pkgPaths, err := os.ReadDir(pacmanDbDir)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read pacman database: %v", err)
 	}
@@ -31,8 +31,6 @@ func fetchPackages(origin string, cacheRoot string) ([]*pkgdata.PkgInfo, error) 
 		freshHistory = make(map[string]int64)
 		newLatestTime = latestLogTime
 	}
-
-	fmt.Println(freshHistory["qp"])
 
 	combinedHistory := make(map[string]int64)
 	currentHistory := make(map[string]int64)
@@ -53,7 +51,7 @@ func fetchPackages(origin string, cacheRoot string) ([]*pkgdata.PkgInfo, error) 
 	go func() {
 		for _, packagePath := range pkgPaths {
 			if packagePath.IsDir() {
-				descPath := filepath.Join(pacmanDbPath, packagePath.Name(), "desc")
+				descPath := filepath.Join(pacmanDbDir, packagePath.Name(), "desc")
 				descPathChan <- descPath
 			}
 		}

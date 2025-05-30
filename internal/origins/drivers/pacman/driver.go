@@ -14,7 +14,7 @@ func (d *PacmanDriver) Name() string {
 }
 
 func (d *PacmanDriver) Detect() bool {
-	_, err := os.Stat(pacmanDbPath)
+	_, err := os.Stat(pacmanDbDir)
 	return err == nil
 }
 
@@ -39,5 +39,5 @@ func (d *PacmanDriver) SaveCache(cacheRoot string, pkgs []*pkgdata.PkgInfo) erro
 }
 
 func (d *PacmanDriver) IsCacheStale(cacheMtime int64) (bool, error) {
-	return shared.IsDirStale(d.Name(), pacmanDbPath, cacheMtime)
+	return shared.IsDirStale(d.Name(), pacmanDbDir, cacheMtime)
 }

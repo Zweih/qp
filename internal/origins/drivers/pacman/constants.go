@@ -24,5 +24,6 @@ const (
 
 	subfieldPkgType = "pkgtype"
 
-	pacmanDbPath = "/var/lib/pacman/local"
+	pacmanDbDir   = "/var/lib/pacman/local"
+	pacmanLogPath = "/var/log/pacman.log"
 )
