@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"os/user"
 	"path/filepath"
 	pb "qp/internal/protobuf"
 	"runtime"
@@ -18,6 +19,8 @@ const (
 	historyVersion  = 1  // bump when updating how history is managed (not likely)
 	xdgCacheHomeEnv = "XDG_CACHE_HOME"
 	homeEnv         = "HOME"
+	sudoUserEnv     = "SUDO_USER"
+	userEnv         = "USER"
 	qpCacheDir      = "query-packages"
 	dotCache        = ".cache"
 	dotModTime      = ".modtime"
@@ -27,7 +30,12 @@ const (
 )
 
 func GetCachePath() (string, error) {
-	cachePath := filepath.Join(GetBaseCachePath(), qpCacheDir)
+	userCacheDir, err := GetUserCachePath()
+	if err != nil {
+		return "", fmt.Errorf("failed to create cache directory: %w", err)
+	}
+
+	cachePath := filepath.Join(userCacheDir, qpCacheDir)
 	if err := os.MkdirAll(cachePath, 0755); err != nil {
 		return "", fmt.Errorf("failed to create cache directory: %w", err)
 	}
@@ -35,14 +43,19 @@ func GetCachePath() (string, error) {
 	return cachePath, nil
 }
 
-func GetBaseCachePath() string {
+func GetUserCachePath() (string, error) {
+	err := switchToRealUser()
+	if err != nil {
+		return "", err
+	}
+
 	home, err := os.UserHomeDir()
 	if err != nil {
 		home = os.Getenv(homeEnv)
 	}
 
 	if runtime.GOOS == "darwin" {
-		return filepath.Join(home, darwinCacheDir)
+		return filepath.Join(home, darwinCacheDir), nil
 	}
 
 	userCacheDir := os.Getenv(xdgCacheHomeEnv)
@@ -50,7 +63,25 @@ func GetBaseCachePath() string {
 		userCacheDir = filepath.Join(home, dotCache)
 	}
 
-	return userCacheDir
+	return userCacheDir, nil
+}
+
+func switchToRealUser() error {
+	realUser := os.Getenv(sudoUserEnv)
+	if realUser == "" {
+		return nil
+	}
+
+	usr, err := user.Lookup(realUser)
+	if err != nil {
+		return err
+	}
+
+	os.Setenv(homeEnv, usr.HomeDir)
+	os.Setenv(userEnv, realUser)
+	os.Unsetenv(xdgCacheHomeEnv)
+
+	return nil
 }
 
 func SaveCacheModTime(cacheRoot string, modTime int64) error {

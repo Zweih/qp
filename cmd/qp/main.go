@@ -177,6 +177,7 @@ func forkCacheWorker(originName string) error {
 	return nil
 }
 
+// TODO: add debouncing
 func rebuildCache(originName string) error {
 	cacheBasePath, err := pkgdata.GetCachePath()
 	if err != nil {

@@ -22,7 +22,12 @@ func loadMetadata[T any](
 	keyFunc func(*T) string,
 	wanted map[string]struct{},
 ) (map[string]*T, error) {
-	fullPath := filepath.Join(pkgdata.GetBaseCachePath(), filePath)
+	userCacheDir, err := pkgdata.GetUserCachePath()
+	if err != nil {
+		return nil, fmt.Errorf("failed to read brew cache: %w", err)
+	}
+
+	fullPath := filepath.Join(userCacheDir, filePath)
 	data, err := os.ReadFile(fullPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read %s cache: %w", filePath, err)

@@ -2,7 +2,6 @@ package phase
 
 import (
 	"fmt"
-	"path/filepath"
 	"qp/internal/compiler"
 	"qp/internal/config"
 	out "qp/internal/display"
@@ -26,8 +25,7 @@ func (p *Pipeline) loadCacheStep(
 		return nil, nil
 	}
 
-	cacheRoot := filepath.Join(p.CachePath, p.Origin.Name())
-	cacheMtime, err := pkgdata.LoadCacheModTime(cacheRoot)
+	cacheMtime, err := pkgdata.LoadCacheModTime(p.CacheRoot)
 	if err != nil {
 		return nil, nil
 	}
@@ -38,7 +36,7 @@ func (p *Pipeline) loadCacheStep(
 		return nil, err
 	}
 
-	pkgs, err := p.Origin.LoadCache(cacheRoot)
+	pkgs, err := p.Origin.LoadCache(p.CacheRoot)
 	if err != nil {
 		p.ModTime = now
 		return nil, nil
@@ -90,19 +88,17 @@ func (p *Pipeline) saveCacheStep(
 	pkgs []*pkgdata.PkgInfo,
 	_ meta.ProgressReporter,
 ) ([]*pkgdata.PkgInfo, error) {
-	cacheRoot := filepath.Join(p.CachePath, p.Origin.Name())
-
 	if cfg.NoCache || p.UsedCache {
 		return pkgs, nil
 	}
 
-	err := p.Origin.SaveCache(cacheRoot, pkgs)
+	err := p.Origin.SaveCache(p.CacheRoot, pkgs)
 	if err != nil {
 		out.WriteLine(fmt.Sprintf("Warning: failed to save cache: %v", err))
 		return pkgs, nil
 	}
 
-	err = pkgdata.SaveCacheModTime(cacheRoot, p.ModTime)
+	err = pkgdata.SaveCacheModTime(p.CacheRoot, p.ModTime)
 	if err != nil {
 		out.WriteLine(fmt.Sprintf("Warning: failed to save cache modtime: %v", err))
 		return pkgs, nil
