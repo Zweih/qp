@@ -26,6 +26,7 @@ message Relation {
 
 message PkgInfo {
   reserved 1, 18;
+  int64 install_timestamp = 26;
   int64 update_timestamp = 17;
   int64 build_timestamp = 16;
   int64 size = 2;
@@ -54,7 +55,7 @@ message PkgInfo {
 }
 
 message CachedPkgs {
-  int64 last_modified = 1;
+  reserved 1;
   repeated PkgInfo pkgs = 2;
   int32 version = 3;
 }

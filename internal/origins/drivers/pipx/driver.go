@@ -24,7 +24,7 @@ func (d *PipxDriver) Detect() bool {
 	return true
 }
 
-func (d *PipxDriver) Load() ([]*pkgdata.PkgInfo, error) {
+func (d *PipxDriver) Load(_ string) ([]*pkgdata.PkgInfo, error) {
 	return fetchPackages(d.venvRoot, d.Name())
 }
 

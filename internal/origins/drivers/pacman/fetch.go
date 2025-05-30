@@ -2,15 +2,17 @@ package pacman
 
 import (
 	"fmt"
+	"math"
 	"os"
 	"path/filepath"
+	"qp/internal/origins/shared"
 	"qp/internal/origins/worker"
 	"qp/internal/pkgdata"
 	"sync"
 )
 
-func fetchPackages(origin string) ([]*pkgdata.PkgInfo, error) {
-	pkgPaths, err := os.ReadDir(pacmanDbPath)
+func fetchPackages(origin string, cacheRoot string) ([]*pkgdata.PkgInfo, error) {
+	pkgPaths, err := os.ReadDir(pacmanDbDir)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read pacman database: %v", err)
 	}
@@ -18,10 +20,38 @@ func fetchPackages(origin string) ([]*pkgdata.PkgInfo, error) {
 	numPkgs := len(pkgPaths)
 	descPathChan := make(chan string, numPkgs)
 
+	cachedHistory, latestLogTime, err := pkgdata.LoadInstallHistory(cacheRoot)
+	if err != nil {
+		cachedHistory = make(map[string]int64)
+		latestLogTime = 0
+	}
+
+	freshHistory, newLatestTime, err := parseLogHistory(latestLogTime)
+	if err != nil {
+		freshHistory = make(map[string]int64)
+		newLatestTime = latestLogTime
+	}
+
+	combinedHistory := make(map[string]int64)
+	currentHistory := make(map[string]int64)
+
+	for name, timestamp := range cachedHistory {
+		combinedHistory[name] = timestamp
+	}
+
+	for name, timestamp := range freshHistory {
+		combinedHistory[name] = timestamp
+	}
+
+	systemInstallTime, err := getSystemInstallTime()
+	if err != nil {
+		return nil, err
+	}
+
 	go func() {
 		for _, packagePath := range pkgPaths {
 			if packagePath.IsDir() {
-				descPath := filepath.Join(pacmanDbPath, packagePath.Name(), "desc")
+				descPath := filepath.Join(pacmanDbDir, packagePath.Name(), "desc")
 				descPathChan <- descPath
 			}
 		}
@@ -43,7 +73,13 @@ func fetchPackages(origin string) ([]*pkgdata.PkgInfo, error) {
 			}
 
 			pkg.Origin = origin
+			installTime := systemInstallTime
 
+			if logInstallTime, exists := combinedHistory[pkg.Name]; exists {
+				installTime = logInstallTime
+			}
+
+			pkg.InstallTimestamp = installTime
 			return pkg, nil
 		},
 		0,
@@ -55,5 +91,57 @@ func fetchPackages(origin string) ([]*pkgdata.PkgInfo, error) {
 		close(errChan)
 	}()
 
-	return worker.CollectOutput(outputChan, errChan)
+	pkgs, err := worker.CollectOutput(outputChan, errChan)
+	if err != nil {
+		return pkgs, err
+	}
+
+	for _, pkg := range pkgs {
+		if installTime, exists := combinedHistory[pkg.Name]; exists {
+			currentHistory[pkg.Name] = installTime
+		}
+	}
+
+	err = pkgdata.SaveInstallHistory(cacheRoot, currentHistory, newLatestTime)
+	return pkgs, err
+}
+
+func getSystemInstallTime() (int64, error) {
+	systemPaths := []string{
+		"/etc/machine-id",
+		"/etc/hostname",
+		"/boot/vmlinuz-linux",
+		"/usr/bin/pacman",
+		"/var/lib/pacman",
+		"/etc/passwd",
+		"/etc/group",
+	}
+
+	var oldestTime int64 = math.MaxInt64
+	foundAny := false
+
+	for _, path := range systemPaths {
+		if fileInfo, err := os.Stat(path); err == nil {
+			if birthTime, reliable, err := shared.GetBirthTime(path); err == nil && reliable {
+				if birthTime < oldestTime {
+					oldestTime = birthTime
+					foundAny = true
+				}
+
+				continue
+			}
+
+			modTime := fileInfo.ModTime().Unix()
+			if modTime < oldestTime {
+				oldestTime = modTime
+				foundAny = true
+			}
+		}
+	}
+
+	if !foundAny {
+		return 0, fmt.Errorf("could not determine system install time")
+	}
+
+	return oldestTime, nil
 }

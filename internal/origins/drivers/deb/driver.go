@@ -20,7 +20,7 @@ func (d *DebDriver) Detect() bool {
 	return err == nil
 }
 
-func (d *DebDriver) Load() ([]*pkgdata.PkgInfo, error) {
+func (d *DebDriver) Load(_ string) ([]*pkgdata.PkgInfo, error) {
 	reasonMap, _ := loadInstallReasons()
 	d.reasonMap = reasonMap
 

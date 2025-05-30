@@ -24,12 +24,13 @@ const (
 )
 
 type InstallHistory struct {
-	state             protoimpl.MessageState `protogen:"open.v1"`
-	Version           int32                  `protobuf:"varint,1,opt,name=version,proto3" json:"version,omitempty"`
-	InstallTimestamps map[string]int64       `protobuf:"bytes,2,rep,name=install_timestamps,json=installTimestamps,proto3" json:"install_timestamps,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"varint,2,opt,name=value"`
-	SeenTimestamps    map[string]int64       `protobuf:"bytes,3,rep,name=seen_timestamps,json=seenTimestamps,proto3" json:"seen_timestamps,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"varint,2,opt,name=value"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	Version            int32                  `protobuf:"varint,1,opt,name=version,proto3" json:"version,omitempty"`
+	LatestLogTimestamp int64                  `protobuf:"varint,4,opt,name=latest_log_timestamp,json=latestLogTimestamp,proto3" json:"latest_log_timestamp,omitempty"`
+	InstallTimestamps  map[string]int64       `protobuf:"bytes,2,rep,name=install_timestamps,json=installTimestamps,proto3" json:"install_timestamps,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"varint,2,opt,name=value"`
+	SeenTimestamps     map[string]int64       `protobuf:"bytes,3,rep,name=seen_timestamps,json=seenTimestamps,proto3" json:"seen_timestamps,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"varint,2,opt,name=value"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *InstallHistory) Reset() {
@@ -69,6 +70,13 @@ func (x *InstallHistory) GetVersion() int32 {
 	return 0
 }
 
+func (x *InstallHistory) GetLatestLogTimestamp() int64 {
+	if x != nil {
+		return x.LatestLogTimestamp
+	}
+	return 0
+}
+
 func (x *InstallHistory) GetInstallTimestamps() map[string]int64 {
 	if x != nil {
 		return x.InstallTimestamps
@@ -87,9 +95,10 @@ var File_protobuf_history_proto protoreflect.FileDescriptor
 
 const file_protobuf_history_proto_rawDesc = "" +
 	"\n" +
-	"\x16protobuf/history.proto\x12\apkginfo\"\xe8\x02\n" +
+	"\x16protobuf/history.proto\x12\apkginfo\"\x9a\x03\n" +
 	"\x0eInstallHistory\x12\x18\n" +
-	"\aversion\x18\x01 \x01(\x05R\aversion\x12]\n" +
+	"\aversion\x18\x01 \x01(\x05R\aversion\x120\n" +
+	"\x14latest_log_timestamp\x18\x04 \x01(\x03R\x12latestLogTimestamp\x12]\n" +
 	"\x12install_timestamps\x18\x02 \x03(\v2..pkginfo.InstallHistory.InstallTimestampsEntryR\x11installTimestamps\x12T\n" +
 	"\x0fseen_timestamps\x18\x03 \x03(\v2+.pkginfo.InstallHistory.SeenTimestampsEntryR\x0eseenTimestamps\x1aD\n" +
 	"\x16InstallTimestampsEntry\x12\x10\n" +

@@ -18,7 +18,7 @@ func (d *OpkgDriver) Detect() bool {
 	return err == nil
 }
 
-func (d *OpkgDriver) Load() ([]*pkgdata.PkgInfo, error) {
+func (d *OpkgDriver) Load(_ string) ([]*pkgdata.PkgInfo, error) {
 	return fetchPackages(d.Name())
 }
 

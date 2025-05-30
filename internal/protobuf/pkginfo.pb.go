@@ -166,32 +166,33 @@ func (x *Relation) GetWhy() string {
 }
 
 type PkgInfo struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
-	UpdateTimestamp int64                  `protobuf:"varint,17,opt,name=update_timestamp,json=updateTimestamp,proto3" json:"update_timestamp,omitempty"`
-	BuildTimestamp  int64                  `protobuf:"varint,16,opt,name=build_timestamp,json=buildTimestamp,proto3" json:"build_timestamp,omitempty"`
-	Size            int64                  `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
-	Name            string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
-	Reason          string                 `protobuf:"bytes,4,opt,name=reason,proto3" json:"reason,omitempty"`
-	Version         string                 `protobuf:"bytes,5,opt,name=version,proto3" json:"version,omitempty"`
-	Origin          string                 `protobuf:"bytes,25,opt,name=origin,proto3" json:"origin,omitempty"`
-	Arch            string                 `protobuf:"bytes,6,opt,name=arch,proto3" json:"arch,omitempty"`
-	License         string                 `protobuf:"bytes,7,opt,name=license,proto3" json:"license,omitempty"`
-	Url             string                 `protobuf:"bytes,8,opt,name=url,proto3" json:"url,omitempty"`
-	Description     string                 `protobuf:"bytes,13,opt,name=description,proto3" json:"description,omitempty"`
-	Validation      string                 `protobuf:"bytes,20,opt,name=validation,proto3" json:"validation,omitempty"`
-	PkgType         string                 `protobuf:"bytes,24,opt,name=pkg_type,json=pkgType,proto3" json:"pkg_type,omitempty"`
-	PkgBase         string                 `protobuf:"bytes,14,opt,name=pkg_base,json=pkgBase,proto3" json:"pkg_base,omitempty"`
-	Packager        string                 `protobuf:"bytes,21,opt,name=packager,proto3" json:"packager,omitempty"`
-	Groups          []string               `protobuf:"bytes,19,rep,name=groups,proto3" json:"groups,omitempty"`
-	Conflicts       []*Relation            `protobuf:"bytes,12,rep,name=conflicts,proto3" json:"conflicts,omitempty"`
-	Replaces        []*Relation            `protobuf:"bytes,15,rep,name=replaces,proto3" json:"replaces,omitempty"`
-	Depends         []*Relation            `protobuf:"bytes,9,rep,name=depends,proto3" json:"depends,omitempty"`
-	OptDepends      []*Relation            `protobuf:"bytes,22,rep,name=opt_depends,json=optDepends,proto3" json:"opt_depends,omitempty"`
-	RequiredBy      []*Relation            `protobuf:"bytes,10,rep,name=required_by,json=requiredBy,proto3" json:"required_by,omitempty"`
-	OptionalFor     []*Relation            `protobuf:"bytes,23,rep,name=optional_for,json=optionalFor,proto3" json:"optional_for,omitempty"`
-	Provides        []*Relation            `protobuf:"bytes,11,rep,name=provides,proto3" json:"provides,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	InstallTimestamp int64                  `protobuf:"varint,26,opt,name=install_timestamp,json=installTimestamp,proto3" json:"install_timestamp,omitempty"`
+	UpdateTimestamp  int64                  `protobuf:"varint,17,opt,name=update_timestamp,json=updateTimestamp,proto3" json:"update_timestamp,omitempty"`
+	BuildTimestamp   int64                  `protobuf:"varint,16,opt,name=build_timestamp,json=buildTimestamp,proto3" json:"build_timestamp,omitempty"`
+	Size             int64                  `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
+	Name             string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	Reason           string                 `protobuf:"bytes,4,opt,name=reason,proto3" json:"reason,omitempty"`
+	Version          string                 `protobuf:"bytes,5,opt,name=version,proto3" json:"version,omitempty"`
+	Origin           string                 `protobuf:"bytes,25,opt,name=origin,proto3" json:"origin,omitempty"`
+	Arch             string                 `protobuf:"bytes,6,opt,name=arch,proto3" json:"arch,omitempty"`
+	License          string                 `protobuf:"bytes,7,opt,name=license,proto3" json:"license,omitempty"`
+	Url              string                 `protobuf:"bytes,8,opt,name=url,proto3" json:"url,omitempty"`
+	Description      string                 `protobuf:"bytes,13,opt,name=description,proto3" json:"description,omitempty"`
+	Validation       string                 `protobuf:"bytes,20,opt,name=validation,proto3" json:"validation,omitempty"`
+	PkgType          string                 `protobuf:"bytes,24,opt,name=pkg_type,json=pkgType,proto3" json:"pkg_type,omitempty"`
+	PkgBase          string                 `protobuf:"bytes,14,opt,name=pkg_base,json=pkgBase,proto3" json:"pkg_base,omitempty"`
+	Packager         string                 `protobuf:"bytes,21,opt,name=packager,proto3" json:"packager,omitempty"`
+	Groups           []string               `protobuf:"bytes,19,rep,name=groups,proto3" json:"groups,omitempty"`
+	Conflicts        []*Relation            `protobuf:"bytes,12,rep,name=conflicts,proto3" json:"conflicts,omitempty"`
+	Replaces         []*Relation            `protobuf:"bytes,15,rep,name=replaces,proto3" json:"replaces,omitempty"`
+	Depends          []*Relation            `protobuf:"bytes,9,rep,name=depends,proto3" json:"depends,omitempty"`
+	OptDepends       []*Relation            `protobuf:"bytes,22,rep,name=opt_depends,json=optDepends,proto3" json:"opt_depends,omitempty"`
+	RequiredBy       []*Relation            `protobuf:"bytes,10,rep,name=required_by,json=requiredBy,proto3" json:"required_by,omitempty"`
+	OptionalFor      []*Relation            `protobuf:"bytes,23,rep,name=optional_for,json=optionalFor,proto3" json:"optional_for,omitempty"`
+	Provides         []*Relation            `protobuf:"bytes,11,rep,name=provides,proto3" json:"provides,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *PkgInfo) Reset() {
@@ -222,6 +223,13 @@ func (x *PkgInfo) ProtoReflect() protoreflect.Message {
 // Deprecated: Use PkgInfo.ProtoReflect.Descriptor instead.
 func (*PkgInfo) Descriptor() ([]byte, []int) {
 	return file_protobuf_pkginfo_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *PkgInfo) GetInstallTimestamp() int64 {
+	if x != nil {
+		return x.InstallTimestamp
+	}
+	return 0
 }
 
 func (x *PkgInfo) GetUpdateTimestamp() int64 {
@@ -387,7 +395,6 @@ func (x *PkgInfo) GetProvides() []*Relation {
 
 type CachedPkgs struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	LastModified  int64                  `protobuf:"varint,1,opt,name=last_modified,json=lastModified,proto3" json:"last_modified,omitempty"`
 	Pkgs          []*PkgInfo             `protobuf:"bytes,2,rep,name=pkgs,proto3" json:"pkgs,omitempty"`
 	Version       int32                  `protobuf:"varint,3,opt,name=version,proto3" json:"version,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -424,13 +431,6 @@ func (*CachedPkgs) Descriptor() ([]byte, []int) {
 	return file_protobuf_pkginfo_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *CachedPkgs) GetLastModified() int64 {
-	if x != nil {
-		return x.LastModified
-	}
-	return 0
-}
-
 func (x *CachedPkgs) GetPkgs() []*PkgInfo {
 	if x != nil {
 		return x.Pkgs
@@ -456,8 +456,9 @@ const file_protobuf_pkginfo_proto_rawDesc = "" +
 	"\boperator\x18\x03 \x01(\x0e2\x13.pkginfo.RelationOpR\boperator\x12\x14\n" +
 	"\x05depth\x18\x04 \x01(\x05R\x05depth\x12\"\n" +
 	"\fproviderName\x18\x05 \x01(\tR\fproviderName\x12\x10\n" +
-	"\x03why\x18\x06 \x01(\tR\x03why\"\xa1\x06\n" +
-	"\aPkgInfo\x12)\n" +
+	"\x03why\x18\x06 \x01(\tR\x03why\"\xce\x06\n" +
+	"\aPkgInfo\x12+\n" +
+	"\x11install_timestamp\x18\x1a \x01(\x03R\x10installTimestamp\x12)\n" +
 	"\x10update_timestamp\x18\x11 \x01(\x03R\x0fupdateTimestamp\x12'\n" +
 	"\x0fbuild_timestamp\x18\x10 \x01(\x03R\x0ebuildTimestamp\x12\x12\n" +
 	"\x04size\x18\x02 \x01(\x03R\x04size\x12\x12\n" +
@@ -485,12 +486,11 @@ const file_protobuf_pkginfo_proto_rawDesc = "" +
 	" \x03(\v2\x11.pkginfo.RelationR\n" +
 	"requiredBy\x124\n" +
 	"\foptional_for\x18\x17 \x03(\v2\x11.pkginfo.RelationR\voptionalFor\x12-\n" +
-	"\bprovides\x18\v \x03(\v2\x11.pkginfo.RelationR\bprovidesJ\x04\b\x01\x10\x02J\x04\b\x12\x10\x13\"q\n" +
+	"\bprovides\x18\v \x03(\v2\x11.pkginfo.RelationR\bprovidesJ\x04\b\x01\x10\x02J\x04\b\x12\x10\x13\"R\n" +
 	"\n" +
-	"CachedPkgs\x12#\n" +
-	"\rlast_modified\x18\x01 \x01(\x03R\flastModified\x12$\n" +
+	"CachedPkgs\x12$\n" +
 	"\x04pkgs\x18\x02 \x03(\v2\x10.pkginfo.PkgInfoR\x04pkgs\x12\x18\n" +
-	"\aversion\x18\x03 \x01(\x05R\aversion*[\n" +
+	"\aversion\x18\x03 \x01(\x05R\aversionJ\x04\b\x01\x10\x02*[\n" +
 	"\n" +
 	"RelationOp\x12\b\n" +
 	"\x04NONE\x10\x00\x12\t\n" +
