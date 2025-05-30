@@ -240,7 +240,6 @@ func protosToPkgs(pbPkgs []*pb.PkgInfo) []*PkgInfo {
 
 func SaveInstallHistory(cacheRoot string, history map[string]int64, latestLogTimestamp int64) error {
 	historyPath := cacheRoot + dotHistory
-
 	installHistory := &pb.InstallHistory{
 		InstallTimestamps:  history,
 		Version:            historyVersion,
