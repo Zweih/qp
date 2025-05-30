@@ -20,7 +20,7 @@ func Preprocess(args []string) ([]string, error) {
 		}
 
 		if currentBlock == consts.BlockNone {
-			return nil, fmt.Errorf("unexpected token: %q (expected in a command block like 'select', 'where', or 'order')", token)
+			return nil, fmt.Errorf("unexpected token: %q (expected a command block like 'select', 'where', or 'order')", token)
 		}
 
 		if currentBlock == consts.BlockWhere {

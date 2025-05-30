@@ -64,10 +64,9 @@ var SizeMatchers = RangeMatcher{
 	},
 }
 
-var RangeMatchers = map[consts.FieldType]RangeMatcher{
-	consts.FieldUpdated: DateMatchers,
-	consts.FieldBuilt:   DateMatchers,
-	consts.FieldSize:    SizeMatchers,
+var RangeMatchers = map[consts.FieldPrim]RangeMatcher{
+	consts.FieldPrimDate: DateMatchers,
+	consts.FieldPrimSize: SizeMatchers,
 }
 
 var StringMatchers = map[consts.MatchType]func(string, []string) bool{
