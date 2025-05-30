@@ -213,7 +213,7 @@ jobs:
               echo "Packaging $binary for AUR"
               tar -czvf ./release/qp-${{ env.TAG_NAME }}-${arch}.tar.gz \
                 -C ./release "$(basename "$binary")" qp.1 NEWS \
-                -C ./hooks/pacman update-qp-cache.hook update-qp-cache
+                -C ./hooks/pacman update-qp-cache.hook
             else
               echo "Skipping $binary for AUR packaging"
             fi
