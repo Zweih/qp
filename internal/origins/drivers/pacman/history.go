@@ -55,7 +55,7 @@ func readLogBackwards(
 					line := reverseLine(lineBuffer.String())
 
 					currentTimestamp = processLine(line, installTimes, removeTimes)
-					if newestTimestamp == 0 {
+					if currentTimestamp > newestTimestamp {
 						newestTimestamp = currentTimestamp
 					}
 
@@ -123,7 +123,6 @@ func processLine(
 	}
 
 	if _, existsInOpposite := oppositeMap[name]; existsInOpposite {
-		delete(oppositeMap, name)
 		return timestamp
 	}
 

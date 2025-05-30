@@ -32,6 +32,8 @@ func fetchPackages(origin string, cacheRoot string) ([]*pkgdata.PkgInfo, error) 
 		newLatestTime = latestLogTime
 	}
 
+	fmt.Println(freshHistory["qp"])
+
 	combinedHistory := make(map[string]int64)
 	currentHistory := make(map[string]int64)
 

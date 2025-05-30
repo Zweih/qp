@@ -16,7 +16,7 @@ import (
 
 const (
 	cacheVersion    = 22 // bump when updating structure of PkgInfo/Relation/pkginfo.proto OR when dependency resolution is updated
-	historyVersion  = 1
+	historyVersion  = 2
 	xdgCacheHomeEnv = "XDG_CACHE_HOME"
 	homeEnv         = "HOME"
 	sudoUserEnv     = "SUDO_USER"
