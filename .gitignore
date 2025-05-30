@@ -38,6 +38,8 @@ src-bundle
 .env.*
 *.local
 *.bak
+notes.md
+docker/
 
 /vendor/
 
