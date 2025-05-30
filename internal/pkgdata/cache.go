@@ -206,59 +206,44 @@ func protosToPkgs(pbPkgs []*pb.PkgInfo) []*PkgInfo {
 	return pkgs
 }
 
-func UpdateInstallHistory(cacheRoot string, pkgs []*PkgInfo) error {
+func SaveInstallHistory(cacheRoot string, history map[string]int64, latestLogTimestamp int64) error {
 	historyPath := cacheRoot + dotHistory
-	oldHistory, err := loadInstallHistory(historyPath)
-	if err != nil {
-		oldHistory = make(map[string]int64)
-	}
 
-	newHistory := make(map[string]int64)
-
-	for _, pkg := range pkgs {
-		pkgKey := pkg.Key()
-		if seenTimestamp, exists := oldHistory[pkgKey]; exists {
-			pkg.SeenTimestamp = seenTimestamp
-			newHistory[pkgKey] = seenTimestamp
-			continue
-		}
-
-		pkg.SeenTimestamp = pkg.UpdateTimestamp
-		newHistory[pkgKey] = pkg.UpdateTimestamp
-	}
-
-	return saveInstallHistory(historyPath, newHistory)
-}
-
-func saveInstallHistory(historyPath string, newHistory map[string]int64) error {
 	installHistory := &pb.InstallHistory{
-		SeenTimestamps: newHistory,
-		Version:        historyVersion,
+		InstallTimestamps:  history,
+		Version:            historyVersion,
+		LatestLogTimestamp: latestLogTimestamp,
 	}
 
 	byteData, err := proto.Marshal(installHistory)
 	if err != nil {
-		return fmt.Errorf("failed to marshal history; %v", err)
+		return fmt.Errorf("failed to marshal history: %v", err)
 	}
 
 	return os.WriteFile(historyPath, byteData, 0644)
 }
 
-func loadInstallHistory(historyPath string) (map[string]int64, error) {
+func LoadInstallHistory(cacheRoot string) (map[string]int64, int64, error) {
+	historyPath := cacheRoot + dotHistory
+
 	if _, err := os.Stat(historyPath); os.IsNotExist(err) {
-		return make(map[string]int64), nil
+		return make(map[string]int64), 0, nil
 	}
 
 	byteData, err := os.ReadFile(historyPath)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	var installHistory pb.InstallHistory
 	err = proto.Unmarshal(byteData, &installHistory)
 	if err != nil {
-		return nil, fmt.Errorf("failed to unmarshal install history: %v", err)
+		return nil, 0, fmt.Errorf("failed to unmarshal install history: %v", err)
 	}
 
-	return installHistory.SeenTimestamps, nil
+	if installHistory.Version != historyVersion {
+		return make(map[string]int64), 0, nil
+	}
+
+	return installHistory.InstallTimestamps, installHistory.LatestLogTimestamp, nil
 }
