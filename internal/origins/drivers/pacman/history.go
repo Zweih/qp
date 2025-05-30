@@ -9,30 +9,36 @@ import (
 
 const bufferSize = 8192
 
-func parseLogHistory(numPkgs int) (map[string]int64, error) {
+func parseLogHistory(latestLogTime int64) (map[string]int64, int64, error) {
 	path := "/var/log/pacman.log"
 
 	file, err := os.Open(path)
 	if err != nil {
-		return nil, err
+		return nil, latestLogTime, err
 	}
 	defer file.Close()
 
 	stat, err := file.Stat()
 	if err != nil {
-		return nil, err
+		return nil, latestLogTime, err
 	}
 
-	return readLogBackwards(file, stat.Size(), numPkgs)
+	return readLogBackwards(file, stat.Size(), latestLogTime)
 }
 
-func readLogBackwards(file *os.File, fileSize int64, numPkgs int) (map[string]int64, error) {
+func readLogBackwards(
+	file *os.File,
+	fileSize int64,
+	latestLogTime int64,
+) (map[string]int64, int64, error) {
 	buffer := make([]byte, bufferSize)
 	installTimes := make(map[string]int64)
 	removeTimes := make(map[string]int64)
 
 	var lineBuffer strings.Builder
 	pos := fileSize
+	var newestTimestamp int64
+	var currentTimestamp int64
 
 	for pos > 0 {
 		readSize := min(int64(bufferSize), pos)
@@ -40,7 +46,7 @@ func readLogBackwards(file *os.File, fileSize int64, numPkgs int) (map[string]in
 
 		numBytes, err := file.ReadAt(buffer[:readSize], pos)
 		if err != nil && err != io.EOF {
-			return nil, err
+			return nil, latestLogTime, err
 		}
 
 		for i := numBytes - 1; i >= 0; i-- {
@@ -48,8 +54,13 @@ func readLogBackwards(file *os.File, fileSize int64, numPkgs int) (map[string]in
 				if lineBuffer.Len() > 0 {
 					line := reverseLine(lineBuffer.String())
 
-					if processLine(line, installTimes, removeTimes) && len(installTimes) >= numPkgs {
-						return installTimes, nil
+					currentTimestamp = processLine(line, installTimes, removeTimes)
+					if newestTimestamp == 0 {
+						newestTimestamp = currentTimestamp
+					}
+
+					if currentTimestamp > 0 && currentTimestamp <= latestLogTime {
+						return installTimes, newestTimestamp, nil
 					}
 
 					lineBuffer.Reset()
@@ -68,52 +79,56 @@ func readLogBackwards(file *os.File, fileSize int64, numPkgs int) (map[string]in
 		processLine(line, installTimes, removeTimes)
 	}
 
-	return installTimes, nil
+	return installTimes, newestTimestamp, nil
 }
 
-func processLine(line string, installTimes map[string]int64, removeTimes map[string]int64) bool {
+func processLine(
+	line string,
+	installTimes map[string]int64,
+	removeTimes map[string]int64,
+) int64 {
 	parts := strings.SplitN(line, " ", 5)
 	if len(parts) != 5 {
-		return false
+		return 0
 	}
 
+	rawTime := parts[0]
+	t, err := time.Parse("2006-01-02T15:04:05-0700", rawTime[1:len(rawTime)-1])
+	if err != nil {
+		return 0
+	}
+
+	timestamp := t.Unix()
+
 	if parts[1] != "[ALPM]" {
-		return false
+		return timestamp
 	}
 
 	var currentMap, oppositeMap map[string]int64
 	action := parts[2]
-	var isInstalled bool
 
 	switch action {
 	case "installed":
 		currentMap, oppositeMap = installTimes, removeTimes
-		isInstalled = true
 	case "removed":
 		currentMap, oppositeMap = removeTimes, installTimes
 	default:
-		return false
+		return timestamp
 	}
 
 	name := parts[3]
 
 	if _, exists := currentMap[name]; exists {
-		return false
+		return timestamp
 	}
 
 	if _, existsInOpposite := oppositeMap[name]; existsInOpposite {
 		delete(oppositeMap, name)
-		return false
+		return timestamp
 	}
 
-	rawTime := parts[0]
-	timestamp, err := time.Parse("2006-01-02T15:04:05-0700", rawTime[1:len(rawTime)-1])
-	if err != nil {
-		return false
-	}
-
-	currentMap[name] = timestamp.Unix()
-	return isInstalled
+	currentMap[name] = timestamp
+	return timestamp
 }
 
 func reverseLine(line string) string {

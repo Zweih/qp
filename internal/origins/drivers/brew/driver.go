@@ -22,7 +22,7 @@ func (d *BrewDriver) Detect() bool {
 	return err == nil
 }
 
-func (d *BrewDriver) Load() ([]*pkgdata.PkgInfo, error) {
+func (d *BrewDriver) Load(_ string) ([]*pkgdata.PkgInfo, error) {
 	return fetchPackages(d.Name(), d.prefix)
 }
 

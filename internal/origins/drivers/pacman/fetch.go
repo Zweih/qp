@@ -11,7 +11,7 @@ import (
 	"sync"
 )
 
-func fetchPackages(origin string) ([]*pkgdata.PkgInfo, error) {
+func fetchPackages(origin string, cacheRoot string) ([]*pkgdata.PkgInfo, error) {
 	pkgPaths, err := os.ReadDir(pacmanDbPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read pacman database: %v", err)
@@ -19,7 +19,30 @@ func fetchPackages(origin string) ([]*pkgdata.PkgInfo, error) {
 
 	numPkgs := len(pkgPaths)
 	descPathChan := make(chan string, numPkgs)
-	history, err := parseLogHistory(numPkgs)
+
+	cachedHistory, latestLogTime, err := pkgdata.LoadInstallHistory(cacheRoot)
+	if err != nil {
+		cachedHistory = make(map[string]int64)
+		latestLogTime = 0
+	}
+
+	freshHistory, newLatestTime, err := parseLogHistory(latestLogTime)
+	if err != nil {
+		freshHistory = make(map[string]int64)
+		newLatestTime = latestLogTime
+	}
+
+	combinedHistory := make(map[string]int64)
+	currentHistory := make(map[string]int64)
+
+	for name, timestamp := range cachedHistory {
+		combinedHistory[name] = timestamp
+	}
+
+	for name, timestamp := range freshHistory {
+		combinedHistory[name] = timestamp
+	}
+
 	systemInstallTime, err := getSystemInstallTime()
 	if err != nil {
 		return nil, err
@@ -52,7 +75,7 @@ func fetchPackages(origin string) ([]*pkgdata.PkgInfo, error) {
 			pkg.Origin = origin
 			installTime := systemInstallTime
 
-			if logInstallTime, exists := history[pkg.Name]; exists {
+			if logInstallTime, exists := combinedHistory[pkg.Name]; exists {
 				installTime = logInstallTime
 			}
 
@@ -68,7 +91,19 @@ func fetchPackages(origin string) ([]*pkgdata.PkgInfo, error) {
 		close(errChan)
 	}()
 
-	return worker.CollectOutput(outputChan, errChan)
+	pkgs, err := worker.CollectOutput(outputChan, errChan)
+	if err != nil {
+		return pkgs, err
+	}
+
+	for _, pkg := range pkgs {
+		if installTime, exists := combinedHistory[pkg.Name]; exists {
+			currentHistory[pkg.Name] = installTime
+		}
+	}
+
+	err = pkgdata.SaveInstallHistory(cacheRoot, currentHistory, newLatestTime)
+	return pkgs, err
 }
 
 func getSystemInstallTime() (int64, error) {

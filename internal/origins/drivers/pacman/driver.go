@@ -18,8 +18,8 @@ func (d *PacmanDriver) Detect() bool {
 	return err == nil
 }
 
-func (d *PacmanDriver) Load() ([]*pkgdata.PkgInfo, error) {
-	return fetchPackages(d.Name())
+func (d *PacmanDriver) Load(cacheRoot string) ([]*pkgdata.PkgInfo, error) {
+	return fetchPackages(d.Name(), cacheRoot)
 }
 
 func (d *PacmanDriver) ResolveDeps(pkgs []*pkgdata.PkgInfo) ([]*pkgdata.PkgInfo, error) {

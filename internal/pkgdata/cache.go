@@ -16,7 +16,7 @@ import (
 
 const (
 	cacheVersion    = 22 // bump when updating structure of PkgInfo/Relation/pkginfo.proto OR when dependency resolution is updated
-	historyVersion  = 1  // bump when updating how history is managed (not likely)
+	historyVersion  = 1
 	xdgCacheHomeEnv = "XDG_CACHE_HOME"
 	homeEnv         = "HOME"
 	sudoUserEnv     = "SUDO_USER"
@@ -238,12 +238,12 @@ func protosToPkgs(pbPkgs []*pb.PkgInfo) []*PkgInfo {
 	return pkgs
 }
 
-func SaveInstallHistory(cacheRoot string, history map[string]int64, latestLogTimestamp int64) error {
+func SaveInstallHistory(cacheRoot string, history map[string]int64, latestLogTime int64) error {
 	historyPath := cacheRoot + dotHistory
 	installHistory := &pb.InstallHistory{
 		InstallTimestamps:  history,
 		Version:            historyVersion,
-		LatestLogTimestamp: latestLogTimestamp,
+		LatestLogTimestamp: latestLogTime,
 	}
 
 	byteData, err := proto.Marshal(installHistory)
@@ -256,7 +256,6 @@ func SaveInstallHistory(cacheRoot string, history map[string]int64, latestLogTim
 
 func LoadInstallHistory(cacheRoot string) (map[string]int64, int64, error) {
 	historyPath := cacheRoot + dotHistory
-
 	if _, err := os.Stat(historyPath); os.IsNotExist(err) {
 		return make(map[string]int64), 0, nil
 	}

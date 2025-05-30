@@ -32,7 +32,7 @@ func (d *RpmDriver) Detect() bool {
 	return false
 }
 
-func (d *RpmDriver) Load() ([]*pkgdata.PkgInfo, error) {
+func (d *RpmDriver) Load(_ string) ([]*pkgdata.PkgInfo, error) {
 	return fetchPackages(d.Name(), filepath.Join(d.dbPath))
 }
 
