@@ -36,6 +36,7 @@ src-bundle
 *.bak
 
 notes.md
+/docker
 
 /vendor/
 
