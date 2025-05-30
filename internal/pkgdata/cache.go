@@ -206,30 +206,6 @@ func protosToPkgs(pbPkgs []*pb.PkgInfo) []*PkgInfo {
 	return pkgs
 }
 
-func UpdateInstallHistory(cacheRoot string, pkgs []*PkgInfo) error {
-	historyPath := cacheRoot + dotHistory
-	oldHistory, err := loadInstallHistory(historyPath)
-	if err != nil {
-		oldHistory = make(map[string]int64)
-	}
-
-	newHistory := make(map[string]int64)
-
-	for _, pkg := range pkgs {
-		pkgKey := pkg.Key()
-		if seenTimestamp, exists := oldHistory[pkgKey]; exists {
-			pkg.SeenTimestamp = seenTimestamp
-			newHistory[pkgKey] = seenTimestamp
-			continue
-		}
-
-		pkg.SeenTimestamp = pkg.UpdateTimestamp
-		newHistory[pkgKey] = pkg.UpdateTimestamp
-	}
-
-	return saveInstallHistory(historyPath, newHistory)
-}
-
 func saveInstallHistory(historyPath string, newHistory map[string]int64) error {
 	installHistory := &pb.InstallHistory{
 		SeenTimestamps: newHistory,
