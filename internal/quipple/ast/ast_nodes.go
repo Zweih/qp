@@ -2,7 +2,7 @@ package ast
 
 import (
 	"qp/internal/pkgdata"
-	"qp/internal/query"
+	"qp/internal/quipple/query"
 )
 
 type ExprType int32

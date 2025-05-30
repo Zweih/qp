@@ -3,7 +3,7 @@ package config
 import (
 	"fmt"
 	"qp/internal/consts"
-	"qp/internal/syntax"
+	"qp/internal/quipple/syntax"
 
 	"github.com/spf13/pflag"
 )

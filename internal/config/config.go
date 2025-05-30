@@ -1,10 +1,10 @@
 package config
 
 import (
-	"qp/internal/ast"
 	"qp/internal/consts"
-	"qp/internal/query"
-	"qp/internal/syntax"
+	"qp/internal/quipple/ast"
+	"qp/internal/quipple/query"
+	"qp/internal/quipple/syntax"
 )
 
 type Config struct {

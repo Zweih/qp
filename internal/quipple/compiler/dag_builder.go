@@ -2,10 +2,10 @@ package compiler
 
 import (
 	"fmt"
-	"qp/internal/ast"
 	"qp/internal/pipeline/filtering"
 	"qp/internal/pkgdata"
-	"qp/internal/query"
+	"qp/internal/quipple/ast"
+	"qp/internal/quipple/query"
 )
 
 func RunDAG(expr ast.Expr, pkgs []*pkgdata.PkgInfo) ([]*pkgdata.PkgInfo, error) {
