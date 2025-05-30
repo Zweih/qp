@@ -2,6 +2,7 @@ package phase
 
 import (
 	"fmt"
+	"path/filepath"
 	"qp/api/driver"
 	"qp/internal/config"
 	"qp/internal/pkgdata"
@@ -14,7 +15,7 @@ type Pipeline struct {
 	Pkgs          []*pkgdata.PkgInfo
 	IsInteractive bool
 	UsedCache     bool
-	CachePath     string
+	CacheRoot     string
 	ModTime       int64
 }
 
@@ -24,11 +25,13 @@ func NewPipeline(
 	isInteractive bool,
 	baseCachePath string,
 ) *Pipeline {
+	cacheRoot := filepath.Join(baseCachePath, origin.Name())
+
 	return &Pipeline{
 		Origin:        origin,
 		Config:        cfg,
 		IsInteractive: isInteractive,
-		CachePath:     baseCachePath,
+		CacheRoot:     cacheRoot,
 	}
 }
 

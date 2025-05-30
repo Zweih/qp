@@ -17,6 +17,7 @@ type Config struct {
 	NoCache           bool
 	RegenCache        bool
 	CacheOnly         string
+	CacheWorker       string
 	OutputFormat      string
 	LimitMode         syntax.LimitMode
 	SortOption        syntax.SortOption
