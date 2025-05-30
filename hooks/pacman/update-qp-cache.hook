@@ -8,4 +8,4 @@ Target = *
 [Action]
 Description = Updating qp cache...
 When = PostTransaction
-Exec = /usr/share/libalpm/scripts/update-qp-cache
+Exec = /usr/bin/qp --cache-only=pacman

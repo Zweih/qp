@@ -31,6 +31,4 @@ package() {
 
   install -Dm644 "update-qp-cache.hook" \
     "$pkgdir/usr/share/libalpm/hooks/update-qp-cache.hook"
-  install -Dm755 "update-qp-cache" \
-    "$pkgdir/usr/share/libalpm/scripts/update-qp-cache"
 }

@@ -48,6 +48,4 @@ package() {
 
   install -Dm644 "${srcdir}/packaging/hooks/pacman/update-qp-cache.hook" \
     "$pkgdir/usr/share/libalpm/hooks/update-qp-cache.hook"
-  install -Dm755 "${srcdir}/packaging/hooks/pacman/update-qp-cache" \
-    "$pkgdir/usr/share/libalpm/scripts/update-qp-cache"
 }
