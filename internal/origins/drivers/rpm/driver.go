@@ -44,6 +44,10 @@ func (d *RpmDriver) LoadCache(path string) ([]*pkgdata.PkgInfo, error) {
 	return pkgdata.LoadProtoCache(path)
 }
 
+func (d *RpmDriver) UpdateHistory(_ string, _ []*pkgdata.PkgInfo) error {
+	return nil
+}
+
 func (d *RpmDriver) SaveCache(cacheRoot string, pkgs []*pkgdata.PkgInfo) error {
 	return pkgdata.SaveProtoCache(cacheRoot, pkgs)
 }

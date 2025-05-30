@@ -30,6 +30,10 @@ func (d *PacmanDriver) LoadCache(path string) ([]*pkgdata.PkgInfo, error) {
 	return pkgdata.LoadProtoCache(path)
 }
 
+func (d *PacmanDriver) UpdateHistory(cacheRoot string, pkgs []*pkgdata.PkgInfo) error {
+	return nil
+}
+
 func (d *PacmanDriver) SaveCache(cacheRoot string, pkgs []*pkgdata.PkgInfo) error {
 	return pkgdata.SaveProtoCache(cacheRoot, pkgs)
 }

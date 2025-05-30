@@ -26,6 +26,10 @@ func (d *OpkgDriver) ResolveDeps(pkgs []*pkgdata.PkgInfo) ([]*pkgdata.PkgInfo, e
 	return pkgdata.ResolveDependencyGraph(pkgs, nil)
 }
 
+func (d *OpkgDriver) UpdateHistory(_ string, _ []*pkgdata.PkgInfo) error {
+	return nil
+}
+
 func (d *OpkgDriver) LoadCache(path string) ([]*pkgdata.PkgInfo, error) {
 	return pkgdata.LoadProtoCache(path)
 }
