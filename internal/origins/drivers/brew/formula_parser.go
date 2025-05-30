@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"qp/internal/consts"
+	"qp/internal/origins/shared"
 	"qp/internal/pkgdata"
 
 	json "github.com/goccy/go-json"
@@ -61,6 +62,11 @@ func parseFormulaReceipt(iPkg *installedPkg) (*pkgdata.PkgInfo, error) {
 
 	if iPkg.IsTap {
 		inferTapMetadata(pkg, iPkg.VersionPath)
+	}
+
+	creationTime, isReliable, err := shared.GetCreationTime(filepath.Dir(iPkg.VersionPath))
+	if err == nil && isReliable {
+		pkg.InstallTimestamp = creationTime
 	}
 
 	inferBuildDate(pkg, receipt)
