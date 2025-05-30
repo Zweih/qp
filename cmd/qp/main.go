@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"os/exec"
 	"qp/api/driver"
 	"qp/internal/config"
 	"qp/internal/consts"
@@ -34,7 +35,11 @@ func mainWithConfig(configProvider config.ConfigProvider) error {
 	}
 
 	if cfg.CacheOnly != "" {
-		return rebuildCache(cfg.CacheOnly)
+		return forkCacheWorker(cfg.CacheOnly)
+	}
+
+	if cfg.CacheWorker != "" {
+		return rebuildCache(cfg.CacheWorker)
 	}
 
 	isInteractive := isInteractive(cfg.DisableProgress)
@@ -157,6 +162,21 @@ func isInteractive(disableProgress bool) bool {
 	return term.IsTerminal(int(os.Stdout.Fd())) && !disableProgress
 }
 
+func forkCacheWorker(originName string) error {
+	cmd := exec.Command(os.Args[0], "--internal-cache-worker="+originName)
+
+	cmd.Stdout = nil
+	cmd.Stderr = nil
+	cmd.Stdin = nil
+
+	err := cmd.Start()
+	if err != nil {
+		return fmt.Errorf("failed to start background cache process: %w", err)
+	}
+
+	return nil
+}
+
 func rebuildCache(originName string) error {
 	cacheBasePath, err := pkgdata.GetCachePath()
 	if err != nil {
@@ -182,8 +202,18 @@ func rebuildCache(originName string) error {
 		wg.Add(1)
 		go func(targetDriver driver.Driver) {
 			defer wg.Done()
-
 			pipeline := phase.NewPipeline(targetDriver, cfg, false, cacheBasePath)
+
+			if pkgdata.IsLockFileExists(pipeline.CacheRoot) {
+				return
+			}
+
+			if err := pkgdata.CreateLockFile(pipeline.CacheRoot); err != nil {
+				return
+			}
+
+			defer pkgdata.RemoveLockFile(pipeline.CacheRoot)
+
 			_, err := pipeline.RunCacheOnly()
 			if err != nil {
 				return
