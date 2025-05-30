@@ -122,7 +122,7 @@ func getSystemInstallTime() (int64, error) {
 
 	for _, path := range systemPaths {
 		if fileInfo, err := os.Stat(path); err == nil {
-			if birthTime, reliable, err := shared.GetBirthTime(path); err == nil && reliable {
+			if birthTime, _, err := shared.GetCreationTime(path); err == nil {
 				if birthTime < oldestTime {
 					oldestTime = birthTime
 					foundAny = true

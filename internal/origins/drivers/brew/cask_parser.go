@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"qp/internal/consts"
+	"qp/internal/origins/shared"
 	"qp/internal/pkgdata"
 
 	json "github.com/goccy/go-json"
@@ -59,6 +60,11 @@ func parseCaskReceipt(name string, path string) (*pkgdata.PkgInfo, error) {
 		Depends:         append(formulaRels, caskRels...),
 		Reason:          reason,
 		PkgType:         typeCask,
+	}
+
+	creationTime, isReliable, err := shared.GetCreationTime(path)
+	if err == nil && isReliable {
+		pkg.InstallTimestamp = creationTime
 	}
 
 	return pkg, nil

@@ -9,7 +9,7 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-func GetBirthTime(path string) (int64, bool, error) {
+func getBirthTime(path string) (int64, bool, error) {
 	var stat unix.Statx_t
 
 	err := unix.Statx(unix.AT_FDCWD, path, 0, unix.STATX_BTIME, &stat)
