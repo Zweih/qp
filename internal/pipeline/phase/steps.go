@@ -91,7 +91,6 @@ func (p *Pipeline) saveCacheStep(
 	_ meta.ProgressReporter,
 ) ([]*pkgdata.PkgInfo, error) {
 	cacheRoot := filepath.Join(p.CachePath, p.Origin.Name())
-	pkgdata.UpdateInstallHistory(cacheRoot, pkgs)
 
 	if cfg.NoCache || p.UsedCache {
 		return pkgs, nil

@@ -49,22 +49,22 @@ func (rel Relation) ProviderKey() string {
 }
 
 type PkgInfo struct {
-	UpdateTimestamp int64
-	BuildTimestamp  int64
-	SeenTimestamp   int64
-	Size            int64
-	Name            string
-	Reason          string
-	Version         string
-	Origin          string
-	Arch            string
-	License         string
-	Description     string
-	Url             string
-	Validation      string
-	PkgType         string
-	PkgBase         string
-	Packager        string
+	UpdateTimestamp  int64
+	BuildTimestamp   int64
+	InstallTimestamp int64
+	Size             int64
+	Name             string
+	Reason           string
+	Version          string
+	Origin           string
+	Arch             string
+	License          string
+	Description      string
+	Url              string
+	Validation       string
+	PkgType          string
+	PkgBase          string
+	Packager         string
 
 	Groups []string
 
@@ -88,7 +88,7 @@ func (pkg *PkgInfo) Key() string {
 func (pkg *PkgInfo) GetInt(field consts.FieldType) int64 {
 	switch field {
 	case consts.FieldInstalled:
-		return pkg.SeenTimestamp
+		return pkg.InstallTimestamp
 	case consts.FieldUpdated:
 		return pkg.UpdateTimestamp
 	case consts.FieldBuilt:
