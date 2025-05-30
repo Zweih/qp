@@ -54,19 +54,24 @@ func fetchPackages(venvRoot string, origin string) ([]*pkgdata.PkgInfo, error) {
 				return nil, fmt.Errorf("couldn't locate metadata file for %s: %v", dir.Name(), err)
 			}
 
-			dirInfo, err := dir.Info()
-			if err != nil {
-				return nil, err
-			}
-
 			pkg, err := parseMetadataFile(metadataPath)
 			if err != nil {
 				return nil, fmt.Errorf("metadata parsing failed for %s: %v", metadataPath, err)
 			}
 
-			pkg.UpdateTimestamp = dirInfo.ModTime().Unix()
+			metaJson, err := os.Stat(filepath.Join(dirPath, "pipx_metadata.json"))
+			if err != nil {
+				return nil, fmt.Errorf("couldn't find pipx_metadata.json in %s: %w", dirPath, err)
+			}
+
+			pkg.UpdateTimestamp = metaJson.ModTime().Unix()
 			pkg.Origin = origin
 			pkg.Reason = consts.ReasonExplicit
+
+			creationTime, _, err := shared.GetBirthTime(dirPath)
+			if err == nil {
+				pkg.InstallTimestamp = creationTime
+			}
 
 			return &PkgMeta{
 				Pkg:          pkg,
