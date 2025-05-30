@@ -5,7 +5,6 @@ import (
 	"qp/internal/compiler"
 	"qp/internal/config"
 	out "qp/internal/display"
-	"qp/internal/pipeline/filtering"
 	"qp/internal/pipeline/meta"
 	"qp/internal/pkgdata"
 	"time"
@@ -116,14 +115,5 @@ func (p *Pipeline) filterStep(
 		return compiler.RunDAG(cfg.QueryExpr, pkgs)
 	}
 
-	if len(cfg.FieldQueries) == 0 {
-		return pkgs, nil
-	}
-
-	filterConditions, err := filtering.QueriesToConditions(cfg.FieldQueries)
-	if err != nil {
-		return nil, fmt.Errorf("filter query error: %w", err)
-	}
-
-	return pkgdata.FilterPackages(pkgs, filterConditions, reportProgress), nil
+	return pkgs, nil
 }

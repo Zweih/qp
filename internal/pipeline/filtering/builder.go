@@ -9,9 +9,16 @@ import (
 	"strings"
 )
 
+type Filter func(*PkgInfo) bool
+
+type FilterCondition struct {
+	Filter    Filter
+	PhaseName string
+	FieldType consts.FieldType
+}
+
 type (
-	PkgInfo         = pkgdata.PkgInfo
-	FilterCondition = pkgdata.FilterCondition
+	PkgInfo = pkgdata.PkgInfo
 )
 
 func QueriesToConditions(queries []query.FieldQuery) ([]*FilterCondition, error) {
@@ -21,24 +28,18 @@ func QueriesToConditions(queries []query.FieldQuery) ([]*FilterCondition, error)
 		var condition *FilterCondition
 		var err error
 
-		switch query.Field {
-		case consts.FieldUpdated, consts.FieldBuilt, consts.FieldSize:
+		switch consts.GetFieldPrim(query.Field) {
+		case consts.FieldPrimDate, consts.FieldPrimSize:
 			condition, err = parseRangeCondition(query)
 
-		case consts.FieldName, consts.FieldReason, consts.FieldVersion,
-			consts.FieldOrigin, consts.FieldArch, consts.FieldLicense,
-			consts.FieldDescription, consts.FieldUrl, consts.FieldValidation,
-			consts.FieldPkgType, consts.FieldPkgBase, consts.FieldPackager:
+		case consts.FieldPrimStr:
 			condition, err = parseStringCondition(query)
 
-		case consts.FieldConflicts, consts.FieldReplaces,
-			consts.FieldDepends, consts.FieldOptDepends,
-			consts.FieldRequiredBy, consts.FieldOptionalFor,
-			consts.FieldProvides:
-			condition, err = parseRelationCondition(query)
-
-		case consts.FieldGroups:
+		case consts.FieldPrimStrArr:
 			condition, err = parseStrArrCondition(query)
+
+		case consts.FieldPrimRel:
+			condition, err = parseRelationCondition(query)
 
 		default:
 			err = fmt.Errorf("unsupported filter type: %s", consts.FieldNameLookup[query.Field])
@@ -110,11 +111,11 @@ func parseRangeCondition(query query.FieldQuery) (*FilterCondition, error) {
 	var parser func(string) (RangeSelector, error)
 	var validator func(RangeSelector) error
 
-	switch query.Field {
-	case consts.FieldUpdated, consts.FieldBuilt:
+	switch consts.GetFieldPrim(query.Field) {
+	case consts.FieldPrimDate:
 		parser = parseDateFilter
 		validator = validateDateFilter
-	case consts.FieldSize:
+	case consts.FieldPrimSize:
 		parser = parseSizeFilter
 		validator = validateSizeFilter
 	default:

@@ -136,7 +136,7 @@ func newRangeCondition(
 	query query.FieldQuery,
 	selector RangeSelector,
 ) (*FilterCondition, error) {
-	matchersByField, ok := RangeMatchers[query.Field]
+	matchersByField, ok := RangeMatchers[consts.GetFieldPrim(query.Field)]
 	if !ok {
 		return nil, fmt.Errorf(
 			"unsupported field type for range: %v", consts.FieldNameLookup[query.Field],
