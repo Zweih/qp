@@ -68,8 +68,8 @@ func fetchPackages(venvRoot string, origin string) ([]*pkgdata.PkgInfo, error) {
 			pkg.Origin = origin
 			pkg.Reason = consts.ReasonExplicit
 
-			creationTime, _, err := shared.GetBirthTime(dirPath)
-			if err == nil {
+			creationTime, reliable, err := shared.GetCreationTime(dirPath)
+			if err == nil && reliable {
 				pkg.InstallTimestamp = creationTime
 			}
 
