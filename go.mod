@@ -7,6 +7,7 @@ require (
 	github.com/glebarez/sqlite v1.11.0
 	github.com/goccy/go-json v0.10.5
 	github.com/spf13/pflag v1.0.6
+	golang.org/x/sys v0.33.0
 	golang.org/x/term v0.32.0
 	google.golang.org/protobuf v1.36.6
 )
@@ -20,7 +21,6 @@ require (
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
-	golang.org/x/sys v0.33.0 // indirect
 	gorm.io/gorm v1.25.7 // indirect
 	modernc.org/libc v1.37.6 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
