@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"qp/internal/pkgdata"
+	"qp/internal/storage"
 
 	json "github.com/goccy/go-json"
 )
@@ -22,7 +22,7 @@ func loadMetadata[T any](
 	keyFunc func(*T) string,
 	wanted map[string]struct{},
 ) (map[string]*T, error) {
-	userCacheDir, err := pkgdata.GetUserCachePath()
+	userCacheDir, err := storage.GetUserCachePath()
 	if err != nil {
 		return nil, fmt.Errorf("failed to read brew cache: %w", err)
 	}

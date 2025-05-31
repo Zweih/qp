@@ -5,6 +5,7 @@ import (
 	"qp/internal/consts"
 	"qp/internal/origins/shared"
 	"qp/internal/pkgdata"
+	"qp/internal/storage"
 )
 
 type RpmDriver struct {
@@ -41,11 +42,11 @@ func (d *RpmDriver) ResolveDeps(pkgs []*pkgdata.PkgInfo) ([]*pkgdata.PkgInfo, er
 }
 
 func (d *RpmDriver) LoadCache(path string) ([]*pkgdata.PkgInfo, error) {
-	return pkgdata.LoadProtoCache(path)
+	return storage.LoadProtoCache(path)
 }
 
 func (d *RpmDriver) SaveCache(cacheRoot string, pkgs []*pkgdata.PkgInfo) error {
-	return pkgdata.SaveProtoCache(cacheRoot, pkgs)
+	return storage.SaveProtoCache(cacheRoot, pkgs)
 }
 
 func (d *RpmDriver) IsCacheStale(cacheMtime int64) (bool, error) {

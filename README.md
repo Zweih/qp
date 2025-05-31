@@ -1,12 +1,14 @@
 # qp - query packages
 
-`qp` is a command-line program for linux and macOS to query installed packages across ecosystems.
+**qp** is a command-line program for linux and macOS to query installed packages across ecosystems.
+
+**qp** queries over 6x faster than native package searching while returning more comprehensive metadata than native package search solutions.
+
+query packages from `brew`, `pacman`, `apt`/`dpkg`, `pipx`, and `dnf`/`yum`. ecosystems are added frequently!
+
+**qp** supports querying with full boolean logic for package metadata, dependency relations, and more.
 
 you can find installation instructions [here](#installation).
-
-`qp` supports querying with full boolean logic for package metadata, dependency relations, and more.
-
-query packages from `brew`, `pacman`, `apt`, `dpkg`, `pipx`, `dnf`, and `yum`. ecosystems are added frequently!
 
 check [features](#features) to find out more.
 
@@ -52,9 +54,9 @@ this package is compatible with the following platforms and distributions:
  - [elementary OS](https://elementary.io/)
  - the 50 other arch, debian, and fedora-based distros, as long as they have `apt`/`dpkg`, `brew`, `pacman`, `dnf`/`yum`, or `opkg` installed
 
-`qp` also detects and queries application-specific package managers like `pipx` for isolated python applications, expanding package discovery beyond traditional system package management.
+**qp** also detects and queries other system level package managers like `pipx` for isolated python applications, expanding package discovery beyond traditional system package management.
 
-`qp` supports embedded linux systems, including meta-distributions like [yocto](https://www.yoctoproject.org/) that use `opkg` (`.ipk` packages) or `apt`/`dpkg` (`.deb` packages) or `.rpm` packages!
+**qp** supports embedded linux systems, including meta-distributions like [yocto](https://www.yoctoproject.org/) that use `opkg` (`.ipk` packages) or `apt`/`dpkg` (`.deb` packages) or `.rpm` packages!
 
 ## features
 
@@ -186,7 +188,7 @@ learn about installation [here](#installation)
 
 ### homebrew (macOS or linuxbrew)
 
-if you have [homebrew](https://brew.sh/) (`brew`), install via `qp`'s cask repo:
+if you have [homebrew](https://brew.sh/) (`brew`), install via **qp**'s cask repo:
 ```bash
 brew tap zweih/qp
 brew install zweih/qp/qp

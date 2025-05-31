@@ -8,6 +8,7 @@ import (
 	"qp/internal/origins/shared"
 	"qp/internal/origins/worker"
 	"qp/internal/pkgdata"
+	"qp/internal/storage"
 	"sync"
 )
 
@@ -20,7 +21,7 @@ func fetchPackages(origin string, cacheRoot string) ([]*pkgdata.PkgInfo, error) 
 	numPkgs := len(pkgPaths)
 	descPathChan := make(chan string, numPkgs)
 
-	cachedHistory, latestLogTime, err := pkgdata.LoadInstallHistory(cacheRoot)
+	cachedHistory, latestLogTime, err := storage.LoadInstallHistory(cacheRoot)
 	if err != nil {
 		cachedHistory = make(map[string]int64)
 		latestLogTime = 0
@@ -102,7 +103,7 @@ func fetchPackages(origin string, cacheRoot string) ([]*pkgdata.PkgInfo, error) 
 		}
 	}
 
-	err = pkgdata.SaveInstallHistory(cacheRoot, currentHistory, newLatestTime)
+	err = storage.SaveInstallHistory(cacheRoot, currentHistory, newLatestTime)
 	return pkgs, err
 }
 

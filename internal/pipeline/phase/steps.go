@@ -7,6 +7,7 @@ import (
 	"qp/internal/pipeline/meta"
 	"qp/internal/pkgdata"
 	"qp/internal/quipple/compiler"
+	"qp/internal/storage"
 	"time"
 )
 
@@ -24,7 +25,7 @@ func (p *Pipeline) loadCacheStep(
 		return nil, nil
 	}
 
-	cacheMtime, err := pkgdata.LoadCacheModTime(p.CacheRoot)
+	cacheMtime, err := storage.LoadCacheModTime(p.CacheRoot)
 	if err != nil {
 		return nil, nil
 	}
@@ -97,7 +98,7 @@ func (p *Pipeline) saveCacheStep(
 		return pkgs, nil
 	}
 
-	err = pkgdata.SaveCacheModTime(p.CacheRoot, p.ModTime)
+	err = storage.SaveCacheModTime(p.CacheRoot, p.ModTime)
 	if err != nil {
 		out.WriteLine(fmt.Sprintf("Warning: failed to save cache modtime: %v", err))
 		return pkgs, nil

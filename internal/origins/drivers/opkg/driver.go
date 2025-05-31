@@ -5,6 +5,7 @@ import (
 	"qp/internal/consts"
 	"qp/internal/origins/shared"
 	"qp/internal/pkgdata"
+	"qp/internal/storage"
 )
 
 type OpkgDriver struct{}
@@ -27,11 +28,11 @@ func (d *OpkgDriver) ResolveDeps(pkgs []*pkgdata.PkgInfo) ([]*pkgdata.PkgInfo, e
 }
 
 func (d *OpkgDriver) LoadCache(path string) ([]*pkgdata.PkgInfo, error) {
-	return pkgdata.LoadProtoCache(path)
+	return storage.LoadProtoCache(path)
 }
 
 func (d *OpkgDriver) SaveCache(cacheRoot string, pkgs []*pkgdata.PkgInfo) error {
-	return pkgdata.SaveProtoCache(cacheRoot, pkgs)
+	return storage.SaveProtoCache(cacheRoot, pkgs)
 }
 
 func (d *OpkgDriver) IsCacheStale(cacheMtime int64) (bool, error) {

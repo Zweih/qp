@@ -5,6 +5,7 @@ import (
 	"qp/internal/consts"
 	"qp/internal/origins/shared"
 	"qp/internal/pkgdata"
+	"qp/internal/storage"
 )
 
 type PacmanDriver struct{}
@@ -27,11 +28,11 @@ func (d *PacmanDriver) ResolveDeps(pkgs []*pkgdata.PkgInfo) ([]*pkgdata.PkgInfo,
 }
 
 func (d *PacmanDriver) LoadCache(path string) ([]*pkgdata.PkgInfo, error) {
-	return pkgdata.LoadProtoCache(path)
+	return storage.LoadProtoCache(path)
 }
 
 func (d *PacmanDriver) SaveCache(cacheRoot string, pkgs []*pkgdata.PkgInfo) error {
-	return pkgdata.SaveProtoCache(cacheRoot, pkgs)
+	return storage.SaveProtoCache(cacheRoot, pkgs)
 }
 
 func (d *PacmanDriver) IsCacheStale(cacheMtime int64) (bool, error) {
