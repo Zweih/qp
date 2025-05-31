@@ -5,6 +5,7 @@ import (
 	"qp/internal/consts"
 	"qp/internal/origins/shared"
 	"qp/internal/pkgdata"
+	"qp/internal/storage"
 )
 
 type BrewDriver struct {
@@ -31,11 +32,11 @@ func (d *BrewDriver) ResolveDeps(pkgs []*pkgdata.PkgInfo) ([]*pkgdata.PkgInfo, e
 }
 
 func (d *BrewDriver) LoadCache(path string) ([]*pkgdata.PkgInfo, error) {
-	return pkgdata.LoadProtoCache(path)
+	return storage.LoadProtoCache(path)
 }
 
 func (d *BrewDriver) SaveCache(cacheRoot string, pkgs []*pkgdata.PkgInfo) error {
-	return pkgdata.SaveProtoCache(cacheRoot, pkgs)
+	return storage.SaveProtoCache(cacheRoot, pkgs)
 }
 
 func (d *BrewDriver) IsCacheStale(cacheModTime int64) (bool, error) {

@@ -1,4 +1,4 @@
-package pkgdata
+package storage
 
 import (
 	"errors"
@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/user"
 	"path/filepath"
+	"qp/internal/pkgdata"
 	pb "qp/internal/protobuf"
 	"runtime"
 	"strconv"
@@ -99,7 +100,7 @@ func LoadCacheModTime(cacheRoot string) (int64, error) {
 	return strconv.ParseInt(strings.TrimSpace(string(data)), 10, 64)
 }
 
-func LoadProtoCache(cacheRoot string) ([]*PkgInfo, error) {
+func LoadProtoCache(cacheRoot string) ([]*pkgdata.PkgInfo, error) {
 	cachePath := cacheRoot + dotCache
 	if cachePath == "" {
 		return nil, errors.New("invalid cache path, skipping cache load")
@@ -124,7 +125,7 @@ func LoadProtoCache(cacheRoot string) ([]*PkgInfo, error) {
 	return pkgs, nil
 }
 
-func SaveProtoCache(cacheRoot string, pkgs []*PkgInfo) error {
+func SaveProtoCache(cacheRoot string, pkgs []*pkgdata.PkgInfo) error {
 	cachePath := cacheRoot + dotCache
 
 	cachedPkgs := &pb.CachedPkgs{
@@ -140,7 +141,7 @@ func SaveProtoCache(cacheRoot string, pkgs []*PkgInfo) error {
 	return os.WriteFile(cachePath, byteData, 0644)
 }
 
-func relationsToProtos(rels []Relation) []*pb.Relation {
+func relationsToProtos(rels []pkgdata.Relation) []*pb.Relation {
 	pbRels := make([]*pb.Relation, len(rels))
 	for i, rel := range rels {
 		pbRels[i] = &pb.Relation{
@@ -156,7 +157,7 @@ func relationsToProtos(rels []Relation) []*pb.Relation {
 	return pbRels
 }
 
-func pkgsToProtos(pkgs []*PkgInfo) []*pb.PkgInfo {
+func pkgsToProtos(pkgs []*pkgdata.PkgInfo) []*pb.PkgInfo {
 	pbPkgs := make([]*pb.PkgInfo, len(pkgs))
 	for i, pkg := range pkgs {
 		pbPkgs[i] = &pb.PkgInfo{
@@ -190,11 +191,11 @@ func pkgsToProtos(pkgs []*PkgInfo) []*pb.PkgInfo {
 	return pbPkgs
 }
 
-func protosToRelations(pbRels []*pb.Relation) []Relation {
-	rels := make([]Relation, len(pbRels))
+func protosToRelations(pbRels []*pb.Relation) []pkgdata.Relation {
+	rels := make([]pkgdata.Relation, len(pbRels))
 	for i, pbRel := range pbRels {
-		rels[i] = Relation{
-			Operator:     RelationOp(pbRel.Operator),
+		rels[i] = pkgdata.Relation{
+			Operator:     pkgdata.RelationOp(pbRel.Operator),
 			Depth:        pbRel.Depth,
 			Name:         pbRel.Name,
 			Version:      pbRel.Version,
@@ -206,10 +207,10 @@ func protosToRelations(pbRels []*pb.Relation) []Relation {
 	return rels
 }
 
-func protosToPkgs(pbPkgs []*pb.PkgInfo) []*PkgInfo {
-	pkgs := make([]*PkgInfo, len(pbPkgs))
+func protosToPkgs(pbPkgs []*pb.PkgInfo) []*pkgdata.PkgInfo {
+	pkgs := make([]*pkgdata.PkgInfo, len(pbPkgs))
 	for i, pbPkg := range pbPkgs {
-		pkgs[i] = &PkgInfo{
+		pkgs[i] = &pkgdata.PkgInfo{
 			InstallTimestamp: pbPkg.InstallTimestamp,
 			UpdateTimestamp:  pbPkg.UpdateTimestamp,
 			BuildTimestamp:   pbPkg.BuildTimestamp,

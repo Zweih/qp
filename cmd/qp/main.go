@@ -13,6 +13,7 @@ import (
 	"qp/internal/pipeline/phase"
 	"qp/internal/pkgdata"
 	"qp/internal/quipple/syntax"
+	"qp/internal/storage"
 	"sync"
 
 	"github.com/spf13/pflag"
@@ -43,7 +44,7 @@ func mainWithConfig(configProvider config.ConfigProvider) error {
 	}
 
 	isInteractive := isInteractive(cfg.DisableProgress)
-	cacheBasePath, err := pkgdata.GetCachePath()
+	cacheBasePath, err := storage.GetCachePath()
 	if err != nil {
 		out.WriteLine(fmt.Sprintf("WARNING: failed to set up cache dir: %v", err))
 	}
@@ -179,7 +180,7 @@ func forkCacheWorker(originName string) error {
 
 // TODO: add debouncing
 func rebuildCache(originName string) error {
-	cacheBasePath, err := pkgdata.GetCachePath()
+	cacheBasePath, err := storage.GetCachePath()
 	if err != nil {
 		return fmt.Errorf("failed to set up cache dir: %v", err)
 	}
@@ -205,15 +206,15 @@ func rebuildCache(originName string) error {
 			defer wg.Done()
 			pipeline := phase.NewPipeline(targetDriver, cfg, false, cacheBasePath)
 
-			if pkgdata.IsLockFileExists(pipeline.CacheRoot) {
+			if storage.IsLockFileExists(pipeline.CacheRoot) {
 				return
 			}
 
-			if err := pkgdata.CreateLockFile(pipeline.CacheRoot); err != nil {
+			if err := storage.CreateLockFile(pipeline.CacheRoot); err != nil {
 				return
 			}
 
-			defer pkgdata.RemoveLockFile(pipeline.CacheRoot)
+			defer storage.RemoveLockFile(pipeline.CacheRoot)
 
 			_, err := pipeline.RunCacheOnly()
 			if err != nil {
