@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"qp/internal/consts"
 	"qp/internal/pkgdata"
-	"qp/internal/query"
+	"qp/internal/quipple/query"
 	"sort"
 	"strings"
 )

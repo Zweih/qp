@@ -2,10 +2,10 @@ package syntax
 
 import (
 	"fmt"
-	"qp/internal/ast"
 	"qp/internal/consts"
-	"qp/internal/preprocess"
-	"qp/internal/query"
+	"qp/internal/quipple/ast"
+	"qp/internal/quipple/preprocess"
+	"qp/internal/quipple/query"
 	"strings"
 )
 

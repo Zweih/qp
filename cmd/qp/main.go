@@ -12,7 +12,7 @@ import (
 	"qp/internal/origins"
 	"qp/internal/pipeline/phase"
 	"qp/internal/pkgdata"
-	"qp/internal/syntax"
+	"qp/internal/quipple/syntax"
 	"sync"
 
 	"github.com/spf13/pflag"

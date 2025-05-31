@@ -2,7 +2,7 @@ package ast
 
 import (
 	"fmt"
-	"qp/internal/query"
+	"qp/internal/quipple/query"
 )
 
 func ParseExprBlock(rawTokens []string) (Expr, error) {

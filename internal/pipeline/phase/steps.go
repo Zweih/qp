@@ -2,11 +2,11 @@ package phase
 
 import (
 	"fmt"
-	"qp/internal/compiler"
 	"qp/internal/config"
 	out "qp/internal/display"
 	"qp/internal/pipeline/meta"
 	"qp/internal/pkgdata"
+	"qp/internal/quipple/compiler"
 	"time"
 )
 

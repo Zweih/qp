@@ -5,7 +5,7 @@ import (
 	"os"
 	"qp/internal/config"
 	"qp/internal/consts"
-	"qp/internal/syntax"
+	"qp/internal/quipple/syntax"
 	"strings"
 	"testing"
 )
