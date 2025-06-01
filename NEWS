@@ -1,4 +1,11 @@
 # qp Release Notes
+## v5.71.0
+### What's Changed
+* Feature: Deprecate flag-based syntax by @Zweih in https://github.com/Zweih/qp/pull/369
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.70.1...v5.71.0
+
+
 ## v5.70.2
 ### What's Changed
 * Refactor: Pipx discovery by @Zweih in https://github.com/Zweih/qp/pull/368
@@ -709,10 +716,3 @@
 * Feature: Add pkgtype field by @Zweih in https://github.com/Zweih/qp/pull/176
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v4.12.2...v4.13.0
-
-
-## v4.12.2
-### What's Changed
-* Refactor: Rename dependency resolution by @Zweih in https://github.com/Zweih/qp/pull/174
-
-**Full Changelog**: https://github.com/Zweih/qp/compare/v4.12.1...v4.12.2
