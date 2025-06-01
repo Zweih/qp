@@ -8,4 +8,4 @@ Target = *
 [Action]
 Description = Updating qp cache...
 When = PostTransaction
-Exec = /usr/bin/qp --cache-only=pacman
+Exec = /bin/sh -c 'REAL_USER="${SUDO_USER:-$USER}"; REAL_HOME=$(eval echo "~$REAL_USER"); sudo -u "$REAL_USER" HOME="$REAL_HOME" /usr/bin/qp --cache-only=pacman'
