@@ -1,5 +1,5 @@
-github.com/Zweih/go-rpmdb/pkg v0.1.1 h1:7ec/2WYmTu6qlsSnRFgymHuCKRoM2sB/iTzTJsdLb+8=
-github.com/Zweih/go-rpmdb/pkg v0.1.1/go.mod h1:PQ33OzusXF90lUhLnrxarT/wjwY0zOmpiS0Ak/WhF/Y=
+github.com/Zweih/go-rpmdb/pkg v0.1.2 h1:Ie+C/T8Jdn36+mFL2TMc1ul8i1W1VLo9GPyv24SAwMo=
+github.com/Zweih/go-rpmdb/pkg v0.1.2/go.mod h1:PQ33OzusXF90lUhLnrxarT/wjwY0zOmpiS0Ak/WhF/Y=
 github.com/goccy/go-json v0.10.5 h1:Fq85nIqj+gXn/S5ahsiTlK3TmC85qgirsdTP/+DeaC4=
 github.com/goccy/go-json v0.10.5/go.mod h1:oq7eo15ShAhp70Anwd5lgX2pLfOS3QCiwU/PULtXL6M=
 github.com/google/go-cmp v0.6.0 h1:ofyhxvXcZhMsU5ulbFiLKl/XBFqE1GSq7atu8tAmTRI=
