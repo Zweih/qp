@@ -1,4 +1,11 @@
 # qp Release Notes
+## v5.71.2
+### What's Changed
+* Refactor: Storage package by @Zweih in https://github.com/Zweih/qp/pull/371
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.71.1...v5.71.2
+
+
 ## v5.71.1
 ### What's Changed
 * Refactor: Quipple language by @Zweih in https://github.com/Zweih/qp/pull/370
@@ -708,11 +715,3 @@
 * Feature: Add groups field by @Zweih in https://github.com/Zweih/qp/pull/180
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v4.14.0...v4.15.0
-
-
-## v4.14.0
-### What's Changed
-* Documentation: Typo fix by @Zweih in https://github.com/Zweih/qp/pull/177
-* Feature: Cache regeneration with `--regen-cache` by @Zweih in https://github.com/Zweih/qp/pull/178
-
-**Full Changelog**: https://github.com/Zweih/qp/compare/v4.13.0...v4.14.0
