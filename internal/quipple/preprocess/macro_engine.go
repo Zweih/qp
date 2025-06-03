@@ -50,6 +50,8 @@ func expandWhereMacro(token string) ([]string, bool) {
 		expanded = []string{"no:required-by", "and", "reason=dependency", "and", "no:optional-for"}
 	case "heavy":
 		expanded = []string{"size=100MB:"}
+	case "light":
+		expanded = []string{"size=:1MB"}
 	default:
 		return nil, false
 	}

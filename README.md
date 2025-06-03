@@ -456,6 +456,16 @@ some frequently-used query patterns are available as built-in macros for conveni
   qp where size=100MB:
   ```
 
+* `light` - matches packages 1MB and smaller
+  ```
+  qp w light
+  ```
+
+  is equivalent to:
+  ```
+  qp where size=1MB:
+  ```
+
 these macros can be combined with other queries as usual:
 
 ```
