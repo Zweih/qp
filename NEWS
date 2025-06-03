@@ -1,4 +1,11 @@
 # qp Release Notes
+## v5.72.1
+### What's Changed
+* Fix: Fresh cache modtime by @Zweih in https://github.com/Zweih/qp/pull/374
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.72.0...v5.72.1
+
+
 ## v5.72.0
 ### What's Changed
 * Feature: Add light macro by @Zweih in https://github.com/Zweih/qp/pull/373
@@ -708,10 +715,3 @@
 * Feature: Add validation field by @Zweih in https://github.com/Zweih/qp/pull/184
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v4.15.1...v4.16.0
-
-
-## v4.15.1
-### What's Changed
-* Feature: Add PGP signing to CI/CD by @Zweih in https://github.com/Zweih/qp/pull/183
-
-**Full Changelog**: https://github.com/Zweih/qp/compare/v4.15.0...v4.15.1
