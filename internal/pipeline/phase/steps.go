@@ -57,6 +57,8 @@ func (p *Pipeline) fetchStep(
 		return pkgs, nil
 	}
 
+	p.ModTime = time.Now().Unix()
+
 	pkgs, err := p.Origin.Load(p.CacheRoot)
 	if err != nil {
 		err = fmt.Errorf("failed to fetch packages: %v", err)
