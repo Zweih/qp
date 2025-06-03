@@ -9,6 +9,7 @@ license=("GPL3")
 makedepends=("go>=1.24.1")
 conflicts=("qp-bin" "qp-git")
 replaces=("yaylog" "yaylog-bin" "yaylog-git")
+optdepends=('sqlite: RPM support')
 source=("${url}/releases/download/v${pkgver}/qp-v${pkgver}.tar.gz")
 sha256sums=("eefadf552b7f3e5610ffc92d28eb147f999c843e8c7e58611e1e6a86f9017e43")
 

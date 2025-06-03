@@ -9,6 +9,7 @@ license=("GPL3")
 provides=("qp")
 conflicts=("qp" "qp-git")
 replaces=("yaylog" "yaylog-bin" "yaylog-git")
+optdepends=('sqlite: RPM support')
 
 _release_url="${url}/releases/download/v${pkgver}/qp-v${pkgver}"
 _ext=".tar.gz"
