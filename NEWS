@@ -1,4 +1,11 @@
 # qp Release Notes
+## v5.72.0
+### What's Changed
+* Feature: Add light macro by @Zweih in https://github.com/Zweih/qp/pull/373
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.71.2...v5.72.0
+
+
 ## v5.71.2
 ### What's Changed
 * Refactor: Storage package by @Zweih in https://github.com/Zweih/qp/pull/371
@@ -708,10 +715,3 @@
 * Feature: Add PGP signing to CI/CD by @Zweih in https://github.com/Zweih/qp/pull/183
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v4.15.0...v4.15.1
-
-
-## v4.15.0
-### What's Changed
-* Feature: Add groups field by @Zweih in https://github.com/Zweih/qp/pull/180
-
-**Full Changelog**: https://github.com/Zweih/qp/compare/v4.14.0...v4.15.0
