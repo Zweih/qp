@@ -22,10 +22,10 @@ const (
 	dnfReasonUser       = 2
 	dnfReasonWeakDep    = 4
 
-	dnfActionInstall  = 1
-	dnfActionUpgrade  = 2
-	dnfActionRemove   = 3
-	dnfActionObsolete = 4
+	dnfActionInstall  = 1 // new package installation
+	dnfActionUpgrade  = 6 // installing new version of existing package
+	dnfActionUpgraded = 7 // removing old version during upgrade
+	dnfActionRemove   = 8
 
 	yumReasonUser = "user"
 	yumReasonDep  = "dep"

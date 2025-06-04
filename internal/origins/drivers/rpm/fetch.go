@@ -34,28 +34,33 @@ func fetchPackages(origin string, path string) ([]*pkgdata.PkgInfo, error) {
 		}
 
 		reason := consts.ReasonExplicit
+
+		// TODO: perhaps for yum, a file should be saved for history
+		installTimestamp := int64(rpmPkg.InstallTime)
 		if historyReason, exists := reasonMap[rpmPkg.Name]; exists {
-			reason = historyReason
+			reason = historyReason.Reason
+			installTimestamp = historyReason.Timestamp
 		}
 
 		pkg := &pkgdata.PkgInfo{
-			UpdateTimestamp: int64(rpmPkg.InstallTime),
-			BuildTimestamp:  int64(rpmPkg.BuildTime),
-			Name:            rpmPkg.Name,
-			Version:         parseVersion(rpmPkg.Epoch, rpmPkg.Version),
-			Arch:            rpmPkg.Arch,
-			Size:            int64(rpmPkg.Size),
-			License:         rpmPkg.License,
-			Origin:          origin,
-			Description:     rpmPkg.Summary,
-			Packager:        rpmPkg.Packager,
-			Url:             rpmPkg.URL,
-			Groups:          []string{group},
-			Reason:          reason,
-			Conflicts:       parseRelationList(rpmPkg.Conflicts),
-			Replaces:        parseRelationList(rpmPkg.Obsoletes),
-			Depends:         parseRelationList(rpmPkg.Requires),
-			Provides:        parseRelationList(rpmPkg.Provides),
+			InstallTimestamp: installTimestamp,
+			UpdateTimestamp:  int64(rpmPkg.InstallTime),
+			BuildTimestamp:   int64(rpmPkg.BuildTime),
+			Name:             rpmPkg.Name,
+			Version:          parseVersion(rpmPkg.Epoch, rpmPkg.Version),
+			Arch:             rpmPkg.Arch,
+			Size:             int64(rpmPkg.Size),
+			License:          rpmPkg.License,
+			Origin:           origin,
+			Description:      rpmPkg.Summary,
+			Packager:         rpmPkg.Packager,
+			Url:              rpmPkg.URL,
+			Groups:           []string{group},
+			Reason:           reason,
+			Conflicts:        parseRelationList(rpmPkg.Conflicts),
+			Replaces:         parseRelationList(rpmPkg.Obsoletes),
+			Depends:          parseRelationList(rpmPkg.Requires),
+			Provides:         parseRelationList(rpmPkg.Provides),
 		}
 
 		pkgs = append(pkgs, pkg)
