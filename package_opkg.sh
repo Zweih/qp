@@ -53,6 +53,7 @@ Section: utils
 License: GPL-3.0-only
 Description: qp - Query Packages. A CLI tool for querying installed packages.
 Homepage: https://github.com/Zweih/qp
+Suggests: sqlite3
 EOF
 
   fakeroot sh -c "cd \"$OUTDIR\" && opkg-build -o 0 -g 0 \"${PKGDIR#$OUTDIR/}\" ."

@@ -50,6 +50,7 @@ Installed-Size: ${SIZE_KB}
 Maintainer: Fernando Nunez <me@fernandonunez.io>
 Description: qp - Query Packages. A CLI tool for querying installed packages.
 Homepage: https://github.com/Zweih/qp
+Suggests: sqlite3
 EOF
 
 dpkg-deb --build "$PKGDIR"
