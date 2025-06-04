@@ -1,7 +1,14 @@
 # qp Release Notes
+## v5.74.0
+### What's Changed
+* Feature: Manage storage permissions by @Zweih in https://github.com/Zweih/qp/pull/376
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.73.0...v5.74.0
+
+
 ## v5.73.0
 ### What's Changed
-* Feature: Remove SQLite dependency. by @Zweih in https://github.com/Zweih/qp/pull/375
+* Feature: Remove SQLite dependency by @Zweih in https://github.com/Zweih/qp/pull/375
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v5.72.1...v5.73.0
 
@@ -708,10 +715,3 @@
 * Feature: Add optdepends field by @Zweih in https://github.com/Zweih/qp/pull/187
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v4.17.0...v4.18.0
-
-
-## v4.17.0
-### What's Changed
-* Feature: Add packager field by @Zweih in https://github.com/Zweih/qp/pull/185
-
-**Full Changelog**: https://github.com/Zweih/qp/compare/v4.16.0...v4.17.0
