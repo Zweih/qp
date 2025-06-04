@@ -14,10 +14,10 @@ func IsLockFileExists(cacheRoot string) bool {
 func CreateLockFile(cacheRoot string) error {
 	lockPath := cacheRoot + dotLock
 	pid := os.Getpid()
-	return os.WriteFile(lockPath, []byte(strconv.Itoa(pid)), 0644)
+	return FileManager.WriteFile(lockPath, []byte(strconv.Itoa(pid)), 0644)
 }
 
 func RemoveLockFile(cacheRoot string) error {
 	lockPath := cacheRoot + dotLock
-	return os.Remove(lockPath)
+	return FileManager.Remove(lockPath)
 }

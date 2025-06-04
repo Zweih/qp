@@ -15,7 +15,7 @@ func GetCachePath() (string, error) {
 	}
 
 	cachePath := filepath.Join(userCacheDir, qpCacheDir)
-	if err := os.MkdirAll(cachePath, 0755); err != nil {
+	if err := FileManager.MkdirAll(cachePath, 0755); err != nil {
 		return "", fmt.Errorf("failed to create cache directory: %w", err)
 	}
 
