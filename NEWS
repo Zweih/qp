@@ -1,4 +1,11 @@
 # qp Release Notes
+## v5.73.0
+### What's Changed
+* Feature: Remove SQLite dependency. by @Zweih in https://github.com/Zweih/qp/pull/375
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.72.1...v5.73.0
+
+
 ## v5.72.1
 ### What's Changed
 * Fix: Fresh cache modtime by @Zweih in https://github.com/Zweih/qp/pull/374
@@ -708,10 +715,3 @@
 * Feature: Add packager field by @Zweih in https://github.com/Zweih/qp/pull/185
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v4.16.0...v4.17.0
-
-
-## v4.16.0
-### What's Changed
-* Feature: Add validation field by @Zweih in https://github.com/Zweih/qp/pull/184
-
-**Full Changelog**: https://github.com/Zweih/qp/compare/v4.15.1...v4.16.0
