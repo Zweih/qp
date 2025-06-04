@@ -14,7 +14,7 @@ import (
 
 func SaveCacheModTime(cacheRoot string, modTime int64) error {
 	modPath := cacheRoot + dotModTime
-	return os.WriteFile(modPath, []byte(strconv.FormatInt(modTime, 10)), 0644)
+	return FileManager.WriteFile(modPath, []byte(strconv.FormatInt(modTime, 10)), 0644)
 }
 
 func LoadCacheModTime(cacheRoot string) (int64, error) {
@@ -65,5 +65,5 @@ func SaveProtoCache(cacheRoot string, pkgs []*pkgdata.PkgInfo) error {
 		return fmt.Errorf("failed to marshal cache: %v", cachedPkgs)
 	}
 
-	return os.WriteFile(cachePath, byteData, 0644)
+	return FileManager.WriteFile(cachePath, byteData, 0644)
 }
