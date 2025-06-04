@@ -1,10 +1,12 @@
 package rpm
 
 import (
-	"database/sql"
 	"fmt"
 	"os"
+	"os/exec"
 	"qp/internal/consts"
+	"strconv"
+	"strings"
 )
 
 const permissionError = "failed to open history database (may need root permissions): %w\n rpm install reasons will incorrectly display as 'explicit'"
@@ -23,155 +25,88 @@ func parseRpmHistory(historyPath string) (map[string]string, error) {
 		return map[string]string{}, fmt.Errorf("history database not found: %w", err)
 	}
 
-	db, err := sql.Open("sqlite", fmt.Sprintf("file:%s?mode=ro&immutable=1", historyPath))
+	dnfQuery := fmt.Sprintf(`
+    SELECT
+      r.name, ti.reason 
+    FROM
+      trans_item ti 
+    JOIN
+      item i ON ti.item_id = i.id 
+    JOIN
+      rpm r ON i.id = r.item_id 
+    WHERE
+      i.item_type = 0 AND ti.action = %d;
+  `, dnfActionInstall)
+
+	cmd := exec.Command("sqlite3", historyPath, dnfQuery)
+	output, err := cmd.CombinedOutput()
+	if err == nil {
+		return parseHistoryOutput(string(output))
+	}
+
+	yumQuery := fmt.Sprintf(`
+    SELECT 
+      p.name, 
+      CASE
+        WHEN py.yumdb_val = '%s' THEN %d
+        WHEN py.yumdb_val = '%s' THEN %d
+        WHEN tdp.state IN ('%s', '%s') THEN %d
+        WHEN tdp.state = '%s' THEN %d
+        ELSE 0
+      END as reason
+    FROM
+      pkgtups p
+    JOIN
+      trans_data_pkgs tdp ON p.pkgtupid = tdp.pkgtupid
+    LEFT JOIN
+      pkg_yumdb py ON p.pkgtupid = py.pkgtupid AND py.yumdb_key = 'reason'
+    WHERE
+      tdp.state IN ('%s', '%s', '%s')
+    GROUP BY
+      p.name;
+  `,
+		yumReasonUser, dnfReasonUser,
+		yumReasonDep, dnfReasonDependency,
+		yumStateInstall, yumStateTrueInstall, dnfReasonUser,
+		yumStateDepInstall, dnfReasonDependency,
+		yumStateInstall, yumStateTrueInstall, yumStateDepInstall)
+
+	cmd = exec.Command("sqlite3", historyPath, yumQuery)
+	output, err = cmd.CombinedOutput()
 	if err != nil {
 		return map[string]string{}, fmt.Errorf(permissionError, err)
 	}
-	defer db.Close()
 
-	var count int
-	testQuery := `
-    SELECT
-      COUNT(*)
-    FROM
-      sqlite_master
-    WHERE
-      type='table'
-  `
-
-	if err := db.QueryRow(testQuery).Scan(&count); err != nil {
-		return map[string]string{}, fmt.Errorf(permissionError, err)
-	}
-
-	// dnf or yum db
-	checkTableQuery := `
-    SELECT 
-      COUNT(*)
-    FROM
-      sqlite_master
-    WHERE
-      type='table' AND name='trans_item'
-  `
-
-	var tableExists bool
-	db.QueryRow(checkTableQuery).Scan(&tableExists)
-
-	if tableExists {
-		return parseDnfHistory(db)
-	}
-
-	return parseYumHistory(db)
+	return parseHistoryOutput(string(output))
 }
 
-func parseDnfHistory(db *sql.DB) (map[string]string, error) {
-	query := `
-		SELECT 
-			r.name,
-			ti.reason
-		FROM
-      trans_item ti
-		JOIN
-      item i ON ti.item_id = i.id
-		JOIN
-      rpm r ON i.id = r.item_id  
-		WHERE
-      i.item_type = 0  -- rpm packages
-		  AND ti.action = 1    -- install actions only
-		ORDER BY
-      r.name
-	`
-
-	rows, err := db.Query(query)
-	if err != nil {
-		return map[string]string{}, fmt.Errorf("failed to query DNF history: %w", err)
-	}
-	defer rows.Close()
-
+func parseHistoryOutput(output string) (map[string]string, error) {
 	reasonMap := make(map[string]string)
 
-	for rows.Next() {
-		var name string
-		var reason int
+	lines := strings.Split(strings.TrimSpace(output), "\n")
+	for _, line := range lines {
+		if line == "" {
+			continue
+		}
 
-		err := rows.Scan(&name, &reason)
+		parts := strings.Split(line, "|")
+		if len(parts) < 2 {
+			continue
+		}
+
+		name := strings.TrimSpace(parts[0])
+		reasonCode := strings.TrimSpace(parts[1])
+		reasonInt, err := strconv.Atoi(reasonCode)
 		if err != nil {
 			continue
 		}
 
 		var pkgReason string
-		switch reason {
-		case dnfReasonUser:
-			pkgReason = consts.ReasonExplicit
+		switch reasonInt {
 		case dnfReasonDependency, dnfReasonWeakDep:
 			pkgReason = consts.ReasonDependency
-		default:
-			pkgReason = ""
-		}
-
-		if pkgReason != "" {
-			reasonMap[name] = pkgReason
-		}
-	}
-
-	return reasonMap, nil
-}
-
-func parseYumHistory(db *sql.DB) (map[string]string, error) {
-	// yum stores install reasons in both state and pkg_yumdb
-	query := `
-		SELECT 
-			p.name,
-			tdp.state,
-			py.yumdb_val as reason
-		FROM
-      pkgtups p
-		JOIN
-      trans_data_pkgs tdp ON p.pkgtupid = tdp.pkgtupid
-		LEFT JOIN
-      pkg_yumdb py ON p.pkgtupid = py.pkgtupid AND py.yumdb_key = 'reason'
-		WHERE
-      tdp.state IN ('Install', 'True-Install', 'Dep-Install')  -- all install ops
-		GROUP BY
-      p.name  -- unique packages
-		ORDER
-      BY p.name
-	`
-
-	rows, err := db.Query(query)
-	if err != nil {
-		return map[string]string{}, fmt.Errorf("failed to query YUM history: %w", err)
-	}
-	defer rows.Close()
-
-	reasonMap := make(map[string]string)
-
-	for rows.Next() {
-		var name, state string
-		var reason sql.NullString
-
-		err := rows.Scan(&name, &state, &reason)
-		if err != nil {
-			continue
-		}
-
-		var pkgReason string
-
-		if reason.Valid {
-			switch reason.String {
-			case yumReasonUser:
-				pkgReason = consts.ReasonExplicit
-			case yumReasonDep:
-				pkgReason = consts.ReasonDependency
-			}
-		}
-
-		if pkgReason == "" {
-			switch state {
-			case yumStateInstall, yumStateTrueInstall:
-				pkgReason = consts.ReasonExplicit
-			case yumStateDepInstall:
-				pkgReason = consts.ReasonDependency
-			}
+		case dnfReasonUser:
+			pkgReason = consts.ReasonExplicit
 		}
 
 		if pkgReason != "" {
