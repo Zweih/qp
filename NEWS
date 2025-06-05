@@ -1,4 +1,11 @@
 # qp Release Notes
+## v5.75.0
+### What's Changed
+* Feature: Add rpm history by @Zweih in https://github.com/Zweih/qp/pull/377
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.74.0...v5.75.0
+
+
 ## v5.74.0
 ### What's Changed
 * Feature: Manage storage permissions by @Zweih in https://github.com/Zweih/qp/pull/376
@@ -708,10 +715,3 @@
 * Feature: Add optional-for field by @Zweih in https://github.com/Zweih/qp/pull/189
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v4.18.0...v4.19.0
-
-
-## v4.18.0
-### What's Changed
-* Feature: Add optdepends field by @Zweih in https://github.com/Zweih/qp/pull/187
-
-**Full Changelog**: https://github.com/Zweih/qp/compare/v4.17.0...v4.18.0
