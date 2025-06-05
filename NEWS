@@ -1,4 +1,12 @@
 # qp Release Notes
+## v5.75.2
+### What's Changed
+* Refactor: Merge compiler and AST modules by @Zweih in https://github.com/Zweih/qp/pull/378
+* Feature: Quipple module by @Zweih in https://github.com/Zweih/qp/pull/379
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.75.0...v5.75.2
+
+
 ## v5.75.0
 ### What's Changed
 * Feature: Add rpm history by @Zweih in https://github.com/Zweih/qp/pull/377
@@ -708,10 +716,3 @@
 * Feature: Fuzzy/Strict querying (fuzzy: =, exact: ==) by @Zweih in https://github.com/Zweih/qp/pull/193
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v4.19.0...v4.20.0
-
-
-## v4.19.0
-### What's Changed
-* Feature: Add optional-for field by @Zweih in https://github.com/Zweih/qp/pull/189
-
-**Full Changelog**: https://github.com/Zweih/qp/compare/v4.18.0...v4.19.0
