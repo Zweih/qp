@@ -28,7 +28,6 @@ type InstallHistory struct {
 	Version            int32                  `protobuf:"varint,1,opt,name=version,proto3" json:"version,omitempty"`
 	LatestLogTimestamp int64                  `protobuf:"varint,4,opt,name=latest_log_timestamp,json=latestLogTimestamp,proto3" json:"latest_log_timestamp,omitempty"`
 	InstallTimestamps  map[string]int64       `protobuf:"bytes,2,rep,name=install_timestamps,json=installTimestamps,proto3" json:"install_timestamps,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"varint,2,opt,name=value"`
-	SeenTimestamps     map[string]int64       `protobuf:"bytes,3,rep,name=seen_timestamps,json=seenTimestamps,proto3" json:"seen_timestamps,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"varint,2,opt,name=value"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
@@ -84,29 +83,18 @@ func (x *InstallHistory) GetInstallTimestamps() map[string]int64 {
 	return nil
 }
 
-func (x *InstallHistory) GetSeenTimestamps() map[string]int64 {
-	if x != nil {
-		return x.SeenTimestamps
-	}
-	return nil
-}
-
 var File_protobuf_history_proto protoreflect.FileDescriptor
 
 const file_protobuf_history_proto_rawDesc = "" +
 	"\n" +
-	"\x16protobuf/history.proto\x12\apkginfo\"\x9a\x03\n" +
+	"\x16protobuf/history.proto\x12\apkginfo\"\x87\x02\n" +
 	"\x0eInstallHistory\x12\x18\n" +
 	"\aversion\x18\x01 \x01(\x05R\aversion\x120\n" +
 	"\x14latest_log_timestamp\x18\x04 \x01(\x03R\x12latestLogTimestamp\x12]\n" +
-	"\x12install_timestamps\x18\x02 \x03(\v2..pkginfo.InstallHistory.InstallTimestampsEntryR\x11installTimestamps\x12T\n" +
-	"\x0fseen_timestamps\x18\x03 \x03(\v2+.pkginfo.InstallHistory.SeenTimestampsEntryR\x0eseenTimestamps\x1aD\n" +
+	"\x12install_timestamps\x18\x02 \x03(\v2..pkginfo.InstallHistory.InstallTimestampsEntryR\x11installTimestamps\x1aD\n" +
 	"\x16InstallTimestampsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\x03R\x05value:\x028\x01\x1aA\n" +
-	"\x13SeenTimestampsEntry\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\x03R\x05value:\x028\x01B\x1cZ\x1ainternal/protobuf;protobufb\x06proto3"
+	"\x05value\x18\x02 \x01(\x03R\x05value:\x028\x01J\x04\b\x03\x10\x04B\x1cZ\x1ainternal/protobuf;protobufb\x06proto3"
 
 var (
 	file_protobuf_history_proto_rawDescOnce sync.Once
@@ -120,20 +108,18 @@ func file_protobuf_history_proto_rawDescGZIP() []byte {
 	return file_protobuf_history_proto_rawDescData
 }
 
-var file_protobuf_history_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_protobuf_history_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_protobuf_history_proto_goTypes = []any{
 	(*InstallHistory)(nil), // 0: pkginfo.InstallHistory
 	nil,                    // 1: pkginfo.InstallHistory.InstallTimestampsEntry
-	nil,                    // 2: pkginfo.InstallHistory.SeenTimestampsEntry
 }
 var file_protobuf_history_proto_depIdxs = []int32{
 	1, // 0: pkginfo.InstallHistory.install_timestamps:type_name -> pkginfo.InstallHistory.InstallTimestampsEntry
-	2, // 1: pkginfo.InstallHistory.seen_timestamps:type_name -> pkginfo.InstallHistory.SeenTimestampsEntry
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	1, // [1:1] is the sub-list for method output_type
+	1, // [1:1] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_protobuf_history_proto_init() }
@@ -147,7 +133,7 @@ func file_protobuf_history_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_protobuf_history_proto_rawDesc), len(file_protobuf_history_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
