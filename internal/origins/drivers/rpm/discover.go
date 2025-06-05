@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"qp/internal/consts"
 	out "qp/internal/display"
 )
 
@@ -44,8 +45,12 @@ func findHistoryDb() string {
 
 	for _, pattern := range candidates {
 		matches, err := filepath.Glob(pattern)
+
 		if err == nil && len(matches) > 0 {
-			return matches[len(matches)-1]
+			dbPath := matches[len(matches)-1]
+			if isValidHistoryDb(dbPath) {
+				return dbPath
+			}
 		}
 	}
 
@@ -64,4 +69,13 @@ func checkSqlite() error {
 	}
 
 	return nil
+}
+
+func isValidHistoryDb(path string) bool {
+	stat, err := os.Stat(path)
+	if err != nil {
+		return false
+	}
+
+	return stat.Size() > consts.KB
 }
