@@ -2,7 +2,7 @@ package config
 
 import (
 	"qp/internal/consts"
-	"qp/internal/quipple/ast"
+	"qp/internal/quipple/compiler"
 	"qp/internal/quipple/query"
 	"qp/internal/quipple/syntax"
 )
@@ -23,7 +23,7 @@ type Config struct {
 	SortOption        syntax.SortOption
 	Fields            []consts.FieldType
 	FieldQueries      []query.FieldQuery
-	QueryExpr         ast.Expr
+	QueryExpr         compiler.Expr
 }
 
 type ConfigProvider interface {

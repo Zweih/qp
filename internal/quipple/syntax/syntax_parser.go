@@ -3,7 +3,7 @@ package syntax
 import (
 	"fmt"
 	"qp/internal/consts"
-	"qp/internal/quipple/ast"
+	"qp/internal/quipple/compiler"
 	"qp/internal/quipple/preprocess"
 	"qp/internal/quipple/query"
 	"strings"
@@ -12,7 +12,7 @@ import (
 type ParsedInput struct {
 	Fields       []consts.FieldType
 	FieldQueries []query.FieldQuery
-	QueryExpr    ast.Expr
+	QueryExpr    compiler.Expr
 	SortOption   SortOption
 	Limit        int
 	LimitMode    LimitMode
@@ -81,9 +81,9 @@ func ParseSyntax(args []string) (ParsedInput, error) {
 		}
 	}
 
-	var queryExpr ast.Expr
+	var queryExpr compiler.Expr
 	if len(whereTokens) > 0 {
-		expr, err := ast.ParseExprBlock(whereTokens)
+		expr, err := compiler.ParseExprBlock(whereTokens)
 		if err != nil {
 			return ParsedInput{}, err
 		}
