@@ -4,11 +4,10 @@ import (
 	"fmt"
 	"qp/internal/pipeline/filtering"
 	"qp/internal/pkgdata"
-	"qp/internal/quipple/ast"
 	"qp/internal/quipple/query"
 )
 
-func RunDAG(expr ast.Expr, pkgs []*pkgdata.PkgInfo) ([]*pkgdata.PkgInfo, error) {
+func RunDAG(expr Expr, pkgs []*pkgdata.PkgInfo) ([]*pkgdata.PkgInfo, error) {
 	root, err := BuildFilterDAG(expr)
 	if err != nil {
 		return nil, err
@@ -32,22 +31,22 @@ func RunDAG(expr ast.Expr, pkgs []*pkgdata.PkgInfo) ([]*pkgdata.PkgInfo, error) 
 	return filtered, nil
 }
 
-func BuildFilterDAG(expr ast.Expr) (FilterNode, error) {
+func BuildFilterDAG(expr Expr) (FilterNode, error) {
 	switch expr := expr.(type) {
-	case *ast.AndExpr:
+	case *AndExpr:
 		return buildAndNode(expr)
-	case *ast.OrExpr:
+	case *OrExpr:
 		return buildOrNode(expr)
-	case *ast.NotExpr:
+	case *NotExpr:
 		return buildNotNode(expr)
-	case *ast.QueryExpr:
+	case *QueryExpr:
 		return buildQueryNode(expr)
 	default:
 		return nil, fmt.Errorf("unsupported expression type")
 	}
 }
 
-func buildAndNode(expr *ast.AndExpr) (FilterNode, error) {
+func buildAndNode(expr *AndExpr) (FilterNode, error) {
 	left, err := BuildFilterDAG(expr.Left)
 	if err != nil {
 		return nil, err
@@ -61,7 +60,7 @@ func buildAndNode(expr *ast.AndExpr) (FilterNode, error) {
 	return &AndNode{Left: left, Right: right}, nil
 }
 
-func buildOrNode(expr *ast.OrExpr) (FilterNode, error) {
+func buildOrNode(expr *OrExpr) (FilterNode, error) {
 	left, err := BuildFilterDAG(expr.Left)
 	if err != nil {
 		return nil, err
@@ -75,7 +74,7 @@ func buildOrNode(expr *ast.OrExpr) (FilterNode, error) {
 	return &OrNode{left, right}, nil
 }
 
-func buildNotNode(expr *ast.NotExpr) (FilterNode, error) {
+func buildNotNode(expr *NotExpr) (FilterNode, error) {
 	inner, err := BuildFilterDAG(expr.Inner)
 	if err != nil {
 		return nil, err
@@ -84,7 +83,7 @@ func buildNotNode(expr *ast.NotExpr) (FilterNode, error) {
 	return &NotNode{inner}, nil
 }
 
-func buildQueryNode(expr *ast.QueryExpr) (FilterNode, error) {
+func buildQueryNode(expr *QueryExpr) (FilterNode, error) {
 	conditions, err := filtering.QueriesToConditions([]query.FieldQuery{expr.Query})
 	if err != nil {
 		return nil, err
