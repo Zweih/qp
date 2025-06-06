@@ -1,11 +1,13 @@
 # qp Release Notes
-## v5.78.1
+## v5.79.2
 ### What's Changed
 * Feature: Improve Linux filesystem detection by @Zweih in https://github.com/Zweih/qp/pull/382
 * Feature: Improve NPM updated timestamp by @Zweih in https://github.com/Zweih/qp/pull/383
 * Fix: MIPSEL statfs length by @Zweih in https://github.com/Zweih/qp/pull/385
+* Fix: Remove unreliable install history by @Zweih in https://github.com/Zweih/qp/pull/384
+* Feature: Origin deduplication by @Zweih in https://github.com/Zweih/qp/pull/386
 
-**Full Changelog**: https://github.com/Zweih/qp/compare/v5.76.0...v5.78.1
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.76.0...v5.79.2
 
 
 ## v5.76.0
