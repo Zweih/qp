@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/user"
 	"path/filepath"
+	"qp/internal/consts"
 	"runtime"
 )
 
@@ -33,7 +34,7 @@ func GetUserCachePath() (string, error) {
 		home = os.Getenv(homeEnv)
 	}
 
-	if runtime.GOOS == osDarwin {
+	if runtime.GOOS == consts.Darwin {
 		return filepath.Join(home, darwinCacheDir), nil
 	}
 

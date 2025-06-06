@@ -4,6 +4,7 @@ import (
 	"qp/api/driver"
 	"qp/internal/origins/drivers/brew"
 	"qp/internal/origins/drivers/deb"
+	"qp/internal/origins/drivers/npm"
 	"qp/internal/origins/drivers/opkg"
 	"qp/internal/origins/drivers/pacman"
 	"qp/internal/origins/drivers/pipx"
@@ -16,6 +17,7 @@ var registeredDrivers = []driver.Driver{
 	&brew.BrewDriver{},
 	&pacman.PacmanDriver{},
 	&pipx.PipxDriver{},
+	&npm.NpmDriver{},
 	&rpm.RpmDriver{},
 }
 
