@@ -21,8 +21,13 @@ type PackageJson struct {
 }
 
 func parsePackageJson(pkgDir string) (*pkgdata.PkgInfo, error) {
+	pkgDirInfo, err := os.Stat(pkgDir)
+	if err != nil {
+		return nil, fmt.Errorf("somehow this directory does not exist: %s. You should report this bug to the author: %w", err)
+	}
+
 	packageJsonPath := filepath.Join(pkgDir, packageJsonFile)
-	jsonInfo, err := os.Stat(packageJsonPath)
+	_, err = os.Stat(packageJsonPath)
 	if err != nil {
 		return nil, fmt.Errorf("%w. No package.json at %s. It looks like NPM did not remove it after uninstalling. You may want to manually remove it.", worker.ErrSkip, pkgDir)
 	}
@@ -43,7 +48,7 @@ func parsePackageJson(pkgDir string) (*pkgdata.PkgInfo, error) {
 	}
 
 	pkg := &pkgdata.PkgInfo{
-		UpdateTimestamp: jsonInfo.ModTime().Unix(),
+		UpdateTimestamp: pkgDirInfo.ModTime().Unix(),
 		Name:            pkgJson.Name,
 		Version:         pkgJson.Version,
 		Reason:          consts.ReasonExplicit,
