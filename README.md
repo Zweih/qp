@@ -228,8 +228,6 @@ installation via `apt` is coming soon™!
 
 ### building from source + manual installation
 
-**note**: this packages is specific to arch-based and debian-based linux distributions
-
 1. clone the repo:
    ```bash
    git clone https://github.com/zweih/qp.git
