@@ -1,7 +1,6 @@
 package npm
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -9,6 +8,8 @@ import (
 	"qp/internal/origins/worker"
 	"qp/internal/pkgdata"
 	"strings"
+
+	json "github.com/goccy/go-json"
 )
 
 type PackageJson struct {
