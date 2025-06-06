@@ -1,4 +1,11 @@
 # qp Release Notes
+## v5.76.0
+### What's Changed
+* Feature: Add npm origin by @Zweih in https://github.com/Zweih/qp/pull/381
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.75.3...v5.76.0
+
+
 ## v5.75.3
 ### What's Changed
 * Refactor: Regenerate history protobuf by @Zweih in https://github.com/Zweih/qp/pull/380
@@ -709,10 +716,3 @@
 * Fix: Value query parsing by @Zweih in https://github.com/Zweih/qp/pull/204
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v4.21.0...v4.22.2
-
-
-## v4.21.0
-### What's Changed
-* Feature: Fuzzy/Exact range querying by @Zweih in https://github.com/Zweih/qp/pull/195
-
-**Full Changelog**: https://github.com/Zweih/qp/compare/v4.20.0...v4.21.0
