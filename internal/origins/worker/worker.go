@@ -8,6 +8,8 @@ import (
 
 const DefaultBufferSize = 64
 
+var ErrSkip = errors.New("skip this item")
+
 func RunWorkers[I any, O any](
 	inputChan <-chan I,
 	errChan chan<- error,
@@ -39,13 +41,17 @@ func RunWorkers[I any, O any](
 			defer errGroup.Done()
 
 			for item := range inputChan {
-				pkg, err := workerFunc(item)
+				result, err := workerFunc(item)
 				if err != nil {
+					if errors.Is(err, ErrSkip) {
+						continue // skip silently
+					}
+
 					errChan <- err
 					continue
 				}
 
-				outputChan <- pkg
+				outputChan <- result
 			}
 		}()
 	}

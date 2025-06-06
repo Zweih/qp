@@ -120,7 +120,7 @@ Tips:
 
 Default Behavior:
   - 20 results shown unless limit is specified
-  - Progress bar disabled in non-interactive terminals
+  - Updated, Name, Reason, and Size fields are displayed
 
 Use 'man qp' to see all available fields
     for select, where, and order.

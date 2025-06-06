@@ -16,7 +16,5 @@ const (
 	dotHistory = ".history"
 	dotLock    = ".lock"
 
-	osDarwin = "darwin"
-
 	darwinCacheDir = "Library/Caches"
 )
