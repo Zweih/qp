@@ -12,6 +12,7 @@ import (
 	"qp/internal/origins"
 	"qp/internal/pipeline/phase"
 	"qp/internal/pkgdata"
+	"qp/internal/quipple/compiler"
 	"qp/internal/quipple/syntax"
 	"qp/internal/storage"
 	"sync"
@@ -81,6 +82,15 @@ func mainWithConfig(configProvider config.ConfigProvider) error {
 	var allPkgs []*pkgdata.PkgInfo
 	for pkgs := range results {
 		allPkgs = append(allPkgs, pkgs...)
+	}
+
+	allPkgs = pkgdata.Deduplicate(allPkgs)
+
+	if cfg.QueryExpr != nil {
+		allPkgs, err = compiler.RunDAG(cfg.QueryExpr, allPkgs)
+		if err != nil {
+			return fmt.Errorf("filtering failed: %w", err)
+		}
 	}
 
 	if len(allPkgs) == 0 {
