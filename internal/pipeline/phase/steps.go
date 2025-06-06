@@ -6,7 +6,6 @@ import (
 	out "qp/internal/display"
 	"qp/internal/pipeline/meta"
 	"qp/internal/pkgdata"
-	"qp/internal/quipple/compiler"
 	"qp/internal/storage"
 	"time"
 )
@@ -104,18 +103,6 @@ func (p *Pipeline) saveCacheStep(
 	if err != nil {
 		out.WriteLine(fmt.Sprintf("Warning: failed to save cache modtime: %v", err))
 		return pkgs, nil
-	}
-
-	return pkgs, nil
-}
-
-func (p *Pipeline) filterStep(
-	cfg *config.Config,
-	pkgs []*pkgdata.PkgInfo,
-	reportProgress meta.ProgressReporter,
-) ([]*pkgdata.PkgInfo, error) {
-	if cfg.QueryExpr != nil {
-		return compiler.RunDAG(cfg.QueryExpr, pkgs)
 	}
 
 	return pkgs, nil
