@@ -4,7 +4,7 @@
 
 **qp** queries over 6x faster than native package searching while returning more comprehensive metadata than native package search solutions.
 
-query packages from `brew`, `pacman`, `apt`/`dpkg`, `pipx`, and `dnf`/`yum`. ecosystems are added frequently!
+query packages from `brew`, `pacman`, `apt`, `npm`, `pipx`, `dnf`, and `opkg`. ecosystems are added frequently!
 
 **qp** supports querying with full boolean logic for package metadata, dependency relations, and more.
 
@@ -54,19 +54,19 @@ this package is compatible with the following platforms and distributions:
  - [elementary OS](https://elementary.io/)
  - the 50 other arch, debian, and fedora-based distros, as long as they have `apt`/`dpkg`, `brew`, `pacman`, `dnf`/`yum`, or `opkg` installed
 
-**qp** also detects and queries other system level package managers like `pipx` for isolated python applications, expanding package discovery beyond traditional system package management.
+**qp** also detects and queries other system level package managers like `npm` or `pipx` for globally installed applications, expanding package discovery beyond traditional system package management.
 
-**qp** supports embedded linux systems, including meta-distributions like [yocto](https://www.yoctoproject.org/) that use `opkg` (`.ipk` packages) or `apt`/`dpkg` (`.deb` packages) or `.rpm` packages!
+**qp** supports embedded linux systems, including meta-distributions like [yocto](https://www.yoctoproject.org/) that use `opkg` (`.ipk` packages) or `apt`/`dpkg` (`.deb` packages) or `.rpm` packages.
 
 ## features
 
 * list installed packages across supported systems
 * compatible with macOS, arch, debian, openwrt, and over 60 distros
-* * supports multiple ecosystems:
-  * system package managers:
-    * pacman, brew, apt/dpkg, dnf/yum, opkg
-* * application package managers:
-    * pipx
+  * supports multiple ecosystems:
+    * system package managers:
+      * pacman, brew, apt/dpkg, dnf/yum, opkg
+    * application package managers:
+      * npm, pipx
 * query packages using an expressive query language
   * supports full boolean logic (`and`, `or`, `not`, grouping)
   * supports fuzzy and strict matching
@@ -183,6 +183,7 @@ learn about installation [here](#installation)
 | - | rpm packaging | - | zypper (openSUSE support) |
 | ✓ | cache-only option | ✓ | pacman hook |
 | - | brew hook | - | deb hook |
+| ✓ | npm origin (npm global packages) | - | nested dependencies |
 
 ## installation
 
@@ -327,11 +328,11 @@ the `pkgtype` field indicates the type or category of package within each ecosys
 | rpm | none | - |
 | opkg | none | - |
 | pipx | none | - |
+| npm | none | - |
 
 **notes:**
 - pacman's pkgtype comes from the package's XDATA field introduced in newer pacman versions
     - older packages may not have this field populated
-- brew distinguishes between formulae (CLI tools/libraries) and casks (GUI applications)
 - deb, rpm, opkg, and pipx origins do not implement package type classifications and will show empty pkgtype values
 
 ### querying with `where`
@@ -344,10 +345,10 @@ the `where` (short: `w`) command is the core of qp's flexible query system.
 - `or`: match any of multiple conditions
 - `not`: invert any condition
 - `q ... p`: group conditions for operation precedence, use them as you would parentheses with `q` being `(` and `p` being `)`
-    - the purpose of this is that `(` and `)` are not safe to use unquoted on the command line
-    - remember with:
-        - `q` is for **q**uery group start: `(`
-        - `p` is for query group sto**p**: `)`
+  - the purpose of this is that `(` and `)` are not safe to use unquoted on the command line
+  - remember with:
+    - `q` is for **q**uery group start: `(`
+    - `p` is for query group sto**p**: `)`
 
 examples:
 ```bash
