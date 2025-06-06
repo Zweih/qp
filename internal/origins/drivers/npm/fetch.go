@@ -80,11 +80,6 @@ func fetchPackages(origin string, modulesDir string) ([]*pkgdata.PkgInfo, error)
 				}
 			}
 
-			creationTime, isReliable, err := shared.GetCreationTime(filepath.Dir(pkgDir))
-			if err == nil && isReliable {
-				pkg.InstallTimestamp = creationTime
-			}
-
 			pkg.Name = name
 			pkg.Groups = groups
 			pkg.Size = size

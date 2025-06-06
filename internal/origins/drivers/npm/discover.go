@@ -35,14 +35,14 @@ func getNodeBin() (string, error) {
 		nodeBinName = nodeBinWin
 	}
 
-	execPath, err := exec.LookPath(nodeBinName)
+	binPath, err := exec.LookPath(nodeBinName)
 	if err != nil {
 		return "", err
 	}
 
-	resolvedPath, err := filepath.EvalSymlinks(execPath)
+	resolvedPath, err := filepath.EvalSymlinks(binPath)
 	if err != nil {
-		return execPath, nil
+		return binPath, nil
 	}
 
 	return resolvedPath, nil
