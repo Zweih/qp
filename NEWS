@@ -1,8 +1,15 @@
 # qp Release Notes
+## v5.75.3
+### What's Changed
+* Refactor: Regenerate history protobuf by @Zweih in https://github.com/Zweih/qp/pull/380
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.75.2...v5.75.3
+
+
 ## v5.75.2
 ### What's Changed
 * Refactor: Merge compiler and AST modules by @Zweih in https://github.com/Zweih/qp/pull/378
-* Feature: Quipple module by @Zweih in https://github.com/Zweih/qp/pull/379
+* Refactor: Quipple module by @Zweih in https://github.com/Zweih/qp/pull/379
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v5.75.0...v5.75.2
 
@@ -709,10 +716,3 @@
 * Feature: Fuzzy/Exact range querying by @Zweih in https://github.com/Zweih/qp/pull/195
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v4.20.0...v4.21.0
-
-
-## v4.20.0
-### What's Changed
-* Feature: Fuzzy/Strict querying (fuzzy: =, exact: ==) by @Zweih in https://github.com/Zweih/qp/pull/193
-
-**Full Changelog**: https://github.com/Zweih/qp/compare/v4.19.0...v4.20.0
