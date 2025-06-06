@@ -35,6 +35,7 @@ func NewPipeline(
 	}
 }
 
+// TODO: we can merge the logic of these two and just swap in arrays
 func (p *Pipeline) Run() ([]*pkgdata.PkgInfo, error) {
 	var wg sync.WaitGroup
 	phases := []PipelinePhase{
@@ -42,7 +43,6 @@ func (p *Pipeline) Run() ([]*pkgdata.PkgInfo, error) {
 		NewPhase("Fetch packages", p.fetchStep, &wg),
 		NewPhase("Resolve dependencies", p.resolveStep, &wg),
 		NewPhase("Save cache", p.saveCacheStep, &wg),
-		NewPhase("Filter", p.filterStep, &wg),
 	}
 
 	pkgs := []*PkgInfo{}
