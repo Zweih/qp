@@ -27,7 +27,8 @@ func getFilesystemType(path string) (int64, error) {
 		return 0, err
 	}
 
-	return statfs.Type, nil
+	// on MIPS architectures, statfs.Type is an int32
+	return int64(statfs.Type), nil
 }
 
 func fsSupportsBtime(path string) bool {
