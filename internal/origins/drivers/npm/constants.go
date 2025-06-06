@@ -12,4 +12,10 @@ const (
 	winModulesDir  = "node_modules"
 
 	packageJsonFile = "package.json"
+
+	fieldType  = "type"
+	fieldName  = "name"
+	fieldEmail = "email"
+
+	archAny = "any"
 )

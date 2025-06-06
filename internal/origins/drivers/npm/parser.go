@@ -23,7 +23,7 @@ type PackageJson struct {
 func parsePackageJson(pkgDir string) (*pkgdata.PkgInfo, error) {
 	pkgDirInfo, err := os.Stat(pkgDir)
 	if err != nil {
-		return nil, fmt.Errorf("somehow this directory does not exist: %s. You should report this bug to the author: %w", err)
+		return nil, fmt.Errorf("the directory %s does not exist: %w", pkgDir, err)
 	}
 
 	packageJsonPath := filepath.Join(pkgDir, packageJsonFile)
@@ -42,7 +42,7 @@ func parsePackageJson(pkgDir string) (*pkgdata.PkgInfo, error) {
 		return nil, fmt.Errorf("failed to parse package.json in %s: %w", pkgDir, err)
 	}
 
-	arch := "any"
+	arch := archAny
 	if len(pkgJson.Cpu) > 0 {
 		arch = strings.Join(pkgJson.Cpu, ", ")
 	}
@@ -55,7 +55,8 @@ func parsePackageJson(pkgDir string) (*pkgdata.PkgInfo, error) {
 		Arch:            arch,
 		Description:     pkgJson.Description,
 		License:         extractLicense(pkgJson.License),
-		Url:             pkgJson.Homepage,
+
+		Url: pkgJson.Homepage,
 	}
 
 	return pkg, nil
@@ -63,13 +64,39 @@ func parsePackageJson(pkgDir string) (*pkgdata.PkgInfo, error) {
 
 // not a fan of type assertion, but a custom unmarshaller wouldn't gain much performance here
 func extractLicense(license interface{}) string {
-	switch v := license.(type) {
+	switch value := license.(type) {
 	case string:
-		return v
+		return value
+
 	case map[string]interface{}:
-		if licType, ok := v["type"].(string); ok {
-			return licType
+		if licenseType, ok := value[fieldType].(string); ok {
+			return licenseType
 		}
+
+	case nil:
+		return ""
+	}
+
+	return ""
+}
+
+func extractAuthor(author interface{}) string {
+	switch value := author.(type) {
+	case string:
+		return value
+
+	case map[string]interface{}:
+		var parts []string
+		if name, ok := value[fieldName].(string); ok {
+			parts = append(parts, name)
+		}
+
+		if email, ok := value[fieldEmail].(string); ok {
+			parts = append(parts, "<"+email+">")
+		}
+
+		return strings.Join(parts, " ")
+
 	case nil:
 		return ""
 	}
