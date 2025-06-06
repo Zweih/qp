@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"qp/internal/consts"
+	"qp/internal/origins/shared"
 	"qp/internal/origins/worker"
 	"qp/internal/pkgdata"
 	"strings"
@@ -16,19 +17,15 @@ type PackageJson struct {
 	Name        string      `json:"name"`
 	Version     string      `json:"version"`
 	Description string      `json:"description"`
-	Cpu         []string    `json:"cpu"`
 	Homepage    string      `json:"homepage"`
+	Cpu         []string    `json:"cpu"`
 	License     interface{} `json:"license"`
+	Author      interface{} `json:"author"`
 }
 
 func parsePackageJson(pkgDir string) (*pkgdata.PkgInfo, error) {
-	pkgDirInfo, err := os.Stat(pkgDir)
-	if err != nil {
-		return nil, fmt.Errorf("the directory %s does not exist: %w", pkgDir, err)
-	}
-
 	packageJsonPath := filepath.Join(pkgDir, packageJsonFile)
-	_, err = os.Stat(packageJsonPath)
+	pkgJsonInfo, err := os.Stat(packageJsonPath)
 	if err != nil {
 		return nil, fmt.Errorf("%w. No package.json at %s. It looks like NPM did not remove it after uninstalling. You may want to manually remove it.", worker.ErrSkip, pkgDir)
 	}
@@ -48,16 +45,22 @@ func parsePackageJson(pkgDir string) (*pkgdata.PkgInfo, error) {
 		arch = strings.Join(pkgJson.Cpu, ", ")
 	}
 
+	updateTimestamp := pkgJsonInfo.ModTime().Unix()
+	creationTime, reliable, err := shared.GetCreationTime(packageJsonPath)
+	if err == nil && reliable {
+		updateTimestamp = max(creationTime, updateTimestamp)
+	}
+
 	pkg := &pkgdata.PkgInfo{
-		UpdateTimestamp: pkgDirInfo.ModTime().Unix(),
+		UpdateTimestamp: updateTimestamp,
 		Name:            pkgJson.Name,
 		Version:         pkgJson.Version,
 		Reason:          consts.ReasonExplicit,
 		Arch:            arch,
 		Description:     pkgJson.Description,
 		License:         extractLicense(pkgJson.License),
-
-		Url: pkgJson.Homepage,
+		Packager:        extractAuthor(pkgJson.Author),
+		Url:             pkgJson.Homepage,
 	}
 
 	return pkg, nil
