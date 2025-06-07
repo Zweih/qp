@@ -73,6 +73,8 @@ this package is compatible with the following platforms and distributions:
   * supports range queries for `size`, `updated`, and `built`
   * supports presence/absence checks (`has:`, `no:`)
   * learn more about querying [here](#querying-with-where)
+  * complex queries via grouping (`q ... p`) and built-in macros
+    * includes `orphan` and `superorphan` filters
 * sort results by any field
 * output formats:
   * table (default)
@@ -80,6 +82,7 @@ this package is compatible with the following platforms and distributions:
   * JSON
 * query by:
   * name, version, origin, architecture, license
+  * cross-origin package detection (also-in field shows where packages exist across different package managers)
   * size on disk
   * update or build time/date
   * package base or groups
@@ -88,9 +91,7 @@ this package is compatible with the following platforms and distributions:
   * installation reason (explicit or dependency)
   * package validation method (e.g., sha256, pgp)
   * packager, URL, description
-  * package type (debug, split, etc.)
-* complex queries via grouping (`q ... p`) and built-in macros
-  * includes `orphan` and `superorphan` filters
+  * package type (debug, split, cask, formula, etc.)
 * customizable field selection for output
 * cache system for fast repeated queries
 * lightweight, fast, concurrent architecture
@@ -184,6 +185,8 @@ learn about installation [here](#installation)
 | ✓ | cache-only option | ✓ | pacman hook |
 | - | brew hook | - | deb hook |
 | ✓ | npm origin (npm global packages) | - | nested dependencies |
+| ✓ | add also-in field (cross-origin managed) | - | add env field |
+| - | add other envs field | - | add support for multiple virtual environments (nvm/pyenv/etc.) |
 
 ## installation
 
@@ -305,6 +308,7 @@ qp [command] [args] [options]
 - `pkgtype` - package type (specific to each origin, some origins have no pkgtype)
 - `pkgbase` - name of the base package used to group split packages; for non-split packages, it is the same as the package name. 
 - `packager` - person/entity who built the package (if available)
+- `also-in` - list of other origins that have this package installed
 - `groups` - list of package groups or categories (e.g., base, gnome, xfce4)
 - `conflicts` - list of packages that conflict, or cause problems, with the package
 - `replaces` - list of packages that are replaced by the package
@@ -511,6 +515,7 @@ qp w q has:depends or has:required-by p and not reason=explicit
 | validation | string |
 | pkgtype | string |
 | packager | string |
+| also-in | string | 
 | groups | string |
 | conflicts | relation |
 | replaces | relation |
@@ -528,8 +533,6 @@ example:
 ```
 qp select all where name=gtk3 --output json
 ```
-
-`gtk3` is one of the few packages that actually has all the fields populated.
 
 output format:
 ```json

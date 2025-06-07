@@ -196,23 +196,23 @@ NodeJS packages installed in isolated environments via npm, yarn, or their deriv
 .B pipx
 Python packages installed in isolated environments via pipx
 
-.SH SUPPORTED QUERY FIELDS
+.SH AVAILABLE FIELDS
+Available for use with \fBselect\fR, \fBorder\fR, and \fBwhere\fR:
+
+updated, built, size, name, reason, version, origin, arch, license,
+description, url, validation, pkgbase, pkgtype, packager, also-in, groups, conflicts,
+replaces, depends, optdepends, required-by, optional-for, provides
+
+.SH FIELD TYPES
 .TP
 .B Range:
 updated, built, size
 .TP
 .B String:
-name, reason, version, origin, arch, license, pkgbase, description, url, groups, validation, pkgtype, packager
+name, reason, version, origin, arch, license, pkgbase, description, url, also-in, groups, validation, pkgtype, packager
 .TP
 .B Relations:
 conflicts, replaces, depends, optdepends, required-by, optional-for, provides
-
-.SH AVAILABLE FIELDS
-Available for use with \fBselect\fR, \fBorder\fR, and \fBwhere\fR:
-
-updated, built, size, name, reason, version, origin, arch, license,
-description, url, validation, pkgbase, pkgtype, packager, groups, conflicts,
-replaces, depends, optdepends, required-by, optional-for, provides
 
 .SH EXAMPLES
 List 10 smallest explicitly installed packages:
