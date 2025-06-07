@@ -1,4 +1,11 @@
 # qp Release Notes
+## v5.80.0
+### What's Changed
+* Feature: Add also-in field by @Zweih in https://github.com/Zweih/qp/pull/387
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.79.2...v5.80.0
+
+
 ## v5.79.2
 ### What's Changed
 * Feature: Improve Linux filesystem detection by @Zweih in https://github.com/Zweih/qp/pull/382
@@ -711,10 +718,3 @@
 * Feature: Add pkgbase query by @Zweih in https://github.com/Zweih/qp/pull/207
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v4.23.0...v4.24.0
-
-
-## v4.23.0
-### What's Changed
-* Feature: Add version flag by @Zweih in https://github.com/Zweih/qp/pull/205
-
-**Full Changelog**: https://github.com/Zweih/qp/compare/v4.22.2...v4.23.0
