@@ -30,6 +30,7 @@ var columnHeaders = map[consts.FieldType]string{
 	consts.FieldValidation:  "VALIDATION",
 	consts.FieldPkgType:     "PKGTYPE",
 	consts.FieldPackager:    "PACKAGER",
+	consts.FieldAlsoIn:      "ALSO IN",
 	consts.FieldGroups:      "GROUPS",
 	consts.FieldConflicts:   "CONFLICTS",
 	consts.FieldReplaces:    "REPLACES",

@@ -2,6 +2,7 @@ package pkgdata
 
 import (
 	"qp/internal/consts"
+	"sort"
 	"strings"
 )
 
@@ -23,7 +24,7 @@ const (
 	pythonNoDash = "python"
 )
 
-func Deduplicate(pkgs []*PkgInfo) []*PkgInfo {
+func EnrichAlsoIn(pkgs []*PkgInfo) []*PkgInfo {
 	nameGroups := make(map[string][]*PkgInfo)
 
 	for _, pkg := range pkgs {
@@ -34,13 +35,21 @@ func Deduplicate(pkgs []*PkgInfo) []*PkgInfo {
 	var result []*PkgInfo
 
 	for _, group := range nameGroups {
-		if len(group) == 1 {
-			result = append(result, group[0])
-			continue
-		}
+		for _, pkg := range group {
+			pkgCopy := *pkg
 
-		bestPkg := bestPriority(group)
-		result = append(result, bestPkg)
+			var otherOrigins []string
+			for _, otherPkg := range group {
+				if otherPkg.Origin != pkg.Origin {
+					otherOrigins = append(otherOrigins, otherPkg.Origin)
+				}
+			}
+
+			sort.Strings(otherOrigins)
+			pkgCopy.AlsoIn = otherOrigins
+
+			result = append(result, &pkgCopy)
+		}
 	}
 
 	return result
@@ -101,28 +110,4 @@ func normalizeRpm(name string) string {
 	}
 
 	return strings.ToLower(name)
-}
-
-func bestPriority(pkgs []*PkgInfo) *PkgInfo {
-	if len(pkgs) == 1 {
-		return pkgs[0]
-	}
-
-	priorityMap := make(map[string]int)
-	for i, origin := range originPriorityOrder {
-		priorityMap[origin] = i
-	}
-
-	bestPkg := pkgs[0]
-	bestPriority := priorityMap[bestPkg.Origin]
-
-	for _, pkg := range pkgs[1:] {
-		priority := priorityMap[pkg.Origin]
-		if priority < bestPriority {
-			bestPkg = pkg
-			bestPriority = priority
-		}
-	}
-
-	return bestPkg
 }

@@ -84,7 +84,7 @@ func mainWithConfig(configProvider config.ConfigProvider) error {
 		allPkgs = append(allPkgs, pkgs...)
 	}
 
-	allPkgs = pkgdata.Deduplicate(allPkgs)
+	allPkgs = pkgdata.EnrichAlsoIn(allPkgs)
 
 	if cfg.QueryExpr != nil {
 		allPkgs, err = compiler.RunDAG(cfg.QueryExpr, allPkgs)
