@@ -122,6 +122,8 @@ func (pkg *PkgInfo) GetString(field consts.FieldType) string {
 		return pkg.Url
 	case consts.FieldValidation:
 		return pkg.Validation
+	case consts.FieldEnv:
+		return pkg.Env
 	case consts.FieldPkgType:
 		return pkg.PkgType
 	case consts.FieldPkgBase:

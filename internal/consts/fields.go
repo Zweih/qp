@@ -8,6 +8,7 @@ const (
 	FieldArch
 	FieldName
 	FieldOrigin
+	FieldEnv
 	FieldPkgType
 	FieldLicense
 	FieldPkgBase
@@ -52,7 +53,7 @@ func GetFieldPrim(field FieldType) FieldPrim {
 	case FieldName, FieldReason, FieldVersion,
 		FieldOrigin, FieldArch, FieldLicense,
 		FieldUrl, FieldDescription, FieldValidation,
-		FieldPkgType, FieldPkgBase, FieldPackager:
+		FieldEnv, FieldPkgType, FieldPkgBase, FieldPackager:
 		return FieldPrimStr
 
 	case FieldAlsoIn, FieldGroups:
@@ -82,6 +83,7 @@ const (
 	description = "description"
 	url         = "url"
 	validation  = "validation"
+	env         = "env"
 	pkgType     = "pkgtype"
 	pkgBase     = "pkgbase"
 	packager    = "packager"
@@ -125,6 +127,7 @@ var FieldTypeLookup = map[string]FieldType{
 	description: FieldDescription,
 	url:         FieldUrl,
 	validation:  FieldValidation,
+	env:         FieldEnv,
 	pkgType:     FieldPkgType,
 	pkgBase:     FieldPkgBase,
 	packager:    FieldPackager,
@@ -153,6 +156,7 @@ var FieldNameLookup = map[FieldType]string{
 	FieldDescription: description,
 	FieldUrl:         url,
 	FieldValidation:  validation,
+	FieldEnv:         env,
 	FieldPkgType:     pkgType,
 	FieldPkgBase:     pkgBase,
 	FieldPackager:    packager,
@@ -188,6 +192,7 @@ var (
 		FieldDescription,
 		FieldUrl,
 		FieldValidation,
+		FieldEnv,
 		FieldPkgType,
 		FieldPkgBase,
 		FieldPackager,

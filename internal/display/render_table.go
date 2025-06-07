@@ -28,6 +28,7 @@ var columnHeaders = map[consts.FieldType]string{
 	consts.FieldDescription: "DESCRIPTION",
 	consts.FieldUrl:         "URL",
 	consts.FieldValidation:  "VALIDATION",
+	consts.FieldEnv:         "ENV",
 	consts.FieldPkgType:     "PKGTYPE",
 	consts.FieldPackager:    "PACKAGER",
 	consts.FieldAlsoIn:      "ALSO IN",
