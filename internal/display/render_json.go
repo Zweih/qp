@@ -23,6 +23,7 @@ type PkgInfoJSON struct {
 	Description        string   `json:"description,omitempty"`
 	Url                string   `json:"url,omitempty"`
 	Validation         string   `json:"validation,omitempty"`
+	Env                string   `json:"env,omitempty"`
 	PkgType            string   `json:"pkgtype,omitempty"`
 	PkgBase            string   `json:"pkgbase,omitempty"`
 	Packager           string   `json:"packager,omitempty"`
@@ -37,16 +38,16 @@ type PkgInfoJSON struct {
 	Provides           []string `json:"provides,omitempty"`
 }
 
-func (o *OutputManager) renderJSON(pkgPtrs []*pkgdata.PkgInfo, fields []consts.FieldType) {
+func (o *OutputManager) renderJSON(pkgs []*pkgdata.PkgInfo, fields []consts.FieldType) {
 	uniqueFields := getUniqueFields(fields)
-	filteredPkgPtrs := selectJsonFields(pkgPtrs, uniqueFields)
+	filteredPkgs := selectJsonFields(pkgs, uniqueFields)
 
 	var buffer bytes.Buffer
 	encoder := json.NewEncoder(&buffer)
 	encoder.SetEscapeHTML(false) // disable escaping of characters like `<`, `>`, perhaps this should be a user defined option
 	encoder.SetIndent("", "  ")
 
-	if err := encoder.Encode(filteredPkgPtrs); err != nil {
+	if err := encoder.Encode(filteredPkgs); err != nil {
 		o.writeLine(fmt.Sprintf("Error generating JSON output: %v", err))
 	}
 
@@ -68,74 +69,76 @@ func getUniqueFields(fields []consts.FieldType) []consts.FieldType {
 }
 
 func selectJsonFields(
-	pkgPtrs []*pkgdata.PkgInfo,
+	pkgs []*pkgdata.PkgInfo,
 	fields []consts.FieldType,
 ) []*PkgInfoJSON {
-	filteredPkgPtrs := make([]*PkgInfoJSON, len(pkgPtrs))
-	for i, pkg := range pkgPtrs {
-		filteredPkgPtrs[i] = getJsonValues(pkg, fields)
+	filteredPkgs := make([]*PkgInfoJSON, len(pkgs))
+	for i, pkg := range pkgs {
+		filteredPkgs[i] = getJsonValues(pkg, fields)
 	}
 
-	return filteredPkgPtrs
+	return filteredPkgs
 }
 
 func getJsonValues(pkg *pkgdata.PkgInfo, fields []consts.FieldType) *PkgInfoJSON {
-	filteredPackage := PkgInfoJSON{}
+	filteredPkg := PkgInfoJSON{}
 
 	for _, field := range fields {
 		switch field {
 		case consts.FieldInstalled:
-			filteredPackage.InstalledTimestamp = pkg.GetInt(field)
+			filteredPkg.InstalledTimestamp = pkg.GetInt(field)
 		case consts.FieldUpdated:
-			filteredPackage.UpdateTimestamp = pkg.GetInt(field)
+			filteredPkg.UpdateTimestamp = pkg.GetInt(field)
 		case consts.FieldBuilt:
-			filteredPackage.BuildTimestamp = pkg.GetInt(field)
+			filteredPkg.BuildTimestamp = pkg.GetInt(field)
 		case consts.FieldSize:
-			filteredPackage.Size = pkg.GetInt(field)
+			filteredPkg.Size = pkg.GetInt(field)
 		case consts.FieldName:
-			filteredPackage.Name = pkg.GetString(field)
+			filteredPkg.Name = pkg.GetString(field)
 		case consts.FieldReason:
-			filteredPackage.Reason = pkg.GetString(field)
+			filteredPkg.Reason = pkg.GetString(field)
 		case consts.FieldVersion:
-			filteredPackage.Version = pkg.GetString(field)
+			filteredPkg.Version = pkg.GetString(field)
 		case consts.FieldOrigin:
-			filteredPackage.Origin = pkg.GetString(field)
+			filteredPkg.Origin = pkg.GetString(field)
 		case consts.FieldArch:
-			filteredPackage.Arch = pkg.GetString(field)
+			filteredPkg.Arch = pkg.GetString(field)
 		case consts.FieldLicense:
-			filteredPackage.License = pkg.GetString(field)
+			filteredPkg.License = pkg.GetString(field)
 		case consts.FieldDescription:
-			filteredPackage.Description = pkg.GetString(field)
+			filteredPkg.Description = pkg.GetString(field)
 		case consts.FieldUrl:
-			filteredPackage.Url = pkg.GetString(field)
+			filteredPkg.Url = pkg.GetString(field)
 		case consts.FieldValidation:
-			filteredPackage.Validation = pkg.GetString(field)
+			filteredPkg.Validation = pkg.GetString(field)
+		case consts.FieldEnv:
+			filteredPkg.Env = pkg.GetString(field)
 		case consts.FieldPkgType:
-			filteredPackage.PkgType = pkg.GetString(field)
+			filteredPkg.PkgType = pkg.GetString(field)
 		case consts.FieldPkgBase:
-			filteredPackage.PkgBase = pkg.GetString(field)
+			filteredPkg.PkgBase = pkg.GetString(field)
 		case consts.FieldPackager:
-			filteredPackage.Packager = pkg.GetString(field)
+			filteredPkg.Packager = pkg.GetString(field)
 		case consts.FieldAlsoIn:
-			filteredPackage.AlsoIn = pkg.GetStrArr(field)
+			filteredPkg.AlsoIn = pkg.GetStrArr(field)
 		case consts.FieldGroups:
-			filteredPackage.Groups = pkg.GetStrArr(field)
+			filteredPkg.Groups = pkg.GetStrArr(field)
 		case consts.FieldConflicts:
-			filteredPackage.Conflicts = flattenRelations(pkg.GetRelations(field))
+			filteredPkg.Conflicts = flattenRelations(pkg.GetRelations(field))
 		case consts.FieldReplaces:
-			filteredPackage.Replaces = flattenRelations(pkg.GetRelations(field))
+			filteredPkg.Replaces = flattenRelations(pkg.GetRelations(field))
 		case consts.FieldDepends:
-			filteredPackage.Depends = flattenRelations(pkg.GetRelations(field))
+			filteredPkg.Depends = flattenRelations(pkg.GetRelations(field))
 		case consts.FieldOptDepends:
-			filteredPackage.OptDepends = flattenRelations(pkg.GetRelations(field))
+			filteredPkg.OptDepends = flattenRelations(pkg.GetRelations(field))
 		case consts.FieldRequiredBy:
-			filteredPackage.RequiredBy = flattenRelations(pkg.GetRelations(field))
+			filteredPkg.RequiredBy = flattenRelations(pkg.GetRelations(field))
 		case consts.FieldOptionalFor:
-			filteredPackage.OptionalFor = flattenRelations(pkg.GetRelations(field))
+			filteredPkg.OptionalFor = flattenRelations(pkg.GetRelations(field))
 		case consts.FieldProvides:
-			filteredPackage.Provides = flattenRelations(pkg.GetRelations(field))
+			filteredPkg.Provides = flattenRelations(pkg.GetRelations(field))
 		}
 	}
 
-	return &filteredPackage
+	return &filteredPkg
 }

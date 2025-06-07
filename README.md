@@ -185,7 +185,7 @@ learn about installation [here](#installation)
 | ✓ | cache-only option | ✓ | pacman hook |
 | - | brew hook | - | deb hook |
 | ✓ | npm origin (npm global packages) | - | nested dependencies |
-| ✓ | add also-in field (cross-origin managed) | - | add env field |
+| ✓ | add also-in field (cross-origin managed) | ✓ | add env field |
 | - | add other envs field | - | add support for multiple virtual environments (nvm/pyenv/etc.) |
 
 ## installation
