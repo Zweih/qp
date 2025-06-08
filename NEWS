@@ -1,4 +1,11 @@
 # qp Release Notes
+## v5.81.0
+### What's Changed
+* Feature: Add env field by @Zweih in https://github.com/Zweih/qp/pull/388
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.80.0...v5.81.0
+
+
 ## v5.80.0
 ### What's Changed
 * Feature: Add also-in field by @Zweih in https://github.com/Zweih/qp/pull/387
@@ -711,10 +718,3 @@
 * Refactor: Multi-driver interface by @Zweih in https://github.com/Zweih/qp/pull/208
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v4.24.0...v4.25.0
-
-
-## v4.24.0
-### What's Changed
-* Feature: Add pkgbase query by @Zweih in https://github.com/Zweih/qp/pull/207
-
-**Full Changelog**: https://github.com/Zweih/qp/compare/v4.23.0...v4.24.0
