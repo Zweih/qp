@@ -176,6 +176,7 @@ type PkgInfo struct {
 	Version          string                 `protobuf:"bytes,5,opt,name=version,proto3" json:"version,omitempty"`
 	Origin           string                 `protobuf:"bytes,25,opt,name=origin,proto3" json:"origin,omitempty"`
 	Arch             string                 `protobuf:"bytes,6,opt,name=arch,proto3" json:"arch,omitempty"`
+	Env              string                 `protobuf:"bytes,27,opt,name=env,proto3" json:"env,omitempty"`
 	License          string                 `protobuf:"bytes,7,opt,name=license,proto3" json:"license,omitempty"`
 	Url              string                 `protobuf:"bytes,8,opt,name=url,proto3" json:"url,omitempty"`
 	Description      string                 `protobuf:"bytes,13,opt,name=description,proto3" json:"description,omitempty"`
@@ -184,6 +185,8 @@ type PkgInfo struct {
 	PkgBase          string                 `protobuf:"bytes,14,opt,name=pkg_base,json=pkgBase,proto3" json:"pkg_base,omitempty"`
 	Packager         string                 `protobuf:"bytes,21,opt,name=packager,proto3" json:"packager,omitempty"`
 	Groups           []string               `protobuf:"bytes,19,rep,name=groups,proto3" json:"groups,omitempty"`
+	AlsoIn           []string               `protobuf:"bytes,28,rep,name=also_in,json=alsoIn,proto3" json:"also_in,omitempty"`
+	OtherEnvs        []string               `protobuf:"bytes,29,rep,name=other_envs,json=otherEnvs,proto3" json:"other_envs,omitempty"`
 	Conflicts        []*Relation            `protobuf:"bytes,12,rep,name=conflicts,proto3" json:"conflicts,omitempty"`
 	Replaces         []*Relation            `protobuf:"bytes,15,rep,name=replaces,proto3" json:"replaces,omitempty"`
 	Depends          []*Relation            `protobuf:"bytes,9,rep,name=depends,proto3" json:"depends,omitempty"`
@@ -288,6 +291,13 @@ func (x *PkgInfo) GetArch() string {
 	return ""
 }
 
+func (x *PkgInfo) GetEnv() string {
+	if x != nil {
+		return x.Env
+	}
+	return ""
+}
+
 func (x *PkgInfo) GetLicense() string {
 	if x != nil {
 		return x.License
@@ -340,6 +350,20 @@ func (x *PkgInfo) GetPackager() string {
 func (x *PkgInfo) GetGroups() []string {
 	if x != nil {
 		return x.Groups
+	}
+	return nil
+}
+
+func (x *PkgInfo) GetAlsoIn() []string {
+	if x != nil {
+		return x.AlsoIn
+	}
+	return nil
+}
+
+func (x *PkgInfo) GetOtherEnvs() []string {
+	if x != nil {
+		return x.OtherEnvs
 	}
 	return nil
 }
@@ -456,7 +480,7 @@ const file_protobuf_pkginfo_proto_rawDesc = "" +
 	"\boperator\x18\x03 \x01(\x0e2\x13.pkginfo.RelationOpR\boperator\x12\x14\n" +
 	"\x05depth\x18\x04 \x01(\x05R\x05depth\x12\"\n" +
 	"\fproviderName\x18\x05 \x01(\tR\fproviderName\x12\x10\n" +
-	"\x03why\x18\x06 \x01(\tR\x03why\"\xce\x06\n" +
+	"\x03why\x18\x06 \x01(\tR\x03why\"\x98\a\n" +
 	"\aPkgInfo\x12+\n" +
 	"\x11install_timestamp\x18\x1a \x01(\x03R\x10installTimestamp\x12)\n" +
 	"\x10update_timestamp\x18\x11 \x01(\x03R\x0fupdateTimestamp\x12'\n" +
@@ -466,7 +490,8 @@ const file_protobuf_pkginfo_proto_rawDesc = "" +
 	"\x06reason\x18\x04 \x01(\tR\x06reason\x12\x18\n" +
 	"\aversion\x18\x05 \x01(\tR\aversion\x12\x16\n" +
 	"\x06origin\x18\x19 \x01(\tR\x06origin\x12\x12\n" +
-	"\x04arch\x18\x06 \x01(\tR\x04arch\x12\x18\n" +
+	"\x04arch\x18\x06 \x01(\tR\x04arch\x12\x10\n" +
+	"\x03env\x18\x1b \x01(\tR\x03env\x12\x18\n" +
 	"\alicense\x18\a \x01(\tR\alicense\x12\x10\n" +
 	"\x03url\x18\b \x01(\tR\x03url\x12 \n" +
 	"\vdescription\x18\r \x01(\tR\vdescription\x12\x1e\n" +
@@ -476,7 +501,10 @@ const file_protobuf_pkginfo_proto_rawDesc = "" +
 	"\bpkg_type\x18\x18 \x01(\tR\apkgType\x12\x19\n" +
 	"\bpkg_base\x18\x0e \x01(\tR\apkgBase\x12\x1a\n" +
 	"\bpackager\x18\x15 \x01(\tR\bpackager\x12\x16\n" +
-	"\x06groups\x18\x13 \x03(\tR\x06groups\x12/\n" +
+	"\x06groups\x18\x13 \x03(\tR\x06groups\x12\x17\n" +
+	"\aalso_in\x18\x1c \x03(\tR\x06alsoIn\x12\x1d\n" +
+	"\n" +
+	"other_envs\x18\x1d \x03(\tR\totherEnvs\x12/\n" +
 	"\tconflicts\x18\f \x03(\v2\x11.pkginfo.RelationR\tconflicts\x12-\n" +
 	"\breplaces\x18\x0f \x03(\v2\x11.pkginfo.RelationR\breplaces\x12+\n" +
 	"\adepends\x18\t \x03(\v2\x11.pkginfo.RelationR\adepends\x122\n" +
