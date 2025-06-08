@@ -16,8 +16,9 @@ const (
 	FieldPackager
 	FieldDescription
 	FieldUrl
-	FieldAlsoIn
 	FieldGroups
+	FieldAlsoIn
+	FieldOtherEnvs
 	FieldSize
 	FieldInstalled
 	FieldUpdated
@@ -56,7 +57,7 @@ func GetFieldPrim(field FieldType) FieldPrim {
 		FieldEnv, FieldPkgType, FieldPkgBase, FieldPackager:
 		return FieldPrimStr
 
-	case FieldAlsoIn, FieldGroups:
+	case FieldGroups, FieldAlsoIn, FieldOtherEnvs:
 		return FieldPrimStrArr
 
 	case FieldConflicts, FieldReplaces, FieldDepends,
@@ -87,8 +88,9 @@ const (
 	pkgType     = "pkgtype"
 	pkgBase     = "pkgbase"
 	packager    = "packager"
-	alsoIn      = "also-in"
 	groups      = "groups"
+	alsoIn      = "also-in"
+	otherEnvs   = "other-envs"
 	conflicts   = "conflicts"
 	replaces    = "replaces"
 	depends     = "depends"
@@ -131,8 +133,9 @@ var FieldTypeLookup = map[string]FieldType{
 	pkgType:     FieldPkgType,
 	pkgBase:     FieldPkgBase,
 	packager:    FieldPackager,
-	alsoIn:      FieldAlsoIn,
 	groups:      FieldGroups,
+	alsoIn:      FieldAlsoIn,
+	otherEnvs:   FieldOtherEnvs,
 	conflicts:   FieldConflicts,
 	replaces:    FieldReplaces,
 	depends:     FieldDepends,
@@ -160,8 +163,9 @@ var FieldNameLookup = map[FieldType]string{
 	FieldPkgType:     pkgType,
 	FieldPkgBase:     pkgBase,
 	FieldPackager:    packager,
-	FieldAlsoIn:      alsoIn,
 	FieldGroups:      groups,
+	FieldAlsoIn:      alsoIn,
+	FieldOtherEnvs:   otherEnvs,
 	FieldConflicts:   conflicts,
 	FieldReplaces:    replaces,
 	FieldDepends:     depends,
@@ -196,8 +200,9 @@ var (
 		FieldPkgType,
 		FieldPkgBase,
 		FieldPackager,
-		FieldAlsoIn,
 		FieldGroups,
+		FieldAlsoIn,
+		FieldOtherEnvs,
 		FieldConflicts,
 		FieldReplaces,
 		FieldDepends,

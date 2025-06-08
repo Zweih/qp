@@ -67,8 +67,9 @@ type PkgInfo struct {
 	PkgBase          string
 	Packager         string
 
-	AlsoIn []string
-	Groups []string
+	Groups    []string
+	AlsoIn    []string
+	OtherEnvs []string
 
 	Depends     []Relation
 	OptDepends  []Relation
@@ -137,10 +138,12 @@ func (pkg *PkgInfo) GetString(field consts.FieldType) string {
 
 func (pkg *PkgInfo) GetStrArr(field consts.FieldType) []string {
 	switch field {
-	case consts.FieldAlsoIn:
-		return pkg.AlsoIn
 	case consts.FieldGroups:
 		return pkg.Groups
+	case consts.FieldAlsoIn:
+		return pkg.AlsoIn
+	case consts.FieldOtherEnvs:
+		return pkg.OtherEnvs
 	default:
 		panic("invalid field passed to GetStringSlice: " + consts.FieldNameLookup[field])
 	}

@@ -27,8 +27,9 @@ type PkgInfoJSON struct {
 	PkgType            string   `json:"pkgtype,omitempty"`
 	PkgBase            string   `json:"pkgbase,omitempty"`
 	Packager           string   `json:"packager,omitempty"`
-	AlsoIn             []string `json:"alsoIn,omitempty"`
 	Groups             []string `json:"groups,omitempty"`
+	AlsoIn             []string `json:"alsoIn,omitempty"`
+	OtherEnvs          []string `json:"otherEnvs,omitempty"`
 	Conflicts          []string `json:"conflicts,omitempty"`
 	Replaces           []string `json:"replaces,omitempty"`
 	Depends            []string `json:"depends,omitempty"`
@@ -119,10 +120,12 @@ func getJsonValues(pkg *pkgdata.PkgInfo, fields []consts.FieldType) *PkgInfoJSON
 			filteredPkg.PkgBase = pkg.GetString(field)
 		case consts.FieldPackager:
 			filteredPkg.Packager = pkg.GetString(field)
-		case consts.FieldAlsoIn:
-			filteredPkg.AlsoIn = pkg.GetStrArr(field)
 		case consts.FieldGroups:
 			filteredPkg.Groups = pkg.GetStrArr(field)
+		case consts.FieldAlsoIn:
+			filteredPkg.AlsoIn = pkg.GetStrArr(field)
+		case consts.FieldOtherEnvs:
+			filteredPkg.OtherEnvs = pkg.GetStrArr(field)
 		case consts.FieldConflicts:
 			filteredPkg.Conflicts = flattenRelations(pkg.GetRelations(field))
 		case consts.FieldReplaces:
