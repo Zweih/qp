@@ -1,4 +1,11 @@
 # qp Release Notes
+## v5.84.0
+### What's Changed
+* Feature: Add NVM other-envs by @Zweih in https://github.com/Zweih/qp/pull/391
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.83.0...v5.84.0
+
+
 ## v5.83.0
 ### What's Changed
 * Feature: Add new fields to protobufs by @Zweih in https://github.com/Zweih/qp/pull/390
@@ -709,12 +716,3 @@
 * Feature: Add build date query by @Zweih in https://github.com/Zweih/qp/pull/219
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v4.27.4...v4.28.0
-
-
-## v4.27.4
-### What's Changed
-* Documentation: Inject version/date into man page by @Zweih in https://github.com/Zweih/qp/pull/214
-* Feature: Add packager query by @Zweih in https://github.com/Zweih/qp/pull/216
-* Fix: Add commit to qp-src by @Zweih in https://github.com/Zweih/qp/pull/221
-
-**Full Changelog**: https://github.com/Zweih/qp/compare/v4.26.2...v4.27.4
