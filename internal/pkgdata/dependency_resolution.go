@@ -220,7 +220,12 @@ func resolveProvisions(
 		return provisions
 	}
 
-	return []Relation{{Name: displayName, Version: version, Operator: operator}}
+	return []Relation{{
+		Name:     displayName,
+		Version:  version,
+		Operator: operator,
+		Depth:    1,
+	}}
 }
 
 // TODO: we can memoize this. we can also paralellize as well.
