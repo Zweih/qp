@@ -1,4 +1,18 @@
 # qp Release Notes
+## v5.83.0
+### What's Changed
+* Feature: Add new fields to protobufs by @Zweih in https://github.com/Zweih/qp/pull/390
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.82.0...v5.83.0
+
+
+## v5.82.0
+### What's Changed
+* Feature: Add other-envs field by @Zweih in https://github.com/Zweih/qp/pull/389
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.81.0...v5.82.0
+
+
 ## v5.81.0
 ### What's Changed
 * Feature: Add env field by @Zweih in https://github.com/Zweih/qp/pull/388
@@ -704,10 +718,3 @@
 * Fix: Add commit to qp-src by @Zweih in https://github.com/Zweih/qp/pull/221
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v4.26.2...v4.27.4
-
-
-## v4.26.2
-### What's Changed
-* Feature: Add pkgtype query by @Zweih in https://github.com/Zweih/qp/pull/213
-
-**Full Changelog**: https://github.com/Zweih/qp/compare/v4.25.0...v4.26.2
