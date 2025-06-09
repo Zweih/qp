@@ -1,7 +1,6 @@
 package origins
 
 import (
-	"fmt"
 	"qp/api/driver"
 	"qp/internal/origins/drivers/brew"
 	"qp/internal/origins/drivers/deb"
@@ -28,7 +27,6 @@ func AvailableDrivers() []driver.Driver {
 	var detected []driver.Driver
 	for _, driver := range registeredDrivers {
 		if driver.Detect() {
-			fmt.Println(driver.Name())
 			detected = append(detected, driver)
 		}
 	}

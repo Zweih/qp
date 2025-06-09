@@ -1,7 +1,6 @@
 package flatpak
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"qp/internal/consts"
@@ -33,12 +32,12 @@ func (d *FlatpakDriver) Detect() bool {
 		return false
 	}
 
-	fmt.Println(d.installDirs)
-
 	return true
 }
 
 func (d *FlatpakDriver) Load(cacheRoot string) ([]*pkgdata.PkgInfo, error) {
+	fetchPackages(d.Name(), d.installDirs)
+
 	return []*pkgdata.PkgInfo{}, nil
 }
 

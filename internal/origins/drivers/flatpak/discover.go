@@ -15,18 +15,40 @@ type PkgRef struct {
 	MetadataPath string
 }
 
-// func discoverPackages(installDirs []string) {
-// 	var pkgRefs []*PkgRef
+func discoverPackages(installDirs []string) ([]*PkgRef, error) {
+	var allPkgRefs []*PkgRef
 
-// 	for _, installDir := range installDirs {
-// 	}
-// }
+	for _, installDir := range installDirs {
+		pkgRefs, err := discoverInDir(installDir)
+		if err != nil {
+			// TODO: log errors
+			continue
+		}
 
-// func discoverInInstallation(installDir string) ([]*PkgRef, error) {
-// 	var pkgRefs []*PkgRef
-// }
+		allPkgRefs = append(allPkgRefs, pkgRefs...)
+	}
 
-func getPkgsOfType(installDir string, pkgType string) ([]*PkgRef, error) {
+	return allPkgRefs, nil
+}
+
+// TODO: handle these errors
+func discoverInDir(installDir string) ([]*PkgRef, error) {
+	var pkgRefs []*PkgRef
+
+	appPkgRefs, err := getPkgRefsOfType(installDir, appsSubdir)
+	if err == nil {
+		pkgRefs = append(pkgRefs, appPkgRefs...)
+	}
+
+	runtimePkgRefs, err := getPkgRefsOfType(installDir, runtimeSubdir)
+	if err == nil {
+		pkgRefs = append(pkgRefs, runtimePkgRefs...)
+	}
+
+	return pkgRefs, nil
+}
+
+func getPkgRefsOfType(installDir string, pkgType string) ([]*PkgRef, error) {
 	baseDir := filepath.Join(installDir, pkgType)
 	if _, err := os.Stat(baseDir); err != nil {
 		return nil, fmt.Errorf("failed to find %s directory: %w", baseDir, err)
@@ -101,5 +123,5 @@ func getPkgsOfType(installDir string, pkgType string) ([]*PkgRef, error) {
 		}
 	}
 
-	return []*PkgRef{}, nil
+	return pkgRefs, nil
 }
