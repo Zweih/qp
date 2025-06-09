@@ -6,16 +6,6 @@ import (
 	"strings"
 )
 
-var originPriorityOrder = []string{
-	consts.OriginPacman,
-	consts.OriginDeb,
-	consts.OriginRpm,
-	consts.OriginOpkg,
-	consts.OriginBrew,
-	consts.OriginPipx,
-	consts.OriginNpm,
-}
-
 const (
 	node         = "node-"
 	nodejs       = "nodejs-"
@@ -24,10 +14,18 @@ const (
 	pythonNoDash = "python"
 )
 
-func EnrichAlsoIn(pkgs []*PkgInfo) []*PkgInfo {
+var originExclusion = map[string]struct{}{
+	consts.OriginPipx: {},
+}
+
+func EnrichAcrossOrigins(pkgs []*PkgInfo) []*PkgInfo {
 	nameGroups := make(map[string][]*PkgInfo)
 
 	for _, pkg := range pkgs {
+		if _, exists := originExclusion[pkg.Origin]; exists {
+			continue
+		}
+
 		normalizedName := normalizeName(pkg.Name, pkg.Origin)
 		nameGroups[normalizedName] = append(nameGroups[normalizedName], pkg)
 	}
@@ -39,14 +37,27 @@ func EnrichAlsoIn(pkgs []*PkgInfo) []*PkgInfo {
 			pkgCopy := *pkg
 
 			var otherOrigins []string
+			var otherEnvs []string
+
 			for _, otherPkg := range group {
+				if pkg == otherPkg {
+					continue
+				}
+
 				if otherPkg.Origin != pkg.Origin {
 					otherOrigins = append(otherOrigins, otherPkg.Origin)
+					continue
+				}
+
+				if pkg.Env != "" {
+					otherEnvs = append(otherEnvs, otherPkg.Env)
 				}
 			}
 
 			sort.Strings(otherOrigins)
+			sort.Strings(otherEnvs)
 			pkgCopy.AlsoIn = otherOrigins
+			pkgCopy.OtherEnvs = otherEnvs
 
 			result = append(result, &pkgCopy)
 		}

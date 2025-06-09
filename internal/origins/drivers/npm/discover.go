@@ -6,27 +6,34 @@ import (
 	"path/filepath"
 	"qp/internal/consts"
 	"runtime"
+	"strings"
 )
 
-func getGlobalModulesDir() (string, error) {
+func getGlobalModulesDirs() ([]string, error) {
+	var modulesDirs []string
+
 	if prefix := os.Getenv(envPrefix); prefix != "" {
-		return getNodeModulesDir(prefix), nil
+		modulesDirs = append(modulesDirs, getNodeModulesDir(prefix))
 	}
 
-	nodeBinPath, err := getNodeBin()
+	nodeBinPaths, err := getAllBins("node")
 	if err != nil {
-		return "", err
+		return modulesDirs, err
 	}
 
-	prefix := getPrefix(nodeBinPath)
+	for _, nodeBinPath := range nodeBinPaths {
+		prefix := getPrefix(nodeBinPath)
 
-	if runtime.GOOS != consts.Windows {
-		if destDir := os.Getenv(envDestDir); destDir != "" {
-			prefix = filepath.Join(destDir, prefix)
+		if runtime.GOOS != consts.Windows {
+			if destDir := os.Getenv(envDestDir); destDir != "" {
+				prefix = filepath.Join(destDir, prefix)
+			}
 		}
+
+		modulesDirs = append(modulesDirs, getNodeModulesDir(prefix))
 	}
 
-	return getNodeModulesDir(prefix), nil
+	return modulesDirs, nil
 }
 
 func getNodeBin() (string, error) {
@@ -64,4 +71,44 @@ func getNodeModulesDir(prefix string) string {
 	}
 
 	return filepath.Join(prefix, unixModulesDir)
+}
+
+func getAllBins(binName string) ([]string, error) {
+	var bins []string
+	seen := make(map[string]bool)
+
+	if runtime.GOOS == consts.Windows && !strings.HasSuffix(binName, ".exe") {
+		binName += ".exe"
+	}
+
+	pathEnv := os.Getenv("PATH")
+	if pathEnv == "" {
+		return bins, nil
+	}
+
+	pathDirs := filepath.SplitList(pathEnv)
+
+	for _, dir := range pathDirs {
+		if dir == "" {
+			continue
+		}
+
+		binPath := filepath.Join(dir, binName)
+
+		if info, err := os.Stat(binPath); err == nil {
+			if info.Mode()&0111 != 0 {
+				resolvedPath, err := filepath.EvalSymlinks(binPath)
+				if err != nil {
+					resolvedPath = binPath
+				}
+
+				if !seen[resolvedPath] {
+					seen[resolvedPath] = true
+					bins = append(bins, resolvedPath)
+				}
+			}
+		}
+	}
+
+	return bins, nil
 }

@@ -11,15 +11,21 @@ import (
 	"sync"
 )
 
-func fetchPackages(origin string, modulesDir string) ([]*pkgdata.PkgInfo, error) {
+func fetchPackages(
+	origin string,
+	modulesDir string,
+	outChan chan<- *pkgdata.PkgInfo,
+	errChan chan<- error,
+	errGroup *sync.WaitGroup,
+) {
 	entries, err := os.ReadDir(modulesDir)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read global node_modules directory: %w", err)
+		errChan <- fmt.Errorf("failed to read global node_modules directory: %w", err)
+		return
 	}
 
+	nodeVersion := extractNodeVersion(modulesDir)
 	inputChan := make(chan string, len(entries))
-	errChan := make(chan error, worker.DefaultBufferSize)
-	var errGroup sync.WaitGroup
 
 	for _, entry := range entries {
 		if !entry.IsDir() {
@@ -50,7 +56,7 @@ func fetchPackages(origin string, modulesDir string) ([]*pkgdata.PkgInfo, error)
 	stage1 := worker.RunWorkers(
 		inputChan,
 		errChan,
-		&errGroup,
+		errGroup,
 		func(pkgName string) (*pkgdata.PkgInfo, error) {
 			return parsePackageJson(filepath.Join(modulesDir, pkgName))
 		},
@@ -61,7 +67,7 @@ func fetchPackages(origin string, modulesDir string) ([]*pkgdata.PkgInfo, error)
 	stage2 := worker.RunWorkers(
 		stage1,
 		errChan,
-		&errGroup,
+		errGroup,
 		func(pkg *pkgdata.PkgInfo) (*pkgdata.PkgInfo, error) {
 			pkgDir := filepath.Join(modulesDir, pkg.Name)
 			size, err := shared.GetInstallSize(pkgDir)
@@ -84,6 +90,7 @@ func fetchPackages(origin string, modulesDir string) ([]*pkgdata.PkgInfo, error)
 			pkg.Groups = groups
 			pkg.Size = size
 			pkg.Origin = origin
+			pkg.Env = nodeVersion
 
 			return pkg, nil
 		},
@@ -91,10 +98,24 @@ func fetchPackages(origin string, modulesDir string) ([]*pkgdata.PkgInfo, error)
 		len(entries),
 	)
 
-	go func() {
-		errGroup.Wait()
-		close(errChan)
-	}()
+	for pkg := range stage2 {
+		outChan <- pkg
+	}
+}
 
-	return worker.CollectOutput(stage2, errChan)
+func extractNodeVersion(modulesDir string) string {
+	if strings.Contains(modulesDir, ".nvm/versions/node/") {
+		parts := strings.Split(modulesDir, "/")
+		for i, part := range parts {
+			if part == "node" && i+1 < len(parts) {
+				return "(nvm) node-" + parts[i+1]
+			}
+		}
+	}
+
+	if strings.HasPrefix(modulesDir, "/usr/") {
+		return "node-system"
+	}
+
+	return "node-unknown"
 }
