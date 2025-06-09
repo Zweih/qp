@@ -4,12 +4,14 @@ import (
 	"os"
 	"qp/internal/consts"
 	"qp/internal/origins/shared"
+	"qp/internal/origins/worker"
 	"qp/internal/pkgdata"
 	"qp/internal/storage"
+	"sync"
 )
 
 type NpmDriver struct {
-	modulesDir string
+	modulesDirs []string
 }
 
 func (d *NpmDriver) Name() string {
@@ -17,21 +19,44 @@ func (d *NpmDriver) Name() string {
 }
 
 func (d *NpmDriver) Detect() bool {
-	modulesDir, err := getGlobalModulesDir()
+	modulesDirs, err := getGlobalModulesDirs()
 	if err != nil {
 		return false
 	}
 
-	if _, err := os.Stat(modulesDir); err != nil {
-		return false
+	for _, modulesDir := range modulesDirs {
+		if _, err := os.Stat(modulesDir); err != nil {
+			continue
+		}
 	}
 
-	d.modulesDir = modulesDir
+	d.modulesDirs = modulesDirs
 	return true
 }
 
 func (d *NpmDriver) Load(_ string) ([]*pkgdata.PkgInfo, error) {
-	return fetchPackages(d.Name(), d.modulesDir)
+	outChan := make(chan *pkgdata.PkgInfo)
+	errChan := make(chan error, worker.DefaultBufferSize)
+
+	var errGroup sync.WaitGroup
+	var setupGroup sync.WaitGroup
+
+	for _, modulesDir := range d.modulesDirs {
+		setupGroup.Add(1)
+		go func() {
+			defer setupGroup.Done()
+			fetchPackages(d.Name(), modulesDir, outChan, errChan, &errGroup)
+		}()
+	}
+
+	go func() {
+		setupGroup.Wait()
+		errGroup.Wait()
+		close(outChan)
+		close(errChan)
+	}()
+
+	return worker.CollectOutput(outChan, errChan)
 }
 
 func (d *NpmDriver) ResolveDeps(pkgs []*pkgdata.PkgInfo) ([]*pkgdata.PkgInfo, error) {
@@ -47,5 +72,13 @@ func (d *NpmDriver) SaveCache(cacheRoot string, pkgs []*pkgdata.PkgInfo) error {
 }
 
 func (d *NpmDriver) IsCacheStale(cacheMtime int64) (bool, error) {
-	return shared.BfsStale(d.modulesDir, cacheMtime, 2)
+	var err error
+	for _, modulesDir := range d.modulesDirs {
+		isStale, err := shared.BfsStale(modulesDir, cacheMtime, 2)
+		if isStale {
+			return true, err
+		}
+	}
+
+	return false, err
 }
