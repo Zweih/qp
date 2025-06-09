@@ -101,13 +101,6 @@ func fetchPackages(
 	for pkg := range stage2 {
 		outChan <- pkg
 	}
-
-	// go func() {
-	// 	errGroup.Wait()
-	// 	close(errChan)
-	// }()
-
-	// return worker.CollectOutput(stage2, errChan)
 }
 
 func extractNodeVersion(modulesDir string) string {
@@ -115,7 +108,7 @@ func extractNodeVersion(modulesDir string) string {
 		parts := strings.Split(modulesDir, "/")
 		for i, part := range parts {
 			if part == "node" && i+1 < len(parts) {
-				return "(nvm) node-" + parts[i+1] // returns "node-v23.6.0"
+				return "(nvm) node-" + parts[i+1]
 			}
 		}
 	}
