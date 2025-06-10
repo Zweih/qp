@@ -83,7 +83,7 @@ this package is compatible with the following platforms and distributions:
 * query by:
   * name, version, origin, architecture, license
   * cross-origin package detection (also-in field shows where packages exist across different package managers)
-  * size on disk
+  * size on disk, freeable storage, and total footprint
   * update or build time/date
   * package base or groups
   * dependencies, optional dependencies, reverse dependencies
@@ -187,7 +187,7 @@ learn about installation [here](#installation)
 | ✓ | npm origin (npm global packages) | - | nested dependencies |
 | ✓ | also-in field (cross-origin managed) | ✓ | env field |
 | ✓ | other envs field | - | support for multiple virtual environments (nvm/pyenv/etc.) |
-| ✓ | freeable field | - | footprint field |
+| ✓ | freeable field | ✓ | footprint field |
 | - | flatpak origin | - | install history |
 
 ## installation
@@ -299,11 +299,13 @@ qp [command] [args] [options]
 - `built` - when the package was built
 - `size` - package size on disk
 - `freeable` - the amount storage that will be freed if the package is uninstalled
+- `footprint` - the real-world proportional disk space impact of the package, accounting for shared dependencies
 - `name` - package name
 - `reason` - installation reason (explicit/dependency)
 - `version` - installed package version
 - `origin` - the package ecosystem or source the package belongs to (e.g., brew, pipx); reflects which package manager or backend maintains it
 - `arch` - architecture the package was built for (e.g., x86_64, aarch64, any)
+- `env` - the environment where the package is installed (applies to origins that can have multiple virtual environments, such as npm)
 - `license` - package software license
 - `description` - package description
 - `url` - the URL of the official site of the software being packaged
@@ -312,6 +314,7 @@ qp [command] [args] [options]
 - `pkgbase` - name of the base package used to group split packages; for non-split packages, it is the same as the package name. 
 - `packager` - person/entity who built the package (if available)
 - `also-in` - list of other origins that have this package installed
+- `other-envs` - list of other environments where this package is also installed
 - `groups` - list of package groups or categories (e.g., base, gnome, xfce4)
 - `conflicts` - list of packages that conflict, or cause problems, with the package
 - `replaces` - list of packages that are replaced by the package
@@ -507,11 +510,13 @@ qp w q has:depends or has:required-by p and not reason=explicit
 | built | range |
 | size | range |
 | freeable | range |
+| footprint | range |
 | name | string |
 | reason | string |
 | version | string |
 | origin | string |
 | arch | string |
+| env | string |
 | license | string |
 | pkgbase | string |
 | description | string |
@@ -519,8 +524,9 @@ qp w q has:depends or has:required-by p and not reason=explicit
 | validation | string |
 | pkgtype | string |
 | packager | string |
-| also-in | string | 
 | groups | string |
+| also-in | string | 
+| other-envs | string |
 | conflicts | relation |
 | replaces | relation |
 | depends | relation |
@@ -545,6 +551,8 @@ output format:
     "installTimestamp": 1743448253,
     "buildTimestamp": 1741400060,
     "size": 58266727,
+    "freeable": 174966161,
+    "footprint": 335629243,
     "name": "gtk3",
     "reason": "dependency",
     "version": "1:3.24.49-1",

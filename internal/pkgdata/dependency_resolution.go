@@ -51,6 +51,7 @@ func ResolveDependencyGraph(
 
 	for _, pkg := range pkgs {
 		pkg.Freeable = calculateFreeable(pkg, installedMap)
+		pkg.Footprint = calculateFootprint(pkg, installedMap)
 	}
 
 	return pkgs, nil

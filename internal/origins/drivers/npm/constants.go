@@ -18,4 +18,9 @@ const (
 	fieldEmail = "email"
 
 	archAny = "any"
+
+	nvmDir         = ".nvm/versions/node/"
+	nvmNodeEnv     = "(nvm) node-"
+	nodeSystemEnv  = "node-system"
+	nodeUnknownEnv = "node-unknown"
 )

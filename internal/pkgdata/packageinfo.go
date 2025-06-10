@@ -53,8 +53,8 @@ type PkgInfo struct {
 	BuildTimestamp   int64
 	InstallTimestamp int64
 	Size             int64
-	Footprint        int64
 	Freeable         int64
+	Footprint        int64
 	Name             string
 	Reason           string
 	Version          string
@@ -100,10 +100,10 @@ func (pkg *PkgInfo) GetInt(field consts.FieldType) int64 {
 		return pkg.BuildTimestamp
 	case consts.FieldSize:
 		return pkg.Size
-	case consts.FieldFootprint:
-		return pkg.Footprint
 	case consts.FieldFreeable:
 		return pkg.Freeable
+	case consts.FieldFootprint:
+		return pkg.Footprint
 	default:
 		panic("invalid field passed to GetInt")
 	}
