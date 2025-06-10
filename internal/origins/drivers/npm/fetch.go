@@ -27,6 +27,7 @@ func fetchPackages(
 	nodeVersion := extractNodeVersion(modulesDir)
 	inputChan := make(chan string, len(entries))
 
+	var packagePaths []string
 	for _, entry := range entries {
 		if !entry.IsDir() {
 			continue
@@ -35,20 +36,28 @@ func fetchPackages(
 		entryName := entry.Name()
 		if entryName != "" && entryName[0] == '@' {
 			scope := filepath.Join(modulesDir, entryName)
-			if subEntries, err := os.ReadDir(scope); err == nil {
-				for _, subEntry := range subEntries {
-					if !subEntry.IsDir() {
-						continue
-					}
+			subEntries, err := os.ReadDir(scope)
+			if err != nil {
+				errChan <- fmt.Errorf("failed to read scope directory %s: %w", scope, err)
+				continue
+			}
 
-					inputChan <- filepath.Join(entryName, subEntry.Name())
+			for _, subEntry := range subEntries {
+				if !subEntry.IsDir() {
+					continue
 				}
+
+				inputChan <- filepath.Join(entryName, subEntry.Name())
 			}
 
 			continue
 		}
 
 		inputChan <- entryName
+	}
+
+	if len(packagePaths) == 0 {
+		return
 	}
 
 	close(inputChan)
@@ -61,7 +70,7 @@ func fetchPackages(
 			return parsePackageJson(filepath.Join(modulesDir, pkgName))
 		},
 		0,
-		len(entries),
+		len(packagePaths),
 	)
 
 	stage2 := worker.RunWorkers(
@@ -95,7 +104,7 @@ func fetchPackages(
 			return pkg, nil
 		},
 		0,
-		len(entries),
+		len(packagePaths),
 	)
 
 	for pkg := range stage2 {
