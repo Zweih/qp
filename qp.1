@@ -14,6 +14,7 @@ is a fast, flexible, and standalone CLI utility for querying installed packages 
 - Advanced querying with boolean logic
 - Field filtering and existence checks
 - Date and size range queries
+- Query freeable storage and total package footprint
 - Dependency graph traversal with depth control
 - Reverse dependencies and provisions
 - Conflicts, optional dependencies, and groups
@@ -199,14 +200,14 @@ Python packages installed in isolated environments via pipx
 .SH AVAILABLE FIELDS
 Available for use with \fBselect\fR, \fBorder\fR, and \fBwhere\fR:
 
-updated, built, size, freeable, name, reason, version, origin, arch, env, license,
+updated, built, size, freeable, footprint, name, reason, version, origin, arch, env, license,
 description, url, validation, pkgbase, pkgtype, packager, groups, also-in, other-envs, conflicts,
 replaces, depends, optdepends, required-by, optional-for, provides
 
 .SH FIELD TYPES
 .TP
 .B Range:
-updated, built, size, freeable
+updated, built, size, freeable, footprint
 .TP
 .B String:
 name, reason, version, origin, arch, env, license, pkgbase, description, url, groups,also-in, other-envs, validation, pkgtype, packager
