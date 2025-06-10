@@ -30,47 +30,23 @@ var licenseHints = []struct {
 	{"lgpl", "LGPL", 2},
 }
 
-// TODO: this should be broken up
 func extractLicense(pkg *pkgdata.PkgInfo) error {
-	basePath := filepath.Join(licensePath, pkg.Name, licenseFileName)
-	resolvedPath, err := filepath.EvalSymlinks(basePath)
-	if err != nil || !fileExists(resolvedPath) {
-		symlinkTarget, statErr := os.Readlink(basePath)
-		var fallbackPrefix string
-
-		if statErr == nil {
-			parts := strings.Split(symlinkTarget, string(filepath.Separator))
-			if len(parts) >= 2 {
-				fallbackPrefix = parts[len(parts)-2]
-			}
-		}
-
-		if fallbackPrefix == "" {
-			fallbackPrefix = pkg.Name
-		}
-
-		pattern := filepath.Join(licensePath, fallbackPrefix+"*/"+licenseFileName)
-		matches, _ := filepath.Glob(pattern)
-
-		if len(matches) == 0 {
-			pkg.License = "unknown"
-			return nil
-		}
-
-		sort.Strings(matches)
-		resolvedPath = matches[0]
+	licensePath, err := resolveLicensePath(pkg.Name)
+	if err != nil {
+		pkg.License = unknownLicense
+		return err
 	}
 
-	file, err := os.Open(resolvedPath)
+	file, err := os.Open(licensePath)
 	if err != nil {
-		pkg.License = "unknown"
+		pkg.License = unknownLicense
 		return fmt.Errorf("failed to open license file for %s: %w", pkg.Name, err)
 	}
 	defer file.Close()
 
 	data, err := io.ReadAll(file)
 	if err != nil {
-		pkg.License = "unknown"
+		pkg.License = unknownLicense
 		return fmt.Errorf("failed to load license file for %s: %w", pkg.Name, err)
 	}
 
@@ -112,6 +88,39 @@ func extractLicense(pkg *pkgdata.PkgInfo) error {
 
 	pkg.License = "custom"
 	return nil
+}
+
+func resolveLicensePath(packageName string) (string, error) {
+	basePath := filepath.Join(licensePath, packageName, licenseFileName)
+	resolvedPath, err := filepath.EvalSymlinks(basePath)
+
+	if err == nil && fileExists(resolvedPath) {
+		return resolvedPath, nil
+	}
+
+	symlinkTarget, statErr := os.Readlink(basePath)
+	var fallbackPrefix string
+
+	if statErr == nil {
+		parts := strings.Split(symlinkTarget, string(filepath.Separator))
+		if len(parts) >= 2 {
+			fallbackPrefix = parts[len(parts)-2]
+		}
+	}
+
+	if fallbackPrefix == "" {
+		fallbackPrefix = packageName
+	}
+
+	pattern := filepath.Join(licensePath, fallbackPrefix+"*/"+licenseFileName)
+	matches, _ := filepath.Glob(pattern)
+
+	if len(matches) == 0 {
+		return "", fmt.Errorf("no license file found for package %s", packageName)
+	}
+
+	sort.Strings(matches)
+	return matches[0], nil
 }
 
 func fileExists(path string) bool {
