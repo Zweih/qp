@@ -93,20 +93,39 @@ func getAllBins(binName string) ([]string, error) {
 			continue
 		}
 
+		dirInfo, err := os.Stat(dir)
+		if err != nil || !dirInfo.IsDir() {
+			continue
+		}
+
 		binPath := filepath.Join(dir, binName)
 
-		if info, err := os.Stat(binPath); err == nil {
-			if info.Mode()&0111 != 0 {
-				resolvedPath, err := filepath.EvalSymlinks(binPath)
-				if err != nil {
-					resolvedPath = binPath
-				}
+		info, err := os.Lstat(binPath)
+		if err != nil {
+			continue
+		}
 
-				if !seen[resolvedPath] {
-					seen[resolvedPath] = true
-					bins = append(bins, resolvedPath)
+		if info.Mode()&0111 == 0 {
+			continue
+		}
+
+		resolvedPath := binPath
+		if info.Mode()&os.ModeSymlink != 0 {
+			resolved, err := filepath.EvalSymlinks(binPath)
+			if err == nil {
+				if resolvedInfo, err := os.Stat(resolved); err == nil && resolvedInfo.Mode()&0111 != 0 {
+					resolvedPath = resolved
 				}
 			}
+
+			if err != nil {
+				continue
+			}
+		}
+
+		if !seen[resolvedPath] {
+			seen[resolvedPath] = true
+			bins = append(bins, resolvedPath)
 		}
 	}
 
