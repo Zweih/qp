@@ -1,4 +1,11 @@
 # qp Release Notes
+## v5.84.1
+### What's Changed
+* Fix: Default provider depth by @Zweih in https://github.com/Zweih/qp/pull/392
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.84.0...v5.84.1
+
+
 ## v5.84.0
 ### What's Changed
 * Feature: Add NVM other-envs by @Zweih in https://github.com/Zweih/qp/pull/391
@@ -709,10 +716,3 @@
 * Feature: Add build date sort by @Zweih in https://github.com/Zweih/qp/pull/223
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v4.28.0...v4.29.0
-
-
-## v4.28.0
-### What's Changed
-* Feature: Add build date query by @Zweih in https://github.com/Zweih/qp/pull/219
-
-**Full Changelog**: https://github.com/Zweih/qp/compare/v4.27.4...v4.28.0
