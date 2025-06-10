@@ -104,18 +104,18 @@ func fetchPackages(
 }
 
 func extractNodeVersion(modulesDir string) string {
-	if strings.Contains(modulesDir, ".nvm/versions/node/") {
+	if strings.Contains(modulesDir, nvmDir) {
 		parts := strings.Split(modulesDir, "/")
 		for i, part := range parts {
 			if part == "node" && i+1 < len(parts) {
-				return "(nvm) node-" + parts[i+1]
+				return nvmNodeEnv + parts[i+1]
 			}
 		}
 	}
 
 	if strings.HasPrefix(modulesDir, "/usr/") {
-		return "node-system"
+		return nodeSystemEnv
 	}
 
-	return "node-unknown"
+	return nodeUnknownEnv
 }
