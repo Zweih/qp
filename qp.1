@@ -199,17 +199,17 @@ Python packages installed in isolated environments via pipx
 .SH AVAILABLE FIELDS
 Available for use with \fBselect\fR, \fBorder\fR, and \fBwhere\fR:
 
-updated, built, size, name, reason, version, origin, arch, license,
-description, url, validation, pkgbase, pkgtype, packager, also-in, groups, conflicts,
+updated, built, size, freeable, name, reason, version, origin, arch, env, license,
+description, url, validation, pkgbase, pkgtype, packager, groups, also-in, other-envs, conflicts,
 replaces, depends, optdepends, required-by, optional-for, provides
 
 .SH FIELD TYPES
 .TP
 .B Range:
-updated, built, size
+updated, built, size, freeable
 .TP
 .B String:
-name, reason, version, origin, arch, license, pkgbase, description, url, also-in, groups, validation, pkgtype, packager
+name, reason, version, origin, arch, env, license, pkgbase, description, url, groups,also-in, other-envs, validation, pkgtype, packager
 .TP
 .B Relations:
 conflicts, replaces, depends, optdepends, required-by, optional-for, provides
