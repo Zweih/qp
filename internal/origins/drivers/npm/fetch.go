@@ -25,8 +25,6 @@ func fetchPackages(
 	}
 
 	nodeVersion := extractNodeVersion(modulesDir)
-	inputChan := make(chan string, len(entries))
-
 	var packagePaths []string
 	for _, entry := range entries {
 		if !entry.IsDir() {
@@ -47,19 +45,23 @@ func fetchPackages(
 					continue
 				}
 
-				inputChan <- filepath.Join(entryName, subEntry.Name())
+				packagePaths = append(packagePaths, filepath.Join(entryName, subEntry.Name()))
 			}
 
 			continue
 		}
 
-		inputChan <- entryName
+		packagePaths = append(packagePaths, entryName)
 	}
 
 	if len(packagePaths) == 0 {
 		return
 	}
 
+	inputChan := make(chan string, len(packagePaths))
+	for _, path := range packagePaths {
+		inputChan <- path
+	}
 	close(inputChan)
 
 	stage1 := worker.RunWorkers(
