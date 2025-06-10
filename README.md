@@ -120,7 +120,7 @@ learn about installation [here](#installation)
 | ✓ | optimize query order (4% speed boost) | ✓ | concurrent querying |
 | ✓ | concurrent sorting | ✓ | asynchronous progress bar |
 | ✓ | channel-based aggregation | ✓ | rewrite in golang |
-| ✓ | automate binaries packaging | ✓ | add CI to release binaries |
+| ✓ | automate binaries packaging | ✓ | CI to release binaries |
 | ✓ | dependency depth resolution | ✓ | config dependency injection for testing |
 | ✓ | query by package name | ✓ | query by size on disk |
 | ✓ | query by range of size on disk | ✓ | query by date range |
@@ -185,8 +185,10 @@ learn about installation [here](#installation)
 | ✓ | cache-only option | ✓ | pacman hook |
 | - | brew hook | - | deb hook |
 | ✓ | npm origin (npm global packages) | - | nested dependencies |
-| ✓ | add also-in field (cross-origin managed) | ✓ | add env field |
-| - | add other envs field | - | add support for multiple virtual environments (nvm/pyenv/etc.) |
+| ✓ | also-in field (cross-origin managed) | ✓ | env field |
+| ✓ | other envs field | - | support for multiple virtual environments (nvm/pyenv/etc.) |
+| ✓ | freeable field | - | footprint field |
+| - | flatpak origin | - | install history |
 
 ## installation
 
@@ -296,6 +298,7 @@ qp [command] [args] [options]
 - `updated` - when the package was last updated
 - `built` - when the package was built
 - `size` - package size on disk
+- `freeable` - the amount storage that will be freed if the package is uninstalled
 - `name` - package name
 - `reason` - installation reason (explicit/dependency)
 - `version` - installed package version
@@ -503,6 +506,7 @@ qp w q has:depends or has:required-by p and not reason=explicit
 | updated | range |
 | built | range |
 | size | range |
+| freeable | range |
 | name | string |
 | reason | string |
 | version | string |

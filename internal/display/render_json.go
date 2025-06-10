@@ -14,6 +14,8 @@ type PkgInfoJSON struct {
 	UpdateTimestamp    int64    `json:"updateTimestamp,omitempty"`
 	BuildTimestamp     int64    `json:"buildTimestamp,omitempty"`
 	Size               int64    `json:"size,omitempty"`
+	Footprint          int64    `json:"footprint,omitempty"`
+	Freeable           int64    `json:"freeable,omitempty"`
 	Name               string   `json:"name,omitempty"`
 	Reason             string   `json:"reason,omitempty"`
 	Version            string   `json:"version,omitempty"`
@@ -94,6 +96,10 @@ func getJsonValues(pkg *pkgdata.PkgInfo, fields []consts.FieldType) *PkgInfoJSON
 			filteredPkg.BuildTimestamp = pkg.GetInt(field)
 		case consts.FieldSize:
 			filteredPkg.Size = pkg.GetInt(field)
+		case consts.FieldFootprint:
+			filteredPkg.Footprint = pkg.GetInt(field)
+		case consts.FieldFreeable:
+			filteredPkg.Freeable = pkg.GetInt(field)
 		case consts.FieldName:
 			filteredPkg.Name = pkg.GetString(field)
 		case consts.FieldReason:

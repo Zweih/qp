@@ -171,6 +171,7 @@ type PkgInfo struct {
 	UpdateTimestamp  int64                  `protobuf:"varint,17,opt,name=update_timestamp,json=updateTimestamp,proto3" json:"update_timestamp,omitempty"`
 	BuildTimestamp   int64                  `protobuf:"varint,16,opt,name=build_timestamp,json=buildTimestamp,proto3" json:"build_timestamp,omitempty"`
 	Size             int64                  `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
+	Freeable         int64                  `protobuf:"varint,30,opt,name=freeable,proto3" json:"freeable,omitempty"`
 	Name             string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
 	Reason           string                 `protobuf:"bytes,4,opt,name=reason,proto3" json:"reason,omitempty"`
 	Version          string                 `protobuf:"bytes,5,opt,name=version,proto3" json:"version,omitempty"`
@@ -185,8 +186,6 @@ type PkgInfo struct {
 	PkgBase          string                 `protobuf:"bytes,14,opt,name=pkg_base,json=pkgBase,proto3" json:"pkg_base,omitempty"`
 	Packager         string                 `protobuf:"bytes,21,opt,name=packager,proto3" json:"packager,omitempty"`
 	Groups           []string               `protobuf:"bytes,19,rep,name=groups,proto3" json:"groups,omitempty"`
-	AlsoIn           []string               `protobuf:"bytes,28,rep,name=also_in,json=alsoIn,proto3" json:"also_in,omitempty"`
-	OtherEnvs        []string               `protobuf:"bytes,29,rep,name=other_envs,json=otherEnvs,proto3" json:"other_envs,omitempty"`
 	Conflicts        []*Relation            `protobuf:"bytes,12,rep,name=conflicts,proto3" json:"conflicts,omitempty"`
 	Replaces         []*Relation            `protobuf:"bytes,15,rep,name=replaces,proto3" json:"replaces,omitempty"`
 	Depends          []*Relation            `protobuf:"bytes,9,rep,name=depends,proto3" json:"depends,omitempty"`
@@ -252,6 +251,13 @@ func (x *PkgInfo) GetBuildTimestamp() int64 {
 func (x *PkgInfo) GetSize() int64 {
 	if x != nil {
 		return x.Size
+	}
+	return 0
+}
+
+func (x *PkgInfo) GetFreeable() int64 {
+	if x != nil {
+		return x.Freeable
 	}
 	return 0
 }
@@ -350,20 +356,6 @@ func (x *PkgInfo) GetPackager() string {
 func (x *PkgInfo) GetGroups() []string {
 	if x != nil {
 		return x.Groups
-	}
-	return nil
-}
-
-func (x *PkgInfo) GetAlsoIn() []string {
-	if x != nil {
-		return x.AlsoIn
-	}
-	return nil
-}
-
-func (x *PkgInfo) GetOtherEnvs() []string {
-	if x != nil {
-		return x.OtherEnvs
 	}
 	return nil
 }
@@ -480,12 +472,13 @@ const file_protobuf_pkginfo_proto_rawDesc = "" +
 	"\boperator\x18\x03 \x01(\x0e2\x13.pkginfo.RelationOpR\boperator\x12\x14\n" +
 	"\x05depth\x18\x04 \x01(\x05R\x05depth\x12\"\n" +
 	"\fproviderName\x18\x05 \x01(\tR\fproviderName\x12\x10\n" +
-	"\x03why\x18\x06 \x01(\tR\x03why\"\x98\a\n" +
+	"\x03why\x18\x06 \x01(\tR\x03why\"\x88\a\n" +
 	"\aPkgInfo\x12+\n" +
 	"\x11install_timestamp\x18\x1a \x01(\x03R\x10installTimestamp\x12)\n" +
 	"\x10update_timestamp\x18\x11 \x01(\x03R\x0fupdateTimestamp\x12'\n" +
 	"\x0fbuild_timestamp\x18\x10 \x01(\x03R\x0ebuildTimestamp\x12\x12\n" +
-	"\x04size\x18\x02 \x01(\x03R\x04size\x12\x12\n" +
+	"\x04size\x18\x02 \x01(\x03R\x04size\x12\x1a\n" +
+	"\bfreeable\x18\x1e \x01(\x03R\bfreeable\x12\x12\n" +
 	"\x04name\x18\x03 \x01(\tR\x04name\x12\x16\n" +
 	"\x06reason\x18\x04 \x01(\tR\x06reason\x12\x18\n" +
 	"\aversion\x18\x05 \x01(\tR\aversion\x12\x16\n" +
@@ -501,10 +494,7 @@ const file_protobuf_pkginfo_proto_rawDesc = "" +
 	"\bpkg_type\x18\x18 \x01(\tR\apkgType\x12\x19\n" +
 	"\bpkg_base\x18\x0e \x01(\tR\apkgBase\x12\x1a\n" +
 	"\bpackager\x18\x15 \x01(\tR\bpackager\x12\x16\n" +
-	"\x06groups\x18\x13 \x03(\tR\x06groups\x12\x17\n" +
-	"\aalso_in\x18\x1c \x03(\tR\x06alsoIn\x12\x1d\n" +
-	"\n" +
-	"other_envs\x18\x1d \x03(\tR\totherEnvs\x12/\n" +
+	"\x06groups\x18\x13 \x03(\tR\x06groups\x12/\n" +
 	"\tconflicts\x18\f \x03(\v2\x11.pkginfo.RelationR\tconflicts\x12-\n" +
 	"\breplaces\x18\x0f \x03(\v2\x11.pkginfo.RelationR\breplaces\x12+\n" +
 	"\adepends\x18\t \x03(\v2\x11.pkginfo.RelationR\adepends\x122\n" +
@@ -514,7 +504,7 @@ const file_protobuf_pkginfo_proto_rawDesc = "" +
 	" \x03(\v2\x11.pkginfo.RelationR\n" +
 	"requiredBy\x124\n" +
 	"\foptional_for\x18\x17 \x03(\v2\x11.pkginfo.RelationR\voptionalFor\x12-\n" +
-	"\bprovides\x18\v \x03(\v2\x11.pkginfo.RelationR\bprovidesJ\x04\b\x01\x10\x02J\x04\b\x12\x10\x13\"R\n" +
+	"\bprovides\x18\v \x03(\v2\x11.pkginfo.RelationR\bprovidesJ\x04\b\x01\x10\x02J\x04\b\x12\x10\x13J\x04\b\x1c\x10\x1dJ\x04\b\x1d\x10\x1e\"R\n" +
 	"\n" +
 	"CachedPkgs\x12$\n" +
 	"\x04pkgs\x18\x02 \x03(\v2\x10.pkginfo.PkgInfoR\x04pkgs\x12\x18\n" +

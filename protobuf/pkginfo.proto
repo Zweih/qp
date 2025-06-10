@@ -25,11 +25,12 @@ message Relation {
 }
 
 message PkgInfo {
-  reserved 1, 18;
+  reserved 1, 18, 28, 29;
   int64 install_timestamp = 26;
   int64 update_timestamp = 17;
   int64 build_timestamp = 16;
   int64 size = 2;
+  int64 freeable = 30;
   string name = 3;
   string reason = 4;
   string version = 5;
@@ -45,8 +46,6 @@ message PkgInfo {
   string packager = 21;
 
   repeated string groups = 19;
-  repeated string also_in = 28;
-  repeated string other_envs = 29;
 
   repeated Relation conflicts = 12;
   repeated Relation replaces = 15;
