@@ -20,6 +20,8 @@ var columnHeaders = map[consts.FieldType]string{
 	consts.FieldName:        "NAME",
 	consts.FieldReason:      "REASON",
 	consts.FieldSize:        "SIZE",
+	consts.FieldFootprint:   "FOOTPRINT",
+	consts.FieldFreeable:    "FREEABLE",
 	consts.FieldVersion:     "VERSION",
 	consts.FieldOrigin:      "ORIGIN",
 	consts.FieldArch:        "ARCH",
