@@ -13,7 +13,7 @@ func Preprocess(args []string) ([]string, error) {
 	currentBlock := consts.BlockNone
 
 	for _, token := range args {
-		if block := consts.CmdTypeLookup[token]; block != consts.BlockNone {
+		if block := consts.CmdTypeLookup[strings.ToLower(token)]; block != consts.BlockNone {
 			currentBlock = block
 			processed = append(processed, token)
 			continue
