@@ -36,13 +36,11 @@ func (d *FlatpakDriver) Detect() bool {
 }
 
 func (d *FlatpakDriver) Load(cacheRoot string) ([]*pkgdata.PkgInfo, error) {
-	fetchPackages(d.Name(), d.installDirs)
-
-	return []*pkgdata.PkgInfo{}, nil
+	return fetchPackages(d.Name(), d.installDirs)
 }
 
 func (d *FlatpakDriver) ResolveDeps(pkgs []*pkgdata.PkgInfo) ([]*pkgdata.PkgInfo, error) {
-	return []*pkgdata.PkgInfo{}, nil
+	return pkgdata.ResolveDependencyGraph(pkgs, nil)
 }
 
 func (d *FlatpakDriver) LoadCache(path string) ([]*pkgdata.PkgInfo, error) {

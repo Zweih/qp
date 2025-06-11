@@ -55,6 +55,8 @@ func fetchPackages(origin string, installDirs []string) ([]*pkgdata.PkgInfo, err
 			}
 
 			pkg.Size = size
+			pkg.Origin = origin
+
 			return pkg, nil
 		},
 		0,
