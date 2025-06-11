@@ -37,7 +37,7 @@ func fetchPackages(origin string, installDirs []string) ([]*pkgdata.PkgInfo, err
 		errChan,
 		&errGroup,
 		func(pkgRef *PkgRef) (*PkgRef, error) {
-			return parseMetainfo(pkgRef)
+			return parseMetadata(pkgRef)
 		},
 		0,
 		len(pkgRefs),
@@ -71,7 +71,7 @@ func fetchPackages(origin string, installDirs []string) ([]*pkgdata.PkgInfo, err
 	return worker.CollectOutput(stage2Out, errChan)
 }
 
-func parseMetainfo(pkgRef *PkgRef) (*PkgRef, error) {
+func parseMetadata(pkgRef *PkgRef) (*PkgRef, error) {
 	file, err := os.Open(pkgRef.MetadataPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open %s metadta file %s: %w", pkgRef.Name, pkgRef.MetadataPath, err)
@@ -146,6 +146,7 @@ func applyApplicationField(pkg *pkgdata.PkgInfo, key string, value string) {
 
 func parseRuntime(runtimeDir string) (pkgdata.Relation, error) {
 	parts := filepath.SplitList(runtimeDir)
+	fmt.Println(parts)
 	if len(parts) < 3 {
 		return pkgdata.Relation{}, fmt.Errorf("malformed runtime value: %s", runtimeDir)
 	}
