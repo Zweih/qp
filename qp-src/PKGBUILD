@@ -11,7 +11,7 @@ conflicts=("qp-bin" "qp-git")
 replaces=("yaylog" "yaylog-bin" "yaylog-git")
 optdepends=('sqlite: RPM support')
 source=("${url}/releases/download/v${pkgver}/qp-v${pkgver}.tar.gz")
-sha256sums=("3fa4ff9a619eb0a773fc06e7c7ba49878b997c4937b2e129c793ca337d74ede9")
+sha256sums=("310508b6a708de463b3e665be0af0b1e2394c0246dbeccadf49699472b629fb1")
 
 build() {
   cd "${srcdir}/${pkgname}-v${pkgver}"

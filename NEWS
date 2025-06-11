@@ -1,14 +1,9 @@
 # qp Release Notes
 ## v5.86.4
 ### What's Changed
-* Fix: Default provider depth by @Zweih in https://github.com/Zweih/qp/pull/392
-* Feature: Add freeable field by @Zweih in https://github.com/Zweih/qp/pull/393
-* Feature: Add footprint field by @Zweih in https://github.com/Zweih/qp/pull/394
-* Fix: Problematic symlinks by @Zweih in https://github.com/Zweih/qp/pull/396
-* Fix: NPM package fetch by @Zweih in https://github.com/Zweih/qp/pull/397
-* Fix: Package pathing by @Zweih in https://github.com/Zweih/qp/pull/398
+* Refactor: Deb license parsing by @Zweih in https://github.com/Zweih/qp/pull/399
 
-**Full Changelog**: https://github.com/Zweih/qp/compare/v5.84.0...v5.86.4
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.86.3...v5.86.4
 
 
 ## v5.86.3
