@@ -17,4 +17,25 @@ const (
 
 	typeFormula = "formula"
 	typeCask    = "cask"
+
+	dotBrew = ".brew"
+	dotRuby = ".rb"
+
+	fieldDesc     = "desc "
+	fieldHomepage = "homepage "
+	fieldLicense  = "license "
+
+	fieldAllOf = "all_of"
+	fieldAnyOf = "any_of"
+
+	spaceAnd = " AND "
+	trimAnd  = "AND"
+	trimOr   = "OR"
+
+	openBracket  = "["
+	closeBracket = "]"
+	openParen    = "("
+	closeParen   = ")"
+	openCurly    = "{"
+	closeCurly   = "}"
 )

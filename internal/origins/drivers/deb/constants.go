@@ -31,6 +31,7 @@ const (
 	licenseFileName = "copyright"
 	filesPrefix     = "Files:"
 	licensePrefix   = "License:"
+	unknownLicense  = "unknown"
 
 	pkgModRoot = "/var/lib/dpkg/info"
 	listExt    = ".list"

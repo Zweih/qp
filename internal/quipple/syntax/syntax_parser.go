@@ -35,7 +35,7 @@ func ParseSyntax(args []string) (ParsedInput, error) {
 	blockSeen := map[consts.CmdType]bool{}
 
 	for _, token := range preprocessedArgs {
-		cmd := consts.CmdTypeLookup[token]
+		cmd := consts.CmdTypeLookup[strings.ToLower(token)]
 		if cmd != consts.BlockNone {
 			currentBlock = cmd
 

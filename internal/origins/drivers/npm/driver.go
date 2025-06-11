@@ -28,9 +28,10 @@ func (d *NpmDriver) Detect() bool {
 		if _, err := os.Stat(modulesDir); err != nil {
 			continue
 		}
+
+		d.modulesDirs = append(d.modulesDirs, modulesDir)
 	}
 
-	d.modulesDirs = modulesDirs
 	return true
 }
 
@@ -43,10 +44,10 @@ func (d *NpmDriver) Load(_ string) ([]*pkgdata.PkgInfo, error) {
 
 	for _, modulesDir := range d.modulesDirs {
 		setupGroup.Add(1)
-		go func() {
+		go func(dir string) {
 			defer setupGroup.Done()
-			fetchPackages(d.Name(), modulesDir, outChan, errChan, &errGroup)
-		}()
+			fetchPackages(d.Name(), dir, outChan, errChan, &errGroup)
+		}(modulesDir)
 	}
 
 	go func() {

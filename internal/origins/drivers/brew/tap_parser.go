@@ -9,16 +9,9 @@ import (
 	"unicode"
 )
 
-const (
-	spaceAnd = " AND "
-	trimAnd  = "AND"
-	trimOr   = "OR"
-)
-
-// TODO: let's remove the magic strings
 // TODO: let's do byte operations here like we do in pacman/parser.go, we can beat the performance of strings.HasPrefix
 func inferTapMetadata(pkg *pkgdata.PkgInfo, path string) {
-	rubyPath := filepath.Join(path, ".brew", pkg.Name+".rb")
+	rubyPath := filepath.Join(path, dotBrew, pkg.Name+dotRuby)
 	data, err := os.ReadFile(rubyPath)
 	if err != nil {
 		return
@@ -37,14 +30,14 @@ func inferTapMetadata(pkg *pkgdata.PkgInfo, path string) {
 			line := string(bytes.TrimSpace(data[start:end]))
 
 			switch {
-			case strings.HasPrefix(line, "desc "):
+			case strings.HasPrefix(line, fieldDesc):
 				pkg.Description = extractQuotedValue(line)
 
-			case strings.HasPrefix(line, "homepage "):
+			case strings.HasPrefix(line, fieldHomepage):
 				pkg.Url = extractQuotedValue(line)
 
-			case strings.HasPrefix(line, "license "):
-				if !strings.Contains(line, ":") && !strings.Contains(line, "[") {
+			case strings.HasPrefix(line, fieldLicense):
+				if !strings.Contains(line, ":") && !strings.Contains(line, openBracket) {
 					pkg.License = extractQuotedValue(line)
 					break
 				}
@@ -53,8 +46,8 @@ func inferTapMetadata(pkg *pkgdata.PkgInfo, path string) {
 
 			if inLicenseBlock {
 				licenseLines = append(licenseLines, line)
-				braceDepth += strings.Count(line, "[") + strings.Count(line, "{")
-				braceDepth -= strings.Count(line, "]") + strings.Count(line, "}")
+				braceDepth += strings.Count(line, openBracket) + strings.Count(line, openCurly)
+				braceDepth -= strings.Count(line, closeBracket) + strings.Count(line, closeCurly)
 
 				if braceDepth <= 0 {
 					inLicenseBlock = false
@@ -85,7 +78,7 @@ func parseLicenseBlock(input string) string {
 
 func trimOuterParens(str string) string {
 	str = strings.TrimSpace(str)
-	if strings.HasPrefix(str, "(") && strings.HasSuffix(str, ")") {
+	if strings.HasPrefix(str, openParen) && strings.HasSuffix(str, closeParen) {
 		depth := 0
 
 		for i := range len(str) {
@@ -158,25 +151,25 @@ func parseLicenseTokens(tokens []string) (string, int) {
 	i := 0
 	for i < len(tokens) {
 		switch tokens[i] {
-		case "all_of":
+		case fieldAllOf:
 			inner, offset := parseLicenseGroup(tokens[i+2:], trimAnd)
-			parts = append(parts, "("+inner+")")
+			parts = append(parts, openParen+inner+closeParen)
 			i += offset + 2
 
-		case "any_of":
+		case fieldAnyOf:
 			inner, offset := parseLicenseGroup(tokens[i+2:], trimOr)
-			parts = append(parts, "("+inner+")")
+			parts = append(parts, openParen+inner+closeParen)
 			i += offset + 2
 
-		case "{":
+		case openCurly:
 			group, offset := parseLicenseTokens(tokens[i+1:])
 			parts = append(parts, group)
 			i += offset + 2
 
-		case "[":
+		case openBracket:
 			i++
 
-		case "]", "}", ":":
+		case closeBracket, closeCurly, ":":
 			return strings.Join(parts, spaceAnd), i
 
 		default:
@@ -196,18 +189,19 @@ func parseLicenseGroup(tokens []string, joiner string) (string, int) {
 	i := 0
 	for i < len(tokens) {
 		switch tokens[i] {
-		case "{":
+		case openCurly:
 			expr, offset := parseLicenseTokens(tokens[i+1:])
 			items = append(items, expr)
 			i += offset + 2
 
-		case "]":
+		case closeBracket:
 			return strings.Join(items, " "+joiner+" "), i + 1
 
 		default:
 			if strings.HasPrefix(tokens[i], "\"") {
 				items = append(items, strings.Trim(tokens[i], "\""))
 			}
+
 			i++
 		}
 	}

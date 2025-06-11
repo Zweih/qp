@@ -20,6 +20,8 @@ const (
 	FieldAlsoIn
 	FieldOtherEnvs
 	FieldSize
+	FieldFreeable
+	FieldFootprint
 	FieldInstalled
 	FieldUpdated
 	FieldBuilt
@@ -48,7 +50,7 @@ func GetFieldPrim(field FieldType) FieldPrim {
 	case FieldUpdated, FieldBuilt, FieldInstalled:
 		return FieldPrimDate
 
-	case FieldSize:
+	case FieldSize, FieldFreeable, FieldFootprint:
 		return FieldPrimSize
 
 	case FieldName, FieldReason, FieldVersion,
@@ -75,6 +77,8 @@ const (
 	updated     = "updated"
 	built       = "built"
 	size        = "size"
+	freeable    = "freeable"
+	footprint   = "footprint"
 	name        = "name"
 	reason      = "reason"
 	version     = "version"
@@ -120,6 +124,8 @@ var FieldTypeLookup = map[string]FieldType{
 	updated:     FieldUpdated,
 	built:       FieldBuilt,
 	size:        FieldSize,
+	freeable:    FieldFreeable,
+	footprint:   FieldFootprint,
 	name:        FieldName,
 	reason:      FieldReason,
 	version:     FieldVersion,
@@ -150,6 +156,8 @@ var FieldNameLookup = map[FieldType]string{
 	FieldUpdated:     updated,
 	FieldBuilt:       built,
 	FieldSize:        size,
+	FieldFreeable:    freeable,
+	FieldFootprint:   footprint,
 	FieldName:        name,
 	FieldReason:      reason,
 	FieldVersion:     version,
@@ -187,6 +195,8 @@ var (
 		FieldUpdated,
 		FieldBuilt,
 		FieldSize,
+		FieldFreeable,
+		FieldFootprint,
 		FieldName,
 		FieldReason,
 		FieldVersion,

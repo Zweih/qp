@@ -25,8 +25,7 @@ func fetchPackages(
 	}
 
 	nodeVersion := extractNodeVersion(modulesDir)
-	inputChan := make(chan string, len(entries))
-
+	var packagePaths []string
 	for _, entry := range entries {
 		if !entry.IsDir() {
 			continue
@@ -35,22 +34,34 @@ func fetchPackages(
 		entryName := entry.Name()
 		if entryName != "" && entryName[0] == '@' {
 			scope := filepath.Join(modulesDir, entryName)
-			if subEntries, err := os.ReadDir(scope); err == nil {
-				for _, subEntry := range subEntries {
-					if !subEntry.IsDir() {
-						continue
-					}
+			subEntries, err := os.ReadDir(scope)
+			if err != nil {
+				errChan <- fmt.Errorf("failed to read scope directory %s: %w", scope, err)
+				continue
+			}
 
-					inputChan <- filepath.Join(entryName, subEntry.Name())
+			for _, subEntry := range subEntries {
+				if !subEntry.IsDir() {
+					continue
 				}
+
+				packagePaths = append(packagePaths, filepath.Join(entryName, subEntry.Name()))
 			}
 
 			continue
 		}
 
-		inputChan <- entryName
+		packagePaths = append(packagePaths, entryName)
 	}
 
+	if len(packagePaths) == 0 {
+		return
+	}
+
+	inputChan := make(chan string, len(packagePaths))
+	for _, path := range packagePaths {
+		inputChan <- path
+	}
 	close(inputChan)
 
 	stage1 := worker.RunWorkers(
@@ -61,7 +72,7 @@ func fetchPackages(
 			return parsePackageJson(filepath.Join(modulesDir, pkgName))
 		},
 		0,
-		len(entries),
+		len(packagePaths),
 	)
 
 	stage2 := worker.RunWorkers(
@@ -95,7 +106,7 @@ func fetchPackages(
 			return pkg, nil
 		},
 		0,
-		len(entries),
+		len(packagePaths),
 	)
 
 	for pkg := range stage2 {
@@ -104,18 +115,18 @@ func fetchPackages(
 }
 
 func extractNodeVersion(modulesDir string) string {
-	if strings.Contains(modulesDir, ".nvm/versions/node/") {
+	if strings.Contains(modulesDir, nvmDir) {
 		parts := strings.Split(modulesDir, "/")
 		for i, part := range parts {
 			if part == "node" && i+1 < len(parts) {
-				return "(nvm) node-" + parts[i+1]
+				return nvmNodeEnv + parts[i+1]
 			}
 		}
 	}
 
 	if strings.HasPrefix(modulesDir, "/usr/") {
-		return "node-system"
+		return nodeSystemEnv
 	}
 
-	return "node-unknown"
+	return nodeUnknownEnv
 }
