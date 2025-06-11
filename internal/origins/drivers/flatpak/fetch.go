@@ -49,7 +49,7 @@ func fetchPackages(origin string, installDirs []string) ([]*pkgdata.PkgInfo, err
 		&errGroup,
 		func(pkgRef *PkgRef) (*pkgdata.PkgInfo, error) {
 			pkg := pkgRef.Pkg
-			size, err := shared.GetInstallSize(pkgRef.Branch)
+			size, err := shared.GetInstallSize(pkgRef.CommitDir)
 			if err != nil {
 				return nil, err
 			}

@@ -8,11 +8,12 @@ import (
 )
 
 type PkgRef struct {
-	Name         string
 	Pkg          *pkgdata.PkgInfo
+	Name         string
 	Type         string
 	Arch         string
 	Branch       string
+	CommitDir    string
 	InstallDir   string
 	MetadataPath string
 }
@@ -117,6 +118,7 @@ func getPkgRefsOfType(installDir string, pkgType string) ([]*PkgRef, error) {
 					Arch:         arch,
 					Type:         pkgType,
 					Branch:       branch,
+					CommitDir:    commitDir,
 					InstallDir:   installDir,
 					MetadataPath: metadataPath,
 				})
