@@ -22,10 +22,6 @@ func EnrichAcrossOrigins(pkgs []*PkgInfo) []*PkgInfo {
 	nameGroups := make(map[string][]*PkgInfo)
 
 	for _, pkg := range pkgs {
-		if _, exists := originExclusion[pkg.Origin]; exists {
-			continue
-		}
-
 		normalizedName := normalizeName(pkg.Name, pkg.Origin)
 		nameGroups[normalizedName] = append(nameGroups[normalizedName], pkg)
 	}
@@ -34,6 +30,10 @@ func EnrichAcrossOrigins(pkgs []*PkgInfo) []*PkgInfo {
 
 	for _, group := range nameGroups {
 		for _, pkg := range group {
+			if _, exists := originExclusion[pkg.Origin]; exists {
+				continue
+			}
+
 			pkgCopy := *pkg
 
 			var otherOrigins []string
