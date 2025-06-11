@@ -30,11 +30,11 @@ func EnrichAcrossOrigins(pkgs []*PkgInfo) []*PkgInfo {
 
 	for _, group := range nameGroups {
 		for _, pkg := range group {
-			if _, exists := originExclusion[pkg.Origin]; exists {
-				continue
-			}
-
 			pkgCopy := *pkg
+
+			if _, exists := originExclusion[pkg.Origin]; exists {
+				result = append(result, &pkgCopy)
+			}
 
 			var otherOrigins []string
 			var otherEnvs []string
