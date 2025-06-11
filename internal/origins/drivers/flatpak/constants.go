@@ -13,9 +13,10 @@ const (
 	activeFile   = "active"
 
 	sectionApplication = "Application"
-	fieldRuntime       = "Runtime"
+	sectionRuntime     = "Runtime"
 	fieldName          = "name"
 	fieldVersion       = "version"
+	fieldRuntime       = "runtime"
 	fieldBranch        = "branch"
 	fieldArch          = "arch"
 	fieldSdkExtends    = "sdk-extensions"
