@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"qp/internal/pkgdata"
 )
 
 type PkgRef struct {
 	Name         string
+	Pkg          *pkgdata.PkgInfo
 	Type         string
 	Arch         string
 	Branch       string

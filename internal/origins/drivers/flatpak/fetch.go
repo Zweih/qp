@@ -4,6 +4,9 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path/filepath"
+	"qp/internal/consts"
+	"qp/internal/origins/shared"
 	"qp/internal/origins/worker"
 	"qp/internal/pkgdata"
 	"strings"
@@ -29,10 +32,44 @@ func fetchPackages(origin string, installDirs []string) ([]*pkgdata.PkgInfo, err
 	}
 	close(inputChan)
 
-	return []*pkgdata.PkgInfo{}, nil
+	stage1Out := worker.RunWorkers(
+		inputChan,
+		errChan,
+		&errGroup,
+		func(pkgRef *PkgRef) (*PkgRef, error) {
+			return parseMetainfo(pkgRef)
+		},
+		0,
+		len(pkgRefs),
+	)
+
+	stage2Out := worker.RunWorkers(
+		stage1Out,
+		errChan,
+		&errGroup,
+		func(pkgRef *PkgRef) (*pkgdata.PkgInfo, error) {
+			pkg := pkgRef.Pkg
+			size, err := shared.GetInstallSize(pkgRef.InstallDir)
+			if err != nil {
+				return nil, err
+			}
+
+			pkg.Size = size
+			return pkg, nil
+		},
+		0,
+		len(pkgRefs),
+	)
+
+	go func() {
+		errGroup.Wait()
+		close(errChan)
+	}()
+
+	return worker.CollectOutput(stage2Out, errChan)
 }
 
-func parseMetadata(pkgRef *PkgRef) (*pkgdata.PkgInfo, error) {
+func parseMetainfo(pkgRef *PkgRef) (*PkgRef, error) {
 	file, err := os.Open(pkgRef.MetadataPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open %s metadta file %s: %w", pkgRef.Name, pkgRef.MetadataPath, err)
@@ -40,9 +77,14 @@ func parseMetadata(pkgRef *PkgRef) (*pkgdata.PkgInfo, error) {
 
 	defer file.Close()
 
-	scanner := bufio.NewScanner(file)
-	var currentSection string
+	pkg := &pkgdata.PkgInfo{
+		Arch:   pkgRef.Arch,
+		Reason: consts.ReasonExplicit,
+	}
 
+	scanner := bufio.NewScanner(file)
+
+	var currentSection string
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
 
@@ -57,8 +99,13 @@ func parseMetadata(pkgRef *PkgRef) (*pkgdata.PkgInfo, error) {
 
 		if strings.Contains(line, "=") {
 			key, value := parseKeyValue(line)
+			applyMetadataField(pkg, currentSection, key, value)
+			continue
 		}
 	}
+
+	pkgRef.Pkg = pkg
+	return pkgRef, nil
 }
 
 func parseKeyValue(line string) (string, string) {
@@ -75,17 +122,35 @@ func applyMetadataField(
 	section string,
 	key string,
 	value string,
-) error {
+) {
 	switch section {
 	case sectionApplication:
-		return applyApplicationField
+		applyApplicationField(pkg, key, value)
 	default:
 		// TODO: extension
-		return nil
 	}
 }
 
-func applyApplicationField(pkg *pkgdata.PkgInfo, key string, value string) error {
-  switch key
+func applyApplicationField(pkg *pkgdata.PkgInfo, key string, value string) {
+	switch key {
+	case fieldName:
+		pkg.Name = strings.TrimSpace(value)
+	case fieldRuntime:
+		rel, err := parseRuntime(value)
+		if err == nil {
+			pkg.Depends = append(pkg.Depends, rel)
+		}
+	}
+}
 
+func parseRuntime(runtimeDir string) (pkgdata.Relation, error) {
+	parts := filepath.SplitList(runtimeDir)
+	if len(parts) < 3 {
+		return pkgdata.Relation{}, fmt.Errorf("malformed runtime value: %s", runtimeDir)
+	}
+
+	name := parts[0]
+	version := parts[len(parts)-1]
+
+	return pkgdata.Relation{Name: name, Version: version}, nil
 }
