@@ -80,6 +80,7 @@ func parseMetainfo(pkgRef *PkgRef) (*PkgRef, error) {
 	defer file.Close()
 
 	pkg := &pkgdata.PkgInfo{
+		Name:   pkgRef.Name,
 		Arch:   pkgRef.Arch,
 		Reason: consts.ReasonExplicit,
 	}
@@ -135,8 +136,6 @@ func applyMetadataField(
 
 func applyApplicationField(pkg *pkgdata.PkgInfo, key string, value string) {
 	switch key {
-	case fieldName:
-		pkg.Name = strings.TrimSpace(value)
 	case fieldRuntime:
 		rel, err := parseRuntime(value)
 		if err == nil {
