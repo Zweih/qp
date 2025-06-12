@@ -1,4 +1,11 @@
 # qp Release Notes
+## v5.86.7
+### What's Changed
+* Refactor: Pkgdata relation module by @Zweih in https://github.com/Zweih/qp/pull/402
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.86.6...v5.86.7
+
+
 ## v5.86.6
 ### What's Changed
 * Fix: Pipx exclusion by @Zweih in https://github.com/Zweih/qp/pull/401
@@ -710,10 +717,3 @@
 * Fix: Limit all by @Zweih in https://github.com/Zweih/qp/pull/240
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v5.2.0...v5.2.1
-
-
-## v5.2.0
-### What's Changed
-* Feature: Add optdepends query by @Zweih in https://github.com/Zweih/qp/pull/235
-
-**Full Changelog**: https://github.com/Zweih/qp/compare/v5.1.1...v5.2.0
