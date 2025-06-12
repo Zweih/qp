@@ -1,4 +1,11 @@
 # qp Release Notes
+## v5.86.6
+### What's Changed
+* Fix: Pipx exclusion by @Zweih in https://github.com/Zweih/qp/pull/401
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.86.5...v5.86.6
+
+
 ## v5.86.5
 ### What's Changed
 * Refactor: Brew tap parsing by @Zweih in https://github.com/Zweih/qp/pull/400
@@ -710,11 +717,3 @@
 * Feature: Add optdepends query by @Zweih in https://github.com/Zweih/qp/pull/235
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v5.1.1...v5.2.0
-
-
-## v5.1.1
-### What's Changed
-* Feature: Limit modifiers by @Zweih in https://github.com/Zweih/qp/pull/229
-* Fix: Limit condition by @Zweih in https://github.com/Zweih/qp/pull/230
-
-**Full Changelog**: https://github.com/Zweih/qp/compare/v5.0.0...v5.1.1
