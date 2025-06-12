@@ -109,24 +109,23 @@ func fetchPackages(origin string, cacheRoot string) ([]*pkgdata.PkgInfo, error) 
 
 func getSystemInstallTime() (int64, error) {
 	systemPaths := []string{
-		"/etc/machine-id",
-		"/etc/hostname",
-		"/boot/vmlinuz-linux",
-		"/usr/bin/pacman",
-		"/var/lib/pacman",
-		"/etc/passwd",
-		"/etc/group",
+		etcMachineId,
+		etcHostname,
+		bootLinux,
+		binPacman,
+		etcPasswd,
+		etcGroup,
 	}
 
 	var oldestTime int64 = math.MaxInt64
-	foundAny := false
+	found := false
 
 	for _, path := range systemPaths {
 		if fileInfo, err := os.Stat(path); err == nil {
 			if birthTime, _, err := shared.GetCreationTime(path); err == nil {
 				if birthTime < oldestTime {
 					oldestTime = birthTime
-					foundAny = true
+					found = true
 				}
 
 				continue
@@ -135,12 +134,12 @@ func getSystemInstallTime() (int64, error) {
 			modTime := fileInfo.ModTime().Unix()
 			if modTime < oldestTime {
 				oldestTime = modTime
-				foundAny = true
+				found = true
 			}
 		}
 	}
 
-	if !foundAny {
+	if !found {
 		return 0, fmt.Errorf("could not determine system install time")
 	}
 

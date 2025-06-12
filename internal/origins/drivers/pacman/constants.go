@@ -26,4 +26,11 @@ const (
 
 	pacmanDbDir   = "/var/lib/pacman/local"
 	pacmanLogPath = "/var/log/pacman.log"
+
+	etcMachineId = "/etc/machine-id"
+	etcHostname  = "/etc/machine-id"
+	bootLinux    = "/boot/vmlinuz-linux"
+	binPacman    = "/usr/bin/pacman"
+	etcPasswd    = "/etc/passwd"
+	etcGroup     = "/etc/group"
 )
