@@ -7,6 +7,7 @@ const (
 	FieldReason FieldType = iota
 	FieldArch
 	FieldName
+	FieldTitle
 	FieldOrigin
 	FieldEnv
 	FieldPkgType
@@ -80,6 +81,7 @@ const (
 	freeable    = "freeable"
 	footprint   = "footprint"
 	name        = "name"
+	title       = "title"
 	reason      = "reason"
 	version     = "version"
 	origin      = "origin"
@@ -127,6 +129,7 @@ var FieldTypeLookup = map[string]FieldType{
 	freeable:    FieldFreeable,
 	footprint:   FieldFootprint,
 	name:        FieldName,
+	title:       FieldTitle,
 	reason:      FieldReason,
 	version:     FieldVersion,
 	origin:      FieldOrigin,
@@ -159,6 +162,7 @@ var FieldNameLookup = map[FieldType]string{
 	FieldFreeable:    freeable,
 	FieldFootprint:   footprint,
 	FieldName:        name,
+	FieldTitle:       title,
 	FieldReason:      reason,
 	FieldVersion:     version,
 	FieldOrigin:      origin,

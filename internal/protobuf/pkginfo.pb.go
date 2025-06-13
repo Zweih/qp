@@ -174,6 +174,7 @@ type PkgInfo struct {
 	Freeable         int64                  `protobuf:"varint,30,opt,name=freeable,proto3" json:"freeable,omitempty"`
 	Footprint        int64                  `protobuf:"varint,31,opt,name=footprint,proto3" json:"footprint,omitempty"`
 	Name             string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	Title            string                 `protobuf:"bytes,32,opt,name=title,proto3" json:"title,omitempty"`
 	Reason           string                 `protobuf:"bytes,4,opt,name=reason,proto3" json:"reason,omitempty"`
 	Version          string                 `protobuf:"bytes,5,opt,name=version,proto3" json:"version,omitempty"`
 	Origin           string                 `protobuf:"bytes,25,opt,name=origin,proto3" json:"origin,omitempty"`
@@ -273,6 +274,13 @@ func (x *PkgInfo) GetFootprint() int64 {
 func (x *PkgInfo) GetName() string {
 	if x != nil {
 		return x.Name
+	}
+	return ""
+}
+
+func (x *PkgInfo) GetTitle() string {
+	if x != nil {
+		return x.Title
 	}
 	return ""
 }
@@ -480,7 +488,7 @@ const file_protobuf_pkginfo_proto_rawDesc = "" +
 	"\boperator\x18\x03 \x01(\x0e2\x13.pkginfo.RelationOpR\boperator\x12\x14\n" +
 	"\x05depth\x18\x04 \x01(\x05R\x05depth\x12\"\n" +
 	"\fproviderName\x18\x05 \x01(\tR\fproviderName\x12\x10\n" +
-	"\x03why\x18\x06 \x01(\tR\x03why\"\xa6\a\n" +
+	"\x03why\x18\x06 \x01(\tR\x03why\"\xbc\a\n" +
 	"\aPkgInfo\x12+\n" +
 	"\x11install_timestamp\x18\x1a \x01(\x03R\x10installTimestamp\x12)\n" +
 	"\x10update_timestamp\x18\x11 \x01(\x03R\x0fupdateTimestamp\x12'\n" +
@@ -488,7 +496,8 @@ const file_protobuf_pkginfo_proto_rawDesc = "" +
 	"\x04size\x18\x02 \x01(\x03R\x04size\x12\x1a\n" +
 	"\bfreeable\x18\x1e \x01(\x03R\bfreeable\x12\x1c\n" +
 	"\tfootprint\x18\x1f \x01(\x03R\tfootprint\x12\x12\n" +
-	"\x04name\x18\x03 \x01(\tR\x04name\x12\x16\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\x12\x14\n" +
+	"\x05title\x18  \x01(\tR\x05title\x12\x16\n" +
 	"\x06reason\x18\x04 \x01(\tR\x06reason\x12\x18\n" +
 	"\aversion\x18\x05 \x01(\tR\aversion\x12\x16\n" +
 	"\x06origin\x18\x19 \x01(\tR\x06origin\x12\x12\n" +

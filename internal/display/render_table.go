@@ -18,6 +18,7 @@ var columnHeaders = map[consts.FieldType]string{
 	consts.FieldUpdated:     "UPDATED",
 	consts.FieldBuilt:       "BUILT",
 	consts.FieldName:        "NAME",
+	consts.FieldTitle:       "TITLE",
 	consts.FieldReason:      "REASON",
 	consts.FieldSize:        "SIZE",
 	consts.FieldFreeable:    "FREEABLE",

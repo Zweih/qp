@@ -17,6 +17,7 @@ type PkgInfoJSON struct {
 	Freeable           int64    `json:"freeable,omitempty"`
 	Footprint          int64    `json:"footprint,omitempty"`
 	Name               string   `json:"name,omitempty"`
+	Title              string   `json:"title,omitempty"`
 	Reason             string   `json:"reason,omitempty"`
 	Version            string   `json:"version,omitempty"`
 	Origin             string   `json:"origin,omitempty"`
@@ -102,6 +103,8 @@ func getJsonValues(pkg *pkgdata.PkgInfo, fields []consts.FieldType) *PkgInfoJSON
 			filteredPkg.Footprint = pkg.GetInt(field)
 		case consts.FieldName:
 			filteredPkg.Name = pkg.GetString(field)
+		case consts.FieldTitle:
+			filteredPkg.Title = pkg.GetString(field)
 		case consts.FieldReason:
 			filteredPkg.Reason = pkg.GetString(field)
 		case consts.FieldVersion:

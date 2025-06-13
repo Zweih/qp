@@ -12,6 +12,7 @@ type PkgInfo struct {
 	Freeable         int64
 	Footprint        int64
 	Name             string
+	Title            string
 	Reason           string
 	Version          string
 	Origin           string
@@ -69,6 +70,8 @@ func (pkg *PkgInfo) GetString(field consts.FieldType) string {
 	switch field {
 	case consts.FieldName:
 		return pkg.Name
+	case consts.FieldTitle:
+		return pkg.Title
 	case consts.FieldReason:
 		return pkg.Reason
 	case consts.FieldVersion:
