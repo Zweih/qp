@@ -1,4 +1,11 @@
 # qp Release Notes
+## v5.86.8
+### What's Changed
+* Refactor: Pacman install history by @Zweih in https://github.com/Zweih/qp/pull/403
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.86.7...v5.86.8
+
+
 ## v5.86.7
 ### What's Changed
 * Refactor: Pkgdata relation module by @Zweih in https://github.com/Zweih/qp/pull/402
@@ -710,10 +717,3 @@
 * Feature: Add optional-for query by @Zweih in https://github.com/Zweih/qp/pull/236
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v5.2.1...v5.3.1
-
-
-## v5.2.1
-### What's Changed
-* Fix: Limit all by @Zweih in https://github.com/Zweih/qp/pull/240
-
-**Full Changelog**: https://github.com/Zweih/qp/compare/v5.2.0...v5.2.1
