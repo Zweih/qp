@@ -33,6 +33,7 @@ message PkgInfo {
   int64 freeable = 30;
   int64 footprint = 31;
   string name = 3;
+  string title = 32;
   string reason = 4;
   string version = 5;
   string origin = 25;

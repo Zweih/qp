@@ -7,6 +7,7 @@ const (
 	FieldReason FieldType = iota
 	FieldArch
 	FieldName
+	FieldTitle
 	FieldOrigin
 	FieldEnv
 	FieldPkgType
@@ -53,10 +54,11 @@ func GetFieldPrim(field FieldType) FieldPrim {
 	case FieldSize, FieldFreeable, FieldFootprint:
 		return FieldPrimSize
 
-	case FieldName, FieldReason, FieldVersion,
-		FieldOrigin, FieldArch, FieldLicense,
-		FieldUrl, FieldDescription, FieldValidation,
-		FieldEnv, FieldPkgType, FieldPkgBase, FieldPackager:
+	case FieldName, FieldTitle, FieldReason,
+		FieldVersion, FieldOrigin, FieldArch,
+		FieldLicense, FieldUrl, FieldDescription,
+		FieldValidation, FieldEnv, FieldPkgType,
+		FieldPkgBase, FieldPackager:
 		return FieldPrimStr
 
 	case FieldGroups, FieldAlsoIn, FieldOtherEnvs:
@@ -80,6 +82,7 @@ const (
 	freeable    = "freeable"
 	footprint   = "footprint"
 	name        = "name"
+	title       = "title"
 	reason      = "reason"
 	version     = "version"
 	origin      = "origin"
@@ -127,6 +130,7 @@ var FieldTypeLookup = map[string]FieldType{
 	freeable:    FieldFreeable,
 	footprint:   FieldFootprint,
 	name:        FieldName,
+	title:       FieldTitle,
 	reason:      FieldReason,
 	version:     FieldVersion,
 	origin:      FieldOrigin,
@@ -159,6 +163,7 @@ var FieldNameLookup = map[FieldType]string{
 	FieldFreeable:    freeable,
 	FieldFootprint:   footprint,
 	FieldName:        name,
+	FieldTitle:       title,
 	FieldReason:      reason,
 	FieldVersion:     version,
 	FieldOrigin:      origin,
@@ -198,6 +203,7 @@ var (
 		FieldFreeable,
 		FieldFootprint,
 		FieldName,
+		FieldTitle,
 		FieldReason,
 		FieldVersion,
 		FieldOrigin,
