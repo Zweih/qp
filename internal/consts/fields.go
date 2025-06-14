@@ -203,6 +203,7 @@ var (
 		FieldFreeable,
 		FieldFootprint,
 		FieldName,
+		FieldTitle,
 		FieldReason,
 		FieldVersion,
 		FieldOrigin,
