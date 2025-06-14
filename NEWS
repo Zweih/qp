@@ -1,4 +1,11 @@
 # qp Release Notes
+## v5.87.0
+### What's Changed
+* Feature: Add title field by @Zweih in https://github.com/Zweih/qp/pull/405
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.86.9...v5.87.0
+
+
 ## v5.86.9
 ### What's Changed
 * Refactor: Main module by @Zweih in https://github.com/Zweih/qp/pull/404
@@ -710,10 +717,3 @@
 * Feature: Add validation query by @Zweih in https://github.com/Zweih/qp/pull/239
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v5.4.1...v5.5.0
-
-
-## v5.4.1
-### What's Changed
-* Feature: Add URL query by @Zweih in https://github.com/Zweih/qp/pull/237
-
-**Full Changelog**: https://github.com/Zweih/qp/compare/v5.3.1...v5.4.1
