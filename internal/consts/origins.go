@@ -1,11 +1,12 @@
 package consts
 
 const (
-	OriginPacman = "pacman"
-	OriginBrew   = "brew"
-	OriginDeb    = "deb"
-	OriginOpkg   = "opkg"
-	OriginNpm    = "npm"
-	OriginPipx   = "pipx"
-	OriginRpm    = "rpm"
+	OriginBrew    = "brew"
+	OriginDeb     = "deb"
+	OriginFlatpak = "flatpak"
+	OriginNpm     = "npm"
+	OriginPacman  = "pacman"
+	OriginPipx    = "pipx"
+	OriginOpkg    = "opkg"
+	OriginRpm     = "rpm"
 )
