@@ -30,6 +30,7 @@ type CaskMetadata struct {
 	Caveats       string              `json:"caveats"`
 	Desc          string              `json:"desc"`
 	Homepage      string              `json:"homepage"`
+	Name          []string            `json:"name"`
 	ConflictsWith map[string][]string `json:"conflicts_with"`
 }
 
@@ -98,6 +99,10 @@ func mergeCaskMetadata(pkg *pkgdata.PkgInfo, cask *CaskMetadata) {
 	pkg.Name = cask.Token
 	pkg.Description = cask.Desc
 	pkg.Url = cask.Homepage
+
+	if len(cask.Name) > 0 {
+		pkg.Title = cask.Name[0]
+	}
 
 	formulaRels := parseRawRels(cask.ConflictsWith[typeFormula])
 	caskRels := parseRawRels(cask.ConflictsWith[typeCask])
