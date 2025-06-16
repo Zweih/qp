@@ -4,8 +4,8 @@ const (
 	systemInstallDir = "/var/lib/flatpak/"
 	userInstallDir   = ".local/share/flatpak/"
 
-	appsSubdir     = "app"
-	runtimeSubdir  = "runtime"
+	typeApp        = "app"
+	typeRuntime    = "runtime"
 	repoSubdir     = "repo"
 	metadataSubdir = "metadata"
 
