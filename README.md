@@ -4,7 +4,7 @@
 
 **qp** queries over 6x faster than native package searching while returning more comprehensive metadata than native package search solutions.
 
-query packages from `brew`, `pacman`, `apt`, `npm`, `pipx`, `dnf`, and `opkg`. ecosystems are added frequently!
+query packages from `brew`, `pacman`, `apt`, `flatpak`, `npm`, `pipx`, `dnf`, and `opkg`. ecosystems are added frequently!
 
 **qp** supports querying with full boolean logic for package metadata, dependency relations, and more.
 
@@ -52,9 +52,9 @@ this package is compatible with the following platforms and distributions:
  - [mabox linux](https://maboxlinux.org/)
  - [zorin OS](https://zorin.com/os/)
  - [elementary OS](https://elementary.io/)
- - the 50 other arch, debian, and fedora-based distros, as long as they have `apt`/`dpkg`, `brew`, `pacman`, `dnf`/`yum`, or `opkg` installed
+ - the 50 other arch, debian, and fedora-based distros, as long as they have `apt`/`dpkg`, `brew`, `pacman`, `flatpak`, `dnf`/`yum`, or `opkg` installed
 
-**qp** also detects and queries other system level package managers like `npm` or `pipx` for globally installed applications, expanding package discovery beyond traditional system package management.
+**qp** also detects and queries other system level package managers like `flatpak`, `npm`, and `pipx` for globally installed applications, expanding package discovery beyond traditional system package management.
 
 **qp** supports embedded linux systems, including meta-distributions like [yocto](https://www.yoctoproject.org/) that use `opkg` (`.ipk` packages) or `apt`/`dpkg` (`.deb` packages) or `.rpm` packages.
 
@@ -66,7 +66,7 @@ this package is compatible with the following platforms and distributions:
     * system package managers:
       * pacman, brew, apt/dpkg, dnf/yum, opkg
     * application package managers:
-      * npm, pipx
+      * flatpak, npm, pipx
 * query packages using an expressive query language
   * supports full boolean logic (`and`, `or`, `not`, grouping)
   * supports fuzzy and strict matching
@@ -188,7 +188,10 @@ learn about installation [here](#installation)
 | ✓ | also-in field (cross-origin managed) | ✓ | env field |
 | ✓ | other envs field | - | support for multiple virtual environments (nvm/pyenv/etc.) |
 | ✓ | freeable field | ✓ | footprint field |
-| - | flatpak origin | - | install history |
+| ✓ | flatpak origin | - | install history |
+| - | snap origin | ✓ | title field |
+| - | keywords/tags field | - | notes/comment field |
+| - | author field | - | cargo origin |
 
 ## installation
 
@@ -301,6 +304,7 @@ qp [command] [args] [options]
 - `freeable` - the amount storage that will be freed if the package is uninstalled
 - `footprint` - the real-world proportional disk space impact of the package, accounting for shared dependencies
 - `name` - package name
+- `title` - alternate, full, or application name; some origins have a proper name for a package other than the name used to install it (i.e., brew has `vlc` and the title is `VLC Media Player`)
 - `reason` - installation reason (explicit/dependency)
 - `version` - installed package version
 - `origin` - the package ecosystem or source the package belongs to (e.g., brew, pipx); reflects which package manager or backend maintains it
@@ -332,6 +336,7 @@ the `pkgtype` field indicates the type or category of package within each ecosys
 |--------|------------------------|-------------|
 | pacman | `pkg`, `split`, `debug`, `src` | package build type |
 | brew | `formula`, `cask` | formulae are command-line tools, casks are GUI applications |
+| flatpak | `app`, `runtime` | runtimes are the main dependencies of apps |
 | deb | none | - |
 | rpm | none | - |
 | opkg | none | - |
@@ -341,6 +346,7 @@ the `pkgtype` field indicates the type or category of package within each ecosys
 **notes:**
 - pacman's pkgtype comes from the package's XDATA field introduced in newer pacman versions
     - older packages may not have this field populated
+- flatpak runtimes are always listed as dependencies
 - deb, rpm, opkg, and pipx origins do not implement package type classifications and will show empty pkgtype values
 
 ### querying with `where`

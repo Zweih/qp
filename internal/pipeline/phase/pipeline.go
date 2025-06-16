@@ -15,7 +15,7 @@ type Pipeline struct {
 	Pkgs          []*pkgdata.PkgInfo
 	IsInteractive bool
 	UsedCache     bool
-	CacheRoot     string
+	CachePath     string
 	ModTime       int64
 }
 
@@ -23,15 +23,15 @@ func NewPipeline(
 	origin driver.Driver,
 	cfg *config.Config,
 	isInteractive bool,
-	baseCachePath string,
+	baseCacheDir string,
 ) *Pipeline {
-	cacheRoot := filepath.Join(baseCachePath, origin.Name())
+	cachePath := filepath.Join(baseCacheDir, origin.Name())
 
 	return &Pipeline{
 		Origin:        origin,
 		Config:        cfg,
 		IsInteractive: isInteractive,
-		CacheRoot:     cacheRoot,
+		CachePath:     cachePath,
 	}
 }
 

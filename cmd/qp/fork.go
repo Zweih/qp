@@ -55,15 +55,15 @@ func rebuildCache(originName string) error {
 			defer wg.Done()
 			pipeline := phase.NewPipeline(targetDriver, cfg, false, cacheBasePath)
 
-			if storage.IsLockFileExists(pipeline.CacheRoot) {
+			if storage.IsLockFileExists(pipeline.CachePath) {
 				return
 			}
 
-			if err := storage.CreateLockFile(pipeline.CacheRoot); err != nil {
+			if err := storage.CreateLockFile(pipeline.CachePath); err != nil {
 				return
 			}
 
-			defer storage.RemoveLockFile(pipeline.CacheRoot)
+			defer storage.RemoveLockFile(pipeline.CachePath)
 
 			_, err := pipeline.RunCacheOnly()
 			if err != nil {

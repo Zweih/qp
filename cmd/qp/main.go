@@ -40,14 +40,14 @@ func mainWithConfig(configProvider config.ConfigProvider) error {
 	}
 
 	isInteractive := isInteractive(cfg.DisableProgress)
-	cacheBasePath, err := storage.GetCachePath()
+	cacheBaseDir, err := storage.GetCachePath()
 	if err != nil {
 		out.WriteLine(fmt.Sprintf("WARNING: failed to set up cache dir: %v", err))
 	}
 
 	var pipelines []*phase.Pipeline
 	for _, driver := range origins.AvailableDrivers() {
-		p := phase.NewPipeline(driver, cfg, isInteractive, cacheBasePath)
+		p := phase.NewPipeline(driver, cfg, isInteractive, cacheBaseDir)
 		pipelines = append(pipelines, p)
 	}
 
