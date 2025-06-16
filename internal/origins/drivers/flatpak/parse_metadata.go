@@ -23,9 +23,11 @@ func parseMetadata(pkgRef *PkgRef) (*PkgRef, error) {
 	}
 
 	pkg := &pkgdata.PkgInfo{
-		Name:   pkgRef.Name,
-		Arch:   pkgRef.Arch,
-		Reason: reason,
+		Name:    pkgRef.Name,
+		Reason:  reason,
+		Arch:    pkgRef.Arch,
+		Env:     fmt.Sprintf("%s (%s)", pkgRef.Scope, pkgRef.Branch),
+		PkgType: pkgRef.Type,
 	}
 
 	scanner := bufio.NewScanner(file)
@@ -76,6 +78,8 @@ func applyMetadataField(
 	switch section {
 	case sectionApplication:
 		applyApplicationField(pkg, key, value)
+	case sectionExtensionOf:
+		applyExtensionOfField(pkg, key, value)
 	default:
 		// TODO: extension
 	}
@@ -87,6 +91,16 @@ func applyApplicationField(pkg *pkgdata.PkgInfo, key string, value string) {
 		rel, err := parseRuntime(value)
 		if err == nil {
 			pkg.Depends = append(pkg.Depends, rel)
+		}
+	}
+}
+
+func applyExtensionOfField(pkg *pkgdata.PkgInfo, key string, value string) {
+	switch key {
+	case fieldRef:
+		rel, err := parseRef(value)
+		if err == nil {
+			pkg.OptionalFor = append(pkg.OptionalFor, rel)
 		}
 	}
 }
@@ -112,6 +126,15 @@ func applyExtensionSection(pkg *pkgdata.PkgInfo, section string) {
 	}
 
 	pkg.OptDepends = append(pkg.OptDepends, pkgdata.Relation{Name: extPart})
+}
+
+func parseRef(refDir string) (pkgdata.Relation, error) {
+	parts := strings.SplitN(refDir, string(os.PathSeparator), 2)
+	if len(parts) != 2 {
+		return pkgdata.Relation{}, fmt.Errorf("malformed ref value: %s", refDir)
+	}
+
+	return parseRuntime(parts[1])
 }
 
 func parseRuntime(runtimeDir string) (pkgdata.Relation, error) {
