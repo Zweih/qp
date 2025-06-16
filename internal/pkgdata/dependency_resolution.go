@@ -1,6 +1,7 @@
 package pkgdata
 
 import (
+	"qp/internal/consts"
 	"strings"
 )
 
@@ -62,13 +63,16 @@ func normalizeOptionalPkgs(pkgs []*PkgInfo, installedMap map[string]*PkgInfo) {
 		optForRels := filterToInstalled(pkg.OptionalFor, installedMap)
 		for _, optForRel := range optForRels {
 			if inst, ok := installedMap[optForRel.Key()]; ok {
-				inst.OptDepends = append(
-					inst.OptDepends, Relation{
-						Name:    pkg.Name,
-						Depth:   1,
-						PkgType: pkg.PkgType,
-					},
-				)
+				rel := Relation{
+					Name:  pkg.Name,
+					Depth: 1,
+				}
+
+				if pkg.Origin == consts.OriginBrew {
+					rel.PkgType = pkg.PkgType
+				}
+
+				inst.OptDepends = append(inst.OptDepends, rel)
 			}
 		}
 	}
