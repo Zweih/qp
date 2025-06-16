@@ -45,12 +45,12 @@ func EnrichAcrossOrigins(pkgs []*PkgInfo) []*PkgInfo {
 					continue
 				}
 
-				if otherPkg.Origin != pkg.Origin {
+				if pkg.Origin != otherPkg.Origin {
 					otherOrigins = append(otherOrigins, otherPkg.Origin)
 					continue
 				}
 
-				if pkg.Env != "" {
+				if pkg.Env != "" && pkg.Title == otherPkg.Title {
 					otherEnvs = append(otherEnvs, otherPkg.Env)
 				}
 			}

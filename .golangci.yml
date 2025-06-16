@@ -5,7 +5,10 @@ linters:
     - govet
     - staticcheck
     - errcheck
+    - lll
   settings:
+    lll:
+      line-length: 95
     revive:
       rules:
         - name: var-naming
