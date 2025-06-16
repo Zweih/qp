@@ -54,7 +54,7 @@ this package is compatible with the following platforms and distributions:
  - [elementary OS](https://elementary.io/)
  - the 50 other arch, debian, and fedora-based distros, as long as they have `apt`/`dpkg`, `brew`, `pacman`, `flatpak`, `dnf`/`yum`, or `opkg` installed
 
-**qp** also detects and queries other system level package managers like `flatpak`, `npm`, `pipx` for globally installed applications, expanding package discovery beyond traditional system package management.
+**qp** also detects and queries other system level package managers like `flatpak`, `npm`, and `pipx` for globally installed applications, expanding package discovery beyond traditional system package management.
 
 **qp** supports embedded linux systems, including meta-distributions like [yocto](https://www.yoctoproject.org/) that use `opkg` (`.ipk` packages) or `apt`/`dpkg` (`.deb` packages) or `.rpm` packages.
 
@@ -190,6 +190,8 @@ learn about installation [here](#installation)
 | ✓ | freeable field | ✓ | footprint field |
 | ✓ | flatpak origin | - | install history |
 | - | snap origin | ✓ | title field |
+| - | keywords/tags field | - | notes/comment field |
+| - | author field | - | cargo origin |
 
 ## installation
 
@@ -302,6 +304,7 @@ qp [command] [args] [options]
 - `freeable` - the amount storage that will be freed if the package is uninstalled
 - `footprint` - the real-world proportional disk space impact of the package, accounting for shared dependencies
 - `name` - package name
+- `title` - alternate, full, or application name; some origins have a proper name for a package other than the name used to install it (i.e., brew has `vlc` and the title is `VLC Media Player`)
 - `reason` - installation reason (explicit/dependency)
 - `version` - installed package version
 - `origin` - the package ecosystem or source the package belongs to (e.g., brew, pipx); reflects which package manager or backend maintains it
@@ -343,6 +346,7 @@ the `pkgtype` field indicates the type or category of package within each ecosys
 **notes:**
 - pacman's pkgtype comes from the package's XDATA field introduced in newer pacman versions
     - older packages may not have this field populated
+- flatpak runtimes are always listed as dependencies
 - deb, rpm, opkg, and pipx origins do not implement package type classifications and will show empty pkgtype values
 
 ### querying with `where`
