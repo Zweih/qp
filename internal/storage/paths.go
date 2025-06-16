@@ -10,20 +10,20 @@ import (
 )
 
 func GetCachePath() (string, error) {
-	userCacheDir, err := GetUserCachePath()
+	userCacheDir, err := GetUserCacheDir()
 	if err != nil {
 		return "", fmt.Errorf("failed to create cache directory: %w", err)
 	}
 
-	cachePath := filepath.Join(userCacheDir, qpCacheDir)
-	if err := FileManager.MkdirAll(cachePath, 0755); err != nil {
+	cacheDir := filepath.Join(userCacheDir, qpCacheDir)
+	if err := FileManager.MkdirAll(cacheDir, 0755); err != nil {
 		return "", fmt.Errorf("failed to create cache directory: %w", err)
 	}
 
-	return cachePath, nil
+	return cacheDir, nil
 }
 
-func GetUserCachePath() (string, error) {
+func GetUserCacheDir() (string, error) {
 	err := switchToRealUser()
 	if err != nil {
 		return "", err

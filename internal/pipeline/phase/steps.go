@@ -24,7 +24,7 @@ func (p *Pipeline) loadCacheStep(
 		return nil, nil
 	}
 
-	cacheMtime, err := storage.LoadCacheModTime(p.CacheRoot)
+	cacheMtime, err := storage.LoadCacheModTime(p.CachePath)
 	if err != nil {
 		return nil, nil
 	}
@@ -35,7 +35,7 @@ func (p *Pipeline) loadCacheStep(
 		return nil, err
 	}
 
-	pkgs, err := p.Origin.LoadCache(p.CacheRoot)
+	pkgs, err := p.Origin.LoadCache(p.CachePath)
 	if err != nil {
 		p.ModTime = now
 		return nil, nil
@@ -58,7 +58,7 @@ func (p *Pipeline) fetchStep(
 
 	p.ModTime = time.Now().Unix()
 
-	pkgs, err := p.Origin.Load(p.CacheRoot)
+	pkgs, err := p.Origin.Load(p.CachePath)
 	if err != nil {
 		err = fmt.Errorf("failed to fetch packages: %v", err)
 		return nil, err
@@ -93,13 +93,13 @@ func (p *Pipeline) saveCacheStep(
 		return pkgs, nil
 	}
 
-	err := p.Origin.SaveCache(p.CacheRoot, pkgs)
+	err := p.Origin.SaveCache(p.CachePath, pkgs)
 	if err != nil {
 		out.WriteLine(fmt.Sprintf("Warning: failed to save cache: %v", err))
 		return pkgs, nil
 	}
 
-	err = storage.SaveCacheModTime(p.CacheRoot, p.ModTime)
+	err = storage.SaveCacheModTime(p.CachePath, p.ModTime)
 	if err != nil {
 		out.WriteLine(fmt.Sprintf("Warning: failed to save cache modtime: %v", err))
 		return pkgs, nil
