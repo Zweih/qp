@@ -1,15 +1,15 @@
 package preprocess
 
 import (
-	"qp/internal/consts"
+	"qp/internal/quipple"
 	"strings"
 )
 
 var ShorthandMap = map[string]string{
-	"s": consts.CmdSelect,
-	"w": consts.CmdWhere,
-	"o": consts.CmdOrder,
-	"l": consts.CmdLimit,
+	"s": quipple.CmdSelect,
+	"w": quipple.CmdWhere,
+	"o": quipple.CmdOrder,
+	"l": quipple.CmdLimit,
 }
 
 func ExpandShortSyntax(args []string) []string {
