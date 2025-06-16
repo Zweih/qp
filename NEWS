@@ -1,4 +1,11 @@
 # qp Release Notes
+## v5.89.0
+### What's Changed
+* Feature: Populate title field for brew casks by @Zweih in https://github.com/Zweih/qp/pull/408
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.88.1...v5.89.0
+
+
 ## v5.88.1
 ### What's Changed
 * Refactor: Flatpak origin by @Zweih in https://github.com/Zweih/qp/pull/407
@@ -710,10 +717,3 @@
 * Feature: Add groups query by @Zweih in https://github.com/Zweih/qp/pull/246
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v5.7.0...v5.8.0
-
-
-## v5.7.0
-### What's Changed
-* Feature: Enforce logical operators between statements by @Zweih in https://github.com/Zweih/qp/pull/244
-
-**Full Changelog**: https://github.com/Zweih/qp/compare/v5.6.0...v5.7.0
