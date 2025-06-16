@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"qp/internal/consts"
 	"qp/internal/origins/shared"
-	"qp/internal/origins/worker"
 	"qp/internal/pkgdata"
+	"qp/internal/worker"
 	"strings"
 
 	json "github.com/goccy/go-json"

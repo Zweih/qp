@@ -6,9 +6,9 @@ import (
 	"os"
 	"path/filepath"
 	"qp/internal/origins/shared"
-	"qp/internal/origins/worker"
 	"qp/internal/pkgdata"
 	"qp/internal/storage"
+	"qp/internal/worker"
 	"sync"
 )
 
