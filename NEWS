@@ -1,4 +1,11 @@
 # qp Release Notes
+## v5.88.1
+### What's Changed
+* Refactor: Flatpak origin by @Zweih in https://github.com/Zweih/qp/pull/407
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.88.0...v5.88.1
+
+
 ## v5.88.0
 ### What's Changed
 * Feature: Add flatpak origin by @Zweih in https://github.com/Zweih/qp/pull/406
@@ -710,10 +717,3 @@
 * Feature: Enforce logical operators between statements by @Zweih in https://github.com/Zweih/qp/pull/244
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v5.6.0...v5.7.0
-
-
-## v5.6.0
-### What's Changed
-* Feature: Revamped querying - and/or/not + grouping (parentheses) logic by @Zweih in https://github.com/Zweih/qp/pull/242
-
-**Full Changelog**: https://github.com/Zweih/qp/compare/v5.5.0...v5.6.0
