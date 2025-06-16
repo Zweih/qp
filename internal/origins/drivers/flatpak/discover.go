@@ -50,14 +50,14 @@ func discoverPackages(
 	for _, installDir := range installDirs {
 		jobChan <- PackageLocation{
 			InstallDir: installDir,
-			PkgType:    appsSubdir,
-			PkgDir:     filepath.Join(installDir, appsSubdir),
+			PkgType:    typeApp,
+			PkgDir:     filepath.Join(installDir, typeApp),
 		}
 
 		jobChan <- PackageLocation{
 			InstallDir: installDir,
-			PkgType:    runtimeSubdir,
-			PkgDir:     filepath.Join(installDir, runtimeSubdir),
+			PkgType:    typeRuntime,
+			PkgDir:     filepath.Join(installDir, typeRuntime),
 		}
 	}
 	close(jobChan)
@@ -189,7 +189,7 @@ func validatePackageCommit(commit PackageCommit) (*PkgRef, error) {
 		return nil, worker.ErrSkip // no metadata, skip commit
 	}
 
-	if commit.PkgType == appsSubdir {
+	if commit.PkgType == typeApp {
 		activePath := filepath.Join(filepath.Dir(commit.CommitDir), activeFile)
 		target, err := filepath.EvalSymlinks(activePath)
 
@@ -282,7 +282,7 @@ func estimatePackageCount(installDirs []string) int {
 	estimate := 0
 
 	for _, installDir := range installDirs {
-		for _, pkgType := range []string{appsSubdir, runtimeSubdir} {
+		for _, pkgType := range []string{typeApp, typeRuntime} {
 			baseDir := filepath.Join(installDir, pkgType)
 			if entries, err := os.ReadDir(baseDir); err == nil {
 				// TODO: perhaps we should use 1.5 and round the result

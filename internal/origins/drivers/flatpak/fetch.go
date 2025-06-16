@@ -54,10 +54,7 @@ func fetchPackages(origin string, installDirs []string) ([]*pkgdata.PkgInfo, err
 		&errGroup,
 		func(pkgRef *PkgRef) (*PkgRef, error) {
 			deployPath := filepath.Join(pkgRef.CommitDir, "deploy")
-			version, err := extractVersion(deployPath)
-			if err != nil {
-				fmt.Println(err)
-			}
+			version, _ := extractVersion(deployPath)
 
 			pkgRef.Pkg.Version = version
 

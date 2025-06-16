@@ -17,10 +17,15 @@ func parseMetadata(pkgRef *PkgRef) (*PkgRef, error) {
 
 	defer file.Close()
 
+	reason := consts.ReasonExplicit
+	if pkgRef.Type == typeRuntime {
+		reason = consts.ReasonDependency
+	}
+
 	pkg := &pkgdata.PkgInfo{
 		Name:   pkgRef.Name,
 		Arch:   pkgRef.Arch,
-		Reason: consts.ReasonExplicit,
+		Reason: reason,
 	}
 
 	scanner := bufio.NewScanner(file)

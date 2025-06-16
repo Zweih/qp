@@ -55,8 +55,8 @@ func (d *FlatpakDriver) SaveCache(cacheRoot string, pkgs []*pkgdata.PkgInfo) err
 
 func (d *FlatpakDriver) IsCacheStale(cacheMtime int64) (bool, error) {
 	for _, installDir := range d.installDirs {
-		appDir := filepath.Join(installDir, appsSubdir)
-		runtimeDir := filepath.Join(installDir, runtimeSubdir)
+		appDir := filepath.Join(installDir, typeApp)
+		runtimeDir := filepath.Join(installDir, typeRuntime)
 
 		for _, dir := range []string{appDir, runtimeDir} {
 			if _, err := os.Stat(dir); err != nil {
