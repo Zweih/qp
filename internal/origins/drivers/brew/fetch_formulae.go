@@ -3,8 +3,8 @@ package brew
 import (
 	"path/filepath"
 	"qp/internal/origins/shared"
-	"qp/internal/origins/worker"
 	"qp/internal/pkgdata"
+	"qp/internal/worker"
 	"sync"
 )
 

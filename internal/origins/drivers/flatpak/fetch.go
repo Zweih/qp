@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"path/filepath"
 	"qp/internal/origins/shared"
-	"qp/internal/origins/worker"
 	"qp/internal/pkgdata"
+	"qp/internal/worker"
 	"sync"
 )
 

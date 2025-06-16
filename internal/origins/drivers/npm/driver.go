@@ -4,9 +4,9 @@ import (
 	"os"
 	"qp/internal/consts"
 	"qp/internal/origins/shared"
-	"qp/internal/origins/worker"
 	"qp/internal/pkgdata"
 	"qp/internal/storage"
+	"qp/internal/worker"
 	"sync"
 )
 

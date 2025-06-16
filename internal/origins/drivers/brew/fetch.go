@@ -1,8 +1,8 @@
 package brew
 
 import (
-	"qp/internal/origins/worker"
 	"qp/internal/pkgdata"
+	"qp/internal/worker"
 	"sync"
 )
 
