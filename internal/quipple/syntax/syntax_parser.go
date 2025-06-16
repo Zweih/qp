@@ -3,6 +3,7 @@ package syntax
 import (
 	"fmt"
 	"qp/internal/consts"
+	"qp/internal/quipple"
 	"qp/internal/quipple/compiler"
 	"qp/internal/quipple/preprocess"
 	"qp/internal/quipple/query"
@@ -31,16 +32,16 @@ func ParseSyntax(args []string) (ParsedInput, error) {
 	limitMode := LimitStart
 	limit := 20
 
-	currentBlock := consts.BlockNone
-	blockSeen := map[consts.CmdType]bool{}
+	currentBlock := quipple.BlockNone
+	blockSeen := map[quipple.CmdType]bool{}
 
 	for _, token := range preprocessedArgs {
-		cmd := consts.CmdTypeLookup[strings.ToLower(token)]
-		if cmd != consts.BlockNone {
+		cmd := quipple.CmdTypeLookup[strings.ToLower(token)]
+		if cmd != quipple.BlockNone {
 			currentBlock = cmd
 
 			if blockSeen[cmd] {
-				return ParsedInput{}, fmt.Errorf("duplicate block: '%s'", consts.CmdNameLookup[cmd])
+				return ParsedInput{}, fmt.Errorf("duplicate block: '%s'", quipple.CmdNameLookup[cmd])
 			}
 			blockSeen[cmd] = true
 
@@ -48,7 +49,7 @@ func ParseSyntax(args []string) (ParsedInput, error) {
 		}
 
 		switch currentBlock {
-		case consts.BlockSelect:
+		case quipple.BlockSelect:
 			fieldTokens := strings.Split(token, ",")
 			for _, fieldStr := range fieldTokens {
 				fieldStr = strings.TrimSpace(fieldStr)
@@ -61,16 +62,16 @@ func ParseSyntax(args []string) (ParsedInput, error) {
 				fields = append(fields, fieldType)
 			}
 
-		case consts.BlockWhere:
+		case quipple.BlockWhere:
 			whereTokens = append(whereTokens, token)
 
-		case consts.BlockOrder:
+		case quipple.BlockOrder:
 			sortOption, err = ParseSortOption(token)
 			if err != nil {
 				return ParsedInput{}, err
 			}
 
-		case consts.BlockLimit:
+		case quipple.BlockLimit:
 			limit, limitMode, err = parseLimit(token)
 			if err != nil {
 				return ParsedInput{}, err

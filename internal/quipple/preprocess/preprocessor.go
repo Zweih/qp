@@ -2,7 +2,7 @@ package preprocess
 
 import (
 	"fmt"
-	"qp/internal/consts"
+	"qp/internal/quipple"
 	"strings"
 )
 
@@ -10,20 +10,20 @@ func Preprocess(args []string) ([]string, error) {
 	args = ExpandShortSyntax(args)
 
 	var processed []string
-	currentBlock := consts.BlockNone
+	currentBlock := quipple.BlockNone
 
 	for _, token := range args {
-		if block := consts.CmdTypeLookup[strings.ToLower(token)]; block != consts.BlockNone {
+		if block := quipple.CmdTypeLookup[strings.ToLower(token)]; block != quipple.BlockNone {
 			currentBlock = block
 			processed = append(processed, token)
 			continue
 		}
 
-		if currentBlock == consts.BlockNone {
+		if currentBlock == quipple.BlockNone {
 			return nil, fmt.Errorf("unexpected token: %q (expected a command block like 'select', 'where', or 'order')", token)
 		}
 
-		if currentBlock == consts.BlockWhere {
+		if currentBlock == quipple.BlockWhere {
 			normalized := normalizeNegationShorthand(token)
 			if len(normalized) == 2 {
 				processed = append(processed, normalized...)
@@ -37,7 +37,7 @@ func Preprocess(args []string) ([]string, error) {
 			expanded, _ := macroExpansion(subtoken, currentBlock)
 
 			if len(expanded) == 0 {
-				return nil, fmt.Errorf("macro expansion for %q in block %q produced no output", subtoken, consts.CmdNameLookup[currentBlock])
+				return nil, fmt.Errorf("macro expansion for %q in block %q produced no output", subtoken, quipple.CmdNameLookup[currentBlock])
 			}
 
 			processed = append(processed, expanded...)
@@ -47,8 +47,8 @@ func Preprocess(args []string) ([]string, error) {
 	return processed, nil
 }
 
-func getSubtokens(block consts.CmdType, token string) []string {
-	if block == consts.BlockSelect && strings.Contains(token, ",") {
+func getSubtokens(block quipple.CmdType, token string) []string {
+	if block == quipple.BlockSelect && strings.Contains(token, ",") {
 		return strings.Split(token, ",")
 	}
 

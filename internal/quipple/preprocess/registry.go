@@ -1,12 +1,12 @@
 package preprocess
 
 import (
-	"qp/internal/consts"
+	"qp/internal/quipple"
 )
 
-var macroRegistry = map[consts.CmdType][]MacroExpander{
-	consts.BlockSelect: {expandSelectMacro},
-	consts.BlockWhere:  {expandWhereMacro},
-	consts.BlockOrder:  {},
-	consts.BlockLimit:  {expandLimitMacro},
+var macroRegistry = map[quipple.CmdType][]MacroExpander{
+	quipple.BlockSelect: {expandSelectMacro},
+	quipple.BlockWhere:  {expandWhereMacro},
+	quipple.BlockOrder:  {},
+	quipple.BlockLimit:  {expandLimitMacro},
 }

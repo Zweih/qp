@@ -2,12 +2,13 @@ package preprocess
 
 import (
 	"qp/internal/consts"
+	"qp/internal/quipple"
 	"strings"
 )
 
 type MacroExpander func(token string) ([]string, bool)
 
-func macroExpansion(token string, cmd consts.CmdType) ([]string, bool) {
+func macroExpansion(token string, cmd quipple.CmdType) ([]string, bool) {
 	expanders := macroRegistry[cmd]
 	for _, expander := range expanders {
 		if replacement, exists := expander(strings.ToLower(token)); exists {

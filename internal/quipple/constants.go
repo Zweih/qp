@@ -1,4 +1,4 @@
-package consts
+package quipple
 
 type CmdType int
 
