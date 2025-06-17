@@ -1,4 +1,11 @@
 # qp Release Notes
+## v5.90.0
+### What's Changed
+* Fix: Flatpak optional-for resolution by @Zweih in https://github.com/Zweih/qp/pull/409
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.89.0...v5.90.0
+
+
 ## v5.89.0
 ### What's Changed
 * Feature: Populate title field for brew casks by @Zweih in https://github.com/Zweih/qp/pull/408
@@ -710,10 +717,3 @@
 * Feature: Add replaces query by @Zweih in https://github.com/Zweih/qp/pull/247
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v5.8.0...v5.9.0
-
-
-## v5.8.0
-### What's Changed
-* Feature: Add groups query by @Zweih in https://github.com/Zweih/qp/pull/246
-
-**Full Changelog**: https://github.com/Zweih/qp/compare/v5.7.0...v5.8.0
