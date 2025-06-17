@@ -56,13 +56,14 @@ Sort results by any available field in ascending (\fBasc\fR) or descending (\fBd
 Limit number of displayed results. Use \fBlimit all\fR to show all.
 Numbers can be prefixed with \fBend:\fR or \fBmid:\fR to display from specific parts of the output.
 
+.TP
+.B format <format>, f <format>
+Output format: \fBtable\fR (default), \fBjson\fR, or \fBkv\fR (key-value).
+
 .SH OPTIONS
 .TP
 .B \-\-no-headers
 Omit column headers (useful in scripts).
-.TP
-.B \-\-output <format>
-Output format: \fBtable\fR (default), \fBjson\fR, or \fBkv\fR (key-value).
 .TP
 .B \-\-full-timestamp
 Show full date+time for install/build timestamps.

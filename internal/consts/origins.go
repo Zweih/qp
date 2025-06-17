@@ -5,8 +5,8 @@ const (
 	OriginDeb     = "deb"
 	OriginFlatpak = "flatpak"
 	OriginNpm     = "npm"
+	OriginOpkg    = "opkg"
 	OriginPacman  = "pacman"
 	OriginPipx    = "pipx"
-	OriginOpkg    = "opkg"
 	OriginRpm     = "rpm"
 )
