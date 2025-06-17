@@ -15,6 +15,7 @@ type ParsedInput struct {
 	FieldQueries []query.FieldQuery
 	QueryExpr    compiler.Expr
 	SortOption   SortOption
+	OutputFormat string
 	Limit        int
 	LimitMode    LimitMode
 }
@@ -28,6 +29,7 @@ func ParseSyntax(args []string) (ParsedInput, error) {
 	var fields []consts.FieldType
 	var queries []query.FieldQuery
 	var sortOption SortOption
+	var formatMode string
 	var whereTokens []string
 	limitMode := LimitStart
 	limit := 20
@@ -77,8 +79,14 @@ func ParseSyntax(args []string) (ParsedInput, error) {
 				return ParsedInput{}, err
 			}
 
+		case quipple.BlockFormat:
+			formatMode, err = parseFormat(token)
+			if err != nil {
+				return ParsedInput{}, err
+			}
+
 		default:
-			return ParsedInput{}, fmt.Errorf("unexpected token: %q (expected in a command block like 'select', 'where', 'order', or 'limit')", token)
+			return ParsedInput{}, fmt.Errorf("unexpected token: %q (expected in a command block like 'select', 'where', 'order',  'limit', or 'format')", token)
 		}
 	}
 
@@ -102,11 +110,16 @@ func ParseSyntax(args []string) (ParsedInput, error) {
 		}
 	}
 
+	if formatMode == "" {
+		formatMode = consts.OutputTable
+	}
+
 	return ParsedInput{
 		Fields:       fields,
 		FieldQueries: queries,
 		QueryExpr:    queryExpr,
 		SortOption:   sortOption,
+		OutputFormat: formatMode,
 		Limit:        limit,
 		LimitMode:    limitMode,
 	}, nil
