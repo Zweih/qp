@@ -12,8 +12,8 @@ func PrintHelp() {
 
 Commands:
   select <list> | s <list>      Fields to display (comma-separated)
-                                - 'select all'      → all fields
-                                - 'select default'  → default fields
+                                - 'select all'      -> all fields
+                                - 'select default'  -> default fields
                                 - e.g. 'select default,version'
 
   where <query> | w <query>     Refine package results using one or more queries
@@ -28,6 +28,13 @@ Commands:
                                 - Use 'limit all' to show everything
                                 - Use end:<num> / mid:<num> prefix to display from
                                     different parts of the output
+
+  format <type> | f <type>      Output format: table, json, kv (default: table)
+                                - 'format table' -> tabular output with headers (default)
+                                - 'format json'  -> JSON array output
+                                - 'format kv'    -> key-value pairs (best for selecting
+                                    many fields)
+
 Options:
 `
 
@@ -106,10 +113,10 @@ Tips:
       qp --no-headers select name,size
 
   - JSON output:
-      qp select name,version,size --output json
+      qp select name,version,size format json
 
   - Key-Value output (ideal for selecting all fields):
-     qp s all --output kv
+     qp s all f kv
 
   - Quote arguments with spaces or special characters:
       qp where description="for tree-sitter"
@@ -117,6 +124,16 @@ Tips:
   - To group conditions, use q and p as grouping parentheses:
     qp where q name=curl or name=openssl and no:depends
       -> matches packages named curl or openssl but only if they have no dependencies
+
+Supported Package Origins:
+  - brew      -> Homebrew (macOS/Linux)
+  - deb       -> APT/dpkg (Debian, Ubuntu)
+  - flatpak   -> Flatpak (universal Linux packages)
+  - npm       -> npm (Global Node.js packages)
+  - opkg      -> opkg (OpenWrt, embedded systems)
+  - pacman    -> pacman (Arch Linux, Manjaro)
+  - pipx      -> pipx (Global virtual Python applications)
+  - rpm       -> RPM (Fedora, RHEL)
 
 Default Behavior:
   - 20 results shown unless limit is specified
