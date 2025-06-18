@@ -53,7 +53,7 @@ func rebuildCache(originName string) error {
 		wg.Add(1)
 		go func(targetDriver driver.Driver) {
 			defer wg.Done()
-			pipeline := phase.NewPipeline(targetDriver, cfg, false, cacheBasePath)
+			pipeline := phase.NewPipeline(targetDriver, cfg, cacheBasePath)
 
 			if storage.IsLockFileExists(pipeline.CachePath) {
 				return
