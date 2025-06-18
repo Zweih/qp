@@ -2,7 +2,7 @@ package storage
 
 const (
 	// bump when updating structure of PkgInfo/Relation/pkginfo.proto OR when you've changed something that requires the cache to be rebuilt upon install
-	cacheVersion   = 31
+	cacheVersion   = 32
 	historyVersion = 3
 
 	xdgCacheHomeEnv = "XDG_CACHE_HOME"
