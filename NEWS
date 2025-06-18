@@ -1,4 +1,12 @@
 # qp Release Notes
+## v5.91.2
+### What's Changed
+* Refactor: Quipple constants by @Zweih in https://github.com/Zweih/qp/pull/411
+* Refactor: Quipple commands by @Zweih in https://github.com/Zweih/qp/pull/412
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.91.0...v5.91.2
+
+
 ## v5.91.0
 ### What's Changed
 * Feature: Improve other-env resolution by @Zweih in https://github.com/Zweih/qp/pull/410
@@ -710,10 +718,3 @@
 * Fix: CmdType by @Zweih in https://github.com/Zweih/qp/pull/251
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v5.10.0...v5.11.1
-
-
-## v5.10.0
-### What's Changed
-* Feature: Add version query by @Zweih in https://github.com/Zweih/qp/pull/249
-
-**Full Changelog**: https://github.com/Zweih/qp/compare/v5.9.0...v5.10.0
