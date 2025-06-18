@@ -192,6 +192,7 @@ learn about installation [here](#installation)
 | - | snap origin | ✓ | title field |
 | - | keywords/tags field | - | notes/comment field |
 | - | author field | - | cargo origin |
+| - | log levels | ✓ | chunked cache (70% speed boost) |
 
 ## installation
 
