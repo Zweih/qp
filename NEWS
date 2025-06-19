@@ -1,10 +1,11 @@
 # qp Release Notes
+## v5.93.0
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.92.1...v5.93.0
+
+
 ## v5.92.1
 ### What's Changed
 * Feature: Add format command (deprecate `--output`) by @Zweih in https://github.com/Zweih/qp/pull/414
-* Feature: Speed up via chunked cache by @Zweih in https://github.com/Zweih/qp/pull/415
-* Refactor: Remove sorting cruft by @Zweih in https://github.com/Zweih/qp/pull/416
-* Refactor: Pipeline module by @Zweih in https://github.com/Zweih/qp/pull/417
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v5.91.3...v5.92.1
 
@@ -713,10 +714,3 @@
 * Feature: Add arch sort by @Zweih in https://github.com/Zweih/qp/pull/262
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v5.13.0...v5.14.0
-
-
-## v5.13.0
-### What's Changed
-* Feature: Packager sort by @Zweih in https://github.com/Zweih/qp/pull/261
-
-**Full Changelog**: https://github.com/Zweih/qp/compare/v5.12.0...v5.13.0
