@@ -9,5 +9,5 @@ var macroRegistry = map[quipple.CmdType][]MacroExpander{
 	quipple.BlockWhere:  {expandWhereMacro},
 	quipple.BlockOrder:  {},
 	quipple.BlockLimit:  {expandLimitMacro},
-	quipple.BlockFormat: {expandFormatMacro},
+	quipple.BlockFormat: {},
 }
