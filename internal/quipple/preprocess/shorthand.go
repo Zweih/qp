@@ -10,7 +10,6 @@ var ShorthandMap = map[string]string{
 	"w": quipple.CmdWhere,
 	"o": quipple.CmdOrder,
 	"l": quipple.CmdLimit,
-	"f": quipple.CmdFormat,
 }
 
 func ExpandShortSyntax(args []string) []string {

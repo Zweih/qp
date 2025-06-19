@@ -2,7 +2,9 @@ package pkgdata
 
 import (
 	"errors"
+	"fmt"
 	"qp/internal/consts"
+	"qp/internal/pipeline/meta"
 	"runtime"
 	"sort"
 	"strings"
@@ -82,10 +84,12 @@ func mergedSortedChunks(
 
 // pkgPointers will be sorted in place, mutating the slice order
 func SortConcurrently(
-	pkg []*PkgInfo,
+	pkgPtrs []*PkgInfo,
 	comparator PkgComparator,
+	phase string,
+	reportProgress meta.ProgressReporter,
 ) []*PkgInfo {
-	total := len(pkg)
+	total := len(pkgPtrs)
 
 	if total == 0 {
 		return nil
@@ -99,13 +103,13 @@ func SortConcurrently(
 	var wg sync.WaitGroup
 
 	numChunks := (total + chunkSize - 1) / chunkSize
-	chunks := make([][]*PkgInfo, 0, numChunks)
+	chunks := make([][]*PkgInfo, 0, numChunks) // pre-allocate
 
 	for chunkIdx := range numChunks {
 		startIdx := chunkIdx * chunkSize
 		endIdx := min(startIdx+chunkSize, total)
 
-		chunk := pkg[startIdx:endIdx]
+		chunk := pkgPtrs[startIdx:endIdx]
 
 		wg.Add(1)
 
@@ -119,10 +123,26 @@ func SortConcurrently(
 			mu.Lock()
 			chunks = append(chunks, c)
 			mu.Unlock()
+
+			if reportProgress != nil {
+				currentProgress := (chunkIdx + 1) * 50 / numChunks // scale chunk sorting progress to 0%-50%
+				reportProgress(
+					currentProgress,
+					100,
+					fmt.Sprintf("%s - Sorted chunk %d/%d", phase, chunkIdx+1, numChunks),
+				)
+			}
 		}(chunk)
 	}
 
 	wg.Wait()
+
+	if reportProgress != nil {
+		// "halfway" there
+		reportProgress(50, 100, fmt.Sprintf("%s - Initial chunk sorting complete", phase))
+	}
+
+	mergeStep := 0
 
 	for len(chunks) > 1 {
 		var newChunks [][]*PkgInfo
@@ -135,10 +155,20 @@ func SortConcurrently(
 				continue
 			}
 
-			newChunks = append(newChunks, chunks[i])
+			newChunks = append(newChunks, chunks[i]) // move odd chunk forward
 		}
 
 		chunks = newChunks
+
+		if reportProgress != nil {
+			mergeStep++
+			currentProgress := 50 + (mergeStep * 50 / (numChunks - 1)) // scale to 50%-100%
+			reportProgress(currentProgress, 100, fmt.Sprintf("%s - Merging step %d", phase, mergeStep))
+		}
+	}
+
+	if reportProgress != nil {
+		reportProgress(total, total, fmt.Sprintf("%s completed", phase))
 	}
 
 	if len(chunks) == 1 {
@@ -150,12 +180,22 @@ func SortConcurrently(
 
 // pkgPointers will be sorted in place, mutating the slice order
 func SortNormally(
-	pkgs []*PkgInfo,
+	pkgPtrs []*PkgInfo,
 	comparator PkgComparator,
+	phase string,
+	reportProgress meta.ProgressReporter,
 ) []*PkgInfo {
-	sort.Slice(pkgs, func(i int, j int) bool {
-		return comparator(pkgs[i], pkgs[j])
+	if reportProgress != nil {
+		reportProgress(0, 100, fmt.Sprintf("%s - normally", phase))
+	}
+
+	sort.Slice(pkgPtrs, func(i int, j int) bool {
+		return comparator(pkgPtrs[i], pkgPtrs[j])
 	})
 
-	return pkgs
+	if reportProgress != nil {
+		reportProgress(100, 100, fmt.Sprintf("%s completed", phase))
+	}
+
+	return pkgPtrs
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"qp/internal/config"
 	out "qp/internal/display"
+	"qp/internal/pipeline/meta"
 	"qp/internal/pkgdata"
 	"qp/internal/storage"
 	"time"
@@ -12,6 +13,7 @@ import (
 func (p *Pipeline) loadCacheStep(
 	cfg *config.Config,
 	_ []*pkgdata.PkgInfo,
+	_ meta.ProgressReporter,
 ) ([]*pkgdata.PkgInfo, error) {
 	now := time.Now().Unix()
 	if cfg.RegenCache {
@@ -48,6 +50,7 @@ func (p *Pipeline) loadCacheStep(
 func (p *Pipeline) fetchStep(
 	_ *config.Config,
 	pkgs []*pkgdata.PkgInfo,
+	_ meta.ProgressReporter,
 ) ([]*pkgdata.PkgInfo, error) {
 	if p.UsedCache {
 		return pkgs, nil
@@ -67,6 +70,7 @@ func (p *Pipeline) fetchStep(
 func (p *Pipeline) resolveStep(
 	_ *config.Config,
 	pkgs []*pkgdata.PkgInfo,
+	reportProgress meta.ProgressReporter,
 ) ([]*pkgdata.PkgInfo, error) {
 	if p.UsedCache {
 		return pkgs, nil
@@ -83,6 +87,7 @@ func (p *Pipeline) resolveStep(
 func (p *Pipeline) saveCacheStep(
 	cfg *config.Config,
 	pkgs []*pkgdata.PkgInfo,
+	_ meta.ProgressReporter,
 ) ([]*pkgdata.PkgInfo, error) {
 	if cfg.NoCache || p.UsedCache {
 		return pkgs, nil

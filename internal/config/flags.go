@@ -40,14 +40,11 @@ func mergeTopLevelOptions(dst *Config, src *syntax.ParsedInput) {
 	dst.QueryExpr = src.QueryExpr
 	dst.Limit = src.Limit
 	dst.LimitMode = src.LimitMode
-
-	if dst.OutputFormat == "" {
-		dst.OutputFormat = src.OutputFormat
-	}
 }
 
 func registerCommonFlags(cfg *Config) {
 	pflag.BoolVar(&cfg.HasNoHeaders, "no-headers", false, "Hide headers")
+	pflag.StringVar(&cfg.OutputFormat, "output", "table", "Output format: \"table\", \"json\", or \"kv\" (key-value)")
 	pflag.BoolVarP(&cfg.ShowHelp, "help", "h", false, "Show help")
 	pflag.BoolVar(&cfg.ShowVersion, "version", false, "Show version")
 	pflag.BoolVar(&cfg.ShowFullTimestamp, "full-timestamp", false, "Show full timestamp")
@@ -65,13 +62,5 @@ func registerCommonFlags(cfg *Config) {
 	_ = pflag.CommandLine.MarkDeprecated("json", "use \"--output json\" instead.")
 	if legacyJSON {
 		cfg.OutputFormat = consts.OutputJSON
-	}
-
-	var legacyOutputFormat string
-	pflag.StringVar(&legacyOutputFormat, "output", "", "")
-	_ = pflag.CommandLine.MarkHidden("output")
-	_ = pflag.CommandLine.MarkDeprecated("output", "use the \"format table\", \"f json\", or \"f kv\" command instead.")
-	if legacyOutputFormat != "" {
-		cfg.OutputFormat = legacyOutputFormat
 	}
 }

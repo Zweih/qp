@@ -19,10 +19,10 @@ func globalPackageSort(
 	}
 
 	if len(allPkgs) >= pkgdata.ConcurrentSortThreshold {
-		return pkgdata.SortConcurrently(allPkgs, comparator), nil
+		return pkgdata.SortConcurrently(allPkgs, comparator, "", nil), nil
 	}
 
-	return pkgdata.SortNormally(allPkgs, comparator), nil
+	return pkgdata.SortNormally(allPkgs, comparator, "", nil), nil
 }
 
 func trimPackagesLen(

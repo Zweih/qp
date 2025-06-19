@@ -192,7 +192,6 @@ learn about installation [here](#installation)
 | - | snap origin | ✓ | title field |
 | - | keywords/tags field | - | notes/comment field |
 | - | author field | - | cargo origin |
-| - | log levels | ✓ | chunked cache (70% speed boost) |
 
 ## installation
 
@@ -285,15 +284,12 @@ qp [command] [args] [options]
   - `limit all` | `l all`: display all packages
   - `limit end:<number>`: display last `n` packages
   - `limit mid:<number>`: display middle `n` packages
-- `format <type>` | `f <type>`: output format: table, json, kv (default: table)
-  - `format table` -> tabular output with headers
-  - `format json` -> JSON array output
-  - `format kv` -> key-value pairs (best for selecting many fields)
 
 ### options
 
 - `--no-headers`: omit column headers in table output (useful for scripting)
 - `--full-timestamp`: display the full timestamp (date and time) of package update/build instead of just the date
+- `--output`: format output as `table`, `kv` (key-value), `json` (default:`table`)
 - `--no-progress`: force no progress bar outside of non-interactive environments
 - `--no-cache`: disable cache loading/saving and force fresh package data loading
 - `--regen-cache`: disable cache loading, force fresh package data loading, and save fresh cache

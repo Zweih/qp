@@ -47,7 +47,7 @@ func mainWithConfig(configProvider config.ConfigProvider) error {
 
 	var pipelines []*phase.Pipeline
 	for _, driver := range origins.AvailableDrivers() {
-		p := phase.NewPipeline(driver, cfg, cacheBaseDir)
+		p := phase.NewPipeline(driver, cfg, isInteractive, cacheBaseDir)
 		pipelines = append(pipelines, p)
 	}
 

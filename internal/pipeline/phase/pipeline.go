@@ -10,25 +10,28 @@ import (
 )
 
 type Pipeline struct {
-	Origin    driver.Driver
-	Config    *config.Config
-	Pkgs      []*pkgdata.PkgInfo
-	UsedCache bool
-	CachePath string
-	ModTime   int64
+	Origin        driver.Driver
+	Config        *config.Config
+	Pkgs          []*pkgdata.PkgInfo
+	IsInteractive bool
+	UsedCache     bool
+	CachePath     string
+	ModTime       int64
 }
 
 func NewPipeline(
 	origin driver.Driver,
 	cfg *config.Config,
+	isInteractive bool,
 	baseCacheDir string,
 ) *Pipeline {
 	cachePath := filepath.Join(baseCacheDir, origin.Name())
 
 	return &Pipeline{
-		Origin:    origin,
-		Config:    cfg,
-		CachePath: cachePath,
+		Origin:        origin,
+		Config:        cfg,
+		IsInteractive: isInteractive,
+		CachePath:     cachePath,
 	}
 }
 
@@ -42,11 +45,11 @@ func (p *Pipeline) Run() ([]*pkgdata.PkgInfo, error) {
 		NewPhase("Save cache", p.saveCacheStep, &wg),
 	}
 
-	pkgs := []*pkgdata.PkgInfo{}
+	pkgs := []*PkgInfo{}
 	var err error
 
 	for _, ph := range phases {
-		pkgs, err = ph.Run(p.Config, pkgs)
+		pkgs, err = ph.Run(p.Config, pkgs, p.IsInteractive)
 		if err != nil {
 			return nil, fmt.Errorf("[%s] %w", ph.name, err)
 		}
@@ -63,11 +66,11 @@ func (p *Pipeline) RunCacheOnly() ([]*pkgdata.PkgInfo, error) {
 		NewPhase("Save cache", p.saveCacheStep, &wg),
 	}
 
-	pkgs := []*pkgdata.PkgInfo{}
+	pkgs := []*PkgInfo{}
 	var err error
 
 	for _, ph := range phases {
-		pkgs, err = ph.Run(p.Config, pkgs)
+		pkgs, err = ph.Run(p.Config, pkgs, p.IsInteractive)
 		if err != nil {
 			return nil, fmt.Errorf("[%s] %w", ph.name, err)
 		}

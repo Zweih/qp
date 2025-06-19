@@ -8,7 +8,6 @@ const (
 	BlockWhere
 	BlockOrder
 	BlockLimit
-	BlockFormat
 )
 
 const (
@@ -16,7 +15,6 @@ const (
 	CmdWhere  = "where"
 	CmdOrder  = "order"
 	CmdLimit  = "limit"
-	CmdFormat = "format"
 )
 
 var CmdTypeLookup = map[string]CmdType{
@@ -24,7 +22,6 @@ var CmdTypeLookup = map[string]CmdType{
 	CmdWhere:  BlockWhere,
 	CmdOrder:  BlockOrder,
 	CmdLimit:  BlockLimit,
-	CmdFormat: BlockFormat,
 }
 
 var CmdNameLookup = map[CmdType]string{
@@ -32,5 +29,4 @@ var CmdNameLookup = map[CmdType]string{
 	BlockWhere:  CmdWhere,
 	BlockOrder:  CmdOrder,
 	BlockLimit:  CmdLimit,
-	BlockFormat: CmdFormat,
 }
