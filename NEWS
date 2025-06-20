@@ -1,4 +1,8 @@
 # qp Release Notes
+## v5.93.1
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.92.1...v5.93.1
+
+
 ## v5.93.0
 **Full Changelog**: https://github.com/Zweih/qp/compare/v5.92.1...v5.93.0
 
@@ -707,10 +711,3 @@
 * Feature: Add validation sort by @Zweih in https://github.com/Zweih/qp/pull/264
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v5.14.0...v5.15.0
-
-
-## v5.14.0
-### What's Changed
-* Feature: Add arch sort by @Zweih in https://github.com/Zweih/qp/pull/262
-
-**Full Changelog**: https://github.com/Zweih/qp/compare/v5.13.0...v5.14.0
