@@ -1,10 +1,13 @@
 # qp Release Notes
+## v5.94.0
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.93.1...v5.94.0
+
+
 ## v5.93.1
+### What's Changed
+*  Feature: Speed up via chunked cache by @Zweih in https://github.com/Zweih/qp/pull/415 
+
 **Full Changelog**: https://github.com/Zweih/qp/compare/v5.92.1...v5.93.1
-
-
-## v5.93.0
-**Full Changelog**: https://github.com/Zweih/qp/compare/v5.92.1...v5.93.0
 
 
 ## v5.92.1
