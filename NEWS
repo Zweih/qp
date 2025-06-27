@@ -1,10 +1,19 @@
 # qp Release Notes
+## v5.94.2
+### What's Changed
+* Refactor: Remove unused progress bar functions by @Zweih in https://github.com/Zweih/qp/pull/418
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.94.1...v5.94.2
+
+
 ## v5.94.1
+### What's Changed
+* Refactor: Pipeline module by @Zweih in https://github.com/Zweih/qp/pull/417 #417 
+
 **Full Changelog**: https://github.com/Zweih/qp/compare/v5.94.0...v5.94.1
 
 
 ## v5.94.0
-**Full Changelog**: https://github.com/Zweih/qp/compare/v5.93.1...v5.94.0
 ### What's Changed
 * Refactor: Remove sorting cruft by @Zweih in https://github.com/Zweih/qp/pull/416
 
@@ -707,11 +716,3 @@
 * Feature: Add description sort by @Zweih in https://github.com/Zweih/qp/pull/268
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v5.16.1...v5.17.0
-
-
-## v5.16.1
-### What's Changed
-* Feature: Add origin field by @Zweih in https://github.com/Zweih/qp/pull/266
-* Fix: Select macro expansion by @Zweih in https://github.com/Zweih/qp/pull/267
-
-**Full Changelog**: https://github.com/Zweih/qp/compare/v5.15.0...v5.16.1
