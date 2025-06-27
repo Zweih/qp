@@ -39,7 +39,6 @@ func mainWithConfig(configProvider config.ConfigProvider) error {
 		return rebuildCache(cfg.CacheWorker)
 	}
 
-	isInteractive := isInteractive(cfg.DisableProgress)
 	cacheBaseDir, err := storage.GetCachePath()
 	if err != nil {
 		out.WriteLine(fmt.Sprintf("WARNING: failed to set up cache dir: %v", err))
@@ -91,7 +90,7 @@ func mainWithConfig(configProvider config.ConfigProvider) error {
 	}
 
 	if len(allPkgs) == 0 {
-		if isInteractive {
+		if isInteractive() {
 			out.WriteLine("No packages to display.")
 		}
 
@@ -112,6 +111,6 @@ func mainWithConfig(configProvider config.ConfigProvider) error {
 	return nil
 }
 
-func isInteractive(disableProgress bool) bool {
-	return term.IsTerminal(int(os.Stdout.Fd())) && !disableProgress
+func isInteractive() bool {
+	return term.IsTerminal(int(os.Stdout.Fd()))
 }
