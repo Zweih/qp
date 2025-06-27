@@ -48,10 +48,6 @@ func PrintProgress(phase string, progress int, description string) {
 	manager.printProgress(phase, progress, description)
 }
 
-func ClearProgress() {
-	manager.clearProgress()
-}
-
 func RenderTable(
 	pkgPtrs []*pkgdata.PkgInfo,
 	fields []consts.FieldType,
@@ -86,10 +82,6 @@ func (o *OutputManager) printProgress(phase string, progress int, description st
 
 	o.write("\r\033[K" + msg)
 	o.lastMsgLength = len(msg)
-}
-
-func (o *OutputManager) clearProgress() {
-	o.clearPrevMsg(0)
 }
 
 func (o *OutputManager) formatProgessMsg(phase string, progress int, description string) string {
