@@ -53,8 +53,6 @@ func (o *OutputManager) renderTable(
 	showFullTimestamp bool,
 	hasNoHeaders bool,
 ) {
-	o.clearProgress()
-
 	dateFormat := consts.DateOnlyFormat
 	if showFullTimestamp {
 		dateFormat = consts.DateTimeFormat

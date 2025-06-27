@@ -294,7 +294,6 @@ qp [command] [args] [options]
 
 - `--no-headers`: omit column headers in table output (useful for scripting)
 - `--full-timestamp`: display the full timestamp (date and time) of package update/build instead of just the date
-- `--no-progress`: force no progress bar outside of non-interactive environments
 - `--no-cache`: disable cache loading/saving and force fresh package data loading
 - `--regen-cache`: disable cache loading, force fresh package data loading, and save fresh cache
 - `--cache-only`: update cache only and nothing else. specify origin ('pacman', 'brew', 'deb', etc.) or all.
@@ -668,7 +667,7 @@ output format:
 
   boolean flags can be explicitly set using `--<option>=true` or `--<option>=false`:
   ```
-  qp --no-headers=true --no-progress=true
+  qp --no-headers=true
   ```
 
   arguments to queries can be quoted if they contain special characters or spaces:
@@ -680,9 +679,6 @@ output format:
   ```
   qp --no-headers select name,size | awk '{print $1, $2}'
   ```
-
-  **note**: `--no-progress` is automatically set to `true` in non-interactive environments, so you can pipe into programs like `cat`, `grep`, or `less` without issue.
-
 
 ### examples
 

@@ -14,8 +14,6 @@ type kvEntry struct {
 }
 
 func (o *OutputManager) renderKeyValue(pkgs []*pkgdata.PkgInfo, fields []consts.FieldType) {
-	o.clearProgress()
-
 	dateFormat := consts.DateTimeFormat
 	ctx := tableContext{DateFormat: dateFormat}
 

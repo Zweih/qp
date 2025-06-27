@@ -8,7 +8,10 @@ import (
 	"github.com/spf13/pflag"
 )
 
-const internalCacheWorker = "internal-cache-worker"
+const (
+	internalCacheWorker = "internal-cache-worker"
+	noProgress          = "no-progress"
+)
 
 func ParseFlags(args []string) (Config, error) {
 	var cfg Config
@@ -51,13 +54,14 @@ func registerCommonFlags(cfg *Config) {
 	pflag.BoolVarP(&cfg.ShowHelp, "help", "h", false, "Show help")
 	pflag.BoolVar(&cfg.ShowVersion, "version", false, "Show version")
 	pflag.BoolVar(&cfg.ShowFullTimestamp, "full-timestamp", false, "Show full timestamp")
-	pflag.BoolVar(&cfg.DisableProgress, "no-progress", false, "Disable progress bar")
+	pflag.BoolVar(&cfg.DisableProgress, noProgress, false, "Disable progress bar")
 	pflag.BoolVar(&cfg.NoCache, "no-cache", false, "Disable cache")
 	pflag.BoolVar(&cfg.RegenCache, "regen-cache", false, "Force fresh cache")
 	pflag.StringVar(&cfg.CacheOnly, "cache-only", "", "Update cache only for specifed origin.")
 	pflag.StringVar(&cfg.CacheWorker, internalCacheWorker, "", "Internal flag for background cache operations - do not use directly")
 
 	_ = pflag.CommandLine.MarkHidden(internalCacheWorker)
+	_ = pflag.CommandLine.MarkHidden(noProgress)
 
 	var legacyJSON bool
 	pflag.BoolVar(&legacyJSON, "json", false, "")
