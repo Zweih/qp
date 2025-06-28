@@ -105,7 +105,7 @@ func parseStringCondition(query query.FieldQuery) (*FilterCondition, error) {
 
 func parseRangeCondition(query query.FieldQuery) (*FilterCondition, error) {
 	if query.IsExistence {
-		return nil, nil
+		return newRangeExistsCondition(query.Field, query.Negate)
 	}
 
 	var parser func(string) (RangeSelector, error)
