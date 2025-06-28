@@ -21,9 +21,9 @@ func macroExpansion(token string, cmd quipple.CmdType) ([]string, bool) {
 
 func expandSelectMacro(token string) ([]string, bool) {
 	switch token {
-	case "default":
+	case quipple.MacroDefault:
 		return fieldTypesToNames(consts.DefaultFields), true
-	case "all":
+	case quipple.MacroAll:
 		return fieldTypesToNames(consts.ValidFields), true
 	default:
 		return nil, false
@@ -45,13 +45,13 @@ func expandWhereMacro(token string) ([]string, bool) {
 	var expanded []string
 
 	switch token {
-	case "orphan":
+	case quipple.MacroOrphan:
 		expanded = []string{"no:required-by", "and", "reason=dependency"}
-	case "superorphan":
+	case quipple.MacroSuperOrphan:
 		expanded = []string{"no:required-by", "and", "reason=dependency", "and", "no:optional-for"}
-	case "heavy":
+	case quipple.MacroHeavy:
 		expanded = []string{"size=100MB:"}
-	case "light":
+	case quipple.MacroLight:
 		expanded = []string{"size=:1MB"}
 	default:
 		return nil, false
@@ -68,7 +68,7 @@ func expandLimitMacro(token string) ([]string, bool) {
 	}
 
 	switch token {
-	case "all":
+	case quipple.MacroAll:
 		return []string{prefix + "0"}, true
 	default:
 		return nil, false

@@ -59,6 +59,7 @@ func registerCommonFlags(cfg *Config) {
 	pflag.BoolVar(&cfg.RegenCache, "regen-cache", false, "Force fresh cache")
 	pflag.StringVar(&cfg.CacheOnly, "cache-only", "", "Update cache only for specifed origin.")
 	pflag.StringVar(&cfg.CacheWorker, internalCacheWorker, "", "Internal flag for background cache operations - do not use directly")
+	pflag.BoolVar(&cfg.ShowCompletion, "completion", false, "Generate bash completion script")
 
 	_ = pflag.CommandLine.MarkHidden(internalCacheWorker)
 	_ = pflag.CommandLine.MarkHidden(noProgress)

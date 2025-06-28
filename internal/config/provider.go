@@ -1,8 +1,10 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"qp/internal/about"
+	"qp/internal/quipple"
 )
 
 func (c *CliConfigProvider) GetConfig() (*Config, error) {
@@ -18,6 +20,11 @@ func (c *CliConfigProvider) GetConfig() (*Config, error) {
 
 	if cfg.ShowVersion {
 		about.PrintVersionInfo()
+		os.Exit(0)
+	}
+
+	if cfg.ShowCompletion {
+		fmt.Print(quipple.GetBashCompletion())
 		os.Exit(0)
 	}
 

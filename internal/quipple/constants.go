@@ -34,3 +34,28 @@ var CmdNameLookup = map[CmdType]string{
 	BlockLimit:  CmdLimit,
 	BlockFormat: CmdFormat,
 }
+
+const (
+	MacroOrphan      = "orphan"
+	MacroSuperOrphan = "superorphan"
+	MacroHeavy       = "heavy"
+	MacroLight       = "light"
+	MacroAll         = "all"
+	MacroDefault     = "default"
+)
+
+var SelectMacros = []string{
+	MacroAll,
+	MacroDefault,
+}
+
+var WhereMacros = []string{
+	MacroOrphan,
+	MacroSuperOrphan,
+	MacroHeavy,
+	MacroLight,
+}
+
+var LimitMacros = []string{
+	MacroAll,
+}

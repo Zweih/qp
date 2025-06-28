@@ -108,17 +108,6 @@ const (
 )
 
 var FieldTypeLookup = map[string]FieldType{
-	"u":    FieldUpdated,
-	"n":    FieldName,
-	"r":    FieldReason,
-	"s":    FieldSize,
-	"v":    FieldVersion,
-	"D":    FieldDepends,
-	"R":    FieldRequiredBy,
-	"p":    FieldProvides,
-	"bd":   FieldBuilt,
-	"type": FieldPkgType,
-
 	"date":       FieldUpdated, // legacy field
 	"build-date": FieldBuilt,   // legacy field
 
