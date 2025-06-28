@@ -163,3 +163,17 @@ func newRangeCondition(
 
 	return &condition, nil
 }
+
+func newRangeExistsCondition(
+	field consts.FieldType,
+	mask bool,
+) (*FilterCondition, error) {
+	condition := newCondition(field)
+
+	condition.Filter = func(pkg *pkgdata.PkgInfo) bool {
+		value := pkg.GetInt(field)
+		return (value > 0) != mask
+	}
+
+	return &condition, nil
+}
