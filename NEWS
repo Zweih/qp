@@ -1,4 +1,11 @@
 # qp Release Notes
+## v5.95.0
+### What's Changed
+* Feature: Deprecate alphabetical order alias by @Zweih in https://github.com/Zweih/qp/pull/419
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.94.2...v5.95.0
+
+
 ## v5.94.2
 ### What's Changed
 * Refactor: Remove unused progress bar functions by @Zweih in https://github.com/Zweih/qp/pull/418
@@ -709,10 +716,3 @@
 * Feature: Add reason sort by @Zweih in https://github.com/Zweih/qp/pull/269
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v5.17.0...v5.18.0
-
-
-## v5.17.0
-### What's Changed
-* Feature: Add description sort by @Zweih in https://github.com/Zweih/qp/pull/268
-
-**Full Changelog**: https://github.com/Zweih/qp/compare/v5.16.1...v5.17.0
