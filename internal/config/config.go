@@ -16,7 +16,7 @@ type Config struct {
 	DisableProgress   bool
 	NoCache           bool
 	RegenCache        bool
-	ShowCompletion    bool
+	ShowCompletion    string
 	CacheOnly         string
 	CacheWorker       string
 	OutputFormat      string

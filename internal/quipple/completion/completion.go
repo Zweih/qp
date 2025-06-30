@@ -14,7 +14,7 @@ type CompletionData struct {
 	description     string
 }
 
-func GetCompletions() string {
+func GetCompletions(shell string) (string, error) {
 	var fieldNames []string
 	for fieldName := range consts.FieldTypeLookup {
 		fieldNames = append(fieldNames, fieldName)
@@ -24,6 +24,17 @@ func GetCompletions() string {
 	completionData := prepareCompletionData(fieldNames)
 	cmds := getOrderedCmds()
 
+	switch shell {
+	case "bash":
+		return getBashCompletion(cmds, completionData), nil
+	case "zsh":
+		return getZshCompletion(cmds, completionData), nil
+	}
+
+	return "", fmt.Errorf("no completions available for: %s", shell)
+}
+
+func getBashCompletion(cmds []CmdPair, completionData map[string]CompletionData) string {
 	var bashCases []string
 	for _, cmd := range cmds {
 		data := completionData[cmd.Full]
@@ -41,6 +52,14 @@ func GetCompletions() string {
 		bashCases = append(bashCases, bashCase)
 	}
 
+	return fmt.Sprintf(
+		bashScriptTemplate,
+		strings.Join(bashCases, "\n"),
+		getAllCmdsStr(),
+	)
+}
+
+func getZshCompletion(cmds []CmdPair, completionData map[string]CompletionData) string {
 	var zshCases []string
 	for _, cmd := range cmds {
 		data := completionData[cmd.Full]
@@ -66,19 +85,11 @@ func GetCompletions() string {
 		zshCases = append(zshCases, zshCase)
 	}
 
-	bashScript := fmt.Sprintf(
-		bashScriptTemplate,
-		strings.Join(bashCases, "\n"),
-		getAllCmdsStr(),
-	)
-
-	zshScript := fmt.Sprintf(
+	return fmt.Sprintf(
 		zshScriptTemplate,
 		generateZshCmdValues(),
 		strings.Join(zshCases, "\n"),
 	)
-
-	return fmt.Sprintf("%s\n%s", bashScript, zshScript)
 }
 
 func createCompletionData(completions []string, description string, shouldSort bool) CompletionData {

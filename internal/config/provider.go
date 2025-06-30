@@ -23,8 +23,13 @@ func (c *CliConfigProvider) GetConfig() (*Config, error) {
 		os.Exit(0)
 	}
 
-	if cfg.ShowCompletion {
-		fmt.Print(completion.GetCompletions())
+	if cfg.ShowCompletion != "" {
+		script, err := completion.GetCompletions(cfg.ShowCompletion)
+		if err != nil {
+			return &Config{}, err
+		}
+
+		fmt.Print(script)
 		os.Exit(0)
 	}
 
