@@ -29,14 +29,31 @@ func GetCompletions() string {
 		data := completionData[cmd.Full]
 		bashCase := generateBashCase(cmd, data.bashCompletions)
 
-		if cmd.Full == quipple.CmdWhere {
+		switch cmd.Full {
+		case quipple.CmdWhere:
 			bashCase += `
       if [[ "${cur}" != *"=" ]] && [[ "${COMPREPLY[0]}" == *"=" ]]; then
         compopt -o nospace 2>/dev/null || true
       fi
       return 0
       ;;`
-		} else {
+		case quipple.CmdSelect:
+			bashCase += fmt.Sprintf(`
+      if [[ "${cur}" == *","* ]]; then
+        local prefix="${cur%%,*},"
+        local suffix="${cur##*,}"
+        local completions=($(compgen -W "%s" -- "${suffix}"))
+        COMPREPLY=()
+        for comp in "${completions[@]}"; do
+          COMPREPLY+=("${prefix}${comp}")
+        done
+      else
+        COMPREPLY=($(compgen -W "%s" -- "${cur}"))
+      fi
+      compopt -o nospace 2>/dev/null || true
+      return 0
+      ;;`, data.bashCompletions, data.bashCompletions)
+		default:
 			bashCase += `
       return 0
       ;;`
@@ -45,21 +62,43 @@ func GetCompletions() string {
 		bashCases = append(bashCases, bashCase)
 	}
 
-	var zshArgCases []string
+	var zshCases []string
 	for _, cmd := range cmds {
 		data := completionData[cmd.Full]
 		zshCase := generateZshCase(cmd, data.zshCompletions, data.description)
 
-		if cmd.Full == quipple.CmdSelect {
-			zshCase += ` -S ','`
-		} else if cmd.Full == quipple.CmdWhere {
+		switch cmd.Full {
+		case quipple.CmdSelect:
+			zshCase = fmt.Sprintf(`      %s | %s)
+        local cur="${words[CURRENT]}"
+        if [[ "$cur" == *","* ]]; then
+          local prefix="${cur%%,*},"
+          local suffix="${cur##*,}"
+          local -a completions
+          completions=(%s)
+          local -a matching
+          for comp in "${completions[@]//\'/}"; do
+            if [[ "$comp" == "$suffix"* ]]; then
+              matching+=("$comp")
+            fi
+          done
+          compadd -S '' -p "$prefix" -a matching
+        else
+          local -a opts
+          opts=(%s)
+          _describe -t %s '%s' opts -S ''
+        fi`,
+				cmd.Full, cmd.Short, data.zshCompletions, data.zshCompletions,
+				strings.ReplaceAll(data.description, " ", "-"), data.description)
+		case quipple.CmdWhere:
 			zshCase += ` -S ''`
+		default:
 		}
 
 		zshCase += `
           ;;`
 
-		zshArgCases = append(zshArgCases, zshCase)
+		zshCases = append(zshCases, zshCase)
 	}
 
 	bashScript := fmt.Sprintf(`
@@ -105,7 +144,7 @@ if [[ -n "$ZSH_VERSION" ]]; then
   compdef _qp_completion qp
 fi`,
 		generateZshCmdValues(),
-		strings.Join(zshArgCases, "\n"),
+		strings.Join(zshCases, "\n"),
 	)
 
 	return fmt.Sprintf("%s\n%s", bashScript, zshScript)
