@@ -48,9 +48,15 @@ func GetCompletions() string {
 
 		switch cmd.Full {
 		case quipple.CmdSelect:
-			zshCase = fmt.Sprintf(zshSelectCase,
-				cmd.Full, cmd.Short, data.zshCompletions, data.zshCompletions,
-				strings.ReplaceAll(data.description, " ", "-"), data.description)
+			zshCase = fmt.Sprintf(
+				zshSelectCase,
+				cmd.Full,
+				cmd.Short,
+				data.zshCompletions,
+				data.zshCompletions,
+				strings.ReplaceAll(data.description, " ", "-"),
+				data.description,
+			)
 		case quipple.CmdWhere:
 			zshCase += zshWhereCase
 		}
@@ -60,48 +66,14 @@ func GetCompletions() string {
 		zshCases = append(zshCases, zshCase)
 	}
 
-	bashScript := fmt.Sprintf(`
-if [[ -n "$BASH_VERSION" ]]; then
-  _qp_completion() {
-    local cur="${COMP_WORDS[COMP_CWORD]}"
-    local prev="${COMP_WORDS[COMP_CWORD - 1]}"
-    local prev_lower="${prev,,}"
-
-    case "${prev_lower}" in
-%s
-    *)
-      COMPREPLY=($(compgen -W "%s" -- "${cur}"))
-      return 0
-      ;;
-    esac
-  }
-  complete -F _qp_completion qp
-fi`,
+	bashScript := fmt.Sprintf(
+		bashScriptTemplate,
 		strings.Join(bashCases, "\n"),
 		getAllCmdsStr(),
 	)
 
-	zshScript := fmt.Sprintf(`
-if [[ -n "$ZSH_VERSION" ]]; then
-  _qp_completion() {
-    local curcontext="$curcontext" state line
-    typeset -A opt_args
-
-    case $words[1] in
-    qp)
-      if (( CURRENT == 2 )); then
-%s
-      else
-        local cmd_lower="${words[2]:l}"
-        case $cmd_lower in
-%s
-        esac
-      fi
-      ;;
-    esac
-  }
-  compdef _qp_completion qp
-fi`,
+	zshScript := fmt.Sprintf(
+		zshScriptTemplate,
 		generateZshCmdValues(),
 		strings.Join(zshCases, "\n"),
 	)

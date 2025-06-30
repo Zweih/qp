@@ -51,3 +51,43 @@ const zshWhereCase = ` -S ''`
 
 const zshCaseSuffix = `
             ;;`
+
+const bashScriptTemplate = `
+if [[ -n "$BASH_VERSION" ]]; then
+  _qp_completion() {
+    local cur="${COMP_WORDS[COMP_CWORD]}"
+    local prev="${COMP_WORDS[COMP_CWORD - 1]}"
+    local prev_lower="${prev,,}"
+
+    case "${prev_lower}" in
+%s
+    *)
+      COMPREPLY=($(compgen -W "%s" -- "${cur}"))
+      return 0
+      ;;
+    esac
+  }
+  complete -F _qp_completion qp
+fi`
+
+const zshScriptTemplate = `
+if [[ -n "$ZSH_VERSION" ]]; then
+  _qp_completion() {
+    local curcontext="$curcontext" state line
+    typeset -A opt_args
+
+    case $words[1] in
+    qp)q
+      if (( CURRENT == 2 )); then
+%s
+      else
+        local cmd_lower="${words[2]:l}"
+        case $cmd_lower in
+%s
+        esac
+      fi
+      ;;
+    esac
+  }
+  compdef _qp_completion qp
+fi`
