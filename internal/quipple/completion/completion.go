@@ -45,23 +45,6 @@ func GetCompletions() string {
 		bashCases = append(bashCases, bashCase)
 	}
 
-	var zshCases []string
-	for _, cmd := range cmds {
-		data := completionData[cmd.Full]
-		zshCase := generateZshCase(cmd, data.zshCompletions, data.description)
-
-		if cmd.Full == quipple.CmdSelect {
-			zshCase += ` -S ','`
-		} else if cmd.Full == quipple.CmdWhere {
-			zshCase += ` -S ''`
-		}
-
-		zshCase += `
-        ;;`
-
-		zshCases = append(zshCases, zshCase)
-	}
-
 	var zshArgCases []string
 	for _, cmd := range cmds {
 		data := completionData[cmd.Full]
