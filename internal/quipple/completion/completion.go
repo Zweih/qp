@@ -30,33 +30,12 @@ func GetCompletions() string {
 		bashCase := generateBashCase(cmd, data.bashCompletions)
 
 		switch cmd.Full {
-		case quipple.CmdWhere:
-			bashCase += `
-      if [[ "${cur}" != *"=" ]] && [[ "${COMPREPLY[0]}" == *"=" ]]; then
-        compopt -o nospace 2>/dev/null || true
-      fi
-      return 0
-      ;;`
 		case quipple.CmdSelect:
-			bashCase += fmt.Sprintf(`
-      if [[ "${cur}" == *","* ]]; then
-        local prefix="${cur%%,*},"
-        local suffix="${cur##*,}"
-        local completions=($(compgen -W "%s" -- "${suffix}"))
-        COMPREPLY=()
-        for comp in "${completions[@]}"; do
-          COMPREPLY+=("${prefix}${comp}")
-        done
-      else
-        COMPREPLY=($(compgen -W "%s" -- "${cur}"))
-      fi
-      compopt -o nospace 2>/dev/null || true
-      return 0
-      ;;`, data.bashCompletions, data.bashCompletions)
+			bashCase += fmt.Sprintf(bashSelectCase, data.bashCompletions, data.bashCompletions)
+		case quipple.CmdWhere:
+			bashCase += bashWhereCase
 		default:
-			bashCase += `
-      return 0
-      ;;`
+			bashCase += bashDefaultCase
 		}
 
 		bashCases = append(bashCases, bashCase)
@@ -69,34 +48,14 @@ func GetCompletions() string {
 
 		switch cmd.Full {
 		case quipple.CmdSelect:
-			zshCase = fmt.Sprintf(`      %s | %s)
-        local cur="${words[CURRENT]}"
-        if [[ "$cur" == *","* ]]; then
-          local prefix="${cur%%,*},"
-          local suffix="${cur##*,}"
-          local -a completions
-          completions=(%s)
-          local -a matching
-          for comp in "${completions[@]//\'/}"; do
-            if [[ "$comp" == "$suffix"* ]]; then
-              matching+=("$comp")
-            fi
-          done
-          compadd -S '' -p "$prefix" -a matching
-        else
-          local -a opts
-          opts=(%s)
-          _describe -t %s '%s' opts -S ''
-        fi`,
+			zshCase = fmt.Sprintf(zshSelectCase,
 				cmd.Full, cmd.Short, data.zshCompletions, data.zshCompletions,
 				strings.ReplaceAll(data.description, " ", "-"), data.description)
 		case quipple.CmdWhere:
-			zshCase += ` -S ''`
-		default:
+			zshCase += zshWhereCase
 		}
 
-		zshCase += `
-          ;;`
+		zshCase += zshCaseSuffix
 
 		zshCases = append(zshCases, zshCase)
 	}
