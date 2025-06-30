@@ -5,19 +5,11 @@ import (
 	"strings"
 )
 
-var ShorthandMap = map[string]string{
-	"s": quipple.CmdSelect,
-	"w": quipple.CmdWhere,
-	"o": quipple.CmdOrder,
-	"l": quipple.CmdLimit,
-	"f": quipple.CmdFormat,
-}
-
 func ExpandShortSyntax(args []string) []string {
 	expanded := make([]string, 0, len(args))
 
 	for _, arg := range args {
-		if cmd, ok := ShorthandMap[strings.ToLower(arg)]; ok {
+		if cmd, ok := quipple.ShorthandMap[strings.ToLower(arg)]; ok {
 			expanded = append(expanded, cmd)
 			continue
 		}

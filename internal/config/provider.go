@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 	"qp/internal/about"
-	"qp/internal/quipple"
+	"qp/internal/quipple/completion"
 )
 
 func (c *CliConfigProvider) GetConfig() (*Config, error) {
@@ -24,7 +24,7 @@ func (c *CliConfigProvider) GetConfig() (*Config, error) {
 	}
 
 	if cfg.ShowCompletion {
-		fmt.Print(quipple.GetBashCompletion())
+		fmt.Print(completion.GetCompletions())
 		os.Exit(0)
 	}
 

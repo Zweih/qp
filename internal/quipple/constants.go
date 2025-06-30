@@ -35,6 +35,14 @@ var CmdNameLookup = map[CmdType]string{
 	BlockFormat: CmdFormat,
 }
 
+var ShorthandMap = map[string]string{
+	"s": CmdSelect,
+	"w": CmdWhere,
+	"o": CmdOrder,
+	"l": CmdLimit,
+	"f": CmdFormat,
+}
+
 const (
 	MacroOrphan      = "orphan"
 	MacroSuperOrphan = "superorphan"
