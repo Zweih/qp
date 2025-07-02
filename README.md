@@ -388,7 +388,7 @@ Each `where` query supports one of the following:
 - **Range match**
   - `field=start:end` -> Fuzzy match
   - `field==start:end` -> Strict match
-  - Works with `updated`, `built`, and `size`
+  - Works with `updated`, `built`, `size`, `freeable`, and `footprint`
   - Supports:
     - Full ranges: `start:end`
     - Open-ended ranges: `start:` or `:end`
