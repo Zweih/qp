@@ -361,7 +361,7 @@ The `where` (short: `w`) command is the core of **qp**'s flexible query system.
 - `and`: Combine multiple conditions where all must match
 - `or`: Match any of multiple conditions
 - `not`: Invert any condition
-- `q ... p`: Qroup conditions for operation precedence, use them as you would parentheses with `q` being `(` and `p` being `)`
+- `q ... p`: Group conditions for operation precedence, use them as you would parentheses with `q` being `(` and `p` being `)`
   - The purpose of this is that `(` and `)` are not safe to use unquoted on the command line
   - Remember with:
     - `q` is for **q**uery group start: `(`
