@@ -204,7 +204,7 @@ brew tap zweih/qp
 brew install zweih/qp/qp
 ```
 
-**note**: Until we are added to the official `homebrew/core` repo, ensure that the package you install is `zweih/qp/qp`
+**Note**: Until we are added to the official `homebrew/core` repo, ensure that the package you install is `zweih/qp/qp`
 
 ### Arch-based systems (AUR)
 
@@ -215,11 +215,11 @@ yay -Sy qp
 
 If you prefer to install a pre-compiled binary* using the AUR, use the `qp-bin` package instead.
 
-***note**: Binaries are automatically, securely, and transparently compiled with github CI when a version release is created. You can audit the binary creation by checking the relevant github action for each release version.
+***Note**: Binaries are automatically, securely, and transparently compiled with github CI when a version release is created. You can audit the binary creation by checking the relevant github action for each release version.
 
 For the latest (unstable) version from git w/ the AUR, use `qp-git`*.  
 
-***note**: This is not recommended for most users
+***Note**: `qp-git` is not recommended for most users
 
 ### Debian-based systems (e.g. Ubuntu, Mint, Pop!_os)
 
@@ -231,7 +231,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/zweih/qp/packaging/install-q
 
 This script downloads the latest published release from github and installs it using `dpkg`.
 
-\***note**: You can inspect the script beforehand [here](https://github.com/zweih/qp/packaging/install-qp-deb.sh). All binaries are built and signed by github CI on release tags.
+\***Note**: You can inspect the script beforehand [here](https://github.com/zweih/qp/packaging/install-qp-deb.sh). All binaries are built and signed by github CI on release tags.
 
 Installation via `apt` is coming soon™!
 
@@ -346,7 +346,7 @@ The `pkgtype` field indicates the type or category of package within each ecosys
 | pipx | none | - |
 | npm | none | - |
 
-**notes:**
+**Notes:**
 - Pacman's pkgtype comes from the package's XDATA field introduced in newer pacman versions
     - Older packages may not have this field populated
 - Flatpak runtimes are always listed as dependencies
@@ -438,7 +438,7 @@ qp w depends=python
 qp w depends=openssl@2
 ```
 
-**note:** Depth querying works with all relation fields: `depends`, `optdepends`, `required-by`, `optional-for`, `provides`, `conflicts`, and `replaces`.
+**Note:** Depth querying works with all relation fields: `depends`, `optdepends`, `required-by`, `optional-for`, `provides`, `conflicts`, and `replaces`.
 
 #### Built-in Macros
 
