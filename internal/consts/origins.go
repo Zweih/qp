@@ -9,4 +9,17 @@ const (
 	OriginPacman  = "pacman"
 	OriginPipx    = "pipx"
 	OriginRpm     = "rpm"
+	OriginSnap    = "snap"
 )
+
+var ValidOrigins = []string{
+	OriginBrew,
+	OriginDeb,
+	OriginFlatpak,
+	OriginNpm,
+	OriginOpkg,
+	OriginPacman,
+	OriginPipx,
+	OriginRpm,
+	OriginSnap,
+}
