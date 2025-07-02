@@ -64,13 +64,13 @@ This package is compatible with the following platforms and distributions:
 * Compatible with MacOS, Arch, Debian, OpenWrt, and over 60 distros
   * Supports multiple ecosystems:
     * System package managers:
-      * pacman, brew, apt/dpkg, dnf/yum, opkg
+      * `pacman`, `brew`, `apt`/`dpkg`, `dnf`/`yum`, and `opkg`
     * Application package managers:
-      * Flatpak, npm, pipx
+      * `flatpak`, `snap`, `npm`, and `pipx`
 * Query packages using an expressive query language
   * Full boolean logic (`and`, `or`, `not`, grouping)
   * Fuzzy and strict matching
-  * Range queries for `size`, `updated`, and `built`
+  * Range queries for `size`, `updated`, `freeable`, `footprint`, etc.
   * Existence checks (`has:`, `no:`)
   * Learn more about querying [here](#Querying-with-where)
   * Complex queries via grouping (`q ... p`) and built-in macros
