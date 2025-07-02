@@ -261,7 +261,7 @@ Installation via `apt` is coming soon™!
 The cache is located under `/query-packages` at `$HOME/.cache/` or wherever you have `$XDG_HOME_CACHE` set to.
 
 #### macOS:
-The cache is located under `/query-packages` at `$HOME/Library/Caches/`
+The cache is located under `/query-packages` at `$HOME/Library/Caches/`.
 
 ## Usage
 
