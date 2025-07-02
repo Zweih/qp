@@ -3,6 +3,7 @@ package snap
 import (
 	"os"
 	"qp/internal/consts"
+	"qp/internal/origins/shared"
 	"qp/internal/pkgdata"
 	"qp/internal/storage"
 )
@@ -47,6 +48,5 @@ func (d *SnapDriver) SaveCache(cacheRoot string, pkgs []*pkgdata.PkgInfo) error 
 }
 
 func (d *SnapDriver) IsCacheStale(cacheMtime int64) (bool, error) {
-	// return shared.IsDirStale(d.Name(), pacmanDbDir, cacheMtime)
-	return true, nil
+	return shared.BfsStale(snapsDir, cacheMtime, 1)
 }
