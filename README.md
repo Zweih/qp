@@ -648,7 +648,7 @@ Output format:
   qp s name,size w name=vim o updated:asc l 10 # full query with shorthand
   ```
 
-- Qroup queries with `q ... p` to clarify order of operations:
+- Group queries with `q ... p` to clarify order of operations:
   ```
   qp w q name=git or name=gh p and has:depends 
   ```
