@@ -296,7 +296,7 @@ qp [command] [args] [options]
 - `--full-timestamp`: Display the full timestamp (date and time) of package update/build instead of just the date
 - `--no-cache`: Disable cache loading/saving and force fresh package data loading
 - `--regen-cache`: Disable cache loading, force fresh package data loading, and save fresh cache
-- `--cache-only`: Update cache only and nothing else. specify origin ('pacman', 'brew', 'deb', etc.) or all.
+- `--cache-only`: Update cache only and nothing else. Specify origin (`pacman`, `brew`, `deb`, etc.) or `all`.
 - `-h` | `--help`: Print help info
 
 ### Available fields
