@@ -1,18 +1,18 @@
 # qp - query packages
 
-**qp** is a command-line program for linux and macOS to query installed packages across ecosystems.
+**qp** is a command-line program for Linux and macOS to query installed packages across ecosystems.
 
 **qp** queries over 6x faster than native package searching while returning more comprehensive metadata than native package search solutions.
 
-query packages from `brew`, `pacman`, `apt`, `flatpak`, `npm`, `pipx`, `dnf`, and `opkg`. ecosystems are added frequently!
+Query packages from `brew`, `pacman`, `apt`, `flatpak`, `snap`, `npm`, `pipx`, `dnf`, and `opkg`. Ecosystems are added frequently!
 
 **qp** supports querying with full boolean logic for package metadata, dependency relations, and more.
 
-you can find installation instructions [here](#installation).
+You can find installation instructions [here](#Installation).
 
-check [features](#features) to find out more.
+Check [features](#Features) to find out more.
 
-check [usage](#usage) for all available commands + options.
+Check [usage](#Usage) for all available commands + options.
 
 ![downloads-badge](https://zweih.github.io/repulse-analytics/downloads_badge.svg) ![clones-badge](https://zweih.github.io/repulse-analytics/clones_badge.svg)
 
@@ -25,91 +25,91 @@ check [usage](#usage) for all available commands + options.
 ![Alt](https://repobeats.axiom.co/api/embed/a13406d103a649d70641774ee85e7a9983ccf96b.svg "Repobeats analytics image")
 
 <details open>
-<summary><strong>download and clone statistics</strong></summary>
+<summary><strong>Download and clone statistics</strong></summary>
 <br>
  
-graphs are generated daily with my other project, [repulse analytics](https://github.com/Zweih/repulse-analytics)
+Graphs are generated daily with my other project, [Repulse Analytics](https://github.com/Zweih/repulse-analytics)
 
 ![repulse graphs for qp](https://zweih.github.io/repulse-analytics/combined_graphs.svg)
 
 </details>
 
-this package is compatible with the following platforms and distributions:
- - [arch linux](https://archlinux.org)
+This package is compatible with the following platforms and distributions:
+ - [Arch Linux](https://archlinux.org)
  - [macOS](https://www.apple.com/macos/)
- - [debian](https://debian.org)
- - [steamOS](https://store.steampowered.com/steamos)
- - [red hat enterprise linux (RHEL)](https://www.redhat.com/en/technologies/linux-platforms/enterprise-linux)
- - [fedora](https://fedoraproject.org/)
- - [linux mint](https://linuxmint.com)
- - [manjaro](https://manjaro.org/)
- - [ubuntu](https://ubuntu.com)
- - [pop!_OS](https://system76.com/pop/)
- - [cachyOS](https://cachyos.org/)
- - [openwrt](https://openwrt.org/)
- - [garuda linux](https://garudalinux.org/)
- - [endeavourOS](https://endeavouros.com/)
- - [mabox linux](https://maboxlinux.org/)
- - [zorin OS](https://zorin.com/os/)
- - [elementary OS](https://elementary.io/)
- - the 50 other arch, debian, and fedora-based distros, as long as they have `apt`/`dpkg`, `brew`, `pacman`, `flatpak`, `dnf`/`yum`, or `opkg` installed
+ - [Debian](https://debian.org)
+ - [SteamOS](https://store.steampowered.com/steamos)
+ - [Red Hat Enterprise Linux (RHEL)](https://www.redhat.com/en/technologies/linux-platforms/enterprise-linux)
+ - [Fedora](https://fedoraproject.org/)
+ - [Linux Mint](https://linuxmint.com)
+ - [Manjaro](https://manjaro.org/)
+ - [Ubuntu](https://ubuntu.com)
+ - [Pop!_OS](https://system76.com/pop/)
+ - [CachyOS](https://cachyos.org/)
+ - [OpenWrt](https://openwrt.org/)
+ - [Garuda Linux](https://garudalinux.org/)
+ - [EndeavourOS](https://endeavouros.com/)
+ - [Mabox Linux](https://maboxlinux.org/)
+ - [Zorin OS](https://zorin.com/os/)
+ - [Elementary OS](https://elementary.io/)
+ - The 50 other Arch, Debian, and Fedora-based distros, as long as they have `apt`/`dpkg`, `brew`, `pacman`, `flatpak`, `dnf`/`yum`, or `opkg` installed.
 
 **qp** also detects and queries other system level package managers like `flatpak`, `npm`, and `pipx` for globally installed applications, expanding package discovery beyond traditional system package management.
 
 **qp** supports embedded linux systems, including meta-distributions like [yocto](https://www.yoctoproject.org/) that use `opkg` (`.ipk` packages) or `apt`/`dpkg` (`.deb` packages) or `.rpm` packages.
 
-## features
+## Features
 
-* list installed packages across supported systems
-* compatible with macOS, arch, debian, openwrt, and over 60 distros
-  * supports multiple ecosystems:
-    * system package managers:
+* List installed packages across supported systems
+* Compatible with MacOS, Arch, Debian, OpenWrt, and over 60 distros
+  * Supports multiple ecosystems:
+    * System package managers:
       * pacman, brew, apt/dpkg, dnf/yum, opkg
-    * application package managers:
-      * flatpak, npm, pipx
-* query packages using an expressive query language
-  * supports full boolean logic (`and`, `or`, `not`, grouping)
-  * supports fuzzy and strict matching
-  * supports range queries for `size`, `updated`, and `built`
-  * supports presence/absence checks (`has:`, `no:`)
-  * learn more about querying [here](#querying-with-where)
-  * complex queries via grouping (`q ... p`) and built-in macros
-    * includes `orphan` and `superorphan` filters
-* sort results by any field
-* output formats:
-  * table (default)
-  * key/value
+    * Application package managers:
+      * Flatpak, npm, pipx
+* Query packages using an expressive query language
+  * Full boolean logic (`and`, `or`, `not`, grouping)
+  * Fuzzy and strict matching
+  * Range queries for `size`, `updated`, and `built`
+  * Existence checks (`has:`, `no:`)
+  * Learn more about querying [here](#Querying-with-where)
+  * Complex queries via grouping (`q ... p`) and built-in macros
+    * Includes `orphan` and `superorphan` filters
+* Sort results by any field
+* Output formats:
+  * Table (default)
+  * Key/value 
   * JSON
-* query by:
-  * name, version, origin, architecture, license
-  * cross-origin package detection (also-in field shows where packages exist across different package managers)
-  * size on disk, freeable storage, and total footprint
-  * update or build time/date
-  * package base or groups
-  * dependencies, optional dependencies, reverse dependencies
-  * package provisions, conflicts, replacements
-  * installation reason (explicit or dependency)
-  * package validation method (e.g., sha256, pgp)
-  * packager, URL, description
-  * package type (debug, split, cask, formula, etc.)
-* customizable field selection for output
-* cache system for fast repeated queries
-* lightweight, fast, concurrent architecture
+* Query by:
+  * Name, version, origin, architecture, license
+  * Cross-origin package detection (also-in field shows where packages exist across different package managers)
+  * Size on disk, freeable storage, and total footprint
+  * Update or build time/date
+  * Package base or groups
+  * Dependencies, optional dependencies, reverse dependencies
+  * Package provisions, conflicts, replacements
+  * Installation reason (explicit or dependency)
+  * Package validation method (e.g., sha256, pgp)
+  * Packager, URL, description
+  * Package type (debug, split, cask, formula, etc.)
+* Customizable field selection for output
+* Cache system for fast repeated queries
+* Lightweight, fast, concurrent architecture
 * CLI designed for both scripting and interactive use
-* extensive roadmap with frequent improvements and optimizations
+* Extensive roadmap with frequent improvements and optimizations
 
-learn about usage [here](#usage)
+Learn about usage [here](#Usage).
 
-learn about installation [here](#installation)
+learn about installation [here](#Installation).
 
-## is it good?
+## Is it good?
 
-[yes.](https://news.ycombinator.com/item?id=3067434)
+[Yes.](https://news.ycombinator.com/item?id=3067434)
 
-## roadmap
+## Roadmap
 
 <details>
-<summary><strong>phase 1</strong></summary>
+<summary><strong>Phase 1</strong></summary>
 
 
 | Status | Feature | Status | Feature |
@@ -160,7 +160,7 @@ learn about installation [here](#installation)
 
 </details>
 
-<strong>phase 2</strong>
+<strong>Phase 2</strong>
 
 | Status | Feature | Status | Feature |
 |--------|---------|--------|---------|
@@ -179,7 +179,7 @@ learn about installation [here](#installation)
 | - | replaced-by resolution | - | multi-license support |
 | – | short-args for queries | ✓ | key/value output |
 | ✓ | rpm origin (dnf/yum support) | ✓ | homebrew packaging |
-| ✓ | pipx origin (python global packages) | - | formulae from taps (brew) |
+| ✓ | pipx origin (python global packages) | ✓ | formulae from taps (brew) |
 | - | casks from taps (brew) | - | dependencies for casks |
 | - | rpm packaging | - | zypper (openSUSE support) |
 | ✓ | cache-only option | ✓ | pacman hook |
@@ -189,157 +189,157 @@ learn about installation [here](#installation)
 | ✓ | other envs field | - | support for multiple virtual environments (nvm/pyenv/etc.) |
 | ✓ | freeable field | ✓ | footprint field |
 | ✓ | flatpak origin | - | install history |
-| - | snap origin | ✓ | title field |
+| ✓ | snap origin | ✓ | title field |
 | - | keywords/tags field | - | notes/comment field |
 | - | author field | - | cargo origin |
 | - | log levels | ✓ | chunked cache (70% speed boost) |
 
-## installation
+## Installation
 
-### homebrew (macOS or linuxbrew)
+### Homebrew (macOS or Linuxbrew)
 
-if you have [homebrew](https://brew.sh/) (`brew`), install via **qp**'s cask repo:
+If you have [homebrew](https://brew.sh/) (`brew`), install via **qp**'s cask repo:
 ```bash
 brew tap zweih/qp
 brew install zweih/qp/qp
 ```
 
-**note**: until we are added to the official `homebrew/core` repo, ensure that the package you install is `zweih/qp/qp`
+**note**: Until we are added to the official `homebrew/core` repo, ensure that the package you install is `zweih/qp/qp`
 
-### arch-based systems (AUR)
+### Arch-based systems (AUR)
 
-install using an [AUR helper](https://wiki.archlinux.org/title/AUR_helpers) like `yay`, `paru`, `aura`, etc.:
+Install using an [AUR helper](https://wiki.archlinux.org/title/AUR_helpers) like `yay`, `paru`, `aura`, etc.:
 ```bash
 yay -Sy qp
 ```
 
-if you prefer to install a pre-compiled binary* using the AUR, use the `qp-bin` package instead.
+If you prefer to install a pre-compiled binary* using the AUR, use the `qp-bin` package instead.
 
-***note**: binaries are automatically, securely, and transparently compiled with github CI when a version release is created. you can audit the binary creation by checking the relevant github action for each release version.
+***note**: Binaries are automatically, securely, and transparently compiled with github CI when a version release is created. You can audit the binary creation by checking the relevant github action for each release version.
 
-for the latest (unstable) version from git w/ the AUR, use `qp-git`*.  
+For the latest (unstable) version from git w/ the AUR, use `qp-git`*.  
 
-***note**: this is not recommended for most users
+***note**: This is not recommended for most users
 
-### debian-based systems (e.g. ubuntu, mint, pop!_os)
+### Debian-based systems (e.g. Ubuntu, Mint, Pop!_os)
 
-to install the latest `.deb` release for your system architecture:
+To install the latest `.deb` release for your system architecture:
 
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/zweih/qp/packaging/install-qp-deb.sh)
 ```
 
-this script downloads the latest published release from github and installs it using `dpkg`.
+This script downloads the latest published release from github and installs it using `dpkg`.
 
-\***note**: you can inspect the script beforehand [here](https://github.com/zweih/qp/packaging/install-qp-deb.sh). all binaries are built and signed by github CI on release tags.
+\***note**: You can inspect the script beforehand [here](https://github.com/zweih/qp/packaging/install-qp-deb.sh). All binaries are built and signed by github CI on release tags.
 
-installation via `apt` is coming soon™!
+Installation via `apt` is coming soon™!
 
-### building from source + manual installation
+### Building from source + manual installation
 
-1. clone the repo:
+1. Clone the repo:
    ```bash
    git clone https://github.com/zweih/qp.git
    cd qp
    ```
-2. build the binary:
+2. Build the binary:
    ```bash
    go build -o qp ./cmd/qp
    ```
-3. copy the binary to your system's `$PATH`:
+3. Copy the binary to your system's `$PATH`:
    ```bash
    sudo install -m755 qp /usr/bin/qp
    ```
-4. copy the manpage:
+4. Copy the manpage:
    ```bash
    sudo install -m644 qp.1 /usr/share/man/man1/qp.1
    ```
 
-### cache
+### Cache
 
-#### linux:
-the cache is located under `/query-packages` at `$HOME/.cache/` or wherever you have `$XDG_HOME_CACHE` set to.
+#### Linux:
+The cache is located under `/query-packages` at `$HOME/.cache/` or wherever you have `$XDG_HOME_CACHE` set to.
 
 #### macOS:
-the cache is located under `/query-packages` at `$HOME/Library/Caches/`
+The cache is located under `/query-packages` at `$HOME/Library/Caches/`
 
-## usage
+## Usage
 
 ```bash
 qp [command] [args] [options]
 ```
 
-### commands
+### Commands
 
-- `select <list>` | `s <list>`: comma-separated list of fields to display
+- `select <list>` | `s <list>`: Comma-separated list of fields to display
   - `select all` | `s all` will act as a list of all available fields
   - `select default` | `s default` will act as a list of all default fields
-  - use `select default,version` to list default fields + version
-  - use `select all,version` to list default fields + version
-  - [see fields available for selection](#available-fields)
-- `where <query>` | `w <query>`: apply one or more queries to refine package results.
-  - learn more about querying [here](#querying-with-where)
-- `order <field>:<direction>` | `o <field>:<direction>`: sort results ascending or descending
-  - default sort is `updated:asc`
-- `limit <number>` | `l <number>`: limit the amount of packages to display (default: 20)
-  - `limit all` | `l all`: display all packages
-  - `limit end:<number>`: display last `n` packages
-  - `limit mid:<number>`: display middle `n` packages
-- `format <type>` | `f <type>`: output format: table, json, kv (default: table)
-  - `format table` -> tabular output with headers
+  - Use `select default,version` to list default fields + version
+  - Use `select all,version` to list default fields + version
+  - [See fields available for selection](#Available-Fields)
+- `where <query>` | `w <query>`: Apply one or more queries to refine package results
+  - Learn more about querying [here](#Querying-with-where)
+- `order <field>:<direction>` | `o <field>:<direction>`: Sort results ascending or descending
+  - Default sort is `updated:asc`
+- `limit <number>` | `l <number>`: Limit the amount of packages to display (default: 20)
+  - `limit all` | `l all`: Display all packages
+  - `limit end:<number>`: Display last `n` packages
+  - `limit mid:<number>`: Display middle `n` packages
+- `format <type>` | `f <type>`: Output format: table, json, kv (default: table)
+  - `format table` -> Tabular output with headers
   - `format json` -> JSON array output
-  - `format kv` -> key-value pairs (best for selecting many fields)
+  - `format kv` -> Key-Value pairs (best for selecting many fields)
 
-### options
+### Options
 
-- `--no-headers`: omit column headers in table output (useful for scripting)
-- `--full-timestamp`: display the full timestamp (date and time) of package update/build instead of just the date
-- `--no-cache`: disable cache loading/saving and force fresh package data loading
-- `--regen-cache`: disable cache loading, force fresh package data loading, and save fresh cache
-- `--cache-only`: update cache only and nothing else. specify origin ('pacman', 'brew', 'deb', etc.) or all.
-- `-h` | `--help`: print help info
+- `--no-headers`: Omit column headers in table output (useful for scripting)
+- `--full-timestamp`: Display the full timestamp (date and time) of package update/build instead of just the date
+- `--no-cache`: Disable cache loading/saving and force fresh package data loading
+- `--regen-cache`: Disable cache loading, force fresh package data loading, and save fresh cache
+- `--cache-only`: Update cache only and nothing else. specify origin ('pacman', 'brew', 'deb', etc.) or all.
+- `-h` | `--help`: Print help info
 
-### available fields
+### Available fields
 
-- `updated` - when the package was last updated
-- `built` - when the package was built
-- `size` - package size on disk
-- `freeable` - the amount storage that will be freed if the package is uninstalled
-- `footprint` - the real-world proportional disk space impact of the package, accounting for shared dependencies
-- `name` - package name
-- `title` - alternate, full, or application name; some origins have a proper name for a package other than the name used to install it (i.e., brew has `vlc` and the title is `VLC Media Player`)
-- `reason` - installation reason (explicit/dependency)
-- `version` - installed package version
-- `origin` - the package ecosystem or source the package belongs to (e.g., brew, pipx); reflects which package manager or backend maintains it
-- `arch` - architecture the package was built for (e.g., x86_64, aarch64, any)
-- `env` - the environment where the package is installed (applies to origins that can have multiple virtual environments, such as npm)
-- `license` - package software license
-- `description` - package description
-- `url` - the URL of the official site of the software being packaged
-- `validation` - package integrity validation method (e.g., sha256, pgp)
-- `pkgtype` - package type (specific to each origin, some origins have no pkgtype)
-- `pkgbase` - name of the base package used to group split packages; for non-split packages, it is the same as the package name. 
-- `packager` - person/entity who built the package (if available)
-- `also-in` - list of other origins that have this package installed
-- `other-envs` - list of other environments where this package is also installed
-- `groups` - list of package groups or categories (e.g., base, gnome, xfce4)
-- `conflicts` - list of packages that conflict, or cause problems, with the package
-- `replaces` - list of packages that are replaced by the package
-- `depends` - list of dependencies
-- `optdepends` - list of optional dependencies
-- `required-by` - list of packages required by the package and are dependent
-- `optional-for` - list of packages that optionally depend on the package (optionally dependent)
-- `provides` - list of alternative package names or shared libraries provided by package
+- `updated` - When the package was last updated
+- `built` - When the package was built
+- `size` - Package size on disk
+- `freeable` - The amount storage that will be freed if the package is uninstalled
+- `footprint` - The real-world proportional disk space impact of the package, accounting for shared dependencies
+- `name` - Package name
+- `title` - Alternate, full, or application name; some origins have a proper name for a package other than the name used to install it (i.e., brew has `vlc` and the title is `VLC Media Player`)
+- `reason` - Installation reason (explicit/dependency)
+- `version` - Installed package version
+- `origin` - The package ecosystem or source the package belongs to (e.g., brew, pipx); reflects which package manager or backend maintains it
+- `arch` - Architecture the package was built for (e.g., x86_64, aarch64, any)
+- `env` - The environment where the package is installed (applies to origins that can have multiple virtual environments, such as npm)
+- `license` - Package software license
+- `description` - Package description
+- `url` - The URL of the official site of the software being packaged
+- `validation` - Package integrity validation method (e.g., sha256, pgp)
+- `pkgtype` - Package type (specific to each origin, some origins have no pkgtype)
+- `pkgbase` - Name of the base package used to group split packages; for non-split packages, it is the same as the package name. 
+- `packager` - Person/entity who built the package (if available)
+- `also-in` - List of other origins that have this package installed
+- `other-envs` - List of other environments where this package is also installed
+- `groups` - List of package groups or categories (e.g., base, gnome, xfce4)
+- `conflicts` - List of packages that conflict, or cause problems, with the package
+- `replaces` - List of packages that are replaced by the package
+- `depends` - List of dependencies
+- `optdepends` - List of optional dependencies
+- `required-by` - List of packages required by the package and are dependent
+- `optional-for` - List of packages that optionally depend on the package (optionally dependent)
+- `provides` - List of alternative package names or shared libraries provided by package
 
-### package types by origin
+### Package Types by Origin
 
-the `pkgtype` field indicates the type or category of package within each ecosystem. different origins use different package type classifications:
+The `pkgtype` field indicates the type or category of package within each ecosystem. Different origins use different package type classifications:
 
-| origin | supported package types | description |
+| Origin | Supported Package Types | Description |
 |--------|------------------------|-------------|
-| pacman | `pkg`, `split`, `debug`, `src` | package build type |
-| brew | `formula`, `cask` | formulae are command-line tools, casks are GUI applications |
-| flatpak | `app`, `runtime` | runtimes are the main dependencies of apps |
+| pacman | `pkg`, `split`, `debug`, `src` | Package build type |
+| brew | `formula`, `cask` | Formulae are command-line tools, casks are GUI applications |
+| flatpak | `app`, `runtime` | Runtimes are the main dependencies of apps |
 | deb | none | - |
 | rpm | none | - |
 | opkg | none | - |
@@ -347,27 +347,27 @@ the `pkgtype` field indicates the type or category of package within each ecosys
 | npm | none | - |
 
 **notes:**
-- pacman's pkgtype comes from the package's XDATA field introduced in newer pacman versions
-    - older packages may not have this field populated
-- flatpak runtimes are always listed as dependencies
-- deb, rpm, opkg, and pipx origins do not implement package type classifications and will show empty pkgtype values
+- Pacman's pkgtype comes from the package's XDATA field introduced in newer pacman versions
+    - Older packages may not have this field populated
+- Flatpak runtimes are always listed as dependencies
+- Deb, rpm, opkg, and pipx origins do not implement package type classifications and will show empty pkgtype values
 
-### querying with `where`
+### Querying with `where`
 
-the `where` (short: `w`) command is the core of qp's flexible query system.
+The `where` (short: `w`) command is the core of **qp**'s flexible query system.
 
-#### logical operations
+#### Logical Operations
 
-- `and`: combine multiple conditions where all must match
-- `or`: match any of multiple conditions
-- `not`: invert any condition
-- `q ... p`: group conditions for operation precedence, use them as you would parentheses with `q` being `(` and `p` being `)`
-  - the purpose of this is that `(` and `)` are not safe to use unquoted on the command line
-  - remember with:
+- `and`: Combine multiple conditions where all must match
+- `or`: Match any of multiple conditions
+- `not`: Invert any condition
+- `q ... p`: Qroup conditions for operation precedence, use them as you would parentheses with `q` being `(` and `p` being `)`
+  - The purpose of this is that `(` and `)` are not safe to use unquoted on the command line
+  - Remember with:
     - `q` is for **q**uery group start: `(`
     - `p` is for query group sto**p**: `)`
 
-examples:
+Examples:
 ```bash
 qp w name=vim and size=10MB:
 qp w reason=explicit and not required-by
@@ -375,43 +375,43 @@ qp w q name=zoxide or name=yazi p and optdepends=fzf
 qp w q name=firefox or name=librewolf p and not has:conflicts
 ```
 
-#### query types
+#### Query Types
 
-all queries that take words as arguments can also take a comma-separated list.
+All queries that take words as arguments can also take a comma-separated list.
 
-each `where` query supports one of the following:
+Each `where` query supports one of the following:
 
-- **string match**
-  - `field=value` -> fuzzy match
-  - `field==value` -> strict match
-  - applies to string-based fields like `name`, `license`, `description`, etc.
-- **range match**
-  - `field=start:end` -> fuzzy match
-  - `field==start:end` -> strict match
-  - works with `updated`, `built`, and `size`
-  - supports:
-    - full ranges: `start:end`
-    - open-ended ranges: `start:` or `:end`
-    - exact values: `value`
-- **existence check**
-  - `has:field` -> field must exist or be non-empty
-  - `no:field` -> field must be missing or empty
+- **String match**
+  - `field=value` -> Fuzzy match
+  - `field==value` -> Strict match
+  - Applies to string-based fields like `name`, `license`, `description`, etc.
+- **Range match**
+  - `field=start:end` -> Fuzzy match
+  - `field==start:end` -> Strict match
+  - Works with `updated`, `built`, and `size`
+  - Supports:
+    - Full ranges: `start:end`
+    - Open-ended ranges: `start:` or `:end`
+    - Exact values: `value`
+- **Existence check**
+  - `has:field` -> Field must exist or be non-empty
+  - `no:field` -> Field must be missing or empty
 
-#### match types
+#### Match Types
 
-|field type | fuzzy | strict | 
+|Field Type | Fuzzy | Strict | 
 |-----------|-------|--------|
-| strings & relations | substring match (case-insensitive) | exact character match (case-insensitive) |
-| dates | matches by day (ignores time) | matches exact timestamp (to the second) |
-| size  | ±0.3% byte tolerance (approximate) | matches exact byte size |
+| Strings & Relations | Substring match (case-insensitive) | Exact character match (case-insensitive) |
+| Dates | Matches by day (ignores time) | Matches exact timestamp (to the second) |
+| Size  | ±0.3% byte tolerance (approximate) | Matches exact byte size |
 
-for example:
+For example:
   - `name=gtk` matches `gtk3`, `libgtk`, etc. (fuzzy)
   - `name==gtk` only matches a package named exactly `gtk`
 
-#### depth querying
+#### Depth Querying
 
-for relation fields, you can specify the depth level to query using the `@` syntax:
+For relation fields, you can specify the depth level to query using the `@` syntax:
 
 ```bash
 qp w depends=glibc@2    # packages that depend on glibc at depth 2
@@ -419,17 +419,17 @@ qp w required-by=gtk3@1 # packages directly required by gtk3 (depth 1)
 qp w provides=libssl@3  # packages that provide libssl at depth 3
 ```
 
-**depth levels:**
-- no `@` specified: depth 1 (direct relations only)
-- `@1`: direct relations only (same as default)
-- `@2`: second-level relations (relations of relations)
-- `@3`, `@4`, etc.: deeper levels in the dependency tree
+**Depth levels:**
+- No `@` specified: depth 1 (direct relations only)
+- `@1`: Direct relations only (same as default)
+- `@2`: Second-level relations (relations of relations)
+- `@3`, `@4`, etc.: Deeper levels in the dependency tree
 
-**spefor optional dependencies:**
+**Specific for optional dependencies:**
 - `optdepends` and `optional-for` return the optional relationships at the depth 1
-- after epth 1, the dependency resolution includes hard dependencies from those optional packages in the final results. this is intentional.
+- After depth 1, the dependency resolution includes hard dependencies from those optional packages in the final results. This is intentional.
 
-**examples:**
+**Examples:**
 ```bash
 # show packages with direct dependencies on python (depth 1 implied)
 qp w depends=python
@@ -438,13 +438,13 @@ qp w depends=python
 qp w depends=openssl@2
 ```
 
-**note:** depth querying works with all relation fields: `depends`, `optdepends`, `required-by`, `optional-for`, `provides`, `conflicts`, and `replaces`.
+**note:** Depth querying works with all relation fields: `depends`, `optdepends`, `required-by`, `optional-for`, `provides`, `conflicts`, and `replaces`.
 
-#### built-in macros
+#### Built-in Macros
 
-some frequently-used query patterns are available as built-in macros for convenience.
+Some frequently-used query patterns are available as built-in macros for convenience.
 
-* `orphan` - matches orphaned packages (dependencies no longer required by anything):
+* `orphan` - Matches orphaned packages (dependencies no longer required by anything):
   ```
   qp where orphan
   ```
@@ -454,7 +454,7 @@ some frequently-used query patterns are available as built-in macros for conveni
   qp where no:required-by and reason=dependency
   ```
 
-* `superorphan` - matches "super" orphaned packages (dependencies no longer required by anything AND optional for nothing)
+* `superorphan` - Matches "super" orphaned packages (dependencies no longer required by anything AND optional for nothing)
   ```
   qp w superorphan
   ```
@@ -464,7 +464,7 @@ some frequently-used query patterns are available as built-in macros for conveni
   qp where no:required-by and reason=dependency and no:optional-for
   ```
 
-* `heavy` - matches packages 100MB and larger
+* `heavy` - Matches packages 100MB and larger
   ```
   qp w superorphan
   ```
@@ -474,7 +474,7 @@ some frequently-used query patterns are available as built-in macros for conveni
   qp where size=100MB:
   ```
 
-* `light` - matches packages 1MB and smaller
+* `light` - Matches packages 1MB and smaller
   ```
   qp w light
   ```
@@ -484,14 +484,14 @@ some frequently-used query patterns are available as built-in macros for conveni
   qp where size=1MB:
   ```
 
-these macros can be combined with other queries as usual:
+These macros can be combined with other queries as usual:
 
 ```
 qp w orphan and size=100KB:
 qp w not superorphan and not name=gtk
 ```
 
-#### query examples
+#### Query Examples
 
 ```
 qp w name==bash and has:depends
@@ -503,17 +503,17 @@ qp w not arch=x86_64
 qp w q has:depends or has:required-by p and not reason=explicit
 ```
 
-#### field types
+#### Field Types
 
-| field type | description |
+| Field Type | Description |
 |------------|-------------|
-| string | matches textual fields. used for fields like name, license, description, etc. <br> can take a comma-separated list |
-| range | matches numerical or time-based fields across a range. <br> supports full ranges (start:end), open-ended ranges (start: / :end), or exact values |
-| relation | matches fields that contain relationships to other packages (e.g., dependencies, conflicts, provides) <br> can take a comma-separated list |
+| String | Matches textual fields. Used for fields like name, license, description, etc. <br> can take a comma-separated list |
+| Range | Matches numerical or time-based fields across a range. <br> Supports full ranges (start:end), open-ended ranges (start: / :end), or exact values |
+| Relation | Matches fields that contain relationships to other packages (e.g., dependencies, conflicts, provides) <br> Can take a comma-separated list |
 
-#### fields and their types
+#### Fields and Their Types
 
-| field name | field type |
+| Field Name | Field Type |
 |------------|------------|
 | updated | range |
 | built | range |
@@ -546,14 +546,14 @@ qp w q has:depends or has:required-by p and not reason=explicit
 
 ### JSON output
 
-`--output json` outputs the package data as structured JSON instead of a table. this can be useful for scripts or automation.
+`format json` outputs the package data as structured JSON instead of a table. this can be useful for scripts or automation.
 
-example:
+Example:
 ```
-qp select all where name=gtk3 --output json
+qp select all where name=gtk3 format json
 ```
 
-output format:
+Output format:
 ```json
 [
   {
@@ -640,245 +640,234 @@ output format:
 ]
 ```
 
-### tips & tricks
+### Tips & Tricks
 
-- multiple short commands are supported using space separation (e.g. `s`, `w`, `l`, `o`), but **cannot** be combined as `swo` or `-swo`. use them like this:
+- Multiple short commands are supported using space separation (e.g. `s`, `w`, `l`, `o`, `f`), but **cannot** be combined as `swo` or `-swo`. use them like this:
   ```
   qp w name yay
   qp s name,size w name=vim o updated:asc l 10 # full query with shorthand
   ```
 
-- group queries with `q ... p` to clarify order of operations:
+- Qroup queries with `q ... p` to clarify order of operations:
   ```
   qp w q name=git or name=gh p and has:depends 
   ```
 
-- the relations table columns can be lengthy. packages like `glibc` are required by thousands of packages. to improve readability, pipe the output to tools like `moar` or `less` (i prefer `moar`, but `less` is usually pre-installed):
+- The relations table columns can be lengthy. Packages like `glibc` are required by thousands of packages. to improve readability, pipe the output to tools like `moar` or `less` (i prefer `moar`, but `less` is usually pre-installed):
   ```
   qp select name,depends | less
   qp s name,depends | moar
   ```
 
-- options that take arguments can be used in the `--<option>=<value>` form:
-  ```
-  qp select name,updated --limit=100
-  qp s name,updated o name
-  ```
-
-  boolean flags can be explicitly set using `--<option>=true` or `--<option>=false`:
-  ```
-  qp --no-headers=true
-  ```
-
-  arguments to queries can be quoted if they contain special characters or spaces:
+- Arguments to queries can be quoted if they contain special characters or spaces:
   ```
   qp where description="for tree-sitter"
   ```
 
-- the `--no-headers` flag is useful when processing output in scripts. It removes the header row, making it easier to parse package lists with tools like `awk`, `sed`, or `cut`:
+- The `--no-headers` flag is useful when processing output in scripts. It removes the header row, making it easier to parse package lists with tools like `awk`, `sed`, or `cut`:
   ```
   qp --no-headers select name,size | awk '{print $1, $2}'
   ```
 
-### examples
+### Examples
 
- 1. show the last 10 installed packages  
+ 1. Show the last 10 installed packages  
    ```
    qp limit 10
    ```
 
- 2. show all explicitly installed packages  
+ 2. Show all explicitly installed packages  
    ```
    qp where reason=explicit limit all
    ```
 
- 3. show only dependencies updated on a specific date  
+ 3. Show only dependencies updated on a specific date  
    ```
    qp where reason=dependency and update=2025-03-01
    ```
 
- 4. show all packages sorted alphabetically by name
+ 4. Show all packages sorted alphabetically by name
    ```
    qp order name limit all
    ```
 
- 5. search for packages that contain a GPL license 
+ 5. Search for packages that contain a GPL license 
    ```
    qp where license=gpl
    ```
 
- 6. show packages installed between January 1, 2025, and January 5, 2025  
+ 6. Show packages installed between January 1, 2025, and January 5, 2025  
    ```
    qp where updated=2025-01-01:2025-01-05
    ```
 
- 7. sort all packages by their license, displaying name and license  
+ 7. Sort all packages by their license, displaying name and license  
    ```
    qp select name,license order license limit all
    ```
 
- 8. show the 20 most recently installed packages larger than 20MB  
+ 8. Show the 20 most recently installed packages larger than 20MB  
    ```
    qp where size=20MB: limit 20
    ```
 
- 9. show packages between 100MB and 1GB installed up to February 27, 2025
+ 9. Show packages between 100MB and 1GB installed up to February 27, 2025
    ```
    qp where size=100MB:1GB and updated=:2025-02-27
    ```
 
-10. show all packages sorted by size in descending order, installed after January 1, 2025
+10. Show all packages sorted by size in descending order, installed after January 1, 2025
    ```
    qp where updated=2025-01-01: order size:desc limit all
    ```
 
-11. search for installed packages containing "python"  
+11. Search for installed packages containing "python"  
    ```
    qp where name=python
    ```
 
-12. search for explicitly installed packages containing "lib" that are between 10MB and 1GB in size
+12. Search for explicitly installed packages containing "lib" that are between 10MB and 1GB in size
    ```
    qp where reason=explicit and name=lib and size=10MB:1GB
    ```
 
-13. search for packages with names containing "linux" installed between January 1 and March 30, 2025
+13. Search for packages with names containing "linux" installed between January 1 and March 30, 2025
    ```
    qp where name=linux and updated=2025-01-01:2025-03-30
    ```
 
-14. search for packages containing "gtk" installed after January 1, 2025, and at least 5MB in size
+14. Search for packages containing "gtk" installed after January 1, 2025, and at least 5MB in size
    ```
    qp where name=gtk and updated=2025-01-01: and size=5MB:
    ```
 
-15. show packages with name, version, and size
+15. Show packages with name, version, and size
    ```
    qp select name,version,size
    ```
 
-16. show package names, descriptions, and dependencies with `less` for readability
+16. Show package names, descriptions, and dependencies with `less` for readability
    ```
    qp select name,depends,description | less
    ```
 
-17. output package data in JSON format
+17. Output package data in JSON format
    ```
-   qp --output json
-   ```
-
-18. save all explicitly installed packages to a JSON file
-   ```
-   qp where reason=explicit --output json > explicit-packages.json
+   qp format json
    ```
 
-19. output all packages sorted by size (descending) in JSON
+18. Save all explicitly installed packages to a JSON file
    ```
-   qp order size:desc limit all --output json
-   ```
-
-20. output JSON with specific fields
-   ```
-   qp select name,version,size --output json
+   qp where reason=explicit format json > explicit-packages.json
    ```
 
-21. show all available package details for all packages
+19. Output all packages sorted by size (descending) in JSON
+   ```
+   qp order size:desc limit all format json
+   ```
+
+20. Output JSON with specific fields
+   ```
+   qp select name,version,size format json
+   ```
+
+21. Show all available package details for all packages
    ```
    qp select all limit all
    ```
 
-22. output all packages with all fields in JSON format
+22. Output all packages with all fields in JSON format
    ```
-   qp select all limit all --output json
+   qp select all limit all format json
    ```
 
-23. show package names and sizes without headers for scripting
+23. Show package names and sizes without headers for scripting
    ```
    qp select name,size --no-headers
    ```
 
-24. show all packages required by `firefox`
+24. Show all packages required by `firefox`
    ```
    qp where required-by=firefox limit all
    ```
 
-25. show all packages required by `gtk3` that are at least 50MB in size
+25. Show all packages required by `gtk3` that are at least 50MB in size
    ```
    qp where required-by=gtk3 and size=50MB: limit all
    ```
 
-26. show packages required by `vlc` and installed after January 1, 2025
+26. Show packages required by `vlc` and installed after January 1, 2025
    ```
    qp where required-by=vlc and updated=2025-01-01:
    ```
 
-27. show all packages that have `glibc` as a dependency and are required by `ffmpeg`
+27. Show all packages that have `glibc` as a dependency and are required by `ffmpeg`
    ```
    qp where depends=glibc and required-by=ffmpeg limit all
    ```
 
-28. inclusively show packages that require `gcc` or `pacman`
+28. Inclusively show packages that require `gcc` or `pacman`
    ```
    qp where required-by=gcc,pacman
    ```
 
-29. show packages that provide `awk`
+29. Show packages that provide `awk`
    ```
    qp where provides=awk
    ```
 
-30. inclusively show packages that provide `rustc` or `python3`
+30. Inclusively show packages that provide `rustc` or `python3`
    ```
    qp where provides=rustc,python3
    ```
 
-31. show packages that conflict with `linuxqq`
+31. Show packages that conflict with `linuxqq`
    ```
    qp where conflicts=linuxqq
    ```
 
-32. show packages that are built for the `aarch64` CPU architecture or any architecture
+32. Show packages that are built for the `aarch64` CPU architecture or any architecture
    ```
    qp where arch=aarch64,any
    ```
 
-33. show all dependencies smaller than 500KB
+33. Show all dependencies smaller than 500KB
    ```
    qp where reason=dependency and size=:500KB
    ```
 
-34. show the 15 most recent explicitly installed packages
+34. Show the 15 most recent explicitly installed packages
    ```
    qp where reason=explicit limit 15
    ```
 
-35. show packages that contain "clang" in their description
+35. Show packages that contain "clang" in their description
    ```
    qp where description=clang
    ```
 
-36. sort packages by their package base while showing their names and package bases, in reverse alphabetical order
+36. Sort packages by their package base while showing their names and package bases, in reverse alphabetical order
    ```
    qp select name,pkgbase order pkgbase:desc
    ```
 
-37. show packages that are exactly named "bash"
+37. Show packages that are exactly named "bash"
    ```
    qp where name==bash
    ```
 
-38. show packages that have no dependencies
+38. Show packages that have no dependencies
    ```
    qp where no:depends
    ```
 
-39. show all packages installed via pipx
+39. Show all packages installed via pipx
    ```
    qp where origin=pipx
    ```
 
-## license
+## License
 
-this project is licensed under GPL-3.0-only.
+This project is licensed under GPL-3.0-only.
 
-for use cases not compatible with the GPL, such as proprietary redistribution or integration/ingestion into ML/LLM systems, a separate commercial license is available. see LICENSE.commercial for details.
+For use cases not compatible with the GPL, such as proprietary redistribution or integration/ingestion into ML/LLM systems, a separate commercial license is available. See LICENSE.commercial for details.
