@@ -12,6 +12,7 @@ type PkgInfo struct {
 	Freeable         int64
 	Footprint        int64
 	Name             string
+	Author           string
 	Title            string
 	Reason           string
 	Version          string

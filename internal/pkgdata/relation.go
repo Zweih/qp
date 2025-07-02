@@ -21,7 +21,7 @@ type Relation struct {
 	Version      string
 	ProviderName string
 	Why          string
-	PkgType      string
+	PkgType      string // pkgtype should only be declared when there is a split ecosystem, such as formulae/casks in Brew
 }
 
 func (rel *Relation) Key() string {

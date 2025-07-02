@@ -10,6 +10,7 @@ import (
 	"qp/internal/origins/drivers/pacman"
 	"qp/internal/origins/drivers/pipx"
 	"qp/internal/origins/drivers/rpm"
+	"qp/internal/origins/drivers/snap"
 )
 
 var registeredDrivers = []driver.Driver{
@@ -21,6 +22,7 @@ var registeredDrivers = []driver.Driver{
 	&pacman.PacmanDriver{},
 	&pipx.PipxDriver{},
 	&rpm.RpmDriver{},
+	&snap.SnapDriver{},
 }
 
 func AvailableDrivers() []driver.Driver {
