@@ -1,4 +1,11 @@
 # qp Release Notes
+## v5.99.1
+### What's Changed
+* Refactor: Completion cases by @Zweih in https://github.com/Zweih/qp/pull/425
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.99.0...v5.99.1
+
+
 ## v5.99.0
 ### What's Changed
 * Feature: Improve select autocomplete by @Zweih in https://github.com/Zweih/qp/pull/424
@@ -709,10 +716,3 @@
 * Feature: .deb packaging by @Zweih in https://github.com/Zweih/qp/pull/279
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v5.23.0...v5.24.1
-
-
-## v5.23.0
-### What's Changed
-* Feature: Add origin query by @Zweih in https://github.com/Zweih/qp/pull/277
-
-**Full Changelog**: https://github.com/Zweih/qp/compare/v5.22.0...v5.23.0
