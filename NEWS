@@ -1,4 +1,11 @@
 # qp Release Notes
+## v5.100.0
+### What's Changed
+* Feature: Add specific shells to completion flag by @Zweih in https://github.com/Zweih/qp/pull/427
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.99.2...v5.100.0
+
+
 ## v5.99.2
 ### What's Changed
 * Refactor: Completion templates by @Zweih in https://github.com/Zweih/qp/pull/426
@@ -708,10 +715,3 @@
 * Feature: Improve reason resolution in minimal envs by @Zweih in https://github.com/Zweih/qp/pull/281
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v5.25.0...v5.26.0
-
-
-## v5.25.0
-### What's Changed
-* Feature: Add deprecation notice for flag syntax by @Zweih in https://github.com/Zweih/qp/pull/280
-
-**Full Changelog**: https://github.com/Zweih/qp/compare/v5.24.1...v5.25.0
