@@ -77,7 +77,7 @@ if [[ -n "$ZSH_VERSION" ]]; then
     typeset -A opt_args
 
     case $words[1] in
-    qp)q
+    qp)
       if (( CURRENT == 2 )); then
 %s
       else
