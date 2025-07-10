@@ -53,7 +53,6 @@ const zshCaseSuffix = `
             ;;`
 
 const bashScriptTemplate = `
-if [[ -n "$BASH_VERSION" ]]; then
   _qp_completion() {
     local cur="${COMP_WORDS[COMP_CWORD]}"
     local prev="${COMP_WORDS[COMP_CWORD - 1]}"
@@ -68,10 +67,10 @@ if [[ -n "$BASH_VERSION" ]]; then
     esac
   }
   complete -F _qp_completion qp
-fi`
+`
 
 const zshScriptTemplate = `
-if [[ -n "$ZSH_VERSION" ]]; then
+  #compdef qp
   _qp_completion() {
     local curcontext="$curcontext" state line
     typeset -A opt_args
@@ -89,5 +88,6 @@ if [[ -n "$ZSH_VERSION" ]]; then
       ;;
     esac
   }
-  compdef _qp_completion qp
-fi`
+
+  _qp_completion "$@"
+`
