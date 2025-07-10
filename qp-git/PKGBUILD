@@ -49,4 +49,10 @@ package() {
 
   install -Dm644 "${srcdir}/packaging/hooks/pacman/update-qp-cache.hook" \
     "$pkgdir/usr/share/libalpm/hooks/update-qp-cache.hook"
+
+  "${pkgdir}/usr/bin/${_binaryname}" --completions bash >"$srcdir/qp.bash"
+  "${pkgdir}/usr/bin/${_binaryname}" --completions zsh >"$srcdir/qp.zsh"
+
+  install -Dm644 "$srcdir/qp.bash" "$pkgdir/usr/share/bash-completion/completions/qp"
+  install -Dm644 "$srcdir/qp.zsh" "$pkgdir/usr/share/zsh/site-functions/_qp"
 }
