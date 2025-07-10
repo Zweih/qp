@@ -1,9 +1,10 @@
 # qp Release Notes
-## v5.102.0
+## v5.102.1
 ### What's Changed
 * Feature: Auto-installed Zsh/Bash completions for Arch by @Zweih in https://github.com/Zweih/qp/pull/430
+* Fix: Zsh completions by @Zweih in https://github.com/Zweih/qp/pull/431
 
-**Full Changelog**: https://github.com/Zweih/qp/compare/v5.101.0...v5.102.0
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.101.0...v5.102.1
 
 
 ## v5.101.0
