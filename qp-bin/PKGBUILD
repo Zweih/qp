@@ -18,9 +18,9 @@ source_x86_64+=("${_release_url}-x86_64${_ext}")
 source_aarch64+=("${_release_url}-aarch64${_ext}")
 source_armv7h+=("${_release_url}-armv7h${_ext}")
 
-sha256sums_x86_64=("69e62abc8a5d7a5abc326c8df107fda7164f1c2aff97cdd5ef28a3b9aa13735f")
-sha256sums_aarch64=("130719f2d323a54f2fc693554131d847c4df0e7cbccb12e460cabe9bf114a8c9")
-sha256sums_armv7h=("2f2c39b6d536f66701db0e5ae1798a59aff7b4ca61da26eb40dc7437e58f1cd1")
+sha256sums_x86_64=("75cb791f17bdde6e516ea9e62ef3bf09ce8b1b12453ac35a1430c1d96dcc4925")
+sha256sums_aarch64=("bdf0eeb9118a229e07fe5734a28df662aa2ba77fd0594c0befa03abca6a1fcdd")
+sha256sums_armv7h=("11bde0fbfd9369cb45424ad1c7d79677042a2836faa7b14935355ec04699b1b5")
 
 package() {
   tar -xzf "$srcdir/qp-v${pkgver}-${CARCH}${_ext}" -C "$srcdir"
