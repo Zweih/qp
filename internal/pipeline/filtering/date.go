@@ -54,7 +54,7 @@ func parseDateMatch(dateInput string, defaultDate int64) (int64, error) {
 }
 
 func parseValidDate(dateInput string) (int64, error) {
-	parsedDate, err := time.Parse(consts.DateOnlyFormat, dateInput)
+	parsedDate, err := time.ParseInLocation(consts.DateOnlyFormat, dateInput, time.Local)
 	if err != nil {
 		return 0, err
 	}

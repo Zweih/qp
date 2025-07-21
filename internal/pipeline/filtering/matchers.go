@@ -11,12 +11,12 @@ type RangeMatcher map[bool]map[consts.MatchType]func(start int64, end int64) Ran
 
 var DateMatchers = RangeMatcher{
 	true: {
-		consts.MatchFuzzy: func(start, _ int64) RangeFilter {
+		consts.MatchFuzzy: func(start int64, _ int64) RangeFilter {
 			return func(value int64) bool {
 				return pkgdata.FuzzyDate(value, start)
 			}
 		},
-		consts.MatchStrict: func(start, _ int64) RangeFilter {
+		consts.MatchStrict: func(start int64, _ int64) RangeFilter {
 			return func(value int64) bool {
 				return pkgdata.StrictDate(value, start)
 			}
@@ -24,12 +24,12 @@ var DateMatchers = RangeMatcher{
 	},
 
 	false: {
-		consts.MatchFuzzy: func(start, end int64) RangeFilter {
+		consts.MatchFuzzy: func(start int64, end int64) RangeFilter {
 			return func(value int64) bool {
 				return pkgdata.FuzzyDateRange(value, start, end)
 			}
 		},
-		consts.MatchStrict: func(start, end int64) RangeFilter {
+		consts.MatchStrict: func(start int64, end int64) RangeFilter {
 			return func(value int64) bool {
 				return pkgdata.StrictDateRange(value, start, end)
 			}
