@@ -55,7 +55,7 @@ func (o *OutputManager) renderTable(
 ) {
 	dateFormat := consts.DateOnlyFormat
 	if showFullTimestamp {
-		dateFormat = consts.DateTimeFormat
+		dateFormat = consts.DateTime12HourSecondTzFormat
 	}
 
 	ctx := tableContext{DateFormat: dateFormat}

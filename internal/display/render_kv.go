@@ -14,7 +14,7 @@ type kvEntry struct {
 }
 
 func (o *OutputManager) renderKeyValue(pkgs []*pkgdata.PkgInfo, fields []consts.FieldType) {
-	dateFormat := consts.DateTimeFormat
+	dateFormat := consts.DateTime12HourSecondTzFormat
 	ctx := tableContext{DateFormat: dateFormat}
 
 	var buffer bytes.Buffer

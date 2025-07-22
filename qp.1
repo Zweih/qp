@@ -85,19 +85,32 @@ Use \fBwhere\fR (or \fBw\fR) one or more times to filter results.
 
 .TP
 .B String Match
-\fIfield=value\fR — fuzzy (substring, case-insensitive)  
+\fIfield=value\fR — fuzzy (substring, case-insensitive) 
 \fIfield==value\fR — strict (exact, case-insensitive)
 
 .TP
 .B Range Match
-\fIfield=start:end\fR — fuzzy  
-\fIfield==start:end\fR — strict  
+\fIfield=start:end\fR — fuzzy
+\fIfield==start:end\fR — strict
 Applies to \fBdates\fR and \fBsizes\fR.
-Supports full (e.g., 1GB:5GB), open-ended (e.g., 1GB:, :5GB), or exact values.
+.RS
+.IP \[bu]
+Full range: \fB2025-01-01:2025-12-31\fR
+.IP \[bu]
+Open-ended: \fB2025-01-01:\fR (from date onwards) or \fB:2025-12-31\fR (up to date)
+.IP \[bu]
+Exact values: \fB2025-07-20\fR (single date) or \fB1GB\fR (single size)
+.IP \[bu]
+Datetime formats: \fB2025-07-20 14:30\fR, \fB2025-07-20 2:30 PM\fR, \fB2025-07-20 2:30 PM EST\fR
+.IP \[bu]
+Datetime ranges: \fB2025-07-20 09:00:2025-07-20 17:00\fR
+.RE
+.IP
+Note: When using datetime formats with spaces, surround with quotes: \fB"2025-07-20 2:30 PM"\fR
 
 .TP
 .B Existence Check
-\fBhas:field\fR — must be non-empty  
+\fBhas:field\fR — must be non-empty
 \fBno:field\fR — must be empty or missing
 
 .TP

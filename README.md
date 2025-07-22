@@ -100,7 +100,7 @@ This package is compatible with the following platforms and distributions:
 
 Learn about usage [here](#Usage).
 
-learn about installation [here](#Installation).
+Learn about installation [here](#Installation).
 
 ## Is it good?
 
