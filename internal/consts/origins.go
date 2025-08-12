@@ -1,6 +1,7 @@
 package consts
 
 const (
+	OriginApk     = "apk"
 	OriginBrew    = "brew"
 	OriginDeb     = "deb"
 	OriginFlatpak = "flatpak"
@@ -13,6 +14,7 @@ const (
 )
 
 var ValidOrigins = []string{
+	OriginApk,
 	OriginBrew,
 	OriginDeb,
 	OriginFlatpak,
