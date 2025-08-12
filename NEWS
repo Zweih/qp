@@ -1,4 +1,11 @@
 # qp Release Notes
+## v5.104.1
+### What's Changed
+* Refactor: Remove unused alias by @Zweih in https://github.com/Zweih/qp/pull/436
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.104.0...v5.104.1
+
+
 ## v5.104.0
 ### What's Changed
 * Feature: Additional date options (AM/PM, Timezone, Seconds) by @Zweih in https://github.com/Zweih/qp/pull/434
@@ -710,10 +717,3 @@
 * Feature: Add "enhances" metadata to optdepends + optional-for fields by @Zweih in https://github.com/Zweih/qp/pull/291
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v5.29.0...v5.30.0
-
-
-## v5.29.0
-### What's Changed
-* Feature: Add depends sort by @Zweih in https://github.com/Zweih/qp/pull/289
-
-**Full Changelog**: https://github.com/Zweih/qp/compare/v5.28.0...v5.29.0
