@@ -9,17 +9,13 @@ import (
 	"strings"
 )
 
-type Filter func(*PkgInfo) bool
+type Filter func(*pkgdata.PkgInfo) bool
 
 type FilterCondition struct {
 	Filter    Filter
 	PhaseName string
 	FieldType consts.FieldType
 }
-
-type (
-	PkgInfo = pkgdata.PkgInfo
-)
 
 func QueriesToConditions(queries []query.FieldQuery) ([]*FilterCondition, error) {
 	conditions := make([]*FilterCondition, 0, len(queries))
