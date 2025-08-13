@@ -6,9 +6,7 @@ import (
 	"qp/internal/pkgdata"
 )
 
-type ApkDriver struct {
-	modulesDirs []string
-}
+type ApkDriver struct{}
 
 func (d *ApkDriver) Name() string {
 	return consts.OriginApk

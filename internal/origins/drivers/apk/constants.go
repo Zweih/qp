@@ -22,4 +22,6 @@ const (
 	fieldReplaces      = "r"
 	fieldRepoTag       = "s"
 	fieldBroken        = "f"
+	fieldDirectory     = "F"
+	fieldFile          = "R"
 )

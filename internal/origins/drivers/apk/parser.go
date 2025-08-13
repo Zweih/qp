@@ -2,6 +2,8 @@ package apk
 
 import (
 	"bytes"
+	"os"
+	"path/filepath"
 	"qp/internal/consts"
 	"qp/internal/pkgdata"
 	"qp/internal/worker"
@@ -13,7 +15,7 @@ import (
 func parseInstalledFile(data []byte, origin string) ([]*pkgdata.PkgInfo, error) {
 	blocks := bytes.Split(data, []byte("\n\n"))
 
-	inputChan := make(chan map[string]string, len(blocks))
+	inputChan := make(chan []byte, len(blocks))
 	errChan := make(chan error, worker.DefaultBufferSize)
 	var errGroup sync.WaitGroup
 
@@ -22,10 +24,7 @@ func parseInstalledFile(data []byte, origin string) ([]*pkgdata.PkgInfo, error) 
 			continue
 		}
 
-		fields := parseFields(block)
-		if len(fields) > 0 {
-			inputChan <- fields
-		}
+		inputChan <- block
 	}
 
 	close(inputChan)
@@ -34,8 +33,8 @@ func parseInstalledFile(data []byte, origin string) ([]*pkgdata.PkgInfo, error) 
 		inputChan,
 		errChan,
 		&errGroup,
-		func(fields map[string]string) (*pkgdata.PkgInfo, error) {
-			return parsePackageBlock(fields, origin)
+		func(block []byte) (*pkgdata.PkgInfo, error) {
+			return parsePackageBlock(block, origin)
 		},
 		0,
 		len(blocks),
@@ -49,8 +48,14 @@ func parseInstalledFile(data []byte, origin string) ([]*pkgdata.PkgInfo, error) 
 	return worker.CollectOutput(resultChan, errChan)
 }
 
-func parseFields(block []byte) map[string]string {
-	fields := make(map[string]string)
+func parsePackageBlock(block []byte, origin string) (*pkgdata.PkgInfo, error) {
+	pkg := &pkgdata.PkgInfo{
+		Origin: origin,
+		Reason: consts.ReasonExplicit, // TODO: default, check WORLD file for explicit
+	}
+
+	var currentDir string
+	var packageFiles []string
 
 	for line := range bytes.SplitSeq(block, []byte("\n")) {
 		if len(line) < 3 || line[1] != ':' {
@@ -59,20 +64,6 @@ func parseFields(block []byte) map[string]string {
 
 		key := string(line[0])
 		value := strings.TrimSpace(string(line[2:]))
-
-		fields[key] = value
-	}
-
-	return fields
-}
-
-func parsePackageBlock(fields map[string]string, origin string) (*pkgdata.PkgInfo, error) {
-	pkg := &pkgdata.PkgInfo{
-		Origin: origin,
-		Reason: consts.ReasonExplicit, // TODO: default, may need inference
-	}
-
-	for key, value := range fields {
 		switch key {
 		case fieldBuildTime:
 			if timestamp, err := strconv.ParseInt(value, 10, 64); err == nil {
@@ -109,10 +100,14 @@ func parsePackageBlock(fields map[string]string, origin string) (*pkgdata.PkgInf
 			if value != "" {
 				pkg.Groups = []string{value}
 			}
+		case fieldDirectory:
+			currentDir = value
+		case fieldFile:
+			packageFiles = append(packageFiles, filepath.Join("/", currentDir, value))
 		}
 	}
 
-	// TODO: set update timestamp to file modification time
+	pkg.UpdateTimestamp = findMostRecentModTime(packageFiles)
 
 	return pkg, nil
 }
@@ -140,4 +135,19 @@ func parseRelations(value string) []pkgdata.Relation {
 	}
 
 	return relations
+}
+
+func findMostRecentModTime(files []string) int64 {
+	var mostRecent int64 = 0
+
+	for _, file := range files {
+		if info, err := os.Stat(file); err == nil {
+			modTime := info.ModTime().Unix()
+			if modTime > mostRecent {
+				mostRecent = modTime
+			}
+		}
+	}
+
+	return mostRecent
 }
