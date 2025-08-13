@@ -100,7 +100,6 @@ func parsePackageBlock(
 		case fieldDepends:
 			pkg.Depends = parseRelations(value)
 		case fieldProvides:
-			// TODO: provides needs specific parsing
 			pkg.Provides = parseRelations(value)
 		case fieldReplaces:
 			pkg.Replaces = parseRelations(value)
@@ -134,6 +133,7 @@ func parseRelations(value string) []pkgdata.Relation {
 	for _, part := range parts {
 		rel := pkgdata.Relation{Depth: 1}
 
+		// TODO: perhaps we should remove the "else" clause, too much nesting
 		if idx := strings.Index(part, "="); idx != -1 {
 			rel.Name = part[:idx]
 			rel.Version = part[idx+1:]
@@ -142,10 +142,19 @@ func parseRelations(value string) []pkgdata.Relation {
 			rel.Name = part
 		}
 
+		rel.Name = stripApkPrefix(rel.Name)
 		relations = append(relations, rel)
 	}
 
 	return relations
+}
+
+func stripApkPrefix(name string) string {
+	if i := strings.Index(name, ":"); i != -1 {
+		return name[i+1:]
+	}
+
+	return name
 }
 
 func findMostRecentModTime(files []string) int64 {
