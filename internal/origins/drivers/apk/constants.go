@@ -1,7 +1,8 @@
 package apk
 
 const (
-	apkDbPath = "/lib/apk/db/installed"
+	apkDbPath    = "/lib/apk/db/installed"
+	apkWorldPath = "/etc/apk/world"
 
 	fieldChecksum      = "C"
 	fieldPackage       = "P"

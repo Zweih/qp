@@ -12,7 +12,11 @@ import (
 	"sync"
 )
 
-func parseInstalledFile(data []byte, origin string) ([]*pkgdata.PkgInfo, error) {
+func parseInstalledFile(
+	data []byte,
+	origin string,
+	reasonMap map[string]bool,
+) ([]*pkgdata.PkgInfo, error) {
 	blocks := bytes.Split(data, []byte("\n\n"))
 
 	inputChan := make(chan []byte, len(blocks))
@@ -34,7 +38,7 @@ func parseInstalledFile(data []byte, origin string) ([]*pkgdata.PkgInfo, error) 
 		errChan,
 		&errGroup,
 		func(block []byte) (*pkgdata.PkgInfo, error) {
-			return parsePackageBlock(block, origin)
+			return parsePackageBlock(block, origin, reasonMap)
 		},
 		0,
 		len(blocks),
@@ -48,10 +52,14 @@ func parseInstalledFile(data []byte, origin string) ([]*pkgdata.PkgInfo, error) 
 	return worker.CollectOutput(resultChan, errChan)
 }
 
-func parsePackageBlock(block []byte, origin string) (*pkgdata.PkgInfo, error) {
+func parsePackageBlock(
+	block []byte,
+	origin string,
+	reasonMap map[string]bool,
+) (*pkgdata.PkgInfo, error) {
 	pkg := &pkgdata.PkgInfo{
 		Origin: origin,
-		Reason: consts.ReasonExplicit, // TODO: default, check WORLD file for explicit
+		Reason: consts.ReasonDependency, // default
 	}
 
 	var currentDir string
@@ -108,6 +116,9 @@ func parsePackageBlock(block []byte, origin string) (*pkgdata.PkgInfo, error) {
 	}
 
 	pkg.UpdateTimestamp = findMostRecentModTime(packageFiles)
+	if _, exists := reasonMap[pkg.Name]; exists {
+		pkg.Reason = consts.ReasonExplicit
+	}
 
 	return pkg, nil
 }

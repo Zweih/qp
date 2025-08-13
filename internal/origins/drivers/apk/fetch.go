@@ -19,5 +19,12 @@ func fetchPackages(origin string) ([]*pkgdata.PkgInfo, error) {
 		return []*pkgdata.PkgInfo{}, fmt.Errorf("failed to read apk database: %w", err)
 	}
 
-	return parseInstalledFile(data, origin)
+	reasonMap, err := loadInstallReasons()
+	if err != nil {
+		return []*pkgdata.PkgInfo{}, err
+	}
+
+	fmt.Println(reasonMap)
+
+	return parseInstalledFile(data, origin, reasonMap)
 }
