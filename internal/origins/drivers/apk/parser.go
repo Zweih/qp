@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"qp/internal/consts"
+	"qp/internal/origins/shared"
 	"qp/internal/pkgdata"
 	"qp/internal/worker"
 	"strconv"
@@ -115,6 +116,8 @@ func parsePackageBlock(
 	}
 
 	pkg.UpdateTimestamp = findMostRecentModTime(packageFiles)
+	pkg.InstallTimestamp = findOldestCreationTime(packageFiles)
+
 	if _, exists := reasonMap[pkg.Name]; exists {
 		pkg.Reason = consts.ReasonExplicit
 	}
@@ -170,4 +173,22 @@ func findMostRecentModTime(files []string) int64 {
 	}
 
 	return mostRecent
+}
+
+func findOldestCreationTime(files []string) int64 {
+	if shared.InDocker() {
+		return 0
+	}
+
+	var oldest int64 = 0
+
+	for _, file := range files {
+		if creationTime, reliable, err := shared.GetCreationTime(file); err == nil && reliable {
+			if oldest == 0 || creationTime < oldest {
+				oldest = creationTime
+			}
+		}
+	}
+
+	return oldest
 }
