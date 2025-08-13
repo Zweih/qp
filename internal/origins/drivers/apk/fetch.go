@@ -24,7 +24,5 @@ func fetchPackages(origin string) ([]*pkgdata.PkgInfo, error) {
 		return []*pkgdata.PkgInfo{}, err
 	}
 
-	fmt.Println(reasonMap)
-
 	return parseInstalledFile(data, origin, reasonMap)
 }
