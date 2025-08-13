@@ -2,6 +2,7 @@ package origins
 
 import (
 	"qp/api/driver"
+	"qp/internal/origins/drivers/apk"
 	"qp/internal/origins/drivers/brew"
 	"qp/internal/origins/drivers/deb"
 	"qp/internal/origins/drivers/flatpak"
@@ -14,6 +15,7 @@ import (
 )
 
 var registeredDrivers = []driver.Driver{
+	&apk.ApkDriver{},
 	&brew.BrewDriver{},
 	&deb.DebDriver{},
 	&flatpak.FlatpakDriver{},
