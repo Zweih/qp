@@ -6,6 +6,11 @@ import (
 	"sync"
 )
 
+const (
+	dockerEnvPath = "/.dockerenv"
+	cGroupPath    = "/proc/1/cgroup"
+)
+
 var (
 	inDocker bool
 	once     sync.Once
@@ -21,11 +26,11 @@ func InDocker() bool {
 }
 
 func detectDocker() bool {
-	if _, err := os.Stat("/.dockerenv"); err == nil {
+	if _, err := os.Stat(dockerEnvPath); err == nil {
 		return true
 	}
 
-	if data, err := os.ReadFile("/proc/1/cgroup"); err == nil {
+	if data, err := os.ReadFile(cGroupPath); err == nil {
 		content := string(data)
 		if strings.Contains(content, "docker") || strings.Contains(content, "/docker/") {
 			return true
