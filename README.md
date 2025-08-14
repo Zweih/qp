@@ -56,7 +56,7 @@ This package is compatible with the following platforms and distributions:
  - [elementary OS](https://elementary.io/)
  - The 50 other Arch, Debian, and Fedora-based distros, as long as they have `apk`, `apt`/`dpkg`, `brew`, `pacman`, `flatpak`, `dnf`/`yum`, or `opkg` installed.
 
-**qp** also detects and queries other system level package managers like `flatpak`, `npm`, and `pipx` for globally installed applications, expanding package discovery beyond traditional system package management.
+**qp** also detects and queries other system level package managers like `flatpak`, `snap`, `npm`, and `pipx` for globally installed applications, expanding package discovery beyond traditional system package management.
 
 **qp** supports embedded linux systems, including meta-distributions like [yocto](https://www.yoctoproject.org/) that use `opkg` (`.ipk` packages) or `apt`/`dpkg` (`.deb` packages) or `.rpm` packages.
 
