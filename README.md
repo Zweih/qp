@@ -4,7 +4,7 @@
 
 **qp** queries over 6x faster than native package searching while returning more comprehensive metadata than native package search solutions.
 
-Query packages from `brew`, `pacman`, `apt`, `flatpak`, `snap`, `npm`, `pipx`, `dnf`, and `opkg`. Ecosystems are added frequently!
+Query packages from `apk`, `brew`, `pacman`, `apt`, `flatpak`, `snap`, `npm`, `pipx`, `dnf`, and `opkg`. Ecosystems are added frequently!
 
 **qp** supports querying with full boolean logic for package metadata, dependency relations, and more.
 
@@ -37,6 +37,7 @@ Graphs are generated daily with my other project, [Repulse Analytics](https://gi
 This package is compatible with the following platforms and distributions:
  - [Arch Linux](https://archlinux.org)
  - [macOS](https://www.apple.com/macos/)
+ - [Alpine LInux](https://alpinelinux.org/)
  - [Debian](https://debian.org)
  - [SteamOS](https://store.steampowered.com/steamos)
  - [Red Hat Enterprise Linux (RHEL)](https://www.redhat.com/en/technologies/linux-platforms/enterprise-linux)
@@ -47,14 +48,15 @@ This package is compatible with the following platforms and distributions:
  - [Pop!_OS](https://system76.com/pop/)
  - [CachyOS](https://cachyos.org/)
  - [OpenWrt](https://openwrt.org/)
+ - [postmarketOS](https://postmarketos.org/)
  - [Garuda Linux](https://garudalinux.org/)
  - [EndeavourOS](https://endeavouros.com/)
  - [Mabox Linux](https://maboxlinux.org/)
  - [Zorin OS](https://zorin.com/os/)
- - [Elementary OS](https://elementary.io/)
- - The 50 other Arch, Debian, and Fedora-based distros, as long as they have `apt`/`dpkg`, `brew`, `pacman`, `flatpak`, `dnf`/`yum`, or `opkg` installed.
+ - [elementary OS](https://elementary.io/)
+ - The 50 other Arch, Debian, and Fedora-based distros, as long as they have `apk`, `apt`/`dpkg`, `brew`, `pacman`, `flatpak`, `dnf`/`yum`, or `opkg` installed.
 
-**qp** also detects and queries other system level package managers like `flatpak`, `npm`, and `pipx` for globally installed applications, expanding package discovery beyond traditional system package management.
+**qp** also detects and queries other system level package managers like `flatpak`, `snap`, `npm`, and `pipx` for globally installed applications, expanding package discovery beyond traditional system package management.
 
 **qp** supports embedded linux systems, including meta-distributions like [yocto](https://www.yoctoproject.org/) that use `opkg` (`.ipk` packages) or `apt`/`dpkg` (`.deb` packages) or `.rpm` packages.
 
@@ -64,7 +66,7 @@ This package is compatible with the following platforms and distributions:
 * Compatible with MacOS, Arch, Debian, OpenWrt, and over 60 distros
   * Supports multiple ecosystems:
     * System package managers:
-      * `pacman`, `brew`, `apt`/`dpkg`, `dnf`/`yum`, and `opkg`
+      * `apk`, `pacman`, `brew`, `apt`/`dpkg`, `dnf`/`yum`, and `opkg`
     * Application package managers:
       * `flatpak`, `snap`, `npm`, and `pipx`
 * Query packages using an expressive query language
@@ -156,7 +158,7 @@ Learn about installation [here](#Installation).
 | ✓ | pkgtype query | ✓ | optdepends query |
 | ✓ | origin sort | ✓ | origin query |
 | ✓ | packager query | ✓ | origin field |
-| ✓ | replaces sort | ✓ | optional-for query 
+| ✓ | replaces sort | ✓ | optional-for query |
 
 </details>
 
@@ -171,7 +173,7 @@ Learn about installation [here](#Installation).
 | ✓ | abstract syntax tree | ✓ | directed acyclical graph for filtering |
 | - | user-defined macros | ✓ | parentetical (grouping) logic |
 | ✓ | limit from end | ✓ | limit from middle |
-| ✓ | built-in macros | – | streaming pipeline |
+| ✓ | built-in macros | ✓ | streaming pipeline |
 | - | query explaination | - | user configuration file |
 | ✓ | deb origin (apt/dpkg support) | ✓ | deb packaging |
 | ✓ | opkg origin (openwrt support) | ✓ | brew origin (homebrew support)|
@@ -193,6 +195,8 @@ Learn about installation [here](#Installation).
 | - | keywords/tags field | - | notes/comment field |
 | - | author field | - | cargo origin |
 | - | log levels | ✓ | chunked cache (70% speed boost) |
+| ✓ | apk origin (alpine linux support) | ✓ | optimize creation-time validation |
+| - | package for apk (alpine) | - | log file |  
 
 ## Installation
 
@@ -340,6 +344,8 @@ The `pkgtype` field indicates the type or category of package within each ecosys
 | pacman | `pkg`, `split`, `debug`, `src` | Package build type |
 | brew | `formula`, `cask` | Formulae are command-line tools, casks are GUI applications |
 | flatpak | `app`, `runtime` | Runtimes are the main dependencies of apps |
+| apk | none | - |
+| snap | none | - |
 | deb | none | - |
 | rpm | none | - |
 | opkg | none | - |
@@ -350,7 +356,7 @@ The `pkgtype` field indicates the type or category of package within each ecosys
 - Pacman's pkgtype comes from the package's XDATA field introduced in newer pacman versions
     - Older packages may not have this field populated
 - Flatpak runtimes are always listed as dependencies
-- Deb, rpm, opkg, and pipx origins do not implement package type classifications and will show empty pkgtype values
+- Origins with "none" do not implement package type classifications and will show empty pkgtype values
 
 ### Querying with `where`
 

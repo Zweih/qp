@@ -47,6 +47,7 @@ func fsSupportsBtime(path string) bool {
 	}
 }
 
+// TODO: this should be pulled out into a separate function that can be called when validating the creation time
 func getBirthTime(path string) (int64, bool, error) {
 	if !fsSupportsBtime(path) {
 		return 0, false, fmt.Errorf("filesystem doesn't support birth time")
