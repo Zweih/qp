@@ -176,14 +176,14 @@ func findMostRecentModTime(files []string) int64 {
 }
 
 func findOldestCreationTime(files []string) int64 {
-	if shared.InDocker() {
+	if shared.IsCreationTimeReliable() {
 		return 0
 	}
 
 	var oldest int64 = 0
 
 	for _, file := range files {
-		if creationTime, reliable, err := shared.GetCreationTime(file); err == nil && reliable {
+		if creationTime, _, err := shared.GetCreationTime(file); err == nil {
 			if oldest == 0 || creationTime < oldest {
 				oldest = creationTime
 			}
