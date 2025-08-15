@@ -1,4 +1,11 @@
 # qp Release Notes
+## v5.106.0
+### What's Changed
+* Feature: Optimize creation-time validation by @Zweih in https://github.com/Zweih/qp/pull/437
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.105.0...v5.106.0
+
+
 ## v5.105.0
 ### What's Changed
 * Feature: Add APK origin (Alpine support) by @Zweih in https://github.com/Zweih/qp/pull/435
@@ -710,10 +717,3 @@
 * Feature: Streamed worker pool for origins by @Zweih in https://github.com/Zweih/qp/pull/293
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v5.31.0...v5.32.0
-
-
-## v5.31.0
-### What's Changed
-* Refactor: Extract worker pool for all origins by @Zweih in https://github.com/Zweih/qp/pull/292
-
-**Full Changelog**: https://github.com/Zweih/qp/compare/v5.30.0...v5.31.0
