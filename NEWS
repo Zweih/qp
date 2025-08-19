@@ -1,4 +1,11 @@
 # qp Release Notes
+## v5.108.0
+### What's Changed
+* Feature: Add pkgtool origin (Slackware support) by @Zweih in https://github.com/Zweih/qp/pull/439
+
+**Full Changelog**: https://github.com/Zweih/qp/compare/v5.107.0...v5.108.0
+
+
 ## v5.107.0
 ### What's Changed
 * Feature: Add multi-line input by @Zweih in https://github.com/Zweih/qp/pull/438
@@ -710,10 +717,3 @@
 * Feature: Add optdepends sort by @Zweih in https://github.com/Zweih/qp/pull/298
 
 **Full Changelog**: https://github.com/Zweih/qp/compare/v5.33.0...v5.34.0
-
-
-## v5.33.0
-### What's Changed
-* Feature: Add required-by sort by @Zweih in https://github.com/Zweih/qp/pull/295
-
-**Full Changelog**: https://github.com/Zweih/qp/compare/v5.32.0...v5.33.0
