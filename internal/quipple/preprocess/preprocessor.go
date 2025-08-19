@@ -7,12 +7,13 @@ import (
 )
 
 func Preprocess(args []string) ([]string, error) {
-	args = ExpandShortSyntax(args)
+	tokens := normalizeWhitespace(args)
+	tokens = ExpandShortSyntax(tokens)
 
 	var processed []string
 	currentBlock := quipple.BlockNone
 
-	for _, token := range args {
+	for _, token := range tokens {
 		if block := quipple.CmdTypeLookup[strings.ToLower(token)]; block != quipple.BlockNone {
 			currentBlock = block
 			processed = append(processed, token)
@@ -45,6 +46,23 @@ func Preprocess(args []string) ([]string, error) {
 	}
 
 	return processed, nil
+}
+
+func normalizeWhitespace(args []string) []string {
+	var tokens []string
+	for _, arg := range args {
+		rawTokens := strings.FieldsFunc(arg, func(r rune) bool {
+			return r == ' ' || r == '\n'
+		})
+
+		for _, token := range rawTokens {
+			if len(token) > 0 {
+				tokens = append(tokens, token)
+			}
+		}
+	}
+
+	return tokens
 }
 
 func getSubtokens(block quipple.CmdType, token string) []string {
