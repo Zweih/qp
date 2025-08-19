@@ -52,7 +52,7 @@ func normalizeWhitespace(args []string) []string {
 	var tokens []string
 	for _, arg := range args {
 		rawTokens := strings.FieldsFunc(arg, func(r rune) bool {
-			return r == ' ' || r == '\n'
+			return r == ' ' || r == '\n' || r == '\t'
 		})
 
 		for _, token := range rawTokens {
