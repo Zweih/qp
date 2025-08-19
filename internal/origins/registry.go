@@ -10,6 +10,7 @@ import (
 	"qp/internal/origins/drivers/opkg"
 	"qp/internal/origins/drivers/pacman"
 	"qp/internal/origins/drivers/pipx"
+	"qp/internal/origins/drivers/pkgtool"
 	"qp/internal/origins/drivers/rpm"
 	"qp/internal/origins/drivers/snap"
 )
@@ -22,6 +23,7 @@ var registeredDrivers = []driver.Driver{
 	&opkg.OpkgDriver{},
 	&npm.NpmDriver{},
 	&pacman.PacmanDriver{},
+	&pkgtool.PkgtoolDriver{},
 	&pipx.PipxDriver{},
 	&rpm.RpmDriver{},
 	&snap.SnapDriver{},

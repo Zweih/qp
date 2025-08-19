@@ -8,6 +8,7 @@ const (
 	OriginNpm     = "npm"
 	OriginOpkg    = "opkg"
 	OriginPacman  = "pacman"
+	OriginPkgtool = "pkgtool"
 	OriginPipx    = "pipx"
 	OriginRpm     = "rpm"
 	OriginSnap    = "snap"
@@ -21,6 +22,7 @@ var ValidOrigins = []string{
 	OriginNpm,
 	OriginOpkg,
 	OriginPacman,
+	OriginPkgtool,
 	OriginPipx,
 	OriginRpm,
 	OriginSnap,
