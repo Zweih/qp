@@ -4,7 +4,7 @@
 
 **qp** queries over 6x faster than native package searching while returning more comprehensive metadata than native package search solutions.
 
-Query packages from `apk`, `brew`, `pacman`, `apt`, `flatpak`, `snap`, `npm`, `pipx`, `dnf`, and `opkg`. Ecosystems are added frequently!
+Query packages from `apk`, `brew`, `pacman`, `apt`, `flatpak`, `snap`, `npm`, `pipx`, `dnf`, `pkgtool`, and `opkg`. Ecosystems are added frequently!
 
 **qp** supports querying with full boolean logic for package metadata, dependency relations, and more.
 
@@ -54,7 +54,8 @@ This package is compatible with the following platforms and distributions:
  - [Mabox Linux](https://maboxlinux.org/)
  - [Zorin OS](https://zorin.com/os/)
  - [elementary OS](https://elementary.io/)
- - The 50 other Arch, Debian, and Fedora-based distros, as long as they have `apk`, `apt`/`dpkg`, `brew`, `pacman`, `flatpak`, `dnf`/`yum`, or `opkg` installed.
+ - [Slackware](http://www.slackware.com/)
+ - The 50 other Arch, Debian, and Fedora-based distros, as long as they have `apk`, `apt`/`dpkg`, `brew`, `pacman`, `flatpak`, `dnf`/`yum`, `pkgtool`, or `opkg` installed.
 
 **qp** also detects and queries other system level package managers like `flatpak`, `snap`, `npm`, and `pipx` for globally installed applications, expanding package discovery beyond traditional system package management.
 
@@ -66,7 +67,7 @@ This package is compatible with the following platforms and distributions:
 * Compatible with MacOS, Arch, Debian, OpenWrt, and over 60 distros
   * Supports multiple ecosystems:
     * System package managers:
-      * `apk`, `pacman`, `brew`, `apt`/`dpkg`, `dnf`/`yum`, and `opkg`
+      * `apk`, `pacman`, `brew`, `apt`/`dpkg`, `dnf`/`yum`, `pkgtool`, and `opkg`
     * Application package managers:
       * `flatpak`, `snap`, `npm`, and `pipx`
 * Query packages using an expressive query language
@@ -197,6 +198,7 @@ Learn about installation [here](#Installation).
 | - | log levels | ✓ | chunked cache (70% speed boost) |
 | ✓ | apk origin (alpine linux support) | ✓ | optimize creation-time validation |
 | - | package for apk (alpine) | - | log file |  
+| ✓ | pkgtool origin (slackware support) | ✓ | multi-line queries |
 
 ## Installation
 
@@ -349,6 +351,7 @@ The `pkgtype` field indicates the type or category of package within each ecosys
 | deb | none | - |
 | rpm | none | - |
 | opkg | none | - |
+| pkgtool | none | - |
 | pipx | none | - |
 | npm | none | - |
 
