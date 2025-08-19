@@ -19,13 +19,9 @@ func fetchPackages(origin string) ([]*pkgdata.PkgInfo, error) {
 	errChan := make(chan error, worker.DefaultBufferSize)
 	var errGroup sync.WaitGroup
 
-	var pkgs []*pkgdata.PkgInfo
-
 	for _, entry := range entries {
 		if !entry.IsDir() {
 			inputChan <- filepath.Join(packagesDbPath, entry.Name())
-			pkg, _ := parsePackageFile(filepath.Join(packagesDbPath, entry.Name()), origin)
-			pkgs = append(pkgs, pkg)
 		}
 	}
 
